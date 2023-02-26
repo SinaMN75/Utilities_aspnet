@@ -13,25 +13,20 @@ public class CategoryRepository : ICategoryRepository {
 	public CategoryRepository(DbContext context) => _dbContext = context;
 
 	public async Task<GenericResponse<CategoryEntity>> Create(CategoryEntity entity) {
-		if (entity.IsUnique)
-		{
-			var exists = await _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Title == entity.Title);
-			if (exists == null)
-            {
+		if (entity.IsUnique) {
+			var exists = await _dbContext.Set<CategoryEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Title == entity.Title && x.DeletedAt != null);
+			if (exists == null) {
 				EntityEntry<CategoryEntity> i = await _dbContext.AddAsync(entity);
 				await _dbContext.SaveChangesAsync();
 				return new GenericResponse<CategoryEntity>(i.Entity);
 			}
 			return new GenericResponse<CategoryEntity>(exists);
 		}
-		else
-        {
+		{
 			EntityEntry<CategoryEntity> i = await _dbContext.AddAsync(entity);
 			await _dbContext.SaveChangesAsync();
 			return new GenericResponse<CategoryEntity>(i.Entity);
 		}
-
-		
 	}
 
 	public GenericResponse<IQueryable<CategoryEntity>> Read() {
