@@ -43,7 +43,6 @@ public class GlobalSearchRepository : IGlobalSearchRepository {
 				.Include(i => i.Categories)
 				.Include(i => i.User).ThenInclude(x => x.Media)
 				.Include(i => i.User).ThenInclude(x => x.Categories)
-				.Include(i => i.Bookmarks)
 				.Where(x => x.DeletedAt == null);
 		else
 			productList =
@@ -68,24 +67,11 @@ public class GlobalSearchRepository : IGlobalSearchRepository {
 			categoryList = categoryList.Where(x => filter.Categories.Contains(x.Id) && x.DeletedAt == null);
 			userList = userList.Where(x => x.Categories.Any(x => filter.Categories.Contains(x.Id)) && x.DeletedAt == null);
 		}
-
-		if (filter.IsFollowing) {
-			List<string?> userFollowing = await _dbContext.Set<FollowEntity>().Where(x => x.FollowerUserId == userId).Select(x => x.FollowsUserId).ToListAsync();
-
-			productList = productList.Where(x => userFollowing.Contains(x.UserId));
-		}
+		
 		if (filter.Oldest) {
 			categoryList = categoryList.OrderBy(x => x.CreatedAt).ToList();
 			userList = userList.OrderBy(x => x.CreatedAt);
 			productList = productList.OrderBy(x => x.CreatedAt);
-		}
-		if (filter.Reputation) {
-			productList = productList.OrderByDescending(x => x.VisitsCount);
-		}
-
-		if (filter.IsMine) {
-			productList = productList.Where(x => x.UserId == userId);
-			userList = userList.Where(x => x.Id == userId);
 		}
 
 		model.Categories = categoryList;
