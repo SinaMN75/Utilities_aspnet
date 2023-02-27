@@ -116,10 +116,10 @@ public class UploadRepository : IUploadRepository
         if (media is null)
             throw new Exception("media is not found");
 
-        media.Title = model.Title;
-        media.Size = model.Size;
+        media.Title = model.Title ?? media.Title;
+        media.Size = model.Size ?? media.Size;
         media.UpdatedAt = DateTime.Now;
-        media.UseCase = model.UseCase;
+        media.UseCase = model.UseCase ?? media.UseCase;
 
         _dbContext.Set<MediaEntity>().Update(media);
         await _dbContext.SaveChangesAsync();

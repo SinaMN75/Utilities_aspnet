@@ -21,5 +21,5 @@ public class MediaController : BaseApiController
     [HttpPut("{id:guid}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ClaimRequirement]
-    public async Task<ActionResult<GenericResponse<MediaEntity>>> UpdateMedia(Guid id, UpdateMediaDto updateMediaDto) => Result(await _repository.UpdateMedia(id, updateMediaDto));
+    public async Task<ActionResult<GenericResponse<MediaEntity>>> Update(Guid id, UpdateMediaDto updateMediaDto) => Result(await _repository.UpdateMedia(id, updateMediaDto));
 }
