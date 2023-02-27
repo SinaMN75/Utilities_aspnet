@@ -98,3 +98,10 @@ public class UploadDto {
 	public IEnumerable<string>? Links { get; set; }
 	public IEnumerable<IFormFile>? Files { get; set; }
 }
+
+public class UpdateMediaDto
+{
+    public string? UseCase { get; set; }
+    public string? Title { get; set; }
+    public string? Size { get; set; }
+}
