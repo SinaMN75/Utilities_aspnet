@@ -218,7 +218,7 @@ public class ProductRepository : IProductRepository
     {
         ProductEntity? i = await _dbContext.Set<ProductEntity>()
             .Include(i => i.Media)
-            .Include(i => i.Categories).ThenInclude(x => x.Media)
+            .Include(i => i.Categories)!.ThenInclude(x => x.Media)
             .Include(i => i.Reports)
             .Include(i => i.Bookmarks)
             .Include(i => i.Votes)
@@ -229,6 +229,7 @@ public class ProductRepository : IProductRepository
             .Include(i => i.Teams)!.ThenInclude(x => x.User).ThenInclude(x => x.Media)
             .Include(i => i.VoteFields)!.ThenInclude(x => x.Votes)
             .Include(i => i.VisitProducts)!.ThenInclude(i => i.User)
+            .Include(i => i.ProductInsights)
             .FirstOrDefaultAsync(i => i.Id == id && i.DeletedAt == null, ct);
         if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound, "Not Found");
 
@@ -260,8 +261,15 @@ public class ProductRepository : IProductRepository
 
         if (i.ProductInsights?.Any() != null)
         {
-            i.ProductInsights.GroupBy(g => g.Reaction).ToList().ForEach(item =>
-                item.Select(s => s.Count == item.Count()));
+            var psGrouping = i.ProductInsights.GroupBy(g => g.Reaction).ToList();
+            i.ProductInsights = null;
+            List<ProductInsight> productInsights = new List<ProductInsight>();
+            foreach (var item in psGrouping)
+            {
+                item.FirstOrDefault().Count = item.Count();
+                productInsights.Add(item.FirstOrDefault());
+            }
+            i.ProductInsights = productInsights;
         }
 
         i.Comments = _dbContext.Set<CommentEntity>().Where(w => w.ProductId == i.Id && w.DeletedAt == null);
