@@ -3,10 +3,10 @@
 public interface IFollowBookmarkRepository {
 	GenericResponse<IQueryable<UserEntity>> GetFollowers(string id);
 	GenericResponse<IQueryable<UserEntity>> GetFollowing(string id);
-	Task<GenericResponse> ToggleFollow(string sourceUserId, FollowCreateDto dto);
+	Task<GenericResponse<FollowEntity?>> ToggleFollow(string sourceUserId, FollowCreateDto dto);
 	Task<GenericResponse> RemoveFollowings(string targetUserId, FollowCreateDto dto);
 	GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarks();
-	Task<GenericResponse> ToggleBookmark(BookmarkCreateDto dto);
+	Task<GenericResponse<BookmarkEntity?>> ToggleBookmark(BookmarkCreateDto dto);
 	GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarksByFolderName(string folderName);
 }
 
@@ -14,14 +14,14 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 	private readonly DbContext _dbContext;
 	private readonly IHttpContextAccessor _httpContextAccessor;
 	private readonly INotificationRepository _notificationRepository;
-	
+
 	public FollowBookmarkRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, INotificationRepository notificationRepository) {
 		_dbContext = dbContext;
 		_httpContextAccessor = httpContextAccessor;
 		_notificationRepository = notificationRepository;
 	}
 
-	public async Task<GenericResponse> ToggleBookmark(BookmarkCreateDto dto) {
+	public async Task<GenericResponse<BookmarkEntity?>> ToggleBookmark(BookmarkCreateDto dto) {
 		BookmarkEntity? oldBookmark = _dbContext.Set<BookmarkEntity>()
 			.FirstOrDefault(x => (x.ProductId != null && x.ProductId == dto.ProductId ||
 			                      x.CategoryId != null && x.CategoryId == dto.CategoryId) &&
@@ -34,13 +34,11 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 
 			await _dbContext.Set<BookmarkEntity>().AddAsync(bookmark);
 			await _dbContext.SaveChangesAsync();
+			return new GenericResponse<BookmarkEntity?>(bookmark, UtilitiesStatusCodes.Success, "Mission Accomplished");
 		}
-		else {
-			_dbContext.Set<BookmarkEntity>().Remove(oldBookmark);
-			await _dbContext.SaveChangesAsync();
-		}
-
-		return new GenericResponse(UtilitiesStatusCodes.Success, "Mission Accomplished");
+		_dbContext.Set<BookmarkEntity>().Remove(oldBookmark);
+		await _dbContext.SaveChangesAsync();
+		return new GenericResponse<BookmarkEntity?>(oldBookmark, UtilitiesStatusCodes.Success, "Mission Accomplished");
 	}
 
 	public GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarks() {
@@ -79,7 +77,7 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 		return new GenericResponse<IQueryable<UserEntity>>(followings);
 	}
 
-	public async Task<GenericResponse> ToggleFollow(string sourceUserId, FollowCreateDto parameters) {
+	public async Task<GenericResponse<FollowEntity?>> ToggleFollow(string sourceUserId, FollowCreateDto parameters) {
 		UserEntity? myUser = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == sourceUserId);
 
 		FollowEntity? follow = await _dbContext.Set<FollowEntity>()
@@ -117,7 +115,7 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 			catch { }
 		}
 
-		return new GenericResponse(UtilitiesStatusCodes.Success, "Mission Accomplished");
+		return new GenericResponse<FollowEntity>(follow, UtilitiesStatusCodes.Success, "Mission Accomplished");
 	}
 
 	public async Task<GenericResponse> RemoveFollowings(string userId, FollowCreateDto parameters) {
@@ -131,8 +129,7 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 		return new GenericResponse(UtilitiesStatusCodes.Success, "Mission Accomplished");
 	}
 
-	public GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarksByFolderName(string folderName)
-	{
+	public GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarksByFolderName(string folderName) {
 		IQueryable<BookmarkEntity> bookmark = _dbContext.Set<BookmarkEntity>()
 			.Where(x => x.UserId == _httpContextAccessor.HttpContext!.User.Identity!.Name! && x.FolderName == folderName)
 			.Include(x => x.Product).ThenInclude(x => x.Media)
@@ -146,5 +143,4 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 			.Include(x => x.Product).ThenInclude(i => i.Teams)!.ThenInclude(x => x.User)!.ThenInclude(x => x.Media);
 		return new GenericResponse<IQueryable<BookmarkEntity>?>(bookmark);
 	}
-
 }
