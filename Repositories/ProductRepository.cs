@@ -49,15 +49,12 @@ public class ProductRepository : IProductRepository
     {
         ProductEntity entity = new();
         List<MediaEntity> medias = new();
-        if (dto.Upload is not null || dto.Upload?.Count() > 0)
+        if (dto.Upload is not null)
         {
-            foreach(var item in dto.Upload)
+            var mediaList = await _uploadRepository.Upload(dto.Upload);
+            if (mediaList.Result is not null)
             {
-                var mediaList = await _uploadRepository.Upload(item);
-                if (mediaList.Result is not null)
-                {
-                    medias.AddRange(mediaList.Result);
-                }
+                medias.AddRange(mediaList.Result);
             }
         }
 
