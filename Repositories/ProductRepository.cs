@@ -48,13 +48,10 @@ public class ProductRepository : IProductRepository
     public async Task<GenericResponse<ProductEntity>> CreateWithFiles(ProductCreateUpdateDto dto, CancellationToken ct)
     {
         ProductEntity entity = new();
-        List<MediaEntity> medias = new();
         if (dto.Upload is not null)
         {
-            var mediaList = await _uploadRepository.Upload(dto.Upload);
-            if (mediaList.Result is not null)
-            {
-                medias.AddRange(mediaList.Result);
+            foreach (UploadDto uploadDto in dto.Upload) { 
+                await _uploadRepository.Upload(uploadDto);
             }
         }
 
@@ -62,7 +59,6 @@ public class ProductRepository : IProductRepository
             dto.ProductInsight.UserId = _httpContextAccessor.HttpContext!.User.Identity!.Name;
 
         ProductEntity e = await entity.FillData(dto, _dbContext);
-        e.Media = medias;
         e.VisitsCount = 1;
         e.UserId = _httpContextAccessor.HttpContext!.User.Identity!.Name;
         e.CreatedAt = DateTime.Now;

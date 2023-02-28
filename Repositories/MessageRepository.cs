@@ -10,7 +10,7 @@ namespace Utilities_aspnet.Repositories
     {
         Task AddEmojiToMessage(Reaction emoji, Guid messageId, Guid userId);
         Task<GenericResponse> AddPrivateMessage(ChatMessageInputDto message);
-        Task<GenericResponse<List<ChatMessage>>> GetPrivateMessages(string firstUser, string secondUser);
+        // Task<GenericResponse<List<ChatMessage>>> GetPrivateMessages(string firstUser, string secondUser);
         Task<GenericResponse> EditPrivateMessages(string messageText, Guid messageId);
         Task<GenericResponse> DeletePrivateMessage(Guid messageId);
         Task<bool> SeenMessage(Guid messageId, Guid userId);
@@ -108,18 +108,18 @@ namespace Utilities_aspnet.Repositories
 
         }
 
-        public async Task<GenericResponse<List<ChatMessage>>> GetPrivateMessages(string firstUser, string secondUser)
-        {
-            //Todo: add pagination to messages
-            var firstMessageBatch = await _context.Set<ChatMessage>().Where(x => x.FromUserId == firstUser && x.ToUserId == secondUser).ToListAsync();
-            var secondMessageBatch = await _context.Set<ChatMessage>().Where(x => x.FromUserId == secondUser && x.ToUserId == firstUser).ToListAsync();
-
-            firstMessageBatch.AddRange(secondMessageBatch);
-            var output = firstMessageBatch.OrderBy(x => x.CreatedAt).ToList();
-
-            return output;
-
-        }
+        // public async Task<GenericResponse<List<ChatMessage>>> GetPrivateMessages(string firstUser, string secondUser)
+        // {
+        //     //Todo: add pagination to messages
+        //     var firstMessageBatch = await _context.Set<ChatMessage>().Where(x => x.FromUserId == firstUser && x.ToUserId == secondUser).ToListAsync();
+        //     var secondMessageBatch = await _context.Set<ChatMessage>().Where(x => x.FromUserId == secondUser && x.ToUserId == firstUser).ToListAsync();
+        //
+        //     firstMessageBatch.AddRange(secondMessageBatch);
+        //     var output = firstMessageBatch.OrderBy(x => x.CreatedAt).ToList();
+        //
+        //     return output;
+        //
+        // }
 
         public async Task<bool> SeenMessage(Guid messageId, Guid userId)
         {

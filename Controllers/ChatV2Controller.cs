@@ -36,17 +36,17 @@ namespace Utilities_aspnet.Controllers
             return Ok(result);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [ClaimRequirement]
-        [HttpGet("GetOneToOneMessages/{firstUserId}/{secondUserId}")]        
-        public async Task<ActionResult<GenericResponse<List<ChatMessage>>>> GetPrivateMessages(string firstUserId, string secondUserId)
-        {
-            var messages = await _messagerepository.GetPrivateMessages(firstUserId, secondUserId);
-            if (messages == null)
-                return NoContent();
-
-            return Result(messages);
-        }
+        // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        // [ClaimRequirement]
+        // [HttpGet("GetOneToOneMessages/{firstUserId}/{secondUserId}")]        
+        // public async Task<ActionResult<GenericResponse<List<ChatMessage>>>> GetPrivateMessages(string firstUserId, string secondUserId)
+        // {
+        //     var messages = await _messagerepository.GetPrivateMessages(firstUserId, secondUserId);
+        //     if (messages == null)
+        //         return NoContent();
+        //
+        //     return Result(messages);
+        // }
 
         [HttpPut("EditOneToOneMessages/{senderId}/{receiverId}/{messageText}/{messageId}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
