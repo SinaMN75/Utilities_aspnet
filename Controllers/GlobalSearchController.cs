@@ -9,8 +9,6 @@ public class GlobalSearchController : BaseApiController {
 		_repository = repository;
 	}
 
-	[AllowAnonymous]
-	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	[HttpPost]
 	public ActionResult<GenericResponse<GlobalSearchDto>> Filter(GlobalSearchParams filter) {
 		GenericResponse<GlobalSearchDto> i = _repository.Filter(filter, User.Identity?.Name);
