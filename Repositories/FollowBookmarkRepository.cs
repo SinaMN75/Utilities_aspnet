@@ -42,7 +42,7 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 	}
 
 	public GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarks() {
-		IQueryable<BookmarkEntity> bookmark = _dbContext.Set<BookmarkEntity>()
+		IQueryable<BookmarkEntity> bookmark = _dbContext.Set<BookmarkEntity>().Include(x => x.Media)
 			.Where(x => x.UserId == _httpContextAccessor.HttpContext!.User.Identity!.Name!)
 			.Include(x => x.Product).ThenInclude(x => x.Media)
 			.Include(x => x.Product).ThenInclude(i => i.Votes)
@@ -130,7 +130,7 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 	}
 
 	public GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarksByFolderName(string folderName) {
-		IQueryable<BookmarkEntity> bookmark = _dbContext.Set<BookmarkEntity>()
+		IQueryable<BookmarkEntity> bookmark = _dbContext.Set<BookmarkEntity>().Include(x => x.Media)
 			.Where(x => x.UserId == _httpContextAccessor.HttpContext!.User.Identity!.Name! && x.FolderName == folderName)
 			.Include(x => x.Product).ThenInclude(x => x.Media)
 			.Include(x => x.Product).ThenInclude(i => i.Votes)
