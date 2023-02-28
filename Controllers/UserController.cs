@@ -28,17 +28,14 @@ public class UserController : BaseApiController {
 
 	[HttpDelete("Logout")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	[ClaimRequirement]
 	public async Task<ActionResult<GenericResponse>> Logout() => Result(await _repository.Logout());
 
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	[ClaimRequirement]
 	[AllowAnonymous]
 	[HttpPost("Filter")]
 	public async Task<ActionResult<GenericResponse<IEnumerable<UserEntity>>>> Filter(UserFilterDto dto) => Result(await _repository.Filter(dto));
 
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	[ClaimRequirement]
 	[AllowAnonymous]
 	[HttpGet("{id}")]
 	public async Task<ActionResult<GenericResponse<UserEntity?>>> ReadById(string id, bool showVotes = false)
@@ -46,17 +43,14 @@ public class UserController : BaseApiController {
 
 	[HttpPut]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	[ClaimRequirement]
 	public async Task<ActionResult<GenericResponse<UserEntity>>> Update(UserCreateUpdateDto dto) => Result(await _repository.Update(dto));
 
 	[HttpDelete("{id}")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	[ClaimRequirement]
 	public async Task<ActionResult<GenericResponse>> Delete(string id) => Result(await _repository.Delete(id));
 
 	[HttpDelete("DeleteFromTeam/{teamId:guid}")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	[ClaimRequirement]
 	public async Task<ActionResult<GenericResponse>> DeleteFromTeam(Guid teamId) => Result(await _repository.RemovalFromTeam(teamId));
 	
 	[HttpGet("ReadMyBlockList")]

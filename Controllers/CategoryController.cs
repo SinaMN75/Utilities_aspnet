@@ -9,7 +9,6 @@ public class CategoryController : BaseApiController {
 
 	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	[ClaimRequirement]
 	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Create(CategoryEntity dto) => Result(await _repository.Create(dto));
 
 	[HttpGet]
@@ -17,11 +16,9 @@ public class CategoryController : BaseApiController {
 
 	[HttpPut]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	[ClaimRequirement]
 	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Update(CategoryEntity dto) => Result(await _repository.Update(dto));
 
 	[HttpDelete("{id:guid}")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	[ClaimRequirement]
 	public async Task<IActionResult> Delete(Guid id) => Result(await _repository.Delete(id));
 }

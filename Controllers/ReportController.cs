@@ -27,11 +27,9 @@ public class ReportController : BaseApiController
 
 	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	[ClaimRequirement]
 	public async Task<ActionResult<GenericResponse<ReportEntity?>>> Create(ReportEntity parameters) => Result(await _repository.Create(parameters));
 
 	[HttpDelete]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	[ClaimRequirement]
 	public async Task<ActionResult<GenericResponse>> Delete(Guid id) => Result(await _repository.Delete(id));
 }

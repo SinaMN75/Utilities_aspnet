@@ -3,7 +3,6 @@ namespace Utilities_aspnet.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-[ClaimRequirement]
 public class TransactionController : BaseApiController {
 	private readonly ITransactionRepository _repository;
 

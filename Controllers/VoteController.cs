@@ -9,12 +9,10 @@ public class VoteController : BaseApiController {
 
 	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	[ClaimRequirement]
 	public async Task<ActionResult<GenericResponse>> Create(VoteCreateUpdateDto dto) => Result(await _repository.CreateUpdateVote(dto));
 
 	[HttpPost("VoteField")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	[ClaimRequirement]
 	public async Task<ActionResult<GenericResponse<IEnumerable<VoteFieldEntity>?>>> CreateVoteFields(VoteFieldCreateUpdateDto dto)
 		=> Result(await _repository.CreateUpdateVoteFields(dto));
 

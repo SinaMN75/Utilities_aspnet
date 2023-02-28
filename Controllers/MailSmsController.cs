@@ -2,7 +2,6 @@
 
 [ApiController]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-[ClaimRequirement]
 [Route("api/[controller]")]
 public class MailSmsController : BaseApiController {
 	private readonly IMailSmsRepository _repository;

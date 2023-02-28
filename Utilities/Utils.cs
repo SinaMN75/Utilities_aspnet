@@ -182,21 +182,3 @@ public static class StartupExtension {
 		});
 	}
 }
-
-public class ClaimRequirementAttribute : TypeFilterAttribute {
-	public ClaimRequirementAttribute() : base(typeof(ClaimRequirementFilter)) {
-		Arguments = new object[] {new Claim("IsLoggedIn", "true")};
-	}
-}
-
-public class ClaimRequirementFilter : IAuthorizationFilter {
-	private readonly DbContext _dbContext;
-
-	public ClaimRequirementFilter(Claim claim, DbContext dbContext) => _dbContext = dbContext;
-
-	public void OnAuthorization(AuthorizationFilterContext context) {
-		UserEntity? entity = _dbContext.Set<UserEntity>()
-			.FirstOrDefault(u => context.HttpContext.User.Identity != null && u.Id == context.HttpContext.User.Identity.Name);
-		if (entity is {IsLoggedIn: false}) context.Result = new ForbidResult();
-	}
-}

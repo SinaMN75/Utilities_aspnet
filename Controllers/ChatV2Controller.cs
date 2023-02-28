@@ -24,7 +24,6 @@ namespace Utilities_aspnet.Controllers
         #region One to One Messaging
         [HttpPost("SendPrivateMessage")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [ClaimRequirement]
         public async Task<ActionResult<GenericResponse>> SendPrivateMessage(ChatMessageInputDto message)
         {
             var receiver = await _context.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == message.ToUserId);
@@ -50,13 +49,11 @@ namespace Utilities_aspnet.Controllers
 
         [HttpPut("EditOneToOneMessages/{senderId}/{receiverId}/{messageText}/{messageId}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [ClaimRequirement]
         public async Task<ActionResult<GenericResponse>> EditPrivateMessages(string senderId, string receiverId, string messageText, Guid messageId)
             => Result(await _messagerepository.EditPrivateMessages(messageText, messageId));
 
         [HttpDelete("DeleteOneToOneMessages/{senderId}/{receiverId}/{messageId}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [ClaimRequirement]
         public async Task<ActionResult<GenericResponse>> DeletePrivateMessages(string senderId, string receiverId, Guid messageId)
             => Result(await _messagerepository.DeletePrivateMessage(messageId));
 
