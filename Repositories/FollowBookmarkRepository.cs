@@ -5,7 +5,7 @@ public interface IFollowBookmarkRepository {
 	GenericResponse<IQueryable<UserEntity>> GetFollowing(string id);
 	Task<GenericResponse<FollowEntity?>> ToggleFollow(string sourceUserId, FollowCreateDto dto);
 	Task<GenericResponse> RemoveFollowings(string targetUserId, FollowCreateDto dto);
-	GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarks();
+	GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarks(string? userId);
 	Task<GenericResponse<BookmarkEntity?>> ToggleBookmark(BookmarkCreateDto dto);
 	GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarksByFolderName(string folderName);
 }
@@ -41,9 +41,10 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 		return new GenericResponse<BookmarkEntity?>(oldBookmark, UtilitiesStatusCodes.Success, "Mission Accomplished");
 	}
 
-	public GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarks() {
+	public GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarks(string? userId) {
+		string uId = userId ?? _httpContextAccessor.HttpContext!.User.Identity!.Name!;
 		IQueryable<BookmarkEntity> bookmark = _dbContext.Set<BookmarkEntity>().Include(x => x.Media)
-			.Where(x => x.UserId == _httpContextAccessor.HttpContext!.User.Identity!.Name!)
+			.Where(x => x.UserId == uId)
 			.Include(x => x.Product).ThenInclude(x => x.Media)
 			.Include(x => x.Product).ThenInclude(i => i.Votes)
 			.Include(x => x.Product).ThenInclude(i => i.User).ThenInclude(x => x.Media)

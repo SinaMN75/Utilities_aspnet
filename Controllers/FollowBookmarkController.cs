@@ -36,7 +36,7 @@ public class FollowBookmarkController : BaseApiController {
 	[HttpPost("ReadBookmarks")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	[ClaimRequirement]
-	public ActionResult<GenericResponse<IEnumerable<BookmarkEntity>?>> ReadBookmarks() => Result(_repository.ReadBookmarks());
+	public ActionResult<GenericResponse<IEnumerable<BookmarkEntity>?>> ReadBookmarks(string? userId) => Result(_repository.ReadBookmarks(userId));
 
 	[HttpGet("ReadBookmarksByFolderName/{folderName}")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
