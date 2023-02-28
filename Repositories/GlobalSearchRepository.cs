@@ -33,7 +33,8 @@ public class GlobalSearchRepository : IGlobalSearchRepository {
 				.Include(u => u.Media)
 				.Include(u => u.Categories)
 				.Include(u => u.Products)!
-				.ThenInclude(u => u.Media);
+				.ThenInclude(u => u.Media)
+				.AsNoTracking();
 
 		if (filter.Product) {
 			productList = _dbContext.Set<ProductEntity>()
