@@ -247,8 +247,8 @@ public class ProductRepository : IProductRepository
                     UserId = user.Id,
                 };
                 await _dbContext.Set<VisitProducts>().AddAsync(visitProduct, ct);
-                i.SeenUsers = i.SeenUsers + string.Join(",", user.Id);
-
+                if (string.IsNullOrEmpty(i.SeenUsers)) i.SeenUsers = user.Id;
+                else i.SeenUsers = i.SeenUsers + "," + user.Id;
             }
             if (i.VisitProducts != null && !i.VisitProducts.Any()) i.VisitsCount = 1;
             else if (i.VisitProducts != null) i.VisitsCount = i.VisitProducts.Count() + 1;

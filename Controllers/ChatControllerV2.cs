@@ -22,8 +22,9 @@ namespace Utilities_aspnet.Controllers
         }
 
         #region One to One Messaging
-        [HttpPost]
-        [Route("/[controller]/send-private-message")]
+        [HttpPost("SendPrivateMessage")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ClaimRequirement]
         public async Task<ActionResult<GenericResponse>> SendPrivateMessage(ChatMessageInputDto message)
         {
             var receiver = await _context.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == message.ToUserId);
@@ -35,41 +36,34 @@ namespace Utilities_aspnet.Controllers
             return Ok(result);
         }
 
-        [HttpGet]
-        [Route("[controller]/get-one-to-one-messages/{firstUserId}/{secondUserId}")]
-        public async Task<IActionResult> GetPrivateMessages(string firstUserId, string secondUserId)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ClaimRequirement]
+        [HttpGet("GetOneToOneMessages/{firstUserId}/{secondUserId}")]        
+        public async Task<ActionResult<GenericResponse<List<ChatMessage>>>> GetPrivateMessages(string firstUserId, string secondUserId)
         {
             var messages = await _messagerepository.GetPrivateMessages(firstUserId, secondUserId);
             if (messages == null)
                 return NoContent();
 
-            return Ok(messages);
-
+            return Result(messages);
         }
 
-        [HttpPut]
-        [Route("[controller]/edit-one-to-one-messages/{senderId}/{receiverId}/{messageText}/{messageId}")]
-        public async Task<IActionResult> EditPrivateMessages(string senderId, string receiverId, string messageText, Guid messageId)
-        {
-            await _messagerepository.EditPrivateMessages(messageText, messageId);
+        [HttpPut("EditOneToOneMessages/{senderId}/{receiverId}/{messageText}/{messageId}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ClaimRequirement]
+        public async Task<ActionResult<GenericResponse>> EditPrivateMessages(string senderId, string receiverId, string messageText, Guid messageId)
+            => Result(await _messagerepository.EditPrivateMessages(messageText, messageId));
 
-            return Ok();
+        [HttpDelete("DeleteOneToOneMessages/{senderId}/{receiverId}/{messageId}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ClaimRequirement]
+        public async Task<ActionResult<GenericResponse>> DeletePrivateMessages(string senderId, string receiverId, Guid messageId)
+            => Result(await _messagerepository.DeletePrivateMessage(messageId));
 
-        }
-        [HttpDelete]
-        [Route("[controller]/delete-one-to-one-messages/{senderId}/{receiverId}/{messageId}")]
-        public async Task<IActionResult> DeletePrivateMessages(string senderId, string receiverId, Guid messageId)
-        {
-            await _messagerepository.DeletePrivateMessage(messageId);
-
-            return Ok();
-
-        }
         #endregion
 
         #region Group Messaging
-        [HttpPost]
-        [Route("/[controller]/send-group-message/{roomId}")]
+        [HttpPost("SendGroupMessage/{roomId}")]        
         public async Task<ActionResult<GenericResponse>> SendGroupMessage(ChatMessageInputDto message, Guid roomId)
         {
             var result = await _chatroomRepository.AddMessageToChatroom(roomId, message);
@@ -77,8 +71,7 @@ namespace Utilities_aspnet.Controllers
             return Ok(result);
         }
 
-        [HttpGet]
-        [Route("/[controller]/get-group-message/{roomId}")]
+        [HttpGet("GetGroupMessage/{roomId}")]
         public async Task<ActionResult> GetGroupMessage(Guid roomId)
         {
             var roomMessages = await _chatroomRepository.GetChatroomMessages(roomId);
@@ -86,8 +79,7 @@ namespace Utilities_aspnet.Controllers
             return Ok(roomMessages);
         }
 
-        [HttpPut]
-        [Route("/[controller]/edit-group-message/{roomId}")]
+        [HttpPut("EditGroupMessage/{roomId}")]       
         public async Task<ActionResult> EditGroupMessage(Guid roomId, ChatMessageEditDto message)
         {
             await _chatroomRepository.EditGroupMessage(roomId, message);
@@ -95,8 +87,7 @@ namespace Utilities_aspnet.Controllers
             return Ok();
         }
 
-        [HttpDelete]
-        [Route("/[controller]/delete-group-message/{roomId}")]
+        [HttpDelete("DeleteGroupMessage/{roomId}")]        
         public async Task<ActionResult> DeleteGroupMessage(Guid roomId, ChatMessageDeleteDto message)
         {
             await _chatroomRepository.DeleteGroupMessage(roomId, message);
@@ -107,8 +98,7 @@ namespace Utilities_aspnet.Controllers
 
         #region Seen/Online/Reaction
         //Todo: change method parameters to a dto
-        [HttpPut]
-        [Route("/[controller]/modify-online-status/{userId}/{status}")]
+        [HttpPut("ModifyOnlineStatus/{userId}/{status}")]
         public async Task<ActionResult> ModifyOnlineStatus(string userId, bool status)
         {
             //Todo: change IsLoggedIn to IsOnline
@@ -123,8 +113,7 @@ namespace Utilities_aspnet.Controllers
         }
 
         //Todo: change method parameters to a dto
-        [HttpPut]
-        [Route("/[controller]/seen-message/{messageId}/receiverUser/senderUser")]
+        [HttpPut("SeenMessage/{messageId}/receiverUser/senderUser")]
         public async Task<ActionResult> HasSeenPrivateMessage(Guid messageId, Guid receiverUser, string senderUser)
         {
             var isPrivateMessage = await _messagerepository.SeenMessage(messageId, receiverUser);
@@ -141,8 +130,7 @@ namespace Utilities_aspnet.Controllers
 
         }
 
-        [HttpPut]
-        [Route("/[controller]/add-emoji/{emoji}/{messageId}/{userId}")]
+        [HttpPut("AddEmoji/{emoji}/{messageId}/{userId}")]
         public async Task<ActionResult> AddEmojiToMessage(Reaction emoji, Guid messageId, Guid userId)
         {
             await _messagerepository.AddEmojiToMessage(emoji, messageId, userId);
@@ -153,8 +141,7 @@ namespace Utilities_aspnet.Controllers
         #endregion
 
         #region Chatroom
-        [HttpPost]
-        [Route("/[controller]/post-chatroom/{userId}/{chatroomName}")]
+        [HttpPost("PostChatRoom/{userId}/{chatroomName}")]        
         public async Task<ActionResult> CreateChatroom(string chatroomName, string userId)
         {
             if (string.IsNullOrEmpty(chatroomName))
@@ -164,8 +151,7 @@ namespace Utilities_aspnet.Controllers
             return Ok();
         }
 
-        [HttpPut]
-        [Route("/[controller]/edit-chatroom/{userId}/{chatroomName}")]
+        [HttpPut("EditChatRoom/{userId}/{chatroomName}")]
         public async Task<ActionResult> EditChatroom(string chatroomName, string userId)
         {
             if (string.IsNullOrEmpty(chatroomName) || string.IsNullOrEmpty(userId.ToString()))
@@ -175,8 +161,7 @@ namespace Utilities_aspnet.Controllers
             return Ok();
         }
 
-        [HttpDelete]
-        [Route("/[controller]/delete-chatroom/{userId}/{chatroomId}")]
+        [HttpDelete("DeleteChatRoom/{userId}/{chatroomId}")]        
         public async Task<ActionResult> DeleteChatroom(Guid chatroomId, string userId)
         {
             if (string.IsNullOrEmpty(chatroomId.ToString()) || string.IsNullOrEmpty(userId.ToString()))
@@ -186,8 +171,7 @@ namespace Utilities_aspnet.Controllers
             return Ok();
         }
 
-        [HttpGet]
-        [Route("/[controller]/get-chatroom/{chatroomName}")]
+        [HttpGet("GetChatRoom/{chatroomName}")]        
         public async Task<ActionResult> GetChatroomsByName(string chatroomName)
         {
             if (string.IsNullOrEmpty(chatroomName))
@@ -197,8 +181,7 @@ namespace Utilities_aspnet.Controllers
             return Ok(result);
         }
 
-        [HttpGet]
-        [Route("/[controller]/get-chatroom/{chatroomId}")]
+        [HttpGet("GetChatRoom/{chatroomId}")]        
         public async Task<ActionResult> GetChatroomsById(string chatroomId)
         {
             if (string.IsNullOrEmpty(chatroomId))
@@ -208,8 +191,7 @@ namespace Utilities_aspnet.Controllers
             return Ok(result);
         }
 
-        [HttpPut]
-        [Route("/[controller]/add-user-to-chatroom/{chatroomId}")]
+        [HttpPut("AddUserToChatRoom/{chatroomId}")]        
         public async Task<ActionResult> AddUserToChatroom(Guid chatroomId, string userId)
         {
             await _chatroomRepository.AddUserToChatroom(chatroomId, userId);
@@ -217,8 +199,7 @@ namespace Utilities_aspnet.Controllers
         }
         #endregion
 
-        [HttpGet]
-        [Route("[controller]/get-latest-messages/{userId}")]
+        [HttpGet("GetLatestMessages/{userId}")]        
         public async Task<ActionResult> GetLatestMessages(string userId)
         {
             var result = await _messagerepository.GetLatestMessage(userId);

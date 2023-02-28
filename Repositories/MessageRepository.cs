@@ -10,9 +10,9 @@ namespace Utilities_aspnet.Repositories
     {
         Task AddEmojiToMessage(Reaction emoji, Guid messageId, Guid userId);
         Task<GenericResponse> AddPrivateMessage(ChatMessageInputDto message);
-        Task<List<ChatMessage>> GetPrivateMessages(string firstUser, string secondUser);
-        Task EditPrivateMessages(string messageText, Guid messageId);
-        Task DeletePrivateMessage(Guid messageId);
+        Task<GenericResponse<List<ChatMessage>>> GetPrivateMessages(string firstUser, string secondUser);
+        Task<GenericResponse> EditPrivateMessages(string messageText, Guid messageId);
+        Task<GenericResponse> DeletePrivateMessage(Guid messageId);
         Task<bool> SeenMessage(Guid messageId, Guid userId);
         Task<List<ChatMessage>> GetLatestMessage(string userId);
     }
@@ -80,22 +80,26 @@ namespace Utilities_aspnet.Repositories
             return new GenericResponse<Guid>(messageToAdd.Id);
         }
 
-        public async Task DeletePrivateMessage(Guid messageId)
+        public async Task<GenericResponse> DeletePrivateMessage(Guid messageId)
         {
             var message = await _context.Set<ChatMessage>().FirstOrDefaultAsync(x => x.Id == messageId);
+            if (message == null)
+                return new GenericResponse(UtilitiesStatusCodes.NotFound, "NotFound");
             _context.Remove<ChatMessage>(message);
             await _context.SaveChangesAsync();
-
+            return new GenericResponse(UtilitiesStatusCodes.Success, message: "Deleted");
         }
 
-        public async Task EditPrivateMessages(string messageText, Guid messageId)
+        public async Task<GenericResponse> EditPrivateMessages(string messageText, Guid messageId)
         {
             var message = await _context.Set<ChatMessage>().FirstOrDefaultAsync(x => x.Id == messageId);
             if (message != null)
             {
                 message.MessageText = messageText;
                 await _context.SaveChangesAsync();
+                return new GenericResponse(message: "Edited");
             }
+            return new GenericResponse(UtilitiesStatusCodes.NotFound, "NotFound");
         }
 
         public Task<List<ChatMessage>> GetLatestMessage(string userId)
@@ -104,7 +108,7 @@ namespace Utilities_aspnet.Repositories
 
         }
 
-        public async Task<List<ChatMessage>> GetPrivateMessages(string firstUser, string secondUser)
+        public async Task<GenericResponse<List<ChatMessage>>> GetPrivateMessages(string firstUser, string secondUser)
         {
             //Todo: add pagination to messages
             var firstMessageBatch = await _context.Set<ChatMessage>().Where(x => x.FromUserId == firstUser && x.ToUserId == secondUser).ToListAsync();
