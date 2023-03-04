@@ -3,7 +3,7 @@ namespace Utilities_aspnet.Repositories;
 public interface IProductRepository {
 	Task<GenericResponse<ProductEntity>> Create(ProductCreateUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse<ProductEntity>> CreateWithFiles(ProductCreateUpdateDto dto, CancellationToken ct);
-	Task<GenericResponse<IQueryable<ProductEntity>>> Filter(ProductFilterDto dto);
+	Task<GenericResponse<IEnumerable<ProductEntity>>> Filter(ProductFilterDto dto);
 	Task<GenericResponse<ProductEntity?>> ReadById(Guid id, CancellationToken ct);
 	Task<GenericResponse<ProductEntity>> Update(ProductCreateUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
@@ -68,7 +68,7 @@ public class ProductRepository : IProductRepository {
 		return new GenericResponse<ProductEntity>(i.Entity);
 	}
 
-	public async Task<GenericResponse<IQueryable<ProductEntity>>> Filter(ProductFilterDto dto) {
+	public async Task<GenericResponse<IEnumerable<ProductEntity>>> Filter(ProductFilterDto dto) {
 		IQueryable<ProductEntity> q = _dbContext.Set<ProductEntity>();
 		q = q.Where(x => x.DeletedAt == null);
 		if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.Now);
@@ -176,25 +176,24 @@ public class ProductRepository : IProductRepository {
 			                 x.Value11.ToInt() <= dto.MaxValue ||
 			                 x.Value12.ToInt() <= dto.MaxValue);
 
+		IEnumerable<ProductEntity> list = await q.AsNoTracking().ToListAsync();
 		if (userId != null) {
 			if (dto.IsFollowing) {
 				IQueryable<UserEntity>? following = _followBookmarkRepository.GetFollowing(userId).Result;
 				q = q.Where(x => following.Any(y => y.Id == x.UserId));
 			}
 
-			foreach (ProductEntity p in q) {
-				GenericResponse<UserEntity?> userResponse = await _userRepository.ReadById(userId);
-				UserEntity user = userResponse.Result!;
-
-				if (user.VisitedProducts.Contains(p.Id.ToString()))
-					p.IsSeen = true;
+			GenericResponse<UserEntity?> userResponse = await _userRepository.ReadById(userId);
+			UserEntity user = userResponse.Result!;
+			foreach (ProductEntity p in list) {
+				if (user.VisitedProducts.Contains(p.Id.ToString())) p.IsSeen = true;
 			}
 		}
 
-		int totalCount = q.Count();
-		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
+		int totalCount = list.Count();
+		list = list.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
-		return new GenericResponse<IQueryable<ProductEntity>>(q.AsNoTracking()) {
+		return new GenericResponse<IEnumerable<ProductEntity>>(list) {
 			TotalCount = totalCount,
 			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
 			PageSize = dto.PageSize
@@ -228,6 +227,7 @@ public class ProductRepository : IProductRepository {
 			}
 			else {
 				await _userRepository.Update(new UserCreateUpdateDto {
+					Id = userId,
 					VisitedProducts = user.VisitedProducts + "," + i.Id
 				});
 			}
