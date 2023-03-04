@@ -4,12 +4,12 @@ namespace Utilities_aspnet.Entities;
 public class TopProductEntity : BaseEntity {
 	public UserEntity? User { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public string? UserId { get; set; }
 
 	public ProductEntity? Product { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public Guid? ProductId { get; set; }
 }
 

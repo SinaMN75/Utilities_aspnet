@@ -20,64 +20,64 @@ public class MediaEntity : BaseEntity {
 	[NotMapped]
 	public string Url => $"{Server.ServerAddress}/Medias/{FileName}";
 
-	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public ContentEntity? Content { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public Guid? ContentId { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public UserEntity? User { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public string? UserId { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public ProductEntity? Product { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public Guid? ProductId { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public CommentEntity? Comment { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public Guid? CommentId { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public ChatEntity? Chat { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public Guid? ChatId { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public NotificationEntity? Notification { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public Guid? NotificationId { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public CategoryEntity? Category { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public Guid? CategoryId { get; set; }
 	
-	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public GroupChatEntity? GroupChat { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public Guid? GroupChatId { get; set; }	
 	
-	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public GroupChatMessageEntity? GroupChatMessage { get; set; }
 	
-	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public Guid? GroupChatMessageId { get; set; }
 	
-	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public Guid? BookmarkId { get; set; }
 	
-	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public BookmarkEntity? Bookmark { get; set; }
 }
 

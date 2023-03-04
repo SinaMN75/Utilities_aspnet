@@ -18,10 +18,10 @@ public class FollowEntity : BaseEntity
 [Table("Bookmarks")]
 public class BookmarkEntity : BaseEntity
 {
-    [System.Text.Json.Serialization.JsonIgnore]
+    [JsonIgnore]
     public UserEntity? User { get; set; }
 
-    [System.Text.Json.Serialization.JsonIgnore]
+    [JsonIgnore]
     public string? UserId { get; set; }
 
     [StringLength(500)]
@@ -29,12 +29,12 @@ public class BookmarkEntity : BaseEntity
 
     public ProductEntity? Product { get; set; }
 
-    [System.Text.Json.Serialization.JsonIgnore]
+    [JsonIgnore]
     public Guid? ProductId { get; set; }
 
     public CategoryEntity? Category { get; set; }
 
-    [System.Text.Json.Serialization.JsonIgnore]
+    [JsonIgnore]
     public Guid? CategoryId { get; set; }
     
     public IEnumerable<MediaEntity>? Media { get; set; }
