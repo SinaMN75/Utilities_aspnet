@@ -177,10 +177,6 @@ public class ProductRepository : IProductRepository {
 			                 x.Value12.ToInt() <= dto.MaxValue);
 
 		if (userId != null) {
-			// if (dto.IsFollowing) {
-			// 	IQueryable<UserEntity>? following = _followBookmarkRepository.GetFollowing(userId).Result;
-			// 	q = q.Where(x => following.Any(y => y.Id == x.UserId));
-			// }
 
 			GenericResponse<UserEntity?> userResponse = await _userRepository.ReadById(userId);
 			UserEntity user = userResponse.Result!;

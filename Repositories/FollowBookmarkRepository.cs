@@ -3,7 +3,7 @@
 public interface IFollowBookmarkRepository {
 	GenericResponse<IQueryable<UserEntity>> GetFollowers(string id);
 	GenericResponse<IQueryable<UserEntity>> GetFollowing(string id);
-	Task<GenericResponse<FollowEntity?>> ToggleFollow(string sourceUserId, FollowCreateDto dto);
+	Task<GenericResponse<FollowEntity?>> ToggleFollow(FollowCreateDto dto);
 	Task<GenericResponse> RemoveFollowings(string targetUserId, FollowCreateDto dto);
 	GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarks(string? userId);
 	Task<GenericResponse<BookmarkEntity?>> ToggleBookmark(BookmarkCreateDto dto);
@@ -99,22 +99,19 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 		return new GenericResponse<IQueryable<UserEntity>>(followings);
 	}
 
-	public async Task<GenericResponse<FollowEntity?>> ToggleFollow(string sourceUserId, FollowCreateDto parameters) {
-		UserEntity myUser = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == sourceUserId))!;
+	public async Task<GenericResponse<FollowEntity?>> ToggleFollow(FollowCreateDto parameters) {
+		string uId = _httpContextAccessor.HttpContext!.User.Identity!.Name!;
+		UserEntity myUser = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == uId))!;
 
 		FollowEntity? follow = await _dbContext.Set<FollowEntity>()
-			.FirstOrDefaultAsync(x => x.FollowerUserId == sourceUserId && x.FollowsUserId == parameters.UserId);
+			.FirstOrDefaultAsync(x => x.FollowerUserId == uId && x.FollowsUserId == parameters.UserId);
 
 		if (follow != null) {
 			_dbContext.Set<FollowEntity>().Remove(follow);
 			await _dbContext.SaveChangesAsync();
 		}
 		else {
-			follow = new FollowEntity {
-				FollowerUserId = sourceUserId,
-				FollowsUserId = parameters.UserId
-			};
-
+			follow = new FollowEntity {FollowerUserId = uId, FollowsUserId = parameters.UserId};
 			await _dbContext.Set<FollowEntity>().AddAsync(follow);
 			await _dbContext.SaveChangesAsync();
 
@@ -131,21 +128,21 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 					Message = "You are being followed by " + myUser?.UserName,
 					Title = "Follow",
 					UseCase = "Follow",
-					CreatorUserId = sourceUserId
+					CreatorUserId = uId
 				});
 			}
 			catch { }
 
 			if (myUser.FollowedUsers.Contains(parameters.UserId)) {
 				await _userRepository.Update(new UserCreateUpdateDto {
-					Id = sourceUserId,
-					BookmarkedProducts = myUser.FollowedUsers.Replace($",{parameters.UserId}", "")
+					Id = uId,
+					FollowedUsers = myUser.FollowedUsers.Replace($",{parameters.UserId}", "")
 				});
 			}
 			else {
 				await _userRepository.Update(new UserCreateUpdateDto {
-					Id = sourceUserId,
-					BookmarkedProducts = myUser.FollowedUsers + "," + parameters.UserId
+					Id = uId,
+					FollowedUsers = myUser.FollowedUsers + "," + parameters.UserId
 				});
 			}
 		}

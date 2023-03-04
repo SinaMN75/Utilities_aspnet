@@ -17,7 +17,7 @@ public class FollowBookmarkController : BaseApiController {
 
 	[HttpPost("ToggleFolllow")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse>> ToggleFollow(FollowCreateDto dto) => Result(await _repository.ToggleFollow(User.Identity?.Name!, dto));
+	public async Task<ActionResult<GenericResponse>> ToggleFollow(FollowCreateDto dto) => Result(await _repository.ToggleFollow(dto));
 
 	[HttpPost("RemoveFollowing")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
