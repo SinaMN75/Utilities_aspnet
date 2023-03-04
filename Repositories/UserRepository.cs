@@ -376,6 +376,7 @@ public class UserRepository : IUserRepository {
 		entity.Point = dto.Point ?? entity.Point;
 		entity.AccessLevel = dto.AccessLevel ?? entity.AccessLevel;
 		entity.VisitedProducts = dto.VisitedProducts ?? entity.VisitedProducts;
+		entity.BookmarkedProducts = dto.BookmarkedProducts ?? entity.BookmarkedProducts;
 		entity.Badge = dto.Badge ?? entity.Badge;
 		entity.UpdatedAt = DateTime.Now;
 
