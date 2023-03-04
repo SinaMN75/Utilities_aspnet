@@ -3,7 +3,7 @@ namespace Utilities_aspnet.Repositories;
 public interface IProductRepository {
 	Task<GenericResponse<ProductEntity>> Create(ProductCreateUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse<ProductEntity>> CreateWithFiles(ProductCreateUpdateDto dto, CancellationToken ct);
-	GenericResponse<IQueryable<ProductEntity>> Filter(ProductFilterDto dto);
+	Task<GenericResponse<IQueryable<ProductEntity>>> Filter(ProductFilterDto dto);
 	Task<GenericResponse<ProductEntity?>> ReadById(Guid id, CancellationToken ct);
 	Task<GenericResponse<ProductEntity>> Update(ProductCreateUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
@@ -68,25 +68,12 @@ public class ProductRepository : IProductRepository {
 		return new GenericResponse<ProductEntity>(i.Entity);
 	}
 
-	public GenericResponse<IQueryable<ProductEntity>> Filter(ProductFilterDto dto) {
+	public async Task<GenericResponse<IQueryable<ProductEntity>>> Filter(ProductFilterDto dto) {
 		IQueryable<ProductEntity> q = _dbContext.Set<ProductEntity>();
 		q = q.Where(x => x.DeletedAt == null);
 		if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.Now);
 
-		string? guestUser = _httpContextAccessor.HttpContext!.User.Identity!.Name;
-		if (dto.FilterByAge != null && dto.FilterByAge == true && !string.IsNullOrEmpty(guestUser)) {
-			UserEntity? user = _dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == guestUser);
-			if (user != null && user.Birthdate.HasValue) {
-				AgeCategory ageCatg = Utils.CalculateAgeCategories(user.Birthdate.Value);
-				q = q.Where(w => w.AgeCategory == ageCatg);
-			}
-			q = q.Where(x => x.UserId == dto.UserId);
-		}
-
-		if (dto.AgeCategory is not null)
-			q.Where(w => w.AgeCategory == dto.AgeCategory);
-
-		if (dto.FilterByAge == null && dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => x.UserId == dto.UserId);
+		string? userId = _httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
 		if (dto.Subtitle.IsNotNullOrEmpty()) q = q.Where(x => (x.Subtitle ?? "").Contains(dto.Subtitle!));
@@ -188,9 +175,20 @@ public class ProductRepository : IProductRepository {
 			                 x.Value10.ToInt() <= dto.MaxValue ||
 			                 x.Value11.ToInt() <= dto.MaxValue ||
 			                 x.Value12.ToInt() <= dto.MaxValue);
-		if (dto.IsFollowing) {
-			IQueryable<UserEntity>? following = _followBookmarkRepository.GetFollowing(guestUser).Result;
-			q = q.Where(x => following.Any(y => y.Id == x.UserId));
+
+		if (userId != null) {
+			if (dto.IsFollowing) {
+				IQueryable<UserEntity>? following = _followBookmarkRepository.GetFollowing(userId).Result;
+				q = q.Where(x => following.Any(y => y.Id == x.UserId));
+			}
+
+			foreach (ProductEntity p in q) {
+				GenericResponse<UserEntity?> userResponse = await _userRepository.ReadById(userId);
+				UserEntity user = userResponse.Result!;
+
+				if (user.VisitedProducts.Contains(p.Id.ToString()))
+					p.IsSeen = true;
+			}
 		}
 
 		int totalCount = q.Count();
@@ -222,10 +220,13 @@ public class ProductRepository : IProductRepository {
 		if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound, "Not Found");
 
 		string? userId = _httpContextAccessor.HttpContext!.User.Identity!.Name;
-		if (userId is not null) {
+		if (userId.IsNotNullOrEmpty()) {
 			GenericResponse<UserEntity?> userResponse = await _userRepository.ReadById(userId);
 			UserEntity user = userResponse.Result!;
-			if (!user.VisitedProducts.Contains(i.Id.ToString())) {
+			if (user.VisitedProducts.Contains(i.Id.ToString())) {
+				i.IsSeen = true;
+			}
+			else {
 				await _userRepository.Update(new UserCreateUpdateDto {
 					VisitedProducts = user.VisitedProducts + "," + i.Id
 				});
