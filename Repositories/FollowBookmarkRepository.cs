@@ -36,32 +36,29 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 			                     x.UserId == userId);
 		if (oldBookmark == null) {
 			BookmarkEntity bookmark = new() {UserId = userId};
-
 			if (dto.ProductId.HasValue) bookmark.ProductId = dto.ProductId;
 			bookmark.FolderName = dto.FolderName;
-
 			await _dbContext.Set<BookmarkEntity>().AddAsync(bookmark);
 			await _dbContext.SaveChangesAsync();
-
-			GenericResponse<UserEntity?> userRespository = await _userRepository.ReadById(userId);
-			UserEntity user = userRespository.Result!;
-			if (user.BookmarkedProducts.Contains(dto.ProductId.ToString())) {
-				await _userRepository.Update(new UserCreateUpdateDto {
-					Id = userId,
-					BookmarkedProducts = user.BookmarkedProducts.Replace($",{dto.ProductId}", "")
-				});
-			}
-			else {
-				await _userRepository.Update(new UserCreateUpdateDto {
-					Id = userId,
-					BookmarkedProducts = user.BookmarkedProducts + "," + dto.ProductId
-				});
-			}
-
 			return new GenericResponse<BookmarkEntity?>(bookmark, UtilitiesStatusCodes.Success, "Mission Accomplished");
 		}
 		_dbContext.Set<BookmarkEntity>().Remove(oldBookmark);
 		await _dbContext.SaveChangesAsync();
+
+		GenericResponse<UserEntity?> userRespository = await _userRepository.ReadById(userId);
+		UserEntity user = userRespository.Result!;
+		if (user.BookmarkedProducts.Contains(dto.ProductId.ToString())) {
+			await _userRepository.Update(new UserCreateUpdateDto {
+				Id = userId,
+				BookmarkedProducts = user.BookmarkedProducts.Replace($",{dto.ProductId}", "")
+			});
+		}
+		else {
+			await _userRepository.Update(new UserCreateUpdateDto {
+				Id = userId,
+				BookmarkedProducts = user.BookmarkedProducts + "," + dto.ProductId
+			});
+		}
 		return new GenericResponse<BookmarkEntity?>(oldBookmark, UtilitiesStatusCodes.Success, "Mission Accomplished");
 	}
 
