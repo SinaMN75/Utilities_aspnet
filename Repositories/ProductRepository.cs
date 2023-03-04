@@ -187,8 +187,8 @@ public class ProductRepository : IProductRepository {
 			foreach (ProductEntity p in q) {
 				if (user.VisitedProducts.Contains(p.Id.ToString())) p.IsSeen = true;
 				if (user.BookmarkedProducts.Contains(p.Id.ToString())) p.IsBookmarked = true;
-				if (dto.IsFollowing) q = q.Where(i => user.FollowedUsers.Contains(i.UserId));
 			}
+			if (dto.IsFollowing) q = q.Where(i => user.FollowedUsers.Contains(i.UserId));
 		}
 
 		int totalCount = q.Count();

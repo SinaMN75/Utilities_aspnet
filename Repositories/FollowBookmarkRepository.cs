@@ -100,7 +100,7 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 	}
 
 	public async Task<GenericResponse<FollowEntity?>> ToggleFollow(string sourceUserId, FollowCreateDto parameters) {
-		UserEntity? myUser = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == sourceUserId);
+		UserEntity myUser = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == sourceUserId))!;
 
 		FollowEntity? follow = await _dbContext.Set<FollowEntity>()
 			.FirstOrDefaultAsync(x => x.FollowerUserId == sourceUserId && x.FollowsUserId == parameters.UserId);
@@ -135,6 +135,19 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 				});
 			}
 			catch { }
+
+			if (myUser.FollowedUsers.Contains(parameters.UserId)) {
+				await _userRepository.Update(new UserCreateUpdateDto {
+					Id = sourceUserId,
+					BookmarkedProducts = myUser.FollowedUsers.Replace($",{parameters.UserId}", "")
+				});
+			}
+			else {
+				await _userRepository.Update(new UserCreateUpdateDto {
+					Id = sourceUserId,
+					BookmarkedProducts = myUser.FollowedUsers + "," + parameters.UserId
+				});
+			}
 		}
 
 		return new GenericResponse<FollowEntity>(follow, UtilitiesStatusCodes.Success, "Mission Accomplished");
