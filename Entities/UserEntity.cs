@@ -82,6 +82,7 @@ public class UserEntity : IdentityUser {
 	public string? GenderTr2 { get; set; }
 
 	public string VisitedProducts { get; set; } = "";
+	public string BookmarkedProducts { get; set; } = "";
 
 	public double? Wallet { get; set; } = 0;
 	public double? Point { get; set; } = 0;
@@ -227,6 +228,7 @@ public class UserCreateUpdateDto {
 	public string? AccessLevel { get; set; }
 	public string? Badge { get; set; }
 	public string? VisitedProducts { get; set; }
+	public string? BookmarkedProducts { get; set; }
 	public double? Wallet { get; set; }
 	public double? Point { get; set; } = 0;
 	public bool? Suspend { get; set; }

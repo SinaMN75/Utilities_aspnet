@@ -13,27 +13,51 @@ public interface IFollowBookmarkRepository {
 public class FollowBookmarkRepository : IFollowBookmarkRepository {
 	private readonly DbContext _dbContext;
 	private readonly IHttpContextAccessor _httpContextAccessor;
+	private readonly IUserRepository _userRepository;
 	private readonly INotificationRepository _notificationRepository;
 
-	public FollowBookmarkRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, INotificationRepository notificationRepository) {
+	public FollowBookmarkRepository(
+		DbContext dbContext,
+		IHttpContextAccessor httpContextAccessor,
+		INotificationRepository notificationRepository,
+		IUserRepository userRepository) {
 		_dbContext = dbContext;
 		_httpContextAccessor = httpContextAccessor;
 		_notificationRepository = notificationRepository;
+		_userRepository = userRepository;
 	}
 
 	public async Task<GenericResponse<BookmarkEntity?>> ToggleBookmark(BookmarkCreateDto dto) {
+		string userId = _httpContextAccessor.HttpContext!.User.Identity!.Name!;
+
 		BookmarkEntity? oldBookmark = _dbContext.Set<BookmarkEntity>()
 			.FirstOrDefault(x => (x.ProductId != null && x.ProductId == dto.ProductId ||
 			                      x.CategoryId != null && x.CategoryId == dto.CategoryId) &&
-			                     x.UserId == _httpContextAccessor.HttpContext!.User.Identity!.Name!);
+			                     x.UserId == userId);
 		if (oldBookmark == null) {
-			BookmarkEntity bookmark = new() {UserId = _httpContextAccessor.HttpContext!.User.Identity!.Name!};
+			BookmarkEntity bookmark = new() {UserId = userId};
 
 			if (dto.ProductId.HasValue) bookmark.ProductId = dto.ProductId;
 			bookmark.FolderName = dto.FolderName;
 
 			await _dbContext.Set<BookmarkEntity>().AddAsync(bookmark);
 			await _dbContext.SaveChangesAsync();
+
+			GenericResponse<UserEntity?> userRespository = await _userRepository.ReadById(userId);
+			UserEntity user = userRespository.Result!;
+			if (user.BookmarkedProducts.Contains(dto.ProductId.ToString())) {
+				await _userRepository.Update(new UserCreateUpdateDto {
+					Id = userId,
+					BookmarkedProducts = user.BookmarkedProducts.Replace($",{dto.ProductId}", "")
+				});
+			}
+			else {
+				await _userRepository.Update(new UserCreateUpdateDto {
+					Id = userId,
+					BookmarkedProducts = user.BookmarkedProducts + "," + dto.ProductId
+				});
+			}
+
 			return new GenericResponse<BookmarkEntity?>(bookmark, UtilitiesStatusCodes.Success, "Mission Accomplished");
 		}
 		_dbContext.Set<BookmarkEntity>().Remove(oldBookmark);

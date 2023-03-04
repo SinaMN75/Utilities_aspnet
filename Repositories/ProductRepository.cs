@@ -180,13 +180,14 @@ public class ProductRepository : IProductRepository {
 		if (userId != null) {
 			if (dto.IsFollowing) {
 				IQueryable<UserEntity>? following = _followBookmarkRepository.GetFollowing(userId).Result;
-				q = q.Where(x => following.Any(y => y.Id == x.UserId));
+				list = q.Where(x => following.Any(y => y.Id == x.UserId));
 			}
 
 			GenericResponse<UserEntity?> userResponse = await _userRepository.ReadById(userId);
 			UserEntity user = userResponse.Result!;
 			foreach (ProductEntity p in list) {
 				if (user.VisitedProducts.Contains(p.Id.ToString())) p.IsSeen = true;
+				if (user.BookmarkedProducts.Contains(p.Id.ToString())) p.IsBookmarked = true;
 			}
 		}
 
@@ -222,15 +223,14 @@ public class ProductRepository : IProductRepository {
 		if (userId.IsNotNullOrEmpty()) {
 			GenericResponse<UserEntity?> userResponse = await _userRepository.ReadById(userId);
 			UserEntity user = userResponse.Result!;
-			if (user.VisitedProducts.Contains(i.Id.ToString())) {
-				i.IsSeen = true;
-			}
-			else {
+			if (user.VisitedProducts.Contains(i.Id.ToString())) i.IsSeen = true;
+			else
 				await _userRepository.Update(new UserCreateUpdateDto {
 					Id = userId,
 					VisitedProducts = user.VisitedProducts + "," + i.Id
 				});
-			}
+
+			if (user.BookmarkedProducts.Contains(i.Id.ToString())) i.IsBookmarked = true;
 
 			VisitProducts? vp = await _dbContext.Set<VisitProducts>().FirstOrDefaultAsync(a => a.UserId == user.Id && a.ProductId == i.Id, ct);
 			if (vp is null) {
