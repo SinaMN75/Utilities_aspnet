@@ -2,7 +2,7 @@
 
 public interface IUserRepository {
 	Task<GenericResponse<IEnumerable<UserEntity>>> Filter(UserFilterDto dto);
-	Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null, bool showVotes = false);
+	Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null);
 	Task<GenericResponse<UserEntity?>> Update(UserCreateUpdateDto dto);
 	Task<GenericResponse> Delete(string id);
 	Task<GenericResponse<UserEntity?>> GetTokenForTest(string mobile);
@@ -39,7 +39,7 @@ public class UserRepository : IUserRepository {
 		return existUserName ? new GenericResponse(UtilitiesStatusCodes.BadRequest, "Username is available") : new GenericResponse();
 	}
 
-	public async Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null, bool showVotes = false) {
+	public async Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null) {
 		bool isUserId = Guid.TryParse(idOrUserName, out _);
 		UserEntity? entity = await _dbContext.Set<UserEntity>()
 			.Include(u => u.Media)
@@ -375,6 +375,7 @@ public class UserRepository : IUserRepository {
 		entity.StateTr2 = dto.StateTr2 ?? entity.StateTr2;
 		entity.Point = dto.Point ?? entity.Point;
 		entity.AccessLevel = dto.AccessLevel ?? entity.AccessLevel;
+		entity.VisitedProducts = dto.VisitedProducts ?? entity.VisitedProducts;
 		entity.Badge = dto.Badge ?? entity.Badge;
 		entity.UpdatedAt = DateTime.Now;
 
