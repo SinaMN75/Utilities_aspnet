@@ -77,6 +77,10 @@ public class GlobalSearchRepository : IGlobalSearchRepository {
 			productList = productList.OrderBy(x => x.CreatedAt);
 		}
 
+		categoryList = categoryList.Skip((filter.PageNumber - 1) * filter.PageSize).Take(filter.PageSize);
+		userList = userList.Skip((filter.PageNumber - 1) * filter.PageSize).Take(filter.PageSize);
+		productList = productList.Skip((filter.PageNumber - 1) * filter.PageSize).Take(filter.PageSize);
+
 		model.Categories = categoryList;
 		model.Users = userList;
 		model.Products = productList;
