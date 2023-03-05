@@ -340,9 +340,7 @@ public class ProductFilterDto
     public IEnumerable<Guid>? Categories { get; set; }
     public IEnumerable<Guid>? CategoriesAnd { get; set; }
     public string? Query { get; set; }
-    public AgeCategory? AgeCategory { get; set; }
     public bool ShowExpired { get; set; } = false;
-    public bool? FilterByAge { get; set; }
     public bool IsFollowing { get; set; } = false;
 }
 

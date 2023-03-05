@@ -123,13 +123,19 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 			}
 
 			try {
-				await _notificationRepository.Create(new NotificationCreateUpdateDto {
+				GenericResponse<IQueryable<NotificationEntity>> notification = _notificationRepository.Filter(new NotificationFilterDto {
 					UserId = parameters.UserId,
-					Message = "You are being followed by " + myUser?.UserName,
-					Title = "Follow",
-					UseCase = "Follow",
-					CreatorUserId = uId
+					CreatorUserId = uId,
+					UseCase = "Follow"
 				});
+				if (notification.Result.IsNullOrEmpty())
+					await _notificationRepository.Create(new NotificationCreateUpdateDto {
+						UserId = parameters.UserId,
+						Message = "You are being followed by " + myUser.UserName,
+						Title = "Follow",
+						UseCase = "Follow",
+						CreatorUserId = uId
+					});
 			}
 			catch { }
 

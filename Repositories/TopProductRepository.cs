@@ -40,7 +40,6 @@ public class TopProductRepository : ITopProductRepository {
 			Title = "Your Post Is TopPost",
 			UserId = product?.UserId,
 			UseCase = "TopProduct",
-			Media = linkMedia
 		});
 
 		return new GenericResponse<TopProductEntity?>(entity);

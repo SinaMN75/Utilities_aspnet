@@ -28,16 +28,14 @@ public class ChatRepository : IChatRepository {
 
 	public async Task<GenericResponse<ChatReadDto?>> Create(ChatCreateUpdateDto model) {
 		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == model.UserId);
-		string? userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+		string? userId = _httpContextAccessor.HttpContext!.User.Identity!.Name;
 		if (user == null) return new GenericResponse<ChatReadDto?>(null, UtilitiesStatusCodes.BadRequest);
 
 		List<UserEntity?> users = new();
-		foreach (string id in model.Users ?? new List<string>()) 
-			users.Add(await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id));
+		foreach (string id in model.Users ?? new List<string>()) users.Add(await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id));
 
 		List<ProductEntity?> products = new();
-		foreach (Guid id in model.Products ?? new List<Guid>()) 
-			products.Add(await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id));
+		foreach (Guid id in model.Products ?? new List<Guid>()) products.Add(await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id));
 		ChatEntity conversation = new() {
 			CreatedAt = DateTime.Now,
 			UpdatedAt = DateTime.Now,
@@ -56,13 +54,12 @@ public class ChatRepository : IChatRepository {
 			User = user,
 			Media = conversation.Media,
 			UserId = conversation.ToUserId,
-			Send = true
 		};
 		return new GenericResponse<ChatReadDto?>(conversations);
 	}
 
 	public async Task<GenericResponse<IEnumerable<ChatReadDto>>> FilterByUserId(ChatFilterDto dto) {
-		string? userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+		string? userId = _httpContextAccessor.HttpContext!.User.Identity!.Name;
 		UserEntity? user = await _dbContext.Set<UserEntity>()
 			.Include(x => x.Media)
 			.FirstOrDefaultAsync(x => x.Id == dto.UserId);
@@ -88,7 +85,6 @@ public class ChatRepository : IChatRepository {
 			User = user,
 			UserId = dto.UserId,
 			Media = x.Media,
-			Send = x.ToUserId == dto.UserId
 		}).OrderByDescending(x => x.DateTime).ToList();
 
 		int totalCount = conversation.Count;
@@ -256,7 +252,7 @@ public class ChatRepository : IChatRepository {
 	}
 
 	public async Task<GenericResponse<IEnumerable<ChatReadDto>?>> ReadByUserId(string id) {
-		string? userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+		string? userId = _httpContextAccessor.HttpContext!.User.Identity!.Name;
 		UserEntity? user = await _dbContext.Set<UserEntity>()
 			.Include(x => x.Media)
 			.FirstOrDefaultAsync(x => x.Id == id);
@@ -282,7 +278,6 @@ public class ChatRepository : IChatRepository {
 			User = user,
 			UserId = id,
 			Media = x.Media,
-			Send = x.ToUserId == id
 		}).OrderByDescending(x => x.DateTime).ToList();
 
 		return new GenericResponse<IEnumerable<ChatReadDto>?>(conversations);
@@ -314,7 +309,6 @@ public class ChatRepository : IChatRepository {
 				DateTime = conversation.CreatedAt,
 				MessageText = conversation.MessageText,
 				UserId = conversation.ToUserId == item ? conversation.ToUserId : conversation.FromUserId,
-				Send = conversation.ToUserId == item,
 				UnReadMessages = countUnReadMessage,
 				User = user,
 				Media = conversation.Media,

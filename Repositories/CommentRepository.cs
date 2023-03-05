@@ -118,7 +118,6 @@ public class CommentRepository : ICommentRepository
                     Title = "Comment",
                     UseCase = "Comment",
                     CreatorUserId = comment.UserId,
-                    Media = linkMedia,
                     Link = product.Id.ToString()
                 });
             }

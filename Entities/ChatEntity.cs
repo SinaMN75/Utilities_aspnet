@@ -76,7 +76,6 @@ public class ChatReadDto {
 	public string UserId { get; set; } = null!;
 	public string? MessageText { get; set; }
 	public DateTime? DateTime { get; set; }
-	public bool Send { get; set; }
 	public int? UnReadMessages { get; set; } = 0;
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public UserEntity? User { get; set; }

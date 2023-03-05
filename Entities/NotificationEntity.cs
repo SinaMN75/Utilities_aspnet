@@ -37,6 +37,15 @@ public class NotificationCreateUpdateDto {
 	public string? CreatorUserId { get; set; }
 	public string? Message { get; set; }
 	public string? Link { get; set; }
-	public string? Media { get; set; }
 	public string? UseCase { get; set; }
+}
+
+public class NotificationFilterDto {
+	public string? Title { get; set; }
+	public string? UserId { get; set; }
+	public string? CreatorUserId { get; set; }
+	public string? Message { get; set; }
+	public string? UseCase { get; set; }
+	public int PageSize { get; set; } = 100;
+	public int PageNumber { get; set; } = 1;
 }
