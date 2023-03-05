@@ -42,6 +42,7 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 			await _dbContext.SaveChangesAsync();
 			return new GenericResponse<BookmarkEntity?>(bookmark, UtilitiesStatusCodes.Success, "Mission Accomplished");
 		}
+		_dbContext.Set<MediaEntity>().Remove((await _dbContext.Set<MediaEntity>().FirstOrDefaultAsync(x => x.BookmarkId == oldBookmark.Id))!);
 		_dbContext.Set<BookmarkEntity>().Remove(oldBookmark);
 		await _dbContext.SaveChangesAsync();
 
