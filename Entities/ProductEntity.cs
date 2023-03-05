@@ -136,9 +136,6 @@ public class ProductEntity : BaseEntity
     public string? UserId { get; set; }
     public UserEntity? User { get; set; }
 
-    public Guid? ChatId { get; set; }
-    public ChatEntity? Chat { get; set; }
-
     public DateTime? ExpireDate { get; set; }
     public AgeCategory? AgeCategory { get; set; }
     [StringLength(100000)]
