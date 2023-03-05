@@ -105,7 +105,8 @@ public class UserEntity : IdentityUser {
 	public IEnumerable<TeamEntity>? Teams { get; set; }
 	public IEnumerable<LikeCommentEntity>? LikeComments { get; set; }
 	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
-
+	public IEnumerable<ChatEntity>? Chats { get; set; }
+	
 	[NotMapped]
 	public bool IsFollowing { get; set; } = false;
 
@@ -126,9 +127,6 @@ public class UserEntity : IdentityUser {
 
 	[NotMapped]
 	public GrowthRateReadDto? GrowthRate { get; set; }
-
-	[NotMapped]
-	public IEnumerable<UserEntity>? Followers { get; set; }
 }
 
 [Table("Otps")]
@@ -166,7 +164,7 @@ public class RegisterDto {
 	public string? PhoneNumber { get; set; }
 	public string? AccessLevel { get; set; }
 	public string? Password { get; set; }
-	public bool SendSMS { get; set; }
+	public bool? SendSMS { get; set; }
 }
 
 public class LoginWithPasswordDto {

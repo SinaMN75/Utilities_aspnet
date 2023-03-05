@@ -156,6 +156,7 @@ public class ProductEntity : BaseEntity
     public IEnumerable<GroupChatEntity>? GroupChat { get; set; }
     public IEnumerable<ProductInsight>? ProductInsights { get; set; }
     public IEnumerable<VisitProducts>? VisitProducts { get; set; }
+    public IEnumerable<ChatEntity>? Chats { get; set; }
 
     [NotMapped]
     public bool IsFollowing { get; set; }

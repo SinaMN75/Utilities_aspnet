@@ -16,7 +16,10 @@ public class ChatEntity : BaseEntity {
 	public string MessageText { get; set; } = null!;
 
 	public bool ReadMessage { get; set; }
+
 	public IEnumerable<MediaEntity>? Media { get; set; }
+	public IEnumerable<ProductEntity>? Products { get; set; }
+	public IEnumerable<UserEntity>? Users { get; set; }
 }
 
 [Table("GroupChat")]
@@ -84,7 +87,6 @@ public class ChatFilterDto {
 	public string UserId { get; set; } = null!;
 	public int PageSize { get; set; } = 100;
 	public int PageNumber { get; set; } = 1;
-	
 }
 
 public class GroupChatFilterDto {
@@ -107,13 +109,14 @@ public class GroupChatFilterDto {
 	public bool? OrderByCreaedDateDecending { get; set; } = false;
 	public int PageSize { get; set; } = 100;
 	public int PageNumber { get; set; } = 1;
-	
 }
 
 public class ChatCreateUpdateDto {
-	public Guid? Id { get; set; } = null!;
-	public string? UserId { get; set; } = null!;
-	public string MessageText { get; set; } = null!;
+	public Guid? Id { get; set; }
+	public string? UserId { get; set; }
+	public string? MessageText { get; set; }
+	public IEnumerable<Guid>? Products { get; set; }
+	public IEnumerable<string>? Users { get; set; }
 }
 
 public class GroupChatCreateUpdateDto {
