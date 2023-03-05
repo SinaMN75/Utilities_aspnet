@@ -22,6 +22,7 @@ public class NotificationRepository : INotificationRepository {
 			.Include(x => x.Media)
 			.Include(x => x.CreatorUser).ThenInclude(x => x!.Media)
 			.Include(x => x.CreatorUser).ThenInclude(x => x!.Categories)
+			.Include(x => x.User)
 			.Where(x => (x.UserId == null || x.UserId == _httpContextAccessor.HttpContext!.User.Identity!.Name) && x.DeletedAt == null)
 			.OrderByDescending(x => x.CreatedAt)
 			.AsNoTracking()
