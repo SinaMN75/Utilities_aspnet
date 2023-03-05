@@ -19,7 +19,6 @@ public class ChatEntity : BaseEntity {
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<ProductEntity>? Products { get; set; }
-	public IEnumerable<UserEntity>? Users { get; set; }
 }
 
 [Table("GroupChat")]

@@ -46,7 +46,6 @@ public class ChatRepository : IChatRepository {
 			MessageText = model.MessageText,
 			ReadMessage = false,
 			Products = products,
-			Users = users
 		};
 		await _dbContext.Set<ChatEntity>().AddAsync(conversation);
 		await _dbContext.SaveChangesAsync();
