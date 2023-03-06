@@ -7,7 +7,7 @@ public interface IFollowBookmarkRepository {
 	Task<GenericResponse> RemoveFollowings(string targetUserId, FollowCreateDto dto);
 	GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarks(string? userId);
 	Task<GenericResponse<BookmarkEntity?>> ToggleBookmark(BookmarkCreateDto dto);
-	GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarksByFolderName(string folderName, string userId);
+	GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarksByFolderName(string? folderName, string userId);
 }
 
 public class FollowBookmarkRepository : IFollowBookmarkRepository {
@@ -42,6 +42,7 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 			await _dbContext.SaveChangesAsync();
 			return new GenericResponse<BookmarkEntity?>(bookmark, UtilitiesStatusCodes.Success, "Mission Accomplished");
 		}
+		_dbContext.Set<MediaEntity>().Remove((await _dbContext.Set<MediaEntity>().FirstOrDefaultAsync(x => x.BookmarkId == oldBookmark.Id))!);
 		_dbContext.Set<BookmarkEntity>().Remove(oldBookmark);
 		await _dbContext.SaveChangesAsync();
 
@@ -167,9 +168,9 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 		return new GenericResponse(UtilitiesStatusCodes.Success, "Mission Accomplished");
 	}
 
-	public GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarksByFolderName(string folderName, string userId) {
+	public GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarksByFolderName(string? folderName, string userId) {
 		IQueryable<BookmarkEntity> bookmark = _dbContext.Set<BookmarkEntity>().Include(x => x.Media)
-			.Where(x => x.UserId == userId && x.FolderName == folderName)
+			.Where(x => x.UserId == userId)
 			.Include(x => x.Product).ThenInclude(x => x.Media)
 			.Include(x => x.Product).ThenInclude(i => i.Votes)
 			.Include(x => x.Product).ThenInclude(i => i.User).ThenInclude(x => x.Media)
@@ -179,6 +180,8 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 			.Include(x => x.Product).ThenInclude(i => i.Comments.Where(x => x.ParentId == null)).ThenInclude(x => x.Children)
 			.Include(x => x.Product).ThenInclude(i => i.Reports)
 			.Include(x => x.Product).ThenInclude(i => i.Teams)!.ThenInclude(x => x.User)!.ThenInclude(x => x.Media);
+
+		if (folderName.IsNotNullOrEmpty()) bookmark = bookmark.Where(x => x.FolderName == folderName);
 		return new GenericResponse<IQueryable<BookmarkEntity>?>(bookmark);
 	}
 }
