@@ -281,7 +281,10 @@ public class ProductRepository : IProductRepository
                     VisitedProducts = user.VisitedProducts + "," + i.Id
                 });
 
-            if (user.BookmarkedProducts.Contains(i.Id.ToString())) i.IsBookmarked = true;
+            //ToDo: in doroste??? man ino commentesh kardam va bejash code payin ro zadam ta badan checkesh konim
+            //if (user.BookmarkedProducts.Contains(i.Id.ToString())) i.IsBookmarked = true;
+            var bookmarked = await _dbContext.Set<BookmarkEntity>().AnyAsync(a => a.ProductId == i.Id && a.UserId == userId);
+            if (bookmarked) i.IsBookmarked = true;
 
             VisitProducts? vp = await _dbContext.Set<VisitProducts>().FirstOrDefaultAsync(a => a.UserId == user.Id && a.ProductId == i.Id, ct);
             if (vp is null)
@@ -316,6 +319,7 @@ public class ProductRepository : IProductRepository
             }
             i.ProductInsights = productInsights;
         }
+
 
         i.Comments = _dbContext.Set<CommentEntity>().Where(w => w.ProductId == i.Id && w.DeletedAt == null);
         i.CommentsCount = i.Comments.Count();
