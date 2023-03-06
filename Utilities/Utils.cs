@@ -64,7 +64,7 @@ public static class StartupExtension {
         builder.Services.AddSignalR();
         builder.Services.AddPushe(options =>
         {
-            options.AccessToken = "8c2ac95bd1b1b0832a8e3ef51327a31b3793d185\r\n";
+            options.AccessToken = "8c2ac95bd1b1b0832a8e3ef51327a31b3793d185";
         });
         builder.Services.BuildServiceProvider().GetRequiredService<IPusheService>();
 
