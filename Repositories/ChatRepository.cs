@@ -25,13 +25,13 @@ public class ChatRepository : IChatRepository
 {
     private readonly DbContext _dbContext;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IPusheService _pusheService;
+    //private readonly IPusheService _pusheService;
 
-    public ChatRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IPusheService pusheService)
+    public ChatRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor/*, IPusheService pusheService*/)
     {
         _dbContext = dbContext;
         _httpContextAccessor = httpContextAccessor;
-        _pusheService = pusheService;
+        //_pusheService = pusheService;
     }
 
     public async Task<GenericResponse<ChatReadDto?>> Create(ChatCreateUpdateDto model)
@@ -67,17 +67,17 @@ public class ChatRepository : IChatRepository
             UserId = conversation.ToUserId,
         };
 
-        var push = new PusheJsonModel
-        {
-            Applications = new string[] { "YooHoo" },
-            Notification = new Notification
-            {
-                Title = "Message Created",
-                Content = JsonConvert.SerializeObject(conversations)
-            }
-        };
+        //var push = new PusheJsonModel
+        //{
+        //    Applications = new string[] { "YooHoo" },
+        //    Notification = new Notification
+        //    {
+        //        Title = "Message Created",
+        //        Content = JsonConvert.SerializeObject(conversations)
+        //    }
+        //};
 
-        await _pusheService.SendAsync(push);
+        //await _pusheService.SendAsync(push);
 
         return new GenericResponse<ChatReadDto?>(conversations);
     }
