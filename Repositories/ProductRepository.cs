@@ -183,6 +183,7 @@ public class ProductRepository : IProductRepository
         if (dto.ShowVotes.IsTrue()) q = q.Include(i => i.Votes);
         if (dto.ShowVoteFields.IsTrue()) q = q.Include(i => i.VoteFields);
         if (dto.ShowCreator.IsTrue()) q = q.Include(i => i.User).ThenInclude(x => x!.Media);
+        if (dto.ShowCreator.IsTrue()) q = q.Include(i => i.User).ThenInclude(x => x!.Categories);
         if (dto.ShowVisitProducts.IsTrue()) q = q.Include(i => i.VisitProducts);
         if (dto.Categories != null && dto.Categories.Any()) q = q.Where(x => x.Categories.Any(y => dto.Categories.ToList().Contains(y.Id)));
         if (dto.CategoriesAnd != null && dto.CategoriesAnd.Any()) q = q.Where(x => x.Categories.All(y => dto.CategoriesAnd.ToList().Contains(y.Id)));
