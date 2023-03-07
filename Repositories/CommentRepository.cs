@@ -1,9 +1,12 @@
-﻿namespace Utilities_aspnet.Repositories;
+﻿using PostmarkDotNet.Model;
+
+namespace Utilities_aspnet.Repositories;
 
 public interface ICommentRepository
 {
     Task<GenericResponse<CommentEntity?>> Create(CommentCreateUpdateDto dto);
     Task<GenericResponse<CommentEntity?>> ToggleLikeComment(Guid commentId);
+    Task<GenericResponse> AddReactionToComment(Guid commentId, Reaction reaction);
     Task<GenericResponse<CommentEntity?>> Read(Guid id);
     GenericResponse<IQueryable<CommentEntity>?> ReadByProductId(Guid id);
     GenericResponse<IQueryable<CommentEntity>?> Filter(CommentFilterDto dto);
@@ -181,5 +184,39 @@ public class CommentRepository : ICommentRepository
         _dbContext.Update(comment);
         await _dbContext.SaveChangesAsync();
         return new GenericResponse();
+    }
+
+    public async Task<GenericResponse> AddReactionToComment(Guid commentId, Reaction reaction)
+    {
+        var userId = _httpContextAccessor.HttpContext!.User.Identity!.Name!;
+        var user = await _dbContext.Set<UserEntity>().Where(w => w.Id == userId).FirstOrDefaultAsync();
+        if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound, "User Donest Logged In");
+
+        var comment = await _dbContext.Set<CommentEntity>().Where(w => w.Id == commentId).FirstOrDefaultAsync();
+        if (comment is null) return new GenericResponse(UtilitiesStatusCodes.NotFound, "Comment Not Found");
+
+        var oldReaction = await _dbContext.Set<CommentReacts>().Where(w => w.UserId == userId && w.CommentId == comment.Id).FirstOrDefaultAsync();
+        if (oldReaction is null)
+        {
+            var react = new CommentReacts
+            {
+                CommentId = comment.Id,
+                Reaction = reaction,
+                CreatedAt = DateTime.UtcNow,
+                UserId = user.Id
+            };
+            await _dbContext.Set<CommentReacts>().AddAsync(react);
+        }
+        else if (oldReaction.Reaction != reaction)
+        {
+            oldReaction.Reaction = reaction;
+            _dbContext.Set<CommentReacts>().Update(oldReaction);
+        }
+        else
+        {
+            _dbContext.Set<CommentReacts>().Remove(oldReaction);
+        }
+        await _dbContext.SaveChangesAsync();
+        return new GenericResponse(UtilitiesStatusCodes.Success, "Ok");
     }
 }

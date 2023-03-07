@@ -1,5 +1,6 @@
 ﻿using Pushe.co;
 using Newtonsoft.Json;
+using Microsoft.VisualBasic;
 
 namespace Utilities_aspnet.Repositories;
 
@@ -19,6 +20,8 @@ public interface IChatRepository
     GenericResponse<IQueryable<GroupChatEntity>> FilterGroupChats(GroupChatFilterDto dto);
     Task<GenericResponse<GroupChatEntity>> ReadGroupChatById(Guid id);
     GenericResponse<IQueryable<GroupChatMessageEntity>?> ReadGroupChatMessages(Guid id);
+    Task<GenericResponse> AddReactionToMessage(Reaction reaction, Guid messageId);
+
 }
 
 public class ChatRepository : IChatRepository
@@ -395,5 +398,39 @@ public class ChatRepository : IChatRepository
         EntityEntry<GroupChatEntity> e = await _dbContext.Set<GroupChatEntity>().AddAsync(entity);
         await _dbContext.SaveChangesAsync();
         return new GenericResponse<GroupChatEntity?>(e.Entity);
+    }
+
+    public async Task<GenericResponse> AddReactionToMessage(Reaction reaction, Guid messageId)
+    {
+        string userId = _httpContextAccessor.HttpContext!.User.Identity!.Name!;
+        var user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == userId);
+        if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound, "User Donest Logged In");
+
+        var chat = await _dbContext.Set<ChatEntity>().Where(w => w.Id == messageId).FirstOrDefaultAsync();
+        if (chat is null) return new GenericResponse(UtilitiesStatusCodes.NotFound, "Chat Not Found");
+
+        var oldReaction = await _dbContext.Set<ChatReacts>().Where(w => w.UserId == userId && w.ChatsId == chat.Id).FirstOrDefaultAsync();
+        if (oldReaction is null)
+        {
+            var react = new ChatReacts
+            {
+                ChatsId = chat.Id,
+                Reaction = reaction,
+                CreatedAt = DateTime.UtcNow,
+                UserId = user.Id
+            };
+            await _dbContext.Set<ChatReacts>().AddAsync(react);
+        }
+        else if (oldReaction.Reaction != reaction)
+        {
+            oldReaction.Reaction = reaction;
+            _dbContext.Set<ChatReacts>().Update(oldReaction);
+        }
+        else
+        {
+            _dbContext.Set<ChatReacts>().Remove(oldReaction);
+        }
+        await _dbContext.SaveChangesAsync();
+        return new GenericResponse(UtilitiesStatusCodes.Success, "Ok");
     }
 }

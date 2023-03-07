@@ -21,12 +21,21 @@ public class CommentEntity : BaseEntity
 
     [InverseProperty("Parent")]
     public IEnumerable<CommentEntity>? Children { get; set; }
-
     public IEnumerable<MediaEntity>? Media { get; set; }
     public IEnumerable<LikeCommentEntity>? LikeComments { get; set; }
+    public IEnumerable<CommentReacts>? CommentReacts { get; set; }
 
     [NotMapped]
     public bool IsLiked { get; set; }
+}
+
+[Table("CommentReacts")]
+public class CommentReacts : BaseEntity
+{
+    public Reaction? Reaction { get; set; }
+    public string? UserId { get; set; }
+    public CommentEntity? Comment { get; set; }
+    public Guid? CommentId { get; set; }
 }
 
 [Table("LikeComment")]

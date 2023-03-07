@@ -26,7 +26,12 @@ public class CommentController : BaseApiController {
 	public async Task<ActionResult<GenericResponse<CommentEntity?>>> ToggleLikeComment(Guid commentId)
 		=> Result(await _repository.ToggleLikeComment(commentId));
 
-	[HttpPut]
+    [HttpPost("AddReactionToComment/{commentId:guid}/{reaction}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<ActionResult<GenericResponse>> AddReactionToComment(Guid commentId, Reaction reaction)
+    => Result(await _repository.AddReactionToComment(commentId, reaction));
+
+    [HttpPut]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	public async Task<ActionResult<GenericResponse>> Update(Guid id, CommentCreateUpdateDto parameter) => Result(await _repository.Update(id, parameter));
 
