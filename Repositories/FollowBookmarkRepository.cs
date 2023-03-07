@@ -217,8 +217,7 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository
         string userId = _httpContextAccessor.HttpContext!.User.Identity!.Name!;
 
         BookmarkEntity? oldBookmark = await _dbContext.Set<BookmarkEntity>()
-            .FirstOrDefaultAsync(x => x.ProductId == dto.ProductId &&
-                                 x.UserId == userId);
+            .FirstOrDefaultAsync(x => x.Id == bookmarkId);
         if (oldBookmark is null)
         {
             return new GenericResponse<BookmarkEntity?>(null, UtilitiesStatusCodes.NotFound, "Not Found");
