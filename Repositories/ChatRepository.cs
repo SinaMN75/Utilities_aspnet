@@ -68,6 +68,7 @@ public class ChatRepository : IChatRepository
             User = user,
             Media = conversation.Media,
             UserId = conversation.ToUserId,
+            Products = conversation.Products
         };
 
         //var push = new PusheJsonModel
@@ -305,7 +306,7 @@ public class ChatRepository : IChatRepository
             .FirstOrDefaultAsync(x => x.Id == id);
         if (user == null) return new GenericResponse<IEnumerable<ChatReadDto>?>(null, UtilitiesStatusCodes.BadRequest);
         List<ChatEntity> conversation = await _dbContext.Set<ChatEntity>()
-            .Where(c => c.ToUserId == userId && c.FromUserId == id)
+            .Where(c => c.ToUserId == userId && c.FromUserId == id || c.ToUserId == id && c.FromUserId == userId)
             .Include(x => x.Media).OrderByDescending(x => x.CreatedAt).ToListAsync();
 
         foreach (ChatEntity? item in conversation.Where(item => item.ReadMessage == false))

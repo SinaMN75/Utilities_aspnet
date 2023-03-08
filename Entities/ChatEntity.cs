@@ -1,4 +1,6 @@
-﻿namespace Utilities_aspnet.Entities;
+﻿using Stripe;
+
+namespace Utilities_aspnet.Entities;
 
 [Table("Chats")]
 public class ChatEntity : BaseEntity
@@ -93,6 +95,7 @@ public class ChatReadDto
     public int? UnReadMessages { get; set; } = 0;
     public IEnumerable<MediaEntity>? Media { get; set; }
     public UserEntity? User { get; set; }
+    public IEnumerable<ProductEntity>? Products{ get; set; }
 }
 
 public class ChatFilterDto
