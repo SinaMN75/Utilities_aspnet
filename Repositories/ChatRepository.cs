@@ -325,9 +325,9 @@ public class ChatRepository : IChatRepository
             Id = x.Id,
             DateTime = x.CreatedAt,
             MessageText = x.MessageText,
-            Send = userId == x.ToUserId,
+            Send = userId == x.FromUserId,
             User = user,
-            UserId = x.FromUserId == userId ? x.FromUserId : x.ToUserId,
+            UserId = x.FromUserId == userId ? x.ToUserId : x.FromUserId,
             Media = x.Media,
         }).OrderByDescending(x => x.DateTime).ToList();
 
