@@ -36,6 +36,7 @@ public class CommentRepository : ICommentRepository
             .Include(x => x.User).ThenInclude(x => x!.Media)
             .Include(x => x.Media)
             .Include(x => x.LikeComments)
+            .Include(x => x.CommentReacts)
             .Include(x => x.Children)!.ThenInclude(x => x.Children)
             .Include(x => x.Children)!.ThenInclude(x => x.LikeComments)
             .Include(x => x.Children)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)

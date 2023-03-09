@@ -307,7 +307,9 @@ public class ChatRepository : IChatRepository
         if (user == null) return new GenericResponse<IEnumerable<ChatReadDto>?>(null, UtilitiesStatusCodes.BadRequest);
         List<ChatEntity> conversation = await _dbContext.Set<ChatEntity>()
             .Where(c => c.ToUserId == userId && c.FromUserId == id)
-            .Include(x => x.Media).OrderByDescending(x => x.CreatedAt).ToListAsync();
+            .Include(x => x.Media)
+            .Include(x => x.Products)
+            .OrderByDescending(x => x.CreatedAt).ToListAsync();
 
         foreach (ChatEntity? item in conversation.Where(item => item.ReadMessage == false))
         {
@@ -317,7 +319,9 @@ public class ChatRepository : IChatRepository
 
         IEnumerable<ChatEntity> conversationToUser = await _dbContext.Set<ChatEntity>()
             .Where(x => x.FromUserId == userId && x.ToUserId == id)
-            .Include(x => x.Media).OrderByDescending(x => x.CreatedAt).ToListAsync();
+            .Include(x => x.Media)
+            .Include(x => x.Products)
+            .OrderByDescending(x => x.CreatedAt).ToListAsync();
 
         conversation.AddRange(conversationToUser);
         List<ChatReadDto> conversations = conversation.Select(x => new ChatReadDto
@@ -356,6 +360,7 @@ public class ChatRepository : IChatRepository
             ChatEntity? conversation = await _dbContext.Set<ChatEntity>()
                 .Where(c => c.FromUserId == item && c.ToUserId == userId || c.FromUserId == userId && c.ToUserId == item).OrderByDescending(c => c.CreatedAt)
                 .Include(y => y.Media)
+                .Include(x => x.Products)
                 .Take(1).FirstOrDefaultAsync();
             int? countUnReadMessage = _dbContext.Set<ChatEntity>().Where(c => c.FromUserId == item && c.ToUserId == userId).Count(x => x.ReadMessage == false);
             conversations.Add(new ChatReadDto
