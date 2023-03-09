@@ -329,6 +329,7 @@ public class ChatRepository : IChatRepository
             User = user,
             UserId = x.FromUserId == userId ? x.ToUserId : x.FromUserId,
             Media = x.Media,
+            Products = x.Products
         }).OrderByDescending(x => x.DateTime).ToList();
 
         return new GenericResponse<IEnumerable<ChatReadDto>?>(conversations);
@@ -367,6 +368,7 @@ public class ChatRepository : IChatRepository
                 UnReadMessages = countUnReadMessage,
                 User = user,
                 Media = conversation.Media,
+                Products = conversation.Products
             });
         }
 
