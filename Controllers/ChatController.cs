@@ -18,19 +18,19 @@ public class ChatController : BaseApiController
     public async Task<ActionResult<GenericResponse<IEnumerable<ChatReadDto>?>>> ReadById(string userId) => Result(await _repository.ReadByUserId(userId));
 
     [HttpPost]
-    public async Task<ActionResult<GenericResponse<ChatReadDto?>>> Create([FromServices] IPusheService _pusheService, ChatCreateUpdateDto model)
+    public async Task<ActionResult<GenericResponse<ChatReadDto?>>> Create(/*[FromServices] IPusheService _pusheService,*/ ChatCreateUpdateDto model)
     {
         var result = await _repository.Create(model);
-        var push = new PusheJsonModel
-        {
-            Applications = new string[] { "YooHoo" },
-            Notification = new Notification
-            {
-                Title = "Message Created",
-                Content = JsonConvert.SerializeObject(result.Result)
-            }
-        };
-        await _pusheService.SendAsync(push);
+        //var push = new PusheJsonModel
+        //{
+        //    Applications = new string[] { "YooHoo" },
+        //    Notification = new Notification
+        //    {
+        //        Title = "Message Created",
+        //        Content = JsonConvert.SerializeObject(result.Result)
+        //    }
+        //};
+        //await _pusheService.SendAsync(push);
         return Result(result);
     }
 
