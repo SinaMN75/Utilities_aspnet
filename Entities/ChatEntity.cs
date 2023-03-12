@@ -96,6 +96,7 @@ public class ChatReadDto
     public DateTime? DateTime { get; set; }
     public bool Send { get; set; }
     public int? UnReadMessages { get; set; } = 0;
+    public Guid? ParentId { get; set; }
     public IEnumerable<MediaEntity>? Media { get; set; }
     public UserEntity? User { get; set; }
     public IEnumerable<ProductEntity>? Products{ get; set; }

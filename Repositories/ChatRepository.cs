@@ -19,7 +19,6 @@ public interface IChatRepository
     GenericResponse<IQueryable<GroupChatEntity>?> ReadMyGroupChats();
     GenericResponse<IQueryable<GroupChatEntity>> FilterGroupChats(GroupChatFilterDto dto);
     Task<GenericResponse<GroupChatEntity>> ReadGroupChatById(Guid id);
-    GenericResponse<IQueryable<GroupChatEntity>> ReadGroupChatsByUserId();
     GenericResponse<IQueryable<GroupChatMessageEntity>?> ReadGroupChatMessages(Guid id);
     Task<GenericResponse> AddReactionToMessage(Reaction reaction, Guid messageId);
 
@@ -70,6 +69,7 @@ public class ChatRepository : IChatRepository
             User = user,
             Media = conversation.Media,
             UserId = conversation.ToUserId,
+            ParentId = model.ParentId,
             Products = conversation.Products
         };
 
@@ -436,18 +436,4 @@ public class ChatRepository : IChatRepository
         return new GenericResponse(UtilitiesStatusCodes.Success, "Ok");
     }
 
-    public GenericResponse<IQueryable<GroupChatEntity>> ReadGroupChatsByUserId()
-    {
-        string? userId = _httpContextAccessor.HttpContext!.User.Identity!.Name;
-        var user = _dbContext.Set<UserEntity>().Where(w => w.Id == userId).FirstOrDefault();
-        if (user == null) return new GenericResponse<IQueryable<GroupChatEntity>>(null, UtilitiesStatusCodes.UserNotFound);
-
-        IQueryable<GroupChatEntity> e = _dbContext.Set<GroupChatEntity>()
-            .Where(x => x.Users.Any(a => a.Id == user.Id))
-            .Include(x => x.Media)
-            .Include(x => x.Users).ThenInclude(x => x.Media)
-            .AsNoTracking();
-
-        return new GenericResponse<IQueryable<GroupChatEntity>>(e);
-    }
 }
