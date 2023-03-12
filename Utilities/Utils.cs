@@ -65,6 +65,7 @@ public static class StartupExtension {
         builder.Services.AddPushe(options =>
         {
             options.AccessToken = "8c2ac95bd1b1b0832a8e3ef51327a31b3793d185";
+            //options.AccessToken = "Token 8c2ac95bd1b1b0832a8e3ef51327a31b3793d185";
         });
         builder.Services.BuildServiceProvider().GetRequiredService<IPusheService>();
 
@@ -110,7 +111,7 @@ public static class StartupExtension {
 		builder.Services.AddTransient<IMailSmsRepository, MailSmsRepository>();
 		builder.Services.AddTransient<IChatroomRepository, ChatroomRepository>();
 		builder.Services.AddTransient<IMessageRepository, MessageRepository>();
-		builder.Services.AddTransient<IPusheService, PusheService>();
+		//builder.Services.AddTransient<IPusheService, PusheService>();
 	}
 
 	private static void AddUtilitiesSwagger(this WebApplicationBuilder builder, IServiceProvider? serviceProvider) {
