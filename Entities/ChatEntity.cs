@@ -19,6 +19,9 @@ public class ChatEntity : BaseEntity
     public string MessageText { get; set; } = null!;
 
     public bool ReadMessage { get; set; }
+    
+    public Guid? ParentId { get; set; }
+    public ChatEntity? Parent { get; set; }
 
     public IEnumerable<ChatReacts>? ChatReacts { get; set; }
     public IEnumerable<MediaEntity>? Media { get; set; }
@@ -135,6 +138,7 @@ public class ChatCreateUpdateDto
     public string? MessageText { get; set; }
     public IEnumerable<Guid>? Products { get; set; }
     public IEnumerable<string>? Users { get; set; }
+    public Guid? ParentId { get; set; }
 }
 
 public class GroupChatCreateUpdateDto

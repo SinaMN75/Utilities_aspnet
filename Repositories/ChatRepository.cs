@@ -58,6 +58,7 @@ public class ChatRepository : IChatRepository
             MessageText = model.MessageText,
             ReadMessage = false,
             Products = products,
+            ParentId = model.ParentId
         };
         await _dbContext.Set<ChatEntity>().AddAsync(conversation);
         await _dbContext.SaveChangesAsync();
@@ -297,7 +298,7 @@ public class ChatRepository : IChatRepository
         List<ChatEntity> conversation = await _dbContext.Set<ChatEntity>()
             .Where(c => c.ToUserId == userId && c.FromUserId == id)
             .Include(x => x.Media)
-            .Include(x => x.Products)
+            .Include(x => x.Products)!.ThenInclude(x => x.Media)
             .OrderByDescending(x => x.CreatedAt).ToListAsync();
 
         foreach (ChatEntity? item in conversation.Where(item => item.ReadMessage == false))
@@ -309,7 +310,7 @@ public class ChatRepository : IChatRepository
         IEnumerable<ChatEntity> conversationToUser = await _dbContext.Set<ChatEntity>()
             .Where(x => x.FromUserId == userId && x.ToUserId == id)
             .Include(x => x.Media)
-            .Include(x => x.Products)
+            .Include(x => x.Products)!.ThenInclude(x => x.Media)
             .OrderByDescending(x => x.CreatedAt).ToListAsync();
 
         conversation.AddRange(conversationToUser);
@@ -333,11 +334,13 @@ public class ChatRepository : IChatRepository
         string userId = _httpContextAccessor.HttpContext!.User.Identity!.Name!;
         List<string> toUserId = await _dbContext.Set<ChatEntity>()
             .Where(x => x.FromUserId == userId)
-            .Include(x => x.Products)
+            .Include(x => x.Products)!.ThenInclude(x => x.Media)
+            .Include(x => x.Parent)
             .Include(x => x.Media).Select(x => x.ToUserId).ToListAsync();
         List<string> fromUserId = await _dbContext.Set<ChatEntity>()
             .Where(x => x.ToUserId == userId)
-            .Include(x => x.Products)
+            .Include(x => x.Parent)
+            .Include(x => x.Products)!.ThenInclude(x => x.Media)
             .Include(x => x.Media).Select(x => x.FromUserId).ToListAsync();
         toUserId.AddRange(fromUserId);
         List<ChatReadDto> conversations = new();
@@ -349,7 +352,8 @@ public class ChatRepository : IChatRepository
             ChatEntity? conversation = await _dbContext.Set<ChatEntity>()
                 .Where(c => c.FromUserId == item && c.ToUserId == userId || c.FromUserId == userId && c.ToUserId == item).OrderByDescending(c => c.CreatedAt)
                 .Include(y => y.Media)
-                .Include(x => x.Products)
+                .Include(x => x.Parent)
+                .Include(x => x.Products)!.ThenInclude(x => x.Media)
                 .Take(1).FirstOrDefaultAsync();
             int? countUnReadMessage = _dbContext.Set<ChatEntity>().Where(c => c.FromUserId == item && c.ToUserId == userId).Count(x => x.ReadMessage == false);
             conversations.Add(new ChatReadDto
