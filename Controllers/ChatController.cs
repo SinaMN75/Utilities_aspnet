@@ -65,8 +65,12 @@ public class ChatController : BaseApiController
     public ActionResult<GenericResponse<GroupChatMessageEntity?>> ReadGroupChatMessages(Guid id) => Result(_repository.ReadGroupChatMessages(id));
 
     [HttpGet("ReadGroupChatById/{id:guid}")]
-    public async Task<ActionResult<GenericResponse<GroupChatMessageEntity?>>> ReadGroupChatById(Guid id) => Result(await _repository.ReadGroupChatById(id));
+    public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> ReadGroupChatById(Guid id) => Result(await _repository.ReadGroupChatById(id));
 
     [HttpPost("AddReactionToMessage/{emoji}/{messageId:guid}")]
     public async Task<ActionResult<GenericResponse>> AddReactionToMessage(Reaction emoji, Guid messageId) => Result(await _repository.AddReactionToMessage(emoji, messageId));
+
+    [HttpGet("ReadMyGroupChatsByUserId")]
+    public ActionResult<GenericResponse<GroupChatMessageEntity?>> ReadGroupChatsByUserId() => Result(_repository.ReadGroupChatsByUserId());
+    
 }
