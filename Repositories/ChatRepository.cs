@@ -71,18 +71,6 @@ public class ChatRepository : IChatRepository
             Products = conversation.Products
         };
 
-        //var push = new PusheJsonModel
-        //{
-        //    Applications = new string[] { "YooHoo" },
-        //    Notification = new Notification
-        //    {
-        //        Title = "Message Created",
-        //        Content = JsonConvert.SerializeObject(conversations)
-        //    }
-        //};
-
-        //await _pusheService.SendAsync(push);
-
         return new GenericResponse<ChatReadDto?>(conversations);
     }
 
