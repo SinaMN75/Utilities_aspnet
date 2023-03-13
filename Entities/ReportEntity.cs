@@ -16,6 +16,8 @@ public class ReportEntity : BaseEntity
 
 	public Guid? ProductId { get; set; }
 	public ProductEntity? Product { get; set; }
+	public CommentEntity? Comment { get; set; }
+	public Guid? CommentId { get; set; }
 	public ReportType ReportType { get; set; } = ReportType.All;
 	[StringLength(500)]
 	public string? ProductUseCase { get; set; }

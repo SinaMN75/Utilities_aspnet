@@ -30,6 +30,7 @@ public class ReportRepository : IReportRepository
 			Description = dto.Description
 		};
 		if (dto.ProductId.HasValue) entity.ProductId = dto.ProductId;
+		if (dto.CommentId.HasValue) entity.CommentId = dto.CommentId;
 		if (!dto.UserId.IsNotNullOrEmpty()) entity.UserId = dto.UserId;
 		await _dbContext.Set<ReportEntity>().AddAsync(entity);
 		await _dbContext.SaveChangesAsync();
@@ -257,6 +258,7 @@ public class ReportRepository : IReportRepository
 		ReportEntity? entity = await _dbContext.Set<ReportEntity>()
 			.Include(x => x.User)
 			.Include(x => x.Product)
+			.Include(x => x.Comment)
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.Id == id);
 		return new GenericResponse<ReportEntity?>(entity);
