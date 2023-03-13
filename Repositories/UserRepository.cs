@@ -23,13 +23,13 @@ public class UserRepository : IUserRepository
 {
     private readonly DbContext _dbContext;
     private readonly UserManager<UserEntity> _userManager;
-    private readonly ISmsSender _sms;
+    private readonly ISmsNotificationRepository _sms;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public UserRepository(
         DbContext dbContext,
         UserManager<UserEntity> userManager,
-        ISmsSender sms,
+        ISmsNotificationRepository sms,
         IHttpContextAccessor httpContextAccessor)
     {
         _dbContext = dbContext;

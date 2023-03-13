@@ -2,7 +2,7 @@
 
 public class AppSettings {
 	public SmsPanelSettings? SmsPanelSettings { get; set; }
-	public Pushe? Pushe { get; set; }
+	public PushNotificationSetting PushNotificationSetting { get; set; } = null!;
 	public string? AndroidMinimumVersion { get; set; }
 	public string? AndroidLatestVersion { get; set; }
 	public string? IosMinimumVersion { get; set; }
@@ -23,9 +23,10 @@ public class SmsPanelSettings {
 	public string? PatternCode { get; set; }
 }
 
-public class Pushe {
-	public string? AccessToken { get; set; }
-	public string? Applications { get; set; }
+public class PushNotificationSetting {
+	public string? Provider { get; set; }
+	public string? Token { get; set; }
+	public string? AppId { get; set; }
 }
 
 public class IdTitleDto {

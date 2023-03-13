@@ -88,7 +88,7 @@ public static class StartupExtension {
 		builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 		builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 		builder.Services.AddTransient<AppSettings>();
-		builder.Services.AddTransient<ISmsSender, SmsSender>();
+		builder.Services.AddTransient<ISmsNotificationRepository, SmsNotificationRepository>();
 		builder.Services.AddTransient<IReportRepository, ReportRepository>();
 		builder.Services.AddTransient<IUserRepository, UserRepository>();
 		builder.Services.AddTransient<IMediaRepository, MediaRepository>();

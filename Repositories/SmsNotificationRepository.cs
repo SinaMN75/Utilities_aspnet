@@ -1,13 +1,14 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
-public interface ISmsSender {
+public interface ISmsNotificationRepository {
 	void SendSms(string mobileNumber, string message);
+	void SendNotification(string userId, string message, string result);
 }
 
-public class SmsSender : ISmsSender {
+public class SmsNotificationRepository : ISmsNotificationRepository {
 	private readonly IConfiguration _config;
 
-	public SmsSender(IConfiguration config) => _config = config;
+	public SmsNotificationRepository(IConfiguration config) => _config = config;
 
 	public void SendSms(string mobileNumber, string message) {
 		AppSettings appSettings = new();
@@ -24,7 +25,7 @@ public class SmsSender : ISmsSender {
 		switch (smsSetting.Provider) {
 			case "ghasedak": {
 				Api sms = new(smsSetting.SmsApiKey);
-				sms.VerifyAsync(1, smsSetting.PatternCode, new[] { mobileNumber}, message);
+				sms.VerifyAsync(1, smsSetting.PatternCode, new[] {mobileNumber}, message);
 				break;
 			}
 			case "faraz": {
@@ -43,4 +44,48 @@ public class SmsSender : ISmsSender {
 			}
 		}
 	}
+
+	public void SendNotification(string userId, string message, string result) {
+		AppSettings appSettings = new();
+		_config.GetSection("AppSettings").Bind(appSettings);
+		PushNotificationSetting setting = appSettings.PushNotificationSetting;
+
+		switch (setting.Provider) {
+			case "pushe": {
+				string appId = setting.AppId;
+				RestClient client = new("https://api.pushe.co/v2/messaging/notifications/");
+				RestRequest request = new(Method.POST);
+				request.AddHeader("Content-Type", "application/json");
+				request.AddHeader("Authorization", "Token " + setting.Token);
+				request.AddObject(new PushNotificationData {
+					app_ids = appId,
+					data = new Data {
+						content = result,
+						title = message
+					},
+					filters = new Filters {
+						
+					}
+				});
+
+				client.Execute(request);
+				break;
+			}
+		}
+	}
+}
+
+public class PushNotificationData {
+	public string app_ids { get; set; }
+	public Filters filters { get; set; }
+	public Data data { get; set; }
+}
+
+public class Data {
+	public string title { get; set; }
+	public string content { get; set; }
+}
+
+public class Filters {
+	public string[] tags { get; set; }
 }
