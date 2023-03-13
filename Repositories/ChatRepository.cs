@@ -28,7 +28,7 @@ public class ChatRepository : IChatRepository
 {
     private readonly DbContext _dbContext;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    //private readonly IPusheService _pusheService;
+    private readonly IPusheService _pusheService;
 
     public ChatRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor/*, IPusheService pusheService*/)
     {
@@ -227,6 +227,7 @@ public class ChatRepository : IChatRepository
             .Include(x => x.Products).ThenInclude(x => x.Categories)
             .Include(x => x.Products).ThenInclude(x => x.Comments)
             .Include(x => x.Products).ThenInclude(x => x.User)
+            .Include(x => x.GroupChatMessage).TakeLast(1)
             .AsNoTracking();
 
         return new GenericResponse<IQueryable<GroupChatEntity>?>(e);
@@ -379,7 +380,7 @@ public class ChatRepository : IChatRepository
         foreach (string id in dto.UserIds) users.Add(await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id));
 
         List<ProductEntity> products = new();
-        foreach (Guid id in dto.ProductIds) products.Add(await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id));
+        foreach (Guid id in dto.ProductIds ) products.Add(await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id));
 
         GroupChatEntity entity = new()
         {

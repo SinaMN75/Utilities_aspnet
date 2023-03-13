@@ -154,8 +154,8 @@ public class GroupChatCreateUpdateDto
     public bool? ReadIfExist { get; set; } = true;
     public ChatStatus? ChatStatus { get; set; }
     public Priority? Priority { get; set; }
-    public IEnumerable<string>? UserIds { get; set; }
-    public IEnumerable<Guid>? ProductIds { get; set; }
+    public IEnumerable<string>? UserIds { get; set; } = new List<string>();
+    public IEnumerable<Guid>? ProductIds { get; set; } = new List<Guid>();
 }
 
 public class GroupChatMessageCreateUpdateDto
