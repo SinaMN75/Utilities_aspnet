@@ -59,13 +59,8 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 				request.AddHeader("Authorization", "Token " + setting.Token);
 				request.AddObject(new PushNotificationData {
 					app_ids = appId,
-					data = new Data {
-						content = result,
-						title = message
-					},
-					filters = new Filters {
-						
-					}
+					data = new Data {content = result, title = message},
+					filters = new Filters {tags = new Tags {UserId = userId}}
 				});
 
 				client.Execute(request);
@@ -87,5 +82,9 @@ public class Data {
 }
 
 public class Filters {
-	public string[] tags { get; set; }
+	public Tags tags { get; set; }
+}
+
+public class Tags {
+	public string UserId { get; set; }
 }
