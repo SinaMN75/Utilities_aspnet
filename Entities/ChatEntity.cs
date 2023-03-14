@@ -160,6 +160,7 @@ public class GroupChatCreateUpdateDto
 
 public class GroupChatMessageCreateUpdateDto
 {
+    public Guid? Id { get; set; }
     public string? Message { get; set; }
     public string? Type { get; set; }
     public string? UseCase { get; set; }

@@ -17,6 +17,8 @@ public interface IChatRepository
     Task<GenericResponse<GroupChatEntity?>> UpdateGroupChat(GroupChatCreateUpdateDto dto);
     Task<GenericResponse<GroupChatMessageEntity?>> CreateGroupChatMessage(GroupChatMessageCreateUpdateDto dto);
     GenericResponse<IQueryable<GroupChatEntity>?> ReadMyGroupChats();
+    Task<GenericResponse<GroupChatMessageEntity?>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto);
+    Task<GenericResponse> DeleteGroupChatMessage(Guid id);
     GenericResponse<IQueryable<GroupChatEntity>> FilterGroupChats(GroupChatFilterDto dto);
     Task<GenericResponse<GroupChatEntity>> ReadGroupChatById(Guid id);
     GenericResponse<IQueryable<GroupChatMessageEntity>?> ReadGroupChatMessages(Guid id);
@@ -230,6 +232,29 @@ public class ChatRepository : IChatRepository
             .AsNoTracking();
 
         return new GenericResponse<IQueryable<GroupChatEntity>?>(e);
+    }
+
+    public async Task<GenericResponse<GroupChatMessageEntity?>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto) {
+        GroupChatMessageEntity? e = await _dbContext.Set<GroupChatMessageEntity>()
+            .FirstOrDefaultAsync(x => x.Id == dto.Id);
+
+        e.Message = dto.Message ?? e.Message;
+        e.Type = dto.Type ?? e.Type;
+        e.UpdatedAt = DateTime.Now;
+        e.UseCase = dto.UseCase ?? e.UseCase;
+
+        EntityEntry<GroupChatMessageEntity> entity = _dbContext.Set<GroupChatMessageEntity>().Update(e);
+        await _dbContext.SaveChangesAsync();
+        return new GenericResponse<GroupChatMessageEntity?>(entity.Entity);
+    }
+
+    public async Task<GenericResponse> DeleteGroupChatMessage(Guid id) {
+        GroupChatMessageEntity? e = await _dbContext.Set<GroupChatMessageEntity>().FirstOrDefaultAsync(x => x.Id == id);
+        if (e == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
+        e.DeletedAt = DateTime.Now;
+        _dbContext.Update(e);
+        await _dbContext.SaveChangesAsync();
+        return new GenericResponse();
     }
 
     public GenericResponse<IQueryable<GroupChatEntity>> FilterGroupChats(GroupChatFilterDto dto)
