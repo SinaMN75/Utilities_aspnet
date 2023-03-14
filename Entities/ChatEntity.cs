@@ -57,6 +57,9 @@ public class GroupChatEntity : BaseEntity
     [StringLength(500)]
     public string? Department { get; set; }
 
+    [StringLength(500)]
+    public string? CreatorUserId { get; set; }
+
     public ChatStatus? ChatStatus { get; set; }
 
     public Priority? Priority { get; set; }

@@ -427,6 +427,7 @@ public class ChatRepository : IChatRepository
             UseCase = dto.UseCase,
             ChatStatus = dto.ChatStatus,
             Description = dto.Description,
+            CreatorUserId = _httpContextAccessor.HttpContext!.User.Identity!.Name!,
             Users = users,
             Products = products
         };
