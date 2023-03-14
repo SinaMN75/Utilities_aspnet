@@ -15,6 +15,7 @@ public interface IChatRepository
 
     Task<GenericResponse<GroupChatEntity?>> CreateGroupChat(GroupChatCreateUpdateDto dto);
     Task<GenericResponse<GroupChatEntity?>> UpdateGroupChat(GroupChatCreateUpdateDto dto);
+    Task<GenericResponse> DeleteGroupChat(Guid id);
     Task<GenericResponse<GroupChatMessageEntity?>> CreateGroupChatMessage(GroupChatMessageCreateUpdateDto dto);
     GenericResponse<IQueryable<GroupChatEntity>?> ReadMyGroupChats();
     Task<GenericResponse<GroupChatMessageEntity?>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto);
@@ -199,6 +200,14 @@ public class ChatRepository : IChatRepository
         EntityEntry<GroupChatEntity> entity = _dbContext.Set<GroupChatEntity>().Update(e);
         await _dbContext.SaveChangesAsync();
         return new GenericResponse<GroupChatEntity?>(entity.Entity);
+    }
+
+    public async Task<GenericResponse> DeleteGroupChat(Guid id) {
+        GroupChatEntity? e = await _dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(x => x.Id == id);
+        if (e == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
+        _dbContext.Remove(e);
+        await _dbContext.SaveChangesAsync();
+        return new GenericResponse();
     }
 
     public async Task<GenericResponse<GroupChatMessageEntity?>> CreateGroupChatMessage(GroupChatMessageCreateUpdateDto dto)
