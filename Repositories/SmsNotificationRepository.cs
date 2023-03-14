@@ -52,18 +52,16 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 
 		switch (setting.Provider) {
 			case "pushe": {
-				string appId = setting.AppId;
-				RestClient client = new("https://api.pushe.co/v2/messaging/notifications/");
 				RestRequest request = new(Method.POST);
 				request.AddHeader("Content-Type", "application/json");
 				request.AddHeader("Authorization", "Token " + setting.Token);
 				request.AddObject(new PushNotificationData {
-					app_ids = appId,
+					app_ids = setting.AppId,
 					data = new Data {content = result, title = message},
 					filters = new Filters {tags = new Tags {UserId = userId}}
 				});
 
-				client.Execute(request);
+				new RestClient("https://api.pushe.co/v2/messaging/notifications/").Execute(request);
 				break;
 			}
 		}
