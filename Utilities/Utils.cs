@@ -108,7 +108,7 @@ public static class StartupExtension {
 		builder.Services.AddTransient<IDiscountRepository, DiscountRepository>();
 		builder.Services.AddTransient<IGlobalSearchRepository, GlobalSearchRepository>();
 		builder.Services.AddTransient<IPaymentRepository, PaymentRepository>();
-		builder.Services.AddTransient<IMailSmsRepository, MailSmsRepository>();
+		builder.Services.AddTransient<ISmsNotificationRepository, SmsNotificationRepository>();
 		builder.Services.AddTransient<IChatroomRepository, ChatroomRepository>();
 		builder.Services.AddTransient<IMessageRepository, MessageRepository>();
 		//builder.Services.AddTransient<IPusheService, PusheService>();

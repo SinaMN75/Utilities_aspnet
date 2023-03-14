@@ -1,8 +1,11 @@
-﻿namespace Utilities_aspnet.Repositories;
+﻿using PostmarkDotNet;
+
+namespace Utilities_aspnet.Repositories;
 
 public interface ISmsNotificationRepository {
 	void SendSms(string mobileNumber, string message);
-	void SendNotification(string userId, string message, string result);
+	public GenericResponse SendNotification(NotificationCreateDto dto);
+	public Task<GenericResponse> SendMail(SendMailDto dto);
 }
 
 public class SmsNotificationRepository : ISmsNotificationRepository {
@@ -44,8 +47,8 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 			}
 		}
 	}
-
-	public void SendNotification(string userId, string message, string result) {
+	
+	public GenericResponse SendNotification(NotificationCreateDto dto) {
 		AppSettings appSettings = new();
 		_config.GetSection("AppSettings").Bind(appSettings);
 		PushNotificationSetting setting = appSettings.PushNotificationSetting;
@@ -57,15 +60,44 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 				request.AddHeader("Authorization", "Token " + setting.Token);
 				request.AddObject(new PushNotificationData {
 					app_ids = setting.AppId,
-					data = new Data {content = result, title = message},
-					filters = new Filters {tags = new Tags {UserId = userId}}
+					data = new Data {content = dto.Title, title = dto.Message},
+					filters = new Filters {tags = new Tags {UserId = dto.UserId}}
 				});
 
 				new RestClient("https://api.pushe.co/v2/messaging/notifications/").Execute(request);
 				break;
 			}
 		}
+		return new GenericResponse();
 	}
+
+	public async Task<GenericResponse> SendMail(SendMailDto dto) {
+		try {
+			PostmarkMessage message = new() {
+				To = dto.To,
+				From = "Support@toubasources.com",
+				Subject = "Touba Technical Mail",
+				TextBody = dto.PlainText,
+			};
+			PostmarkClient client = new PostmarkClient("00ed8f38-a980-4201-bddd-6621fb77eaa6");
+			PostmarkResponse? sendResult = await client.SendMessageAsync(message);
+
+			return sendResult.Status == PostmarkStatus.Success ? new GenericResponse() : new GenericResponse(UtilitiesStatusCodes.Unhandled);
+
+			#region SendGrid
+
+			#endregion
+		}
+		catch (Exception ex) {
+			return new GenericResponse(UtilitiesStatusCodes.Unhandled, ex.ToString());
+		}
+	}
+}
+
+public class NotificationCreateDto {
+	public string UserId { get; set; }
+	public string Title { get; set; }
+	public string Message { get; set; }
 }
 
 public class PushNotificationData {
