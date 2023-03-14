@@ -47,7 +47,7 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 			}
 		}
 	}
-	
+
 	public GenericResponse SendNotification(NotificationCreateDto dto) {
 		AppSettings appSettings = new();
 		_config.GetSection("AppSettings").Bind(appSettings);
@@ -58,12 +58,13 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 				RestRequest request = new(Method.POST);
 				request.AddHeader("Content-Type", "application/json");
 				request.AddHeader("Authorization", "Token " + setting.Token);
-				request.AddObject(new PushNotificationData {
+				var body = new {
 					app_ids = setting.AppId,
-					data = new Data {content = dto.Title, title = dto.Message},
-					filters = new Filters {tags = new Tags {UserId = dto.UserId}}
-				});
-
+					data = new {title = dto.Title, content = dto.Message},
+					filters = new {userId = dto.UserIds}
+				};
+				request.AddJsonBody(body);
+				
 				new RestClient("https://api.pushe.co/v2/messaging/notifications/").Execute(request);
 				break;
 			}
@@ -95,26 +96,7 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 }
 
 public class NotificationCreateDto {
-	public string UserId { get; set; }
+	public IEnumerable<string> UserIds { get; set; }
 	public string Title { get; set; }
 	public string Message { get; set; }
-}
-
-public class PushNotificationData {
-	public string app_ids { get; set; }
-	public Filters filters { get; set; }
-	public Data data { get; set; }
-}
-
-public class Data {
-	public string title { get; set; }
-	public string content { get; set; }
-}
-
-public class Filters {
-	public Tags tags { get; set; }
-}
-
-public class Tags {
-	public string UserId { get; set; }
 }
