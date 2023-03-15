@@ -183,7 +183,7 @@ public class CommentRepository : ICommentRepository
 
     public async Task<GenericResponse> Delete(Guid id)
     {
-        CommentEntity? comment = await _dbContext.Set<CommentEntity>().Include(p => p.Children).FirstOrDefaultAsync(x => x.Id == id);
+        CommentEntity? comment = await _dbContext.Set<CommentEntity>().FirstOrDefaultAsync(x => x.Id == id);
         if (comment == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
         comment.DeletedAt = DateTime.Now;
         _dbContext.Update(comment);
