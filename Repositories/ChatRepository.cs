@@ -237,7 +237,7 @@ public class ChatRepository : IChatRepository
             .Include(x => x.Products).ThenInclude(x => x.Media)
             .Include(x => x.Products).ThenInclude(x => x.Categories)
             .Include(x => x.Products).ThenInclude(x => x.Comments)
-            .Include(x => x.Products).ThenInclude(x => x.User)
+            .Include(x => x.Products).ThenInclude(x => x.User).Where(x => x.DeletedAt == null)
             .AsNoTracking();
 
         return new GenericResponse<IQueryable<GroupChatEntity>?>(e);
