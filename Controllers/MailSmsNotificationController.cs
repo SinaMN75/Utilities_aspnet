@@ -3,10 +3,10 @@
 [ApiController]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [Route("api/[controller]")]
-public class MailSmsController : BaseApiController {
+public class MailSmsNotificationController : BaseApiController {
 	private readonly ISmsNotificationRepository _repository;
 
-	public MailSmsController(ISmsNotificationRepository repository) => _repository = repository;
+	public MailSmsNotificationController(ISmsNotificationRepository repository) => _repository = repository;
 
 	[HttpPost("SendMail")]
 	public async Task<ActionResult<GenericResponse>> SendMail(SendMailDto dto) => Result(await _repository.SendMail(dto));
