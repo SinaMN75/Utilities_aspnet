@@ -202,7 +202,8 @@ public class ChatRepository : IChatRepository
         return new GenericResponse<GroupChatEntity?>(entity.Entity);
     }
 
-    public async Task<GenericResponse> DeleteGroupChat(Guid id) {
+    public async Task<GenericResponse> DeleteGroupChat(Guid id)
+    {
         GroupChatEntity? e = await _dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(x => x.Id == id);
         if (e == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
         _dbContext.Remove(e);
@@ -220,6 +221,7 @@ public class ChatRepository : IChatRepository
             UpdatedAt = DateTime.Now,
             UseCase = dto.UseCase,
             GroupChatId = dto.GroupChatId,
+            ParentId = dto.ParentId,
             UserId = _httpContextAccessor.HttpContext!.User.Identity!.Name
         };
 
@@ -243,7 +245,8 @@ public class ChatRepository : IChatRepository
         return new GenericResponse<IQueryable<GroupChatEntity>?>(e);
     }
 
-    public async Task<GenericResponse<GroupChatMessageEntity?>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto) {
+    public async Task<GenericResponse<GroupChatMessageEntity?>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto)
+    {
         GroupChatMessageEntity? e = await _dbContext.Set<GroupChatMessageEntity>()
             .FirstOrDefaultAsync(x => x.Id == dto.Id);
 
@@ -257,7 +260,8 @@ public class ChatRepository : IChatRepository
         return new GenericResponse<GroupChatMessageEntity?>(entity.Entity);
     }
 
-    public async Task<GenericResponse> DeleteGroupChatMessage(Guid id) {
+    public async Task<GenericResponse> DeleteGroupChatMessage(Guid id)
+    {
         GroupChatMessageEntity? e = await _dbContext.Set<GroupChatMessageEntity>().FirstOrDefaultAsync(x => x.Id == id);
         if (e == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
         e.DeletedAt = DateTime.Now;
@@ -317,6 +321,7 @@ public class ChatRepository : IChatRepository
         IQueryable<GroupChatMessageEntity> e = _dbContext.Set<GroupChatMessageEntity>()
             .Where(x => x.GroupChatId == id && x.DeletedAt == null)
             .Include(x => x.Media)
+            .Include(x => x.Parent)!.ThenInclude(x => x.Media)
             .Include(x => x.User).ThenInclude(x => x.Media)
             .AsNoTracking();
         return new GenericResponse<IQueryable<GroupChatMessageEntity>?>(e);
@@ -344,6 +349,7 @@ public class ChatRepository : IChatRepository
         IEnumerable<ChatEntity> conversationToUser = await _dbContext.Set<ChatEntity>()
             .Where(x => x.FromUserId == userId && x.ToUserId == id)
             .Include(x => x.Media)
+            .Include(x => x.Parent)!.ThenInclude(x => x.Media)
             .Include(x => x.Products)!.ThenInclude(x => x.Media)
             .OrderByDescending(x => x.CreatedAt).ToListAsync();
 
@@ -357,7 +363,15 @@ public class ChatRepository : IChatRepository
             User = user,
             UserId = x.FromUserId == userId ? x.ToUserId : x.FromUserId,
             Media = x.Media,
-            Products = x.Products
+            Products = x.Products,
+            Parent = new ChatReadDto
+            {
+                Id = x.Parent.Id,
+                DateTime = x.Parent.CreatedAt,
+                MessageText = x.Parent.MessageText,
+                Media = x.Parent.Media
+                //UserId = conversation.Parent.ToUserId == conversation.Parent.User //Todo this and other one when need
+            }
         }).OrderByDescending(x => x.DateTime).ToList();
 
         return new GenericResponse<IEnumerable<ChatReadDto>?>(conversations);
@@ -386,10 +400,11 @@ public class ChatRepository : IChatRepository
             ChatEntity? conversation = await _dbContext.Set<ChatEntity>()
                 .Where(c => c.FromUserId == item && c.ToUserId == userId || c.FromUserId == userId && c.ToUserId == item).OrderByDescending(c => c.CreatedAt)
                 .Include(y => y.Media)
-                .Include(x => x.Parent)
+                .Include(x => x.Parent)!.ThenInclude(x => x.Media)
                 .Include(x => x.Products)!.ThenInclude(x => x.Media)
                 .Take(1).FirstOrDefaultAsync();
             int? countUnReadMessage = _dbContext.Set<ChatEntity>().Where(c => c.FromUserId == item && c.ToUserId == userId).Count(x => x.ReadMessage == false);
+
             conversations.Add(new ChatReadDto
             {
                 Id = conversation!.Id,
@@ -400,7 +415,15 @@ public class ChatRepository : IChatRepository
                 UnReadMessages = countUnReadMessage,
                 User = user,
                 Media = conversation.Media,
-                Products = conversation.Products
+                Products = conversation.Products,
+                Parent = new ChatReadDto
+                {
+                    Id = conversation.Parent.Id,
+                    DateTime = conversation.Parent.CreatedAt,
+                    MessageText = conversation.Parent.MessageText,
+                    Media = conversation.Parent.Media
+                    //UserId = conversation.Parent.ToUserId == conversation.Parent.User //Todo this and other one when need
+                }
             });
         }
 
@@ -413,7 +436,7 @@ public class ChatRepository : IChatRepository
         foreach (string id in dto.UserIds) users.Add(await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id));
 
         List<ProductEntity> products = new();
-        foreach (Guid id in dto.ProductIds ) products.Add(await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id));
+        foreach (Guid id in dto.ProductIds) products.Add(await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id));
 
         GroupChatEntity entity = new()
         {

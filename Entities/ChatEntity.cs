@@ -88,6 +88,9 @@ public class GroupChatMessageEntity : BaseEntity
     public UserEntity? User { get; set; }
     public string? UserId { get; set; }
 
+    public GroupChatMessageEntity? Parent { get; set; }
+    public Guid? ParentId { get; set; }
+
     public IEnumerable<MediaEntity>? Media { get; set; }
 }
 
@@ -103,6 +106,7 @@ public class ChatReadDto
     public IEnumerable<MediaEntity>? Media { get; set; }
     public UserEntity? User { get; set; }
     public IEnumerable<ProductEntity>? Products{ get; set; }
+    public ChatReadDto? Parent { get; set; }
 }
 
 public class ChatFilterDto
@@ -168,4 +172,5 @@ public class GroupChatMessageCreateUpdateDto
     public string? Type { get; set; }
     public string? UseCase { get; set; }
     public Guid? GroupChatId { get; set; }
+    public Guid? ParentId { get; set; }
 }
