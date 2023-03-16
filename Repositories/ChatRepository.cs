@@ -315,7 +315,7 @@ public class ChatRepository : IChatRepository
     public GenericResponse<IQueryable<GroupChatMessageEntity>?> ReadGroupChatMessages(Guid id)
     {
         IQueryable<GroupChatMessageEntity> e = _dbContext.Set<GroupChatMessageEntity>()
-            .Where(x => x.GroupChatId == id)
+            .Where(x => x.GroupChatId == id && x.DeletedAt == null)
             .Include(x => x.Media)
             .Include(x => x.User).ThenInclude(x => x.Media)
             .AsNoTracking();
