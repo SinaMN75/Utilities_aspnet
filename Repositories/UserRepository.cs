@@ -321,18 +321,15 @@ public class UserRepository : IUserRepository
     public async Task<GenericResponse<UserEntity?>> VerifyCodeForLogin(VerifyMobileForLoginDto dto)
     {
         string mobile = dto.Mobile.Replace("+", "");
-
         UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == mobile || x.Email == mobile);
-
         if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.UserNotFound, "کاربر یافت نشد");
-
         if (user.Suspend) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.UserSuspended, "کاربر به حالت تعلیق در آمده است");
 
         user.IsLoggedIn = true;
         await _dbContext.SaveChangesAsync();
         JwtSecurityToken token = await CreateToken(user);
 
-        if (Verify(user.Id, dto.VerificationCode) != OtpResult.Ok)
+        if (await Verify(user.Id, dto.VerificationCode) != OtpResult.Ok)
             return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.WrongVerificationCode, "کد تایید وارد شده صحیح نیست");
 
         return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result,
@@ -496,13 +493,17 @@ public class UserRepository : IUserRepository
         return true;
     }
 
-    private OtpResult Verify(string userId, string otp)
-    {
+    private async Task<OtpResult> Verify(string userId, string otp) {
         if (otp == "1375") return OtpResult.Ok;
-        IQueryable<OtpEntity> model = _dbContext.Set<OtpEntity>().Where(x => x.UserId == userId &&
-                                                                           x.CreatedAt > DateTime.Now.AddMinutes(-5) &&
-                                                                           x.OtpCode == otp);
-        return model.IsNotNullOrEmpty() ? OtpResult.Ok : OtpResult.Incorrect;
+        OtpEntity? e = await _dbContext.Set<OtpEntity>().SingleOrDefaultAsync(x => x.UserId == userId &&
+                                                                                   x.CreatedAt > DateTime.Now.AddMinutes(-5) &&
+                                                                                   x.OtpCode == otp);
+        if (e != null) {
+            _dbContext.Set<OtpEntity>().Remove(e);
+            await _dbContext.SaveChangesAsync();
+            return OtpResult.Ok;
+        }
+        return OtpResult.Incorrect;
     }
 
     public async Task<GenericResponse> OnlineState(bool state)
