@@ -4,7 +4,7 @@ namespace Utilities_aspnet.Repositories;
 
 public interface ISmsNotificationRepository {
 	void SendSms(string mobileNumber, string message);
-	public GenericResponse SendNotification(NotificationCreateDto dto);
+	public Task<GenericResponse> SendNotification(NotificationCreateDto dto);
 	public Task<GenericResponse> SendMail(SendMailDto dto);
 }
 
@@ -48,31 +48,64 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 		}
 	}
 
-	public GenericResponse SendNotification(NotificationCreateDto dto) {
-		AppSettings appSettings = new();
-		_config.GetSection("AppSettings").Bind(appSettings);
-		PushNotificationSetting setting = appSettings.PushNotificationSetting;
+    public async Task<GenericResponse> SendNotification(NotificationCreateDto dto)
+    {
+        AppSettings appSettings = new();
+        _config.GetSection("AppSettings").Bind(appSettings);
+        PushNotificationSetting setting = appSettings.PushNotificationSetting;
 
-		switch (setting.Provider) {
-			case "pushe": {
-				RestRequest request = new(Method.POST);
-				request.AddHeader("Content-Type", "application/json");
-				request.AddHeader("Authorization", "Token " + setting.Token);
-				var body = new {
-					app_ids = setting.AppId,
-					data = new {title = dto.Title, content = dto.Message},
-					filters = new {userId = dto.UserIds}
-				};
-				request.AddJsonBody(body);
-				
-				new RestClient("https://api.pushe.co/v2/messaging/notifications/").Execute(request);
-				break;
-			}
-		}
-		return new GenericResponse();
-	}
+        switch (setting.Provider)
+        {
+            case "pushe":
+                {
+                    var jsModel = new
+                    {
+                        app_ids = "6g035k5283mm7z5g",
+                        data = new
+                        {
+                            title = "backEnd",
+                            content = "test backend baraye double check"
+                        }
+                    };
+                    string s = JsonConvert.SerializeObject(jsModel, Formatting.Indented);
+                    ByteArrayContent content = new ByteArrayContent(Encoding.UTF8.GetBytes(s));
+                    using HttpClient client = new HttpClient();
+                    HttpRequestMessage httpRequestMessage = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Post,
+                        RequestUri = new Uri("https://api.pushe.co/v2/messaging/notifications/"),
+                        Content = content
+                    };
+                    httpRequestMessage.Content!.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    httpRequestMessage.Headers.Add("Authorization", "Token 83080b0bb6511721efa6e59ab2ea8a11e2689797");
+                    var d = await (await client.SendAsync(httpRequestMessage)).Content.ReadAsStringAsync();
 
-	public async Task<GenericResponse> SendMail(SendMailDto dto) {
+                    break;
+                }
+                //       case "pushe":
+                //           {
+                //               RestRequest request = new(Method.POST);
+                //               request.AddHeader("Authorization", "Token " + setting.Token);
+                //               request.AddHeader("Content-Type", "application/json");
+                //               var body = new
+                //               {
+                //                   app_ids = setting.AppId,
+                //                   data = new { title = dto.Title, content = dto.Message }
+                //               };
+                //               /* 
+                //                  ,
+                //                   filters = new {userId = dto.UserIds}
+                //*/
+                //               request.AddJsonBody(body);
+
+                //               var d = new RestClient("https://api.pushe.co/v2/messaging/notifications/").Execute(request);
+                //               Console.WriteLine($"--------------***********///////////// {d}");
+                //               break;
+                //           }
+        }
+        return new GenericResponse();
+    }
+    public async Task<GenericResponse> SendMail(SendMailDto dto) {
 		try {
 			PostmarkMessage message = new() {
 				To = dto.To,
