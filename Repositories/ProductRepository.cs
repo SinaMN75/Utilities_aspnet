@@ -236,23 +236,23 @@ public class ProductRepository : IProductRepository
                 if (user.VisitedProducts.Contains(p.Id.ToString())) p.IsSeen = true;
                 if (user.BookmarkedProducts.Contains(p.Id.ToString())) p.IsBookmarked = true;
             }
-            //if (dto.IsFollowing) q = q.Where(i => user.FollowedUsers.Contains(i.UserId));
+            if (dto.IsFollowing) q = q.Where(i => user.FollowedUsers.Contains(i.UserId));
         }
 
-        if (userId != null && dto.IsFollowing)
-        {
-            var following = _followBookmarkRepository.GetFollowing(userId).Result;
-            if (following != null)
-            {
-                var tempQ = q.Where(w => following.Any(a => a.Id == w.UserId)).ToList();
-                q = null;
-                foreach (var item in tempQ)
-                {
-                    item.IsFollowing = true;
-                }
-                q = tempQ.AsQueryable();
-            }
-        }
+        // if (userId != null && dto.IsFollowing)
+        // {
+        //     var following = _followBookmarkRepository.GetFollowing(userId).Result;
+        //     if (following != null)
+        //     {
+        //         var tempQ = q.Where(w => following.Any(a => a.Id == w.UserId)).ToList();
+        //         q = null;
+        //         foreach (var item in tempQ)
+        //         {
+        //             item.IsFollowing = true;
+        //         }
+        //         q = tempQ.AsQueryable();
+        //     }
+        // }
 
 
 
