@@ -10,8 +10,6 @@ public class GlobalSearchController : BaseApiController {
 	}
 
 	[HttpPost]
-	public ActionResult<GenericResponse<GlobalSearchDto>> Filter(GlobalSearchParams filter) {
-		GenericResponse<GlobalSearchDto> i = _repository.Filter(filter, User.Identity?.Name);
-		return Result(i);
-	}
+	public async Task<ActionResult<GenericResponse<GlobalSearchDto>>> Filter(GlobalSearchParams filter)
+		=> Result(await _repository.Filter(filter, User.Identity?.Name));
 }

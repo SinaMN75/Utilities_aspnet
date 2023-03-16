@@ -1,17 +1,26 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
 public interface IGlobalSearchRepository {
-	GenericResponse<GlobalSearchDto> Filter(GlobalSearchParams filter, string? userId);
+	Task<GenericResponse<GlobalSearchDto>> Filter(GlobalSearchParams filter, string? userId);
 }
 
 public class GlobalSearchRepository : IGlobalSearchRepository {
 	private readonly DbContext _dbContext;
+	private readonly UserRepository _userRepository;
 
-	public GlobalSearchRepository(DbContext dbContext) => _dbContext = dbContext;
+	public GlobalSearchRepository(DbContext dbContext, UserRepository userRepository) {
+		_dbContext = dbContext;
+		_userRepository = userRepository;
+	}
 
-	public GenericResponse<GlobalSearchDto> Filter(GlobalSearchParams filter, string? userId) {
+	public async Task<GenericResponse<GlobalSearchDto>> Filter(GlobalSearchParams filter, string? userId) {
 		GlobalSearchDto model = new();
 
+		UserEntity myUser = null;
+		if (userId != null) {
+			GenericResponse<UserEntity?> e = await _userRepository.ReadById(userId);
+			myUser = e.Result!;
+		}
 		IQueryable<CategoryEntity> categoryList = Enumerable.Empty<CategoryEntity>().AsQueryable();
 		IQueryable<UserEntity> userList = Enumerable.Empty<UserEntity>().AsQueryable();
 		IQueryable<ProductEntity> productList = Enumerable.Empty<ProductEntity>().AsQueryable();
@@ -24,7 +33,7 @@ public class GlobalSearchRepository : IGlobalSearchRepository {
 				                                    x.TitleTr1.Contains(filter.Query) ||
 				                                    x.TitleTr2.Contains(filter.Query)));
 
-		if (filter.User)
+		if (filter.User) {
 			userList = _dbContext.Set<UserEntity>()
 				.Where(x => x.FullName.Contains(filter.Query) ||
 				            x.AppUserName.Contains(filter.Query) ||
@@ -36,6 +45,12 @@ public class GlobalSearchRepository : IGlobalSearchRepository {
 				.ThenInclude(u => u.Media)
 				.AsNoTracking();
 
+			if (userId != null) {
+				foreach (UserEntity user in userList) {
+					if (myUser!.FollowedUsers.Contains(user.Id)) user.IsFollowing = true;
+				}
+			}
+		}
 		if (filter.Product) {
 			productList = _dbContext.Set<ProductEntity>()
 				.Where(x => x.DeletedAt == null && (x.Title.Contains(filter.Query) ||
