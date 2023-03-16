@@ -231,7 +231,7 @@ public class ChatRepository : IChatRepository
     public GenericResponse<IQueryable<GroupChatEntity>?> ReadMyGroupChats()
     {
         IQueryable<GroupChatEntity> e = _dbContext.Set<GroupChatEntity>()
-            .Where(x => x.Users.Any(y => y.Id == _httpContextAccessor.HttpContext!.User.Identity!.Name))
+            .Where(x => x.DeletedAt == null && x.Users.Any(y => y.Id == _httpContextAccessor.HttpContext!.User.Identity!.Name))
             .Include(x => x.Users)
             .Include(x => x.Media)
             .Include(x => x.Products).ThenInclude(x => x.Media)
