@@ -9,6 +9,8 @@ public class GlobalSearchController : BaseApiController {
 		_repository = repository;
 	}
 
+	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+	[AllowAnonymous]
 	[HttpPost]
 	public async Task<ActionResult<GenericResponse<GlobalSearchDto>>> Filter(GlobalSearchParams filter)
 		=> Result(await _repository.Filter(filter, User.Identity?.Name));

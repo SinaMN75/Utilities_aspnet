@@ -6,21 +6,16 @@ public interface IGlobalSearchRepository {
 
 public class GlobalSearchRepository : IGlobalSearchRepository {
 	private readonly DbContext _dbContext;
-	private readonly UserRepository _userRepository;
 
-	public GlobalSearchRepository(DbContext dbContext, UserRepository userRepository) {
+	public GlobalSearchRepository(DbContext dbContext) {
 		_dbContext = dbContext;
-		_userRepository = userRepository;
 	}
 
 	public async Task<GenericResponse<GlobalSearchDto>> Filter(GlobalSearchParams filter, string? userId) {
 		GlobalSearchDto model = new();
 
-		UserEntity myUser = null;
-		if (userId != null) {
-			GenericResponse<UserEntity?> e = await _userRepository.ReadById(userId);
-			myUser = e.Result!;
-		}
+		UserEntity? myUser = null;
+		if (userId != null) myUser = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == userId);
 		IQueryable<CategoryEntity> categoryList = Enumerable.Empty<CategoryEntity>().AsQueryable();
 		IQueryable<UserEntity> userList = Enumerable.Empty<UserEntity>().AsQueryable();
 		IQueryable<ProductEntity> productList = Enumerable.Empty<ProductEntity>().AsQueryable();
@@ -45,10 +40,14 @@ public class GlobalSearchRepository : IGlobalSearchRepository {
 				.ThenInclude(u => u.Media)
 				.AsNoTracking();
 
+			IEnumerable<UserEntity> temp = await userList.ToListAsync();
 			if (userId != null) {
-				foreach (UserEntity user in userList) {
-					if (myUser!.FollowedUsers.Contains(user.Id)) user.IsFollowing = true;
+				foreach (UserEntity user in temp) {
+					if (myUser!.FollowedUsers.Contains(user.Id)) {
+						user.IsFollowing = true;
+					}
 				}
+				userList = temp.AsQueryable();
 			}
 		}
 		if (filter.Product) {
