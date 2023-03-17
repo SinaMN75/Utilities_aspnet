@@ -33,8 +33,7 @@ public class CategoryRepository : ICategoryRepository {
 		IQueryable<CategoryEntity> i = _dbContext.Set<CategoryEntity>()
 			.Where(x => x.DeletedAt == null)
 			.Where(x => x.ParentId == null)
-			.Include(i => i.Media.Select(x => new {
-			}))
+			.Include(i => i.Media)
 			.Include(i => i.Children.Where(x => x.DeletedAt == null)).ThenInclude(i => i.Media).Where(i => i.DeletedAt == null)
 			.AsNoTracking();
 		return new GenericResponse<IQueryable<CategoryEntity>>(i);
