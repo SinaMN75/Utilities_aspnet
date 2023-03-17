@@ -64,15 +64,15 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
                         app_ids = "6g035k5283mm7z5g",
                         data = new
                         {
-                            title = "backEnd",
-                            content = "test backend baraye double check"
-                        }
+	                        app_ids = setting.AppId,
+	                        data = new { title = dto.Title, content = dto.Message }
+                        },
+                        filters = new {userId = dto.UserIds}
                     };
                     string s = JsonConvert.SerializeObject(jsModel, Formatting.Indented);
-                    ByteArrayContent content = new ByteArrayContent(Encoding.UTF8.GetBytes(s));
-                    using HttpClient client = new HttpClient();
-                    HttpRequestMessage httpRequestMessage = new HttpRequestMessage
-                    {
+                    ByteArrayContent content = new(Encoding.UTF8.GetBytes(s));
+                    using HttpClient client = new();
+                    HttpRequestMessage httpRequestMessage = new() {
                         Method = HttpMethod.Post,
                         RequestUri = new Uri("https://api.pushe.co/v2/messaging/notifications/"),
                         Content = content
@@ -83,26 +83,6 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 
                     break;
                 }
-                //       case "pushe":
-                //           {
-                //               RestRequest request = new(Method.POST);
-                //               request.AddHeader("Authorization", "Token " + setting.Token);
-                //               request.AddHeader("Content-Type", "application/json");
-                //               var body = new
-                //               {
-                //                   app_ids = setting.AppId,
-                //                   data = new { title = dto.Title, content = dto.Message }
-                //               };
-                //               /* 
-                //                  ,
-                //                   filters = new {userId = dto.UserIds}
-                //*/
-                //               request.AddJsonBody(body);
-
-                //               var d = new RestClient("https://api.pushe.co/v2/messaging/notifications/").Execute(request);
-                //               Console.WriteLine($"--------------***********///////////// {d}");
-                //               break;
-                //           }
         }
         return new GenericResponse();
     }
