@@ -25,7 +25,7 @@ public class ChatEntity : BaseEntity
 
     public IEnumerable<ChatReacts>? ChatReacts { get; set; }
     public IEnumerable<MediaEntity>? Media { get; set; }
-    public IEnumerable<ProductEntity>? Products { get; set; }
+    public IEnumerable<ProductEntity?>? Products { get; set; }
 }
 [Table("ChatReacts")]
 public class ChatReacts : BaseEntity
