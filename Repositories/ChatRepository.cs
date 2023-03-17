@@ -208,6 +208,8 @@ public class ChatRepository : IChatRepository
 
     public async Task<GenericResponse<GroupChatMessageEntity?>> CreateGroupChatMessage(GroupChatMessageCreateUpdateDto dto)
     {
+        List<ProductEntity?> products = new();
+        foreach (Guid id in dto.Products ?? new List<Guid>()) products.Add(await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id));
         GroupChatMessageEntity entity = new()
         {
             Message = dto.Message,
@@ -217,7 +219,8 @@ public class ChatRepository : IChatRepository
             UseCase = dto.UseCase,
             GroupChatId = dto.GroupChatId,
             ParentId = dto.ParentId,
-            UserId = _httpContextAccessor.HttpContext!.User.Identity!.Name
+            UserId = _httpContextAccessor.HttpContext!.User.Identity!.Name,
+            Products = products
         };
 
         EntityEntry<GroupChatMessageEntity> e = await _dbContext.Set<GroupChatMessageEntity>().AddAsync(entity);
@@ -316,6 +319,7 @@ public class ChatRepository : IChatRepository
         IQueryable<GroupChatMessageEntity> e = _dbContext.Set<GroupChatMessageEntity>()
             .Where(x => x.GroupChatId == id && x.DeletedAt == null)
             .Include(x => x.Media)
+            .Include(x => x.Products)!.ThenInclude(x => x.Media)
             .Include(x => x.Parent)!.ThenInclude(x => x.Media)
             .Include(x => x.User).ThenInclude(x => x.Media)
             .AsNoTracking();
