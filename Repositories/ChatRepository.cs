@@ -332,6 +332,7 @@ public class ChatRepository : IChatRepository
         List<ChatEntity> conversation = await _dbContext.Set<ChatEntity>()
             .Where(c => c.ToUserId == userId && c.FromUserId == id)
             .Include(x => x.Media)
+            .Include(x => x.Parent)
             .Include(x => x.Products)!.ThenInclude(x => x.Media)
             .OrderByDescending(x => x.CreatedAt).ToListAsync();
 
@@ -344,7 +345,8 @@ public class ChatRepository : IChatRepository
         IEnumerable<ChatEntity> conversationToUser = await _dbContext.Set<ChatEntity>()
             .Where(x => x.FromUserId == userId && x.ToUserId == id)
             .Include(x => x.Media)
-            .Include(x => x.Parent)!.ThenInclude(x => x.Media)
+            .Include(x => x.Parent)
+            .Include(x => x.Parent).ThenInclude(x => x.Media)
             .Include(x => x.Products)!.ThenInclude(x => x.Media)
             .OrderByDescending(x => x.CreatedAt).ToListAsync();
 
