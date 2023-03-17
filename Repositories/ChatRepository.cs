@@ -360,10 +360,10 @@ public class ChatRepository : IChatRepository
             Products = x.Products,
             Parent = new ChatReadDto
             {
-                Id = x.Parent.Id,
-                DateTime = x.Parent.CreatedAt,
-                MessageText = x.Parent.MessageText,
-                Media = x.Parent.Media
+                Id = x.Parent?.Id,
+                DateTime = x.Parent?.CreatedAt,
+                MessageText = x.Parent?.MessageText,
+                Media = x.Parent?.Media
                 //UserId = conversation.Parent.ToUserId == conversation.Parent.User //Todo this and other one when need
             }
         }).OrderByDescending(x => x.DateTime).ToList();
