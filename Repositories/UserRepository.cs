@@ -13,7 +13,7 @@ public interface IUserRepository {
 	Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model);
 	Task<GenericResponse> RemovalFromTeam(Guid teamId);
 	Task<GenericResponse> Logout();
-	GenericResponse<IQueryable<UserEntity>> ReadMyBlockList();
+	Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList();
 	Task<GenericResponse> ToggleBlock(string userId);
 	Task<GenericResponse> OnlineState(bool state);
 }
@@ -103,10 +103,10 @@ public class UserRepository : IUserRepository {
 
 		string? userId = _httpContextAccessor.HttpContext?.User.Identity?.Name;
 
-		if (dto.ShowFollowings.IsTrue()) {
-			List<string?> follows = _dbContext.Set<FollowEntity>().Where(x => x.FollowerUserId == userId).Select(x => x.FollowsUserId).ToList();
-			q = q.Where(u => follows.Contains(u.Id));
-		}
+		// if (dto.ShowFollowings.IsTrue()) {
+		// List<string?> follows = _dbContext.Set<FollowEntity>().Where(x => x.FollowerUserId == userId).Select(x => x.FollowsUserId).ToList();
+		// q = q.Where(u => follows.Contains(u.Id));
+		// }
 
 		if (dto.UserId != null) q = q.Where(x => x.Id == dto.UserId);
 		if (dto.UserIds != null) q = q.Where(x => dto.UserIds.Contains(x.Id));
@@ -311,13 +311,12 @@ public class UserRepository : IUserRepository {
 		                                        UtilitiesStatusCodes.Success, "Success");
 	}
 
-	public GenericResponse<IQueryable<UserEntity>> ReadMyBlockList() {
-		IQueryable<UserEntity?> blocks = _dbContext.Set<BlockEntity>()
-			.Include(x => x.BlockedUser).ThenInclude(x => x!.Media)
-			.Where(x => x.UserId == _httpContextAccessor.HttpContext!.User.Identity!.Name)
-			.AsNoTracking()
-			.Select(x => x.BlockedUser);
-		return new GenericResponse<IQueryable<UserEntity>>(blocks);
+	public async Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList() {
+		GenericResponse<UserEntity?> user = await ReadById(_httpContextAccessor.HttpContext!.User.Identity!.Name!)!;
+		GenericResponse<IEnumerable<UserEntity>> blockedUsers = await Filter(new UserFilterDto {
+			UserIds = user?.Result?.BlockedUsers.Split(",")
+		});
+		return new GenericResponse<IEnumerable<UserEntity>>(blockedUsers.Result!);
 	}
 
 	public async Task<GenericResponse> ToggleBlock(string userId) {
