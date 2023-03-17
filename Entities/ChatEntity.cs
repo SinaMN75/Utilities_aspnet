@@ -96,16 +96,16 @@ public class GroupChatMessageEntity : BaseEntity
 
 public class ChatReadDto
 {
-    public Guid Id { get; set; }
-    public string UserId { get; set; } = null!;
+    public Guid? Id { get; set; }
+    public string? UserId { get; set; } = null!;
     public string? MessageText { get; set; }
     public DateTime? DateTime { get; set; }
-    public bool Send { get; set; }
+    public bool? Send { get; set; }
     public int? UnReadMessages { get; set; } = 0;
     public Guid? ParentId { get; set; }
     public IEnumerable<MediaEntity>? Media { get; set; }
     public UserEntity? User { get; set; }
-    public IEnumerable<ProductEntity>? Products{ get; set; }
+    public IEnumerable<ProductEntity?>? Products{ get; set; }
     public ChatReadDto? Parent { get; set; }
 }
 

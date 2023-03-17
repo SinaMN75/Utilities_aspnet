@@ -418,10 +418,10 @@ public class ChatRepository : IChatRepository
                 Products = conversation.Products,
                 Parent = new ChatReadDto
                 {
-                    Id = conversation.Parent.Id,
-                    DateTime = conversation.Parent.CreatedAt,
-                    MessageText = conversation.Parent.MessageText,
-                    Media = conversation.Parent.Media
+                    Id = conversation.Parent?.Id,
+                    DateTime = conversation.Parent?.CreatedAt,
+                    MessageText = conversation.Parent?.MessageText,
+                    Media = conversation.Parent?.Media
                     //UserId = conversation.Parent.ToUserId == conversation.Parent.User //Todo this and other one when need
                 }
             });
