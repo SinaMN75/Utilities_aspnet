@@ -85,7 +85,8 @@ public class UserEntity : IdentityUser
     public string VisitedProducts { get; set; } = "";
     public string BookmarkedProducts { get; set; } = "";
     public string FollowedUsers { get; set; } = "";
-
+    public string BlockedUsers { get; set; } = "";
+    
     public double? Wallet { get; set; } = 0;
     public double? Point { get; set; } = 0;
     public bool? ShowContactInfo { get; set; }
@@ -237,6 +238,7 @@ public class UserCreateUpdateDto
     public string? VisitedProducts { get; set; }
     public string? BookmarkedProducts { get; set; }
     public string? FollowedUsers { get; set; }
+    public string BlockedUsers { get; set; } = "";
     public double? Wallet { get; set; }
     public double? Point { get; set; } = 0;
     public bool? Suspend { get; set; }
@@ -257,4 +259,5 @@ public class UserFilterDto
     public bool? ShowFollowings { get; set; }
     public bool? ShowSuspend { get; set; }
     public bool? OrderByUserName { get; set; }
+    public IEnumerable<string>? UserIds { get; set; }
 }
