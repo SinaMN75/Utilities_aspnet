@@ -54,10 +54,13 @@ public class UserController : BaseApiController
     public async Task<ActionResult<GenericResponse>> DeleteFromTeam(Guid teamId) => Result(await _repository.RemovalFromTeam(teamId));
 
     [HttpGet("ReadMyBlockList")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<GenericResponse<IQueryable<UserEntity>>>> ReadMine() => Result(await _repository.ReadMyBlockList());
 
     [HttpPost("ToggleBlock")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<GenericResponse>> Create(string userId) => Result(await _repository.ToggleBlock(userId));
+    
     [HttpPost("UserOnlineState")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<GenericResponse>> UserOnlineState(bool state) => Result(await _repository.OnlineState(state));

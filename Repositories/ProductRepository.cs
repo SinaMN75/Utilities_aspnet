@@ -273,7 +273,6 @@ public class ProductRepository : IProductRepository
             .Include(i => i.Media)
             .Include(i => i.Categories)!.ThenInclude(x => x.Media)
             .Include(i => i.Reports)
-            .Include(i => i.Bookmarks)
             .Include(i => i.Votes)
             .Include(i => i.Comments)!.ThenInclude(x => x.LikeComments)
             .Include(i => i.User).ThenInclude(x => x.Media)
@@ -299,10 +298,7 @@ public class ProductRepository : IProductRepository
                     VisitedProducts = user.VisitedProducts + "," + i.Id
                 });
 
-            //ToDo: in doroste??? man ino commentesh kardam va bejash code payin ro zadam ta badan checkesh konim
-            //if (user.BookmarkedProducts.Contains(i.Id.ToString())) i.IsBookmarked = true;
-            var bookmarked = await _dbContext.Set<BookmarkEntity>().AnyAsync(a => a.ProductId == i.Id && a.UserId == userId);
-            if (bookmarked) i.IsBookmarked = true;
+            if (user.BookmarkedProducts.Contains(i.Id.ToString())) i.IsBookmarked = true;
 
             VisitProducts? vp = await _dbContext.Set<VisitProducts>().FirstOrDefaultAsync(a => a.UserId == user.Id && a.ProductId == i.Id, ct);
             if (vp is null)

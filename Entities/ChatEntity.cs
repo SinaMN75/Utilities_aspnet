@@ -36,6 +36,12 @@ public class ChatReacts : BaseEntity
     public Guid? ChatsId { get; set; }
 }
 
+public class ChatReaction : BaseEntity
+{
+    public Reaction? Reaction { get; set; }
+    public Guid? UserId { get; set; }
+}
+
 [Table("GroupChat")]
 public class GroupChatEntity : BaseEntity
 {

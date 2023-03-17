@@ -312,21 +312,21 @@ public class UserRepository : IUserRepository {
 	}
 
 	public async Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList() {
-		GenericResponse<UserEntity?> user = await ReadById(_httpContextAccessor.HttpContext!.User.Identity!.Name!)!;
+		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _httpContextAccessor.HttpContext!.User.Identity!.Name!);
 		GenericResponse<IEnumerable<UserEntity>> blockedUsers = await Filter(new UserFilterDto {
-			UserIds = user?.Result?.BlockedUsers.Split(",")
+			ShowMedia = true,
+			UserIds = user?.BlockedUsers.Split(",")
 		});
 		return new GenericResponse<IEnumerable<UserEntity>>(blockedUsers.Result!);
 	}
 
 	public async Task<GenericResponse> ToggleBlock(string userId) {
-		UserEntity user = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _httpContextAccessor.HttpContext!.User.Identity!.Name))!;
+		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _httpContextAccessor.HttpContext!.User.Identity!.Name);
 
-		if (user.FollowedUsers.Contains(userId))
-			await Update(new UserCreateUpdateDto {Id = user.Id, FollowedUsers = user.BlockedUsers.Replace($",{userId}", "")});
-		else await Update(new UserCreateUpdateDto {Id = userId, BlockedUsers = user.BlockedUsers + "," + userId});
-
-		await _dbContext.SaveChangesAsync();
+		await Update(new UserCreateUpdateDto {Id = user.Id, BlockedUsers = "user.BlockedUsers + \",\" + userId"});
+		if (user!.BlockedUsers.Contains(userId))
+			await Update(new UserCreateUpdateDto {Id = user.Id, BlockedUsers = user.BlockedUsers.Replace($",{userId}", "")});
+		else await Update(new UserCreateUpdateDto {Id = user.Id, BlockedUsers = user.BlockedUsers + "," + userId});
 		return new GenericResponse();
 	}
 
@@ -372,6 +372,7 @@ public class UserRepository : IUserRepository {
 		entity.VisitedProducts = dto.VisitedProducts ?? entity.VisitedProducts;
 		entity.BookmarkedProducts = dto.BookmarkedProducts ?? entity.BookmarkedProducts;
 		entity.FollowedUsers = dto.FollowedUsers ?? entity.FollowedUsers;
+		entity.BlockedUsers = dto.BlockedUsers ?? entity.BlockedUsers;
 		entity.Badge = dto.Badge ?? entity.Badge;
 		entity.UpdatedAt = DateTime.Now;
 

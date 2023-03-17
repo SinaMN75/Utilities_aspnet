@@ -1,6 +1,4 @@
-﻿using PostmarkDotNet.Model;
-
-namespace Utilities_aspnet.Repositories;
+﻿namespace Utilities_aspnet.Repositories;
 
 public interface ICommentRepository
 {

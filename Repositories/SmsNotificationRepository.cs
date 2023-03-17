@@ -1,12 +1,8 @@
-﻿using PostmarkDotNet;
-using System.Net.Http.Headers;
-
-namespace Utilities_aspnet.Repositories;
+﻿namespace Utilities_aspnet.Repositories;
 
 public interface ISmsNotificationRepository {
 	void SendSms(string mobileNumber, string message);
 	public Task<GenericResponse> SendNotification(NotificationCreateDto dto);
-	public Task<GenericResponse> SendMail(SendMailDto dto);
 }
 
 public class SmsNotificationRepository : ISmsNotificationRepository {
@@ -75,27 +71,6 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
         }
         return new GenericResponse();
     }
-    public async Task<GenericResponse> SendMail(SendMailDto dto) {
-		try {
-			PostmarkMessage message = new() {
-				To = dto.To,
-				From = "Support@toubasources.com",
-				Subject = "Touba Technical Mail",
-				TextBody = dto.PlainText,
-			};
-			PostmarkClient client = new PostmarkClient("00ed8f38-a980-4201-bddd-6621fb77eaa6");
-			PostmarkResponse? sendResult = await client.SendMessageAsync(message);
-
-			return sendResult.Status == PostmarkStatus.Success ? new GenericResponse() : new GenericResponse(UtilitiesStatusCodes.Unhandled);
-
-			#region SendGrid
-
-			#endregion
-		}
-		catch (Exception ex) {
-			return new GenericResponse(UtilitiesStatusCodes.Unhandled, ex.ToString());
-		}
-	}
 }
 
 public class NotificationCreateDto {

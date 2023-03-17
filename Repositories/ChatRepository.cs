@@ -1,8 +1,4 @@
-﻿using Pushe.co;
-using Newtonsoft.Json;
-using Microsoft.VisualBasic;
-
-namespace Utilities_aspnet.Repositories;
+﻿namespace Utilities_aspnet.Repositories;
 
 public interface IChatRepository
 {
@@ -31,13 +27,11 @@ public class ChatRepository : IChatRepository
 {
     private readonly DbContext _dbContext;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IPusheService _pusheService;
 
-    public ChatRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor/*, IPusheService pusheService*/)
+    public ChatRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor)
     {
         _dbContext = dbContext;
         _httpContextAccessor = httpContextAccessor;
-        //_pusheService = pusheService;
     }
 
     public async Task<GenericResponse<ChatReadDto?>> Create(ChatCreateUpdateDto model)

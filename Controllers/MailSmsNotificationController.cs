@@ -9,9 +9,6 @@ public class MailSmsNotificationController : BaseApiController
 
     public MailSmsNotificationController(ISmsNotificationRepository repository) => _repository = repository;
 
-    [HttpPost("SendMail")]
-    public async Task<ActionResult<GenericResponse>> SendMail(SendMailDto dto) => Result(await _repository.SendMail(dto));
-
     [HttpPost("SendNotification")]
     public async Task<ActionResult<GenericResponse>> SendNotification(NotificationCreateDto dto) => Result(await _repository.SendNotification(dto));
 }

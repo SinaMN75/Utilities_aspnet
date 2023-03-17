@@ -1,8 +1,4 @@
-﻿using Pushe.co;
-using Stripe;
-using Utilities_aspnet.Hubs;
-
-namespace Utilities_aspnet.Utilities;
+﻿namespace Utilities_aspnet.Utilities;
 
 public static class StartupExtension {
 	public static void SetupUtilities<T>(
@@ -62,12 +58,6 @@ public static class StartupExtension {
 
 		builder.Services.AddHttpContextAccessor();
         builder.Services.AddSignalR();
-        builder.Services.AddPushe(options =>
-        {
-            options.AccessToken = "8c2ac95bd1b1b0832a8e3ef51327a31b3793d185";
-            //options.AccessToken = "Token 8c2ac95bd1b1b0832a8e3ef51327a31b3793d185";
-        });
-        builder.Services.BuildServiceProvider().GetRequiredService<IPusheService>();
 
         builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 		builder.Services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")));
@@ -109,9 +99,6 @@ public static class StartupExtension {
 		builder.Services.AddTransient<IGlobalSearchRepository, GlobalSearchRepository>();
 		builder.Services.AddTransient<IPaymentRepository, PaymentRepository>();
 		builder.Services.AddTransient<ISmsNotificationRepository, SmsNotificationRepository>();
-		builder.Services.AddTransient<IChatroomRepository, ChatroomRepository>();
-		builder.Services.AddTransient<IMessageRepository, MessageRepository>();
-		//builder.Services.AddTransient<IPusheService, PusheService>();
 	}
 
 	private static void AddUtilitiesSwagger(this WebApplicationBuilder builder, IServiceProvider? serviceProvider) {
