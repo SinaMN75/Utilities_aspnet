@@ -200,7 +200,8 @@ public class ChatRepository : IChatRepository
     {
         GroupChatEntity? e = await _dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(x => x.Id == id);
         if (e == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
-        _dbContext.Remove(e);
+        e.DeletedAt = DateTime.Now;
+        _dbContext.Update(e);
         await _dbContext.SaveChangesAsync();
         return new GenericResponse();
     }
