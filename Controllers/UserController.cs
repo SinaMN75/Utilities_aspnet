@@ -54,7 +54,7 @@ public class UserController : BaseApiController
     public async Task<ActionResult<GenericResponse>> DeleteFromTeam(Guid teamId) => Result(await _repository.RemovalFromTeam(teamId));
 
     [HttpGet("ReadMyBlockList")]
-    public ActionResult<GenericResponse<IQueryable<UserEntity>>> ReadMine() => Result(_repository.ReadMyBlockList());
+    public async Task<ActionResult<GenericResponse<IQueryable<UserEntity>>>> ReadMine() => Result(await _repository.ReadMyBlockList());
 
     [HttpPost("ToggleBlock")]
     public async Task<ActionResult<GenericResponse>> Create(string userId) => Result(await _repository.ToggleBlock(userId));
