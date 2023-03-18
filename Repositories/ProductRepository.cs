@@ -11,11 +11,11 @@ public interface IProductRepository {
 
 public class ProductRepository : IProductRepository {
 	private readonly DbContext _dbContext;
-	private readonly IHttpContextAccessor _httpContextAccessor;
 	private readonly IFollowBookmarkRepository _followBookmarkRepository;
 	private readonly IUploadRepository _uploadRepository;
 	private readonly IUserRepository _userRepository;
 	private readonly INotificationRepository _notificationRepository;
+	private readonly string? _userId;
 
 	public ProductRepository(
 		DbContext dbContext,
@@ -25,22 +25,21 @@ public class ProductRepository : IProductRepository {
 		IUserRepository userRepository,
 		INotificationRepository notificationRepository) {
 		_dbContext = dbContext;
-		_httpContextAccessor = httpContextAccessor;
 		_followBookmarkRepository = followBookmarkRepository;
 		_uploadRepository = uploadRepository;
 		_userRepository = userRepository;
 		_notificationRepository = notificationRepository;
+		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 	}
 
 	public async Task<GenericResponse<ProductEntity>> Create(ProductCreateUpdateDto dto, CancellationToken ct) {
 		ProductEntity entity = new();
 
-		if (dto.ProductInsight is not null)
-			dto.ProductInsight.UserId = _httpContextAccessor.HttpContext!.User.Identity!.Name;
+		if (dto.ProductInsight is not null) dto.ProductInsight.UserId = _userId;
 
 		ProductEntity e = await entity.FillData(dto, _dbContext);
 		e.VisitsCount = 1;
-		e.UserId = _httpContextAccessor.HttpContext!.User.Identity!.Name;
+		e.UserId = _userId;
 		e.CreatedAt = DateTime.Now;
 
 		EntityEntry<ProductEntity> i = await _dbContext.Set<ProductEntity>().AddAsync(e, ct);
@@ -50,7 +49,7 @@ public class ProductRepository : IProductRepository {
 			if (e.Teams is not null) {
 				foreach (TeamEntity item in e.Teams) {
 					await _notificationRepository.Create(new NotificationCreateUpdateDto {
-						CreatorUserId = _httpContextAccessor.HttpContext!.User.Identity!.Name,
+						CreatorUserId = _userId,
 						UserId = item.UserId,
 						Link = e.Id.ToString(),
 						UseCase = "Product",
@@ -73,11 +72,11 @@ public class ProductRepository : IProductRepository {
 		}
 
 		if (dto.ProductInsight is not null)
-			dto.ProductInsight.UserId = _httpContextAccessor.HttpContext!.User.Identity!.Name;
+			dto.ProductInsight.UserId = _userId;
 
 		ProductEntity e = await entity.FillData(dto, _dbContext);
 		e.VisitsCount = 1;
-		e.UserId = _httpContextAccessor.HttpContext!.User.Identity!.Name;
+		e.UserId = _userId;
 		e.CreatedAt = DateTime.Now;
 
 		EntityEntry<ProductEntity> i = await _dbContext.Set<ProductEntity>().AddAsync(e, ct);
@@ -87,7 +86,7 @@ public class ProductRepository : IProductRepository {
 			if (e.Teams is not null) {
 				foreach (TeamEntity item in e.Teams) {
 					await _notificationRepository.Create(new NotificationCreateUpdateDto {
-						CreatorUserId = _httpContextAccessor.HttpContext!.User.Identity!.Name,
+						CreatorUserId = _userId,
 						UserId = item.UserId,
 						Link = e.Id.ToString(),
 						UseCase = "Product",
@@ -106,7 +105,7 @@ public class ProductRepository : IProductRepository {
 		q = q.Where(x => x.DeletedAt == null);
 		if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.Now);
 
-		string? userId = _httpContextAccessor.HttpContext!.User.Identity!.Name;
+		string? userId = _userId;
 
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
 		if (dto.Subtitle.IsNotNullOrEmpty()) q = q.Where(x => (x.Subtitle ?? "").Contains(dto.Subtitle!));
@@ -181,8 +180,7 @@ public class ProductRepository : IProductRepository {
 		if (dto.OrderByCreaedDateDecending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 
 		if (userId != null) {
-			GenericResponse<UserEntity?> userResponse = await _userRepository.ReadById(userId);
-			UserEntity user = userResponse.Result!;
+			UserEntity? user = await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == userId);
 			foreach (ProductEntity p in q) {
 				if (user.VisitedProducts.Contains(p.Id.ToString())) p.IsSeen = true;
 				if (user.BookmarkedProducts.Contains(p.Id.ToString())) p.IsBookmarked = true;
@@ -217,10 +215,9 @@ public class ProductRepository : IProductRepository {
 			.FirstOrDefaultAsync(i => i.Id == id && i.DeletedAt == null, ct);
 		if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound, "Not Found");
 
-		string? userId = _httpContextAccessor.HttpContext!.User.Identity!.Name;
+		string? userId = _userId;
 		if (userId.IsNotNullOrEmpty()) {
-			GenericResponse<UserEntity?> userResponse = await _userRepository.ReadById(userId);
-			UserEntity user = userResponse.Result!;
+			UserEntity? user = await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == userId, ct);
 			if (user.VisitedProducts.Contains(i.Id.ToString())) i.IsSeen = true;
 			else
 				await _userRepository.Update(new UserCreateUpdateDto {
@@ -278,7 +275,7 @@ public class ProductRepository : IProductRepository {
 			return new GenericResponse<ProductEntity>(new ProductEntity());
 
 		if (dto.ProductInsight is not null)
-			dto.ProductInsight.UserId = _httpContextAccessor.HttpContext!.User.Identity!.Name;
+			dto.ProductInsight.UserId = _userId;
 
 		ProductEntity e = await entity.FillData(dto, _dbContext);
 		_dbContext.Update(e);
@@ -288,7 +285,7 @@ public class ProductRepository : IProductRepository {
 			if (entity.Teams is not null) {
 				foreach (TeamEntity item in e.Teams) {
 					await _notificationRepository.Create(new NotificationCreateUpdateDto {
-						CreatorUserId = _httpContextAccessor.HttpContext!.User.Identity!.Name,
+						CreatorUserId = _userId,
 						UserId = item.UserId,
 						Link = e.Id.ToString(),
 						UseCase = "Product",

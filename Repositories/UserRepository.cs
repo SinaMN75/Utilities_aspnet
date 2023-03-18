@@ -23,6 +23,7 @@ public class UserRepository : IUserRepository {
 	private readonly UserManager<UserEntity> _userManager;
 	private readonly ISmsNotificationRepository _sms;
 	private readonly IHttpContextAccessor _httpContextAccessor;
+	private readonly string? _userId;
 
 	public UserRepository(
 		DbContext dbContext,
@@ -33,6 +34,7 @@ public class UserRepository : IUserRepository {
 		_userManager = userManager;
 		_sms = sms;
 		_httpContextAccessor = httpContextAccessor;
+		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 	}
 
 	public async Task<GenericResponse> CheckUserName(string userName) {
@@ -51,7 +53,7 @@ public class UserRepository : IUserRepository {
 			.FirstOrDefaultAsync(u => isUserId ? u.Id == idOrUserName : u.UserName == idOrUserName);
 
 		if (entity == null)
-			return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound, $"User: {idOrUserName} Not Found");
+			return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
 
 		entity.CountProducts = entity.Products?.Count();
 		List<FollowEntity> follower = await _dbContext.Set<FollowEntity>().Where(x => x.FollowsUserId == entity.Id).ToListAsync();
@@ -63,6 +65,9 @@ public class UserRepository : IUserRepository {
 		entity.Token = token;
 		entity.GrowthRate = GetGrowthRate(entity.Id).Result;
 
+		UserEntity? user = await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == _userId);
+		if (user.FollowedUsers.Contains(entity.Id)) entity.IsFollowing = true;
+		
 		try {
 			if (_httpContextAccessor.HttpContext?.User.Identity?.Name != null) {
 				entity.IsFollowing = await _dbContext.Set<FollowEntity>()
