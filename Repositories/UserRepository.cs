@@ -16,6 +16,7 @@ public interface IUserRepository {
 	Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList();
 	Task<GenericResponse> ToggleBlock(string userId);
 	Task<GenericResponse> OnlineState(bool state);
+	Task<UserEntity?> ReadByIdMinimal(string? idOrUserName);
 }
 
 public class UserRepository : IUserRepository {
@@ -65,9 +66,9 @@ public class UserRepository : IUserRepository {
 		entity.Token = token;
 		entity.GrowthRate = GetGrowthRate(entity.Id).Result;
 
-		UserEntity? user = await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == _userId);
+		UserEntity? user = await ReadByIdMinimal(_userId);
 		if (user.FollowedUsers.Contains(entity.Id)) entity.IsFollowing = true;
-		
+
 		try {
 			if (_httpContextAccessor.HttpContext?.User.Identity?.Name != null) {
 				entity.IsFollowing = await _dbContext.Set<FollowEntity>()
@@ -76,22 +77,21 @@ public class UserRepository : IUserRepository {
 		}
 		catch { }
 
-		return new GenericResponse<UserEntity?>(entity, UtilitiesStatusCodes.Success, "Success");
+		return new GenericResponse<UserEntity?>(entity);
 	}
 
+	public async Task<UserEntity?> ReadByIdMinimal(string? idOrUserName)
+		=> await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(u => u.Id == idOrUserName || u.UserName == idOrUserName);
+	
 	public async Task<GenericResponse<UserEntity?>> Update(UserCreateUpdateDto dto) {
-		UserEntity? entity = _dbContext.Set<UserEntity>()
+		UserEntity? entity = await _dbContext.Set<UserEntity>()
 			.Include(x => x.Categories)
 			.Include(x => x.Media)
-			.FirstOrDefault(x => x.Id == dto.Id);
+			.FirstOrDefaultAsync(x => x.Id == dto.Id);
 
-		if (entity == null)
-			return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound, "Not Found");
-
+		if (entity == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
 		FillUserData(dto, entity);
-
 		await _dbContext.SaveChangesAsync();
-
 		return new GenericResponse<UserEntity?>(entity);
 	}
 
@@ -132,21 +132,16 @@ public class UserRepository : IUserRepository {
 	}
 
 	public async Task<GenericResponse> Delete(string id) {
-		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id);
-
-		if (user == null)
-			return new GenericResponse(UtilitiesStatusCodes.NotFound, "User notfound");
-
+		UserEntity? user = await ReadByIdMinimal(id);
+		if (user == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
 		user.DeletedAt = DateTime.Now;
-
 		_dbContext.Set<UserEntity>().Update(user);
 		await _dbContext.SaveChangesAsync();
-
-		return new GenericResponse(UtilitiesStatusCodes.Success, "Mission Accomplished");
+		return new GenericResponse();
 	}
 
 	public async Task<GenericResponse> RemovalFromTeam(Guid teamId) {
-		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _httpContextAccessor.HttpContext!.User.Identity!.Name);
+		UserEntity? user = await ReadByIdMinimal(_userId);
 
 		if (user == null)
 			return new GenericResponse(UtilitiesStatusCodes.NotFound, "User notfound");
@@ -157,11 +152,11 @@ public class UserRepository : IUserRepository {
 		_dbContext.Set<TeamEntity>().Remove(team);
 		await _dbContext.SaveChangesAsync();
 
-		return new GenericResponse(UtilitiesStatusCodes.Success, "Mission Accomplished");
+		return new GenericResponse();
 	}
 
 	public async Task<GenericResponse> Logout() {
-		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _httpContextAccessor.HttpContext!.User.Identity!.Name);
+		UserEntity? user = await ReadByIdMinimal(_userId);
 		user!.IsLoggedIn = false;
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
@@ -170,17 +165,14 @@ public class UserRepository : IUserRepository {
 	public async Task<GenericResponse<UserEntity?>> GetTokenForTest(string mobile) {
 		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == mobile);
 
-		if (user == null)
-			return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound, "شماره موبایل وارد شده یافت نشد");
+		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
 
-		if (user.Suspend)
-			return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.BadRequest, "کاربر به حالت تعلیق در آمده است");
+		if (user.Suspend) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.UserSuspended);
 
 		user.IsLoggedIn = true;
 		await _dbContext.SaveChangesAsync();
 		JwtSecurityToken token = await CreateToken(user);
-		return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result, UtilitiesStatusCodes.Success,
-		                                        "Success");
+		return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result);
 	}
 
 	private async Task<JwtSecurityToken> CreateToken(UserEntity user) {
@@ -312,12 +304,11 @@ public class UserRepository : IUserRepository {
 		if (await Verify(user.Id, dto.VerificationCode) != OtpResult.Ok)
 			return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.WrongVerificationCode, "کد تایید وارد شده صحیح نیست");
 
-		return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result,
-		                                        UtilitiesStatusCodes.Success, "Success");
+		return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result);
 	}
 
 	public async Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList() {
-		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _httpContextAccessor.HttpContext!.User.Identity!.Name!);
+		UserEntity? user = await ReadByIdMinimal(_userId);
 		GenericResponse<IEnumerable<UserEntity>> blockedUsers = await Filter(new UserFilterDto {
 			ShowMedia = true,
 			UserIds = user?.BlockedUsers.Split(",")
@@ -326,7 +317,7 @@ public class UserRepository : IUserRepository {
 	}
 
 	public async Task<GenericResponse> ToggleBlock(string userId) {
-		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _httpContextAccessor.HttpContext!.User.Identity!.Name);
+		UserEntity? user = await ReadByIdMinimal(_userId);
 
 		await Update(new UserCreateUpdateDto {Id = user.Id, BlockedUsers = "user.BlockedUsers + \",\" + userId"});
 		if (user!.BlockedUsers.Contains(userId))
@@ -452,7 +443,7 @@ public class UserRepository : IUserRepository {
 
 		string newOtp = Utils.Random(codeLength).ToString();
 		_dbContext.Set<OtpEntity>().Add(new OtpEntity {UserId = userId, OtpCode = newOtp, CreatedAt = DateTime.Now, UpdatedAt = DateTime.Now});
-		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == userId);
+		UserEntity? user = await ReadByIdMinimal(userId);
 		_sms.SendSms(user?.PhoneNumber!, newOtp);
 		await _dbContext.SaveChangesAsync();
 		return true;
@@ -473,16 +464,14 @@ public class UserRepository : IUserRepository {
 
 	public async Task<GenericResponse> OnlineState(bool state) {
 		string? userId = _httpContextAccessor.HttpContext?.User.Identity?.Name;
-		if (string.IsNullOrEmpty(userId))
-			return new GenericResponse(UtilitiesStatusCodes.NotFound, "User Token Expired");
+		if (string.IsNullOrEmpty(userId)) return new GenericResponse(UtilitiesStatusCodes.NotFound);
 
-		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == userId);
-		if (user == null)
-			return new GenericResponse(UtilitiesStatusCodes.NotFound, "Not Foumd");
+		UserEntity? user = await ReadByIdMinimal(userId);
+		if (user == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
 
 		user.IsOnline = state;
 
 		await _dbContext.SaveChangesAsync();
-		return new GenericResponse(UtilitiesStatusCodes.Success, "State Changed");
+		return new GenericResponse();
 	}
 }

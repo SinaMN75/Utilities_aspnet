@@ -57,8 +57,14 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 				request.AddHeader("Authorization", "Token " + setting.Token);
 				var body = new {
 					app_ids = setting.AppId,
-					data = new {title = dto.Title, content = dto.Message},
-					filters = new {userId = dto.UserIds}
+					data = new {
+						title = dto.Title,
+						content = dto.Content,
+						bigContent = dto.BigContent,
+						action = new {action_type = dto.ActionType, url = dto.Url}
+					},
+					is_draft = false,
+					filter = new {custom_id = dto.UserIds}
 				};
 				request.AddJsonBody(body);
 
@@ -71,7 +77,10 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 }
 
 public class NotificationCreateDto {
-	public IEnumerable<string> UserIds { get; set; }
-	public string Title { get; set; }
-	public string Message { get; set; }
+	public IEnumerable<string> UserIds { get; set; } = new List<string>();
+	public string Title { get; set; } = "";
+	public string Content { get; set; } = "";
+	public string BigContent { get; set; } = "";
+	public string Url { get; set; } = "";
+	public string ActionType { get; set; } = "U";
 }

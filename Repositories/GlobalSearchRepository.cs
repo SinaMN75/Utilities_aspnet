@@ -7,9 +7,7 @@ public interface IGlobalSearchRepository {
 public class GlobalSearchRepository : IGlobalSearchRepository {
 	private readonly DbContext _dbContext;
 
-	public GlobalSearchRepository(DbContext dbContext) {
-		_dbContext = dbContext;
-	}
+	public GlobalSearchRepository(DbContext dbContext) => _dbContext = dbContext;
 
 	public async Task<GenericResponse<GlobalSearchDto>> Filter(GlobalSearchParams filter, string? userId) {
 		GlobalSearchDto model = new();

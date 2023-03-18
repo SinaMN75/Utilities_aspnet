@@ -21,12 +21,12 @@ public class ContentRepository : IContentRepository {
 	public GenericResponse<IQueryable<ContentEntity>> Read() => new(_dbContext.Set<ContentEntity>().Include(x => x.Media).AsNoTracking());
 
 	public async Task<GenericResponse<ContentEntity>> Update(ContentEntity dto) {
-		ContentEntity? e = await _dbContext.Set<ContentEntity>().AsNoTracking().Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
+		ContentEntity? e = await _dbContext.Set<ContentEntity>().Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
 		if (e == null) return new GenericResponse<ContentEntity>(new ContentEntity());
-		e.UseCase = dto.UseCase;
-		e.Title = dto.Title;
-		e.SubTitle = dto.SubTitle;
-		e.Description = dto.Description;
+		e.UseCase = dto.UseCase ?? e.UseCase;
+		e.Title = dto.Title ?? e.Title;
+		e.SubTitle = dto.SubTitle ?? e.SubTitle;
+		e.Description = dto.Description ?? e.Description;
 		_dbContext.Update(e);
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse<ContentEntity>(e);

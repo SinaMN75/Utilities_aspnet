@@ -208,7 +208,7 @@ public class OrderRepository : IOrderRepository {
 	public async Task<GenericResponse> Delete(Guid id) {
 		OrderEntity? i = await _dbContext.Set<OrderEntity>().FirstOrDefaultAsync(i => i.Id == id);
 		if (i == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
-		if (i.PayDateTime != null) return new GenericResponse(UtilitiesStatusCodes.orderPayed);
+		if (i.PayDateTime != null) return new GenericResponse(UtilitiesStatusCodes.OrderPayed);
 		if (i != null) {
 			_dbContext.Remove(i);
 			await _dbContext.SaveChangesAsync();
@@ -221,7 +221,7 @@ public class OrderRepository : IOrderRepository {
 		OrderEntity? e = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails.Where(x => x.DeletedAt == null)).ThenInclude(y => y.Product)
 			.FirstOrDefaultAsync(x => x.Id == dto.OrderId);
 		if (e == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
-		if (e.PayDateTime != null) return new GenericResponse(UtilitiesStatusCodes.orderPayed);
+		if (e.PayDateTime != null) return new GenericResponse(UtilitiesStatusCodes.OrderPayed);
 
 		IEnumerable<string?> q = e.OrderDetails?.GroupBy(x => x.Product?.UserId).Select(z => z.Key);
 		if (q.Count() > 1)

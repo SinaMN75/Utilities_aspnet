@@ -23,8 +23,8 @@ public enum UtilitiesStatusCodes {
 	UserSuspended = 604,
 	UserNotFound = 605,
 	MultipleSeller = 607,
-	orderPayed = 608,
-	zeroPayed = 609
+	OrderPayed = 608,
+	ZeroPayed = 609
 }
 
 public enum OtpResult {
