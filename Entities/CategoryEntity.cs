@@ -51,7 +51,7 @@ public class CategoryEntity : BaseEntity {
 
 	[JsonIgnore]
 	public IEnumerable<OrderDetailEntity>? OrderDetails { get; set; }
-	
+
 	[NotMapped]
 	public bool IsUnique { get; set; } = true;
 }

@@ -13,7 +13,7 @@ public class NotificationEntity : BaseEntity {
 
 	[StringLength(500)]
 	public string? UseCase { get; set; }
-	
+
 	public SeenStatus? SeenStatus { get; set; }
 
 	public bool? Visited { get; set; }
@@ -28,7 +28,6 @@ public class NotificationEntity : BaseEntity {
 
 	[ForeignKey(nameof(CreatorUserId))]
 	public UserEntity? CreatorUser { get; set; }
-	
 }
 
 public class NotificationCreateUpdateDto {

@@ -33,7 +33,6 @@ public class AppSettingsController : BaseApiController {
 			AgeCategory = EnumExtension.GetValues<AgeCategory>(),
 			ReferenceIdType = EnumExtension.GetValues<ReferenceIdType>(),
 			AppSettings = appSettings
-			
 		}));
 	}
 }

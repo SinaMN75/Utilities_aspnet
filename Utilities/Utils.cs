@@ -10,7 +10,7 @@ public static class StartupExtension {
 
 		if (redisConnectionString != null) builder.AddRedis(redisConnectionString);
 
-		IServiceProvider? serviceProvider = builder.Services.BuildServiceProvider().GetService<IServiceProvider>();		
+		IServiceProvider? serviceProvider = builder.Services.BuildServiceProvider().GetService<IServiceProvider>();
 
 		builder.AddUtilitiesSwagger(serviceProvider);
 		builder.AddUtilitiesIdentity();
@@ -57,9 +57,9 @@ public static class StartupExtension {
 		});
 
 		builder.Services.AddHttpContextAccessor();
-        builder.Services.AddSignalR();
+		builder.Services.AddSignalR();
 
-        builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+		builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 		builder.Services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")));
 		builder.Services.AddControllersWithViews(option => {
 			option.EnableEndpointRouting = false;
@@ -93,7 +93,6 @@ public static class StartupExtension {
 		builder.Services.AddTransient<ITransactionRepository, TransactionRepository>();
 		builder.Services.AddTransient<IContentRepository, ContentRepository>();
 		builder.Services.AddTransient<IVoteRepository, VoteRepository>();
-		builder.Services.AddTransient<ITopProductRepository, TopProductRepository>();
 		builder.Services.AddTransient<IOrderRepository, OrderRepository>();
 		builder.Services.AddTransient<IDiscountRepository, DiscountRepository>();
 		builder.Services.AddTransient<IGlobalSearchRepository, GlobalSearchRepository>();
@@ -166,11 +165,10 @@ public static class StartupExtension {
 		app.UseAuthentication();
 		app.UseRouting();
 		app.UseAuthorization();
-        app.MapHub<ChatHub>("/hubs/ChatHub");
+		app.MapHub<ChatHub>("/hubs/ChatHub");
+	}
 
-    }
-
-    private static void UseUtilitiesSwagger(this IApplicationBuilder app) {
+	private static void UseUtilitiesSwagger(this IApplicationBuilder app) {
 		app.UseSwagger();
 		app.UseSwaggerUI(c => {
 			c.DocExpansion(DocExpansion.None);

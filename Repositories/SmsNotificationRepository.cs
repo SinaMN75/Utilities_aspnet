@@ -45,32 +45,29 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 		}
 	}
 
-    public async Task<GenericResponse> SendNotification(NotificationCreateDto dto)
-    {
-        AppSettings appSettings = new();
-        _config.GetSection("AppSettings").Bind(appSettings);
-        PushNotificationSetting setting = appSettings.PushNotificationSetting;
+	public async Task<GenericResponse> SendNotification(NotificationCreateDto dto) {
+		AppSettings appSettings = new();
+		_config.GetSection("AppSettings").Bind(appSettings);
+		PushNotificationSetting setting = appSettings.PushNotificationSetting;
 
-        switch (setting.Provider)
-        {
-	        case "pushe":
-	        {
-		        RestRequest request = new(Method.POST);
-		        request.AddHeader("Content-Type", "application/json");
-		        request.AddHeader("Authorization", "Token " + setting.Token);
-		        var body = new {
-			        app_ids = setting.AppId,
-			        data = new {title = dto.Title, content = dto.Message},
-			        filters = new {userId = dto.UserIds}
-		        };
-		        request.AddJsonBody(body);
-				
-		        IRestResponse i =await new RestClient("https://api.pushe.co/v2/messaging/notifications/").ExecuteAsync(request);
-		        break;
-	        }
-        }
-        return new GenericResponse();
-    }
+		switch (setting.Provider) {
+			case "pushe": {
+				RestRequest request = new(Method.POST);
+				request.AddHeader("Content-Type", "application/json");
+				request.AddHeader("Authorization", "Token " + setting.Token);
+				var body = new {
+					app_ids = setting.AppId,
+					data = new {title = dto.Title, content = dto.Message},
+					filters = new {userId = dto.UserIds}
+				};
+				request.AddJsonBody(body);
+
+				IRestResponse i = await new RestClient("https://api.pushe.co/v2/messaging/notifications/").ExecuteAsync(request);
+				break;
+			}
+		}
+		return new GenericResponse();
+	}
 }
 
 public class NotificationCreateDto {

@@ -1,8 +1,7 @@
 namespace Utilities_aspnet.Entities;
 
 [Table("Reports")]
-public class ReportEntity : BaseEntity
-{
+public class ReportEntity : BaseEntity {
 	[StringLength(500)]
 	public string? Title { get; set; }
 
@@ -19,12 +18,12 @@ public class ReportEntity : BaseEntity
 	public CommentEntity? Comment { get; set; }
 	public Guid? CommentId { get; set; }
 	public ReportType ReportType { get; set; } = ReportType.All;
+
 	[StringLength(500)]
 	public string? ProductUseCase { get; set; }
 }
 
-public class ReportFilterDto
-{
+public class ReportFilterDto {
 	public bool? User { get; set; }
 	public bool? Product { get; set; }
 	public ReportType ReportType { get; set; }
@@ -33,8 +32,7 @@ public class ReportFilterDto
 	public int? Count { get; set; }
 }
 
-public class ReportResponseDto
-{
+public class ReportResponseDto {
 	public string? Title { get; set; }
 	public int? Month { get; set; }
 	public int? Year { get; set; }

@@ -28,14 +28,14 @@ public class FollowBookmarkController : BaseApiController {
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	public async Task<IActionResult> ToggleBookmark(BookmarkCreateDto dto) => Result(await _repository.ToggleBookmark(dto));
 
-    [HttpPut("UpdateBookmark")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<IActionResult> UpdateBookmark(Guid bookmarkId,BookmarkCreateDto dto) => Result(await _repository.UpdateBookmark(bookmarkId,dto));
+	[HttpPut("UpdateBookmark")]
+	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+	public async Task<IActionResult> UpdateBookmark(Guid bookmarkId, BookmarkCreateDto dto) => Result(await _repository.UpdateBookmark(bookmarkId, dto));
 
-    [HttpPost("ReadBookmarks")]
+	[HttpPost("ReadBookmarks")]
 	public ActionResult<GenericResponse<IEnumerable<BookmarkEntity>?>> ReadBookmarks(string? userId) => Result(_repository.ReadBookmarks(userId));
-	
+
 	[HttpGet("ReadBookmarksByFolderName")]
-	public ActionResult<GenericResponse<IEnumerable<BookmarkEntity>?>> ReadBookmarksByFolderName(string userId, string? folderName = null) 
+	public ActionResult<GenericResponse<IEnumerable<BookmarkEntity>?>> ReadBookmarksByFolderName(string userId, string? folderName = null)
 		=> Result(_repository.ReadBookmarksByFolderName(folderName, userId));
 }

@@ -467,11 +467,11 @@ public class UserRepository : IUserRepository {
 	}
 
 	public async Task<GenericResponse> OnlineState(bool state) {
-		var userId = _httpContextAccessor.HttpContext?.User.Identity?.Name;
+		string? userId = _httpContextAccessor.HttpContext?.User.Identity?.Name;
 		if (string.IsNullOrEmpty(userId))
 			return new GenericResponse(UtilitiesStatusCodes.NotFound, "User Token Expired");
 
-		var user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == userId);
+		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == userId);
 		if (user == null)
 			return new GenericResponse(UtilitiesStatusCodes.NotFound, "Not Foumd");
 

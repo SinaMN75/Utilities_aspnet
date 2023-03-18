@@ -39,10 +39,9 @@ public class OrderController : BaseApiController {
 	[AllowAnonymous]
 	[HttpDelete("DeleteOrderDetail")]
 	public async Task<ActionResult<GenericResponse<OrderEntity>>> DeleteOrderDetail(Guid id) => Result(await _repository.DeleteOrderDetail(id));
-	
+
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	[AllowAnonymous]
 	[HttpPost("ReadOrderSummary")]
-	public ActionResult<GenericResponse<OrderSummaryResponseDto>> ReadOrderSummary(OrderSummaryRequestDto dto) =>
-		Result(_repository.ReadOrderSummary(dto));
+	public ActionResult<GenericResponse<OrderSummaryResponseDto>> ReadOrderSummary(OrderSummaryRequestDto dto) => Result(_repository.ReadOrderSummary(dto));
 }

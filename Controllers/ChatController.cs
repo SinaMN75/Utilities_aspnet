@@ -36,7 +36,7 @@ public class ChatController : BaseApiController {
 	[HttpPut("UpdateGroupChat")]
 	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> UpdateGroupChat(GroupChatCreateUpdateDto dto)
 		=> Result(await _repository.UpdateGroupChat(dto));
-	
+
 	[HttpDelete("DeleteGroupChat/{id}")]
 	public async Task<ActionResult<GenericResponse>> DeleteGroupChat(Guid id) => Result(await _repository.DeleteGroupChat(id));
 
@@ -56,14 +56,11 @@ public class ChatController : BaseApiController {
 	[HttpPost("AddReactionToMessage/{emoji}/{messageId:guid}")]
 	public async Task<ActionResult<GenericResponse>> AddReactionToMessage(Reaction emoji, Guid messageId)
 		=> Result(await _repository.AddReactionToMessage(emoji, messageId));
-	
-	
+
 	[HttpPut("UpdateGroupChatMessage")]
-	public async Task<ActionResult<GenericResponse<GroupChatMessageEntity?>>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto) =>
-		Result(await _repository.UpdateGroupChatMessage(dto));
+	public async Task<ActionResult<GenericResponse<GroupChatMessageEntity?>>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto)
+		=> Result(await _repository.UpdateGroupChatMessage(dto));
 
 	[HttpDelete("DeleteGroupChatMessage/{id}")]
-	public async Task<ActionResult<GenericResponse>> DeleteGroupChatMessage(Guid id) => 
-		Result(await _repository.DeleteGroupChatMessage(id));
-
+	public async Task<ActionResult<GenericResponse>> DeleteGroupChatMessage(Guid id) => Result(await _repository.DeleteGroupChatMessage(id));
 }

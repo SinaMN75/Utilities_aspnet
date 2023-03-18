@@ -61,22 +61,22 @@ public class MediaEntity : BaseEntity {
 
 	[JsonIgnore]
 	public Guid? CategoryId { get; set; }
-	
+
 	[JsonIgnore]
 	public GroupChatEntity? GroupChat { get; set; }
 
 	[JsonIgnore]
-	public Guid? GroupChatId { get; set; }	
-	
+	public Guid? GroupChatId { get; set; }
+
 	[JsonIgnore]
 	public GroupChatMessageEntity? GroupChatMessage { get; set; }
-	
+
 	[JsonIgnore]
 	public Guid? GroupChatMessageId { get; set; }
-	
+
 	[JsonIgnore]
 	public Guid? BookmarkId { get; set; }
-	
+
 	[JsonIgnore]
 	public BookmarkEntity? Bookmark { get; set; }
 }
@@ -99,9 +99,8 @@ public class UploadDto {
 	public IEnumerable<IFormFile>? Files { get; set; }
 }
 
-public class UpdateMediaDto
-{
-    public string? UseCase { get; set; }
-    public string? Title { get; set; }
-    public string? Size { get; set; }
+public class UpdateMediaDto {
+	public string? UseCase { get; set; }
+	public string? Title { get; set; }
+	public string? Size { get; set; }
 }

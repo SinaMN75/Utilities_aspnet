@@ -10,7 +10,7 @@ public interface IVoteRepository {
 public class VoteRepository : IVoteRepository {
 	private readonly DbContext _dbContext;
 	private readonly IHttpContextAccessor _httpContextAccessor;
-	
+
 	public VoteRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) {
 		_dbContext = dbContext;
 		_httpContextAccessor = httpContextAccessor;
