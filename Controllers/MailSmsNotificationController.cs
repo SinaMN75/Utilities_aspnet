@@ -1,7 +1,6 @@
 ﻿namespace Utilities_aspnet.Controllers;
 
 [ApiController]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [Route("api/[controller]")]
 public class MailSmsNotificationController : BaseApiController {
 	private readonly ISmsNotificationRepository _repository;
