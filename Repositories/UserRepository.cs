@@ -66,8 +66,7 @@ public class UserRepository : IUserRepository {
 		entity.Token = token;
 		entity.GrowthRate = GetGrowthRate(entity.Id).Result;
 
-		UserEntity? user = await ReadByIdMinimal(_userId);
-		if (user.FollowedUsers.Contains(entity.Id)) entity.IsFollowing = true;
+		if (entity.FollowedUsers.Contains(entity.Id)) entity.IsFollowing = true;
 
 		try {
 			if (_httpContextAccessor.HttpContext?.User.Identity?.Name != null) {
