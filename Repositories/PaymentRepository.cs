@@ -23,18 +23,17 @@ public interface IPaymentRepository {
 
 public class PaymentRepository : IPaymentRepository {
 	private readonly DbContext _dbContext;
-	private readonly IHttpContextAccessor _httpContextAccessor;
-
+	private readonly string? _userId;
+	
 	public PaymentRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) {
-		_dbContext = dbContext;
-		_httpContextAccessor = httpContextAccessor;
+		_dbContext = dbContext; 
+		_userId = httpContextAccessor.HttpContext?.User.Identity?.Name;
 	}
 
 	public async Task<GenericResponse<string?>> IncreaseWalletBalance(double amount, string zarinPalMerchantId) {
-		string? userId = _httpContextAccessor.HttpContext?.User.Identity?.Name;
 
 		try {
-			UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == userId);
+			UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
 			Payment payment = new(zarinPalMerchantId, amount.ToInt());
 			string callbackUrl = $"{Server.ServerAddress}/Payment/WalletCallBack/{user?.Id}/{amount}";
 			string desc = $"شارژ کیف پول به مبلغ {amount}";
@@ -46,7 +45,7 @@ public class PaymentRepository : IPaymentRepository {
 				CreatedAt = DateTime.Now,
 				Descriptions = desc,
 				GatewayName = "ZarinPal",
-				UserId = userId,
+				UserId = _userId,
 				StatusId = TransactionStatus.Pending
 			});
 			await _dbContext.SaveChangesAsync();
@@ -94,11 +93,10 @@ public class PaymentRepository : IPaymentRepository {
 	}
 
 	public async Task<GenericResponse<string?>> BuyProduct(Guid productId, string zarinPalMerchantId) {
-		string? userId = _httpContextAccessor.HttpContext?.User.Identity?.Name;
 
 		try {
 			ProductEntity product = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == productId))!;
-			UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == userId);
+			UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
 			Payment payment = new(zarinPalMerchantId, product.Price.ToInt());
 			string callbackUrl = $"{Server.ServerAddress}/Payment/CallBack/{productId}";
 			string desc = $"خرید محصول {product.Title}";
@@ -109,7 +107,7 @@ public class PaymentRepository : IPaymentRepository {
 				CreatedAt = DateTime.Now,
 				Descriptions = desc,
 				GatewayName = "ZarinPal",
-				UserId = userId,
+				UserId = _userId,
 				ProductId = productId,
 				StatusId = TransactionStatus.Pending
 			});
@@ -150,11 +148,9 @@ public class PaymentRepository : IPaymentRepository {
 	}
 
 	public async Task<GenericResponse<string?>> StripeBuyProduct(Guid productId, string? extraparams) {
-		string? userId = _httpContextAccessor.HttpContext?.User.Identity?.Name;
 
 		try {
 			OrderEntity order = (await _dbContext.Set<OrderEntity>().FirstOrDefaultAsync(x => x.Id == productId))!;
-			UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == userId);
 
 			if (order == null || order.TotalPrice == 0)
 				return new GenericResponse<string?>("zero price", UtilitiesStatusCodes.BadRequest);

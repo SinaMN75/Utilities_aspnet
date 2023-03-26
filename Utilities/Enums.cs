@@ -24,7 +24,8 @@ public enum UtilitiesStatusCodes {
 	UserNotFound = 605,
 	MultipleSeller = 607,
 	OrderPayed = 608,
-	ZeroPayed = 609
+	ZeroPayed = 609,
+	OutOfStock = 610,
 }
 
 public enum OtpResult {

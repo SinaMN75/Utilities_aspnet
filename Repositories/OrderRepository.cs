@@ -23,11 +23,11 @@ public interface IOrderRepository {
 
 public class OrderRepository : IOrderRepository {
 	private readonly DbContext _dbContext;
-	private readonly IHttpContextAccessor _httpContextAccessor;
+	private readonly string? _userId;
 
 	public OrderRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) {
 		_dbContext = dbContext;
-		_httpContextAccessor = httpContextAccessor;
+		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 	}
 
 	public async Task<GenericResponse<OrderEntity?>> Create(OrderCreateUpdateDto dto) {
@@ -46,7 +46,7 @@ public class OrderRepository : IOrderRepository {
 		OrderEntity entityOrder = new() {
 			Description = dto.Description,
 			ReceivedDate = dto.ReceivedDate,
-			UserId = _httpContextAccessor.HttpContext?.User.Identity?.Name!,
+			UserId = dto.UserId ?? _userId,
 			DiscountPercent = dto.DiscountPercent,
 			DiscountCode = dto.DiscountCode,
 			PayType = PayType.Online,
@@ -59,8 +59,6 @@ public class OrderRepository : IOrderRepository {
 			ProductUseCase = dto.ProductUseCase,
 			ProductOwnerId = listProducts.First().UserId,
 		};
-		if (dto.UserId.IsNotNullOrEmpty())
-			entityOrder.UserId = dto.UserId;
 
 		await _dbContext.Set<OrderEntity>().AddAsync(entityOrder);
 		await _dbContext.SaveChangesAsync();
@@ -69,7 +67,7 @@ public class OrderRepository : IOrderRepository {
 			ProductEntity? productEntity = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == item.ProductId);
 			if (productEntity != null && productEntity.Stock < item.Count) {
 				await Delete(entityOrder.Id);
-				throw new ArgumentException("failed request! this request is more than stock!");
+				return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.OutOfStock);
 			}
 
 			OrderDetailEntity orderDetailEntity = new() {
@@ -103,7 +101,7 @@ public class OrderRepository : IOrderRepository {
 	}
 
 	public async Task<GenericResponse<OrderEntity?>> Update(OrderCreateUpdateDto dto) {
-		string userId = _httpContextAccessor.HttpContext?.User.Identity?.Name!;
+		string? userId = _userId;
 		OrderEntity? oldOrder =
 			await _dbContext.Set<OrderEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id && (x.UserId == userId || x.ProductOwnerId == userId));
 		if (oldOrder == null) return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.NotFound);
@@ -209,11 +207,8 @@ public class OrderRepository : IOrderRepository {
 		OrderEntity? i = await _dbContext.Set<OrderEntity>().FirstOrDefaultAsync(i => i.Id == id);
 		if (i == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
 		if (i.PayDateTime != null) return new GenericResponse(UtilitiesStatusCodes.OrderPayed);
-		if (i != null) {
-			_dbContext.Remove(i);
-			await _dbContext.SaveChangesAsync();
-		}
-		else return new GenericResponse(UtilitiesStatusCodes.NotFound);
+		_dbContext.Remove(i);
+		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}
 
@@ -223,7 +218,7 @@ public class OrderRepository : IOrderRepository {
 		if (e == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
 		if (e.PayDateTime != null) return new GenericResponse(UtilitiesStatusCodes.OrderPayed);
 
-		IEnumerable<string?> q = e.OrderDetails?.GroupBy(x => x.Product?.UserId).Select(z => z.Key);
+		IEnumerable<string?>? q = e.OrderDetails?.GroupBy(x => x.Product?.UserId).Select(z => z.Key);
 		if (q.Count() > 1)
 			return new GenericResponse(UtilitiesStatusCodes.MultipleSeller, "Cannot Add from multiple seller.");
 
@@ -404,7 +399,7 @@ public class OrderRepository : IOrderRepository {
 
 				#region OrderStuse
 
-				c = q.GroupBy(o => (int) o.Status
+				c = q.GroupBy(o => ((int) o.Status)!
 					).Select(g => new OrderSummaryResponseDto {
 						Title = g.Max(y => ((int) y.Status).ToString()),
 						Count = g.Count(),
@@ -429,10 +424,10 @@ public class OrderRepository : IOrderRepository {
 			.AsNoTracking()
 			.FirstOrDefaultAsync(i => i.Id == id && i.DeletedAt == null && i.Status == OrderStatuses.Accept);
 
-		if (order == null) return null;
-		if (order.PayDateTime != null) return null;
-		OrderCreateUpdateDto orderCreateUpdateDto = new OrderCreateUpdateDto();
-		orderCreateUpdateDto.TotalPrice = order.TotalPrice;
+		if (order is not {PayDateTime: null}) return null;
+		OrderCreateUpdateDto orderCreateUpdateDto = new() {
+			TotalPrice = order.TotalPrice
+		};
 		return orderCreateUpdateDto;
 	}
 
@@ -457,6 +452,6 @@ public class OrderRepository : IOrderRepository {
 			order.Status = OrderStatuses.PaidFail;
 
 		await _dbContext.SaveChangesAsync();
-		return new GenericResponse(UtilitiesStatusCodes.Success);
+		return new GenericResponse();
 	}
 }

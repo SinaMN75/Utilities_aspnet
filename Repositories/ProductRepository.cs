@@ -358,7 +358,6 @@ public static class ProductEntityExtension {
 		entity.DeletedAt = dto.DeletedAt ?? entity.DeletedAt;
 		entity.UpdatedAt = DateTime.Now;
 		entity.ExpireDate = dto.ExpireDate ?? entity.ExpireDate;
-		entity.AgeCategory = dto.AgeCategory ?? entity.AgeCategory;
 
 		if (dto.VisitsCountPlus.HasValue) {
 			if (entity.VisitsCount == null) entity.VisitsCount = 1;

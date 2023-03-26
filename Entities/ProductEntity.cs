@@ -88,7 +88,6 @@ public class ProductEntity : BaseEntity {
 	public UserEntity? User { get; set; }
 
 	public DateTime? ExpireDate { get; set; }
-	public AgeCategory? AgeCategory { get; set; }
 
 	[StringLength(100000)]
 	public string? SeenUsers { get; set; }
@@ -191,7 +190,6 @@ public class ProductCreateUpdateDto {
 	public ProductStatus? Status { get; set; }
 	public Currency? Currency { get; set; }
 	public ProductInsightDto? ProductInsight { get; set; }
-	public AgeCategory? AgeCategory { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 	public IEnumerable<string>? Teams { get; set; }
 	public IEnumerable<UploadDto>? Upload { get; set; }

@@ -187,8 +187,6 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 	}
 
 	public async Task<GenericResponse<BookmarkEntity?>> UpdateBookmark(Guid bookmarkId, BookmarkCreateDto dto) {
-		string userId = _httpContextAccessor.HttpContext!.User.Identity!.Name!;
-
 		BookmarkEntity? oldBookmark = await _dbContext.Set<BookmarkEntity>()
 			.FirstOrDefaultAsync(x => x.Id == bookmarkId);
 		if (oldBookmark is null) {
