@@ -92,6 +92,7 @@ public class GroupChatMessageEntity : BaseEntity {
 
 	public GroupChatMessageEntity? Parent { get; set; }
 	public Guid? ParentId { get; set; }
+	public string? UsersSeen { get; set; }
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<ProductEntity?>? Products { get; set; }
