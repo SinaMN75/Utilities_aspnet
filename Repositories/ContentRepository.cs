@@ -18,7 +18,9 @@ public class ContentRepository : IContentRepository {
 		return new GenericResponse<ContentEntity>(i.Entity);
 	}
 
-	public GenericResponse<IQueryable<ContentEntity>> Read() => new(_dbContext.Set<ContentEntity>().Include(x => x.Media).AsNoTracking());
+	public GenericResponse<IQueryable<ContentEntity>> Read() => new(_dbContext.Set<ContentEntity>()
+		                                                                .Where(x => x.DeletedAt == null)
+		                                                                .Include(x => x.Media).AsNoTracking());
 
 	public async Task<GenericResponse<ContentEntity>> Update(ContentEntity dto) {
 		ContentEntity? e = await _dbContext.Set<ContentEntity>().Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
@@ -34,8 +36,7 @@ public class ContentRepository : IContentRepository {
 
 	public async Task<GenericResponse> Delete(Guid id) {
 		ContentEntity? e = await _dbContext.Set<ContentEntity>().FirstOrDefaultAsync(i => i.Id == id);
-		if (e == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
-		_dbContext.Set<ContentEntity>().Remove(e);
+		e.DeletedAt = DateTime.Now;
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}
