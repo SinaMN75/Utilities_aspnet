@@ -502,7 +502,7 @@ public class ChatRepository : IChatRepository
             return new GenericResponse(UtilitiesStatusCodes.NotFound, "GroupChatMessage Not Found!");
 
         if (string.IsNullOrEmpty(groupMessageChat.UsersSeen)) groupMessageChat.UsersSeen = userId;
-        else groupMessageChat.UsersSeen = $",{userId}";
+        else groupMessageChat.UsersSeen = groupMessageChat.UsersSeen + $",{userId}";
 
         _dbContext.Update(groupMessageChat);
         await _dbContext.SaveChangesAsync();
