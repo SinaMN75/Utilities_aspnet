@@ -157,10 +157,9 @@ public class ProductRepository : IProductRepository {
 			}
 			q = temp.AsQueryable();
 			if (dto.IsFollowing) q = q.Where(i => user.FollowedUsers.Contains(i.UserId));
-			
 		}
 
-		int totalCount = q.Count();
+		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
 		return new GenericResponse<IQueryable<ProductEntity>>(q) {

@@ -236,13 +236,15 @@ public class ChatRepository : IChatRepository
             .Include(x => x.Products).ThenInclude(x => x.Media)
             .Include(x => x.Products).ThenInclude(x => x.Categories)
             .Include(x => x.Products).ThenInclude(x => x.Comments)
-            .Include(x => x.Products).ThenInclude(x => x.User).Where(x => x.DeletedAt == null)
+            .Include(x => x.Products).ThenInclude(x => x.User)
+            .Where(x => x.DeletedAt == null)
             .AsNoTracking();
 
         try {
             e = e.Include(x => x.GroupChatMessage).TakeLast(10);
         }
         catch (Exception) {
+            e = e.Include(x => x.GroupChatMessage);
         }
 
         return new GenericResponse<IQueryable<GroupChatEntity>?>(e);
@@ -315,6 +317,7 @@ public class ChatRepository : IChatRepository
             .Include(x => x.Users)!.ThenInclude(x => x.Media)
             .Include(x => x.Products)!.ThenInclude(x => x.Media)
             .Include(x => x.Products)!.ThenInclude(x => x.Categories)
+            .Include(x => x.GroupChatMessage)
             .Include(x => x.Media).FirstOrDefaultAsync(x => x.Id == id);
         return new GenericResponse<GroupChatEntity>(e);
     }
