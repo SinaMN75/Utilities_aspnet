@@ -27,17 +27,18 @@ public class ChatRepository : IChatRepository
 {
     private readonly DbContext _dbContext;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly string? _userId;
 
     public ChatRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor)
     {
         _dbContext = dbContext;
         _httpContextAccessor = httpContextAccessor;
+        _userId = _httpContextAccessor.HttpContext!.User.Identity!.Name;
     }
 
     public async Task<GenericResponse<ChatReadDto?>> Create(ChatCreateUpdateDto model)
     {
         UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == model.UserId);
-        string? userId = _httpContextAccessor.HttpContext!.User.Identity!.Name;
         if (user == null) return new GenericResponse<ChatReadDto?>(null, UtilitiesStatusCodes.BadRequest);
 
         List<UserEntity?> users = new();
@@ -49,7 +50,7 @@ public class ChatRepository : IChatRepository
         {
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now,
-            FromUserId = userId!,
+            FromUserId = _userId!,
             ToUserId = model.UserId,
             MessageText = model.MessageText,
             ReadMessage = false,
