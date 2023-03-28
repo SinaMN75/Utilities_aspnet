@@ -85,6 +85,7 @@ public static class CategoryEntityExtension {
 		entity.Date1 = dto.Date1 ?? entity.Date1;
 		entity.Date2 = dto.Date2 ?? entity.Date2;
 		entity.Color = dto.Color ?? entity.Color;
+		entity.ParentId = dto.ParentId ?? entity.ParentId;
 		return entity;
 	}
 }
