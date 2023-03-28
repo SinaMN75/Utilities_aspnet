@@ -3,7 +3,7 @@
 public interface ICategoryRepository {
 	public Task<GenericResponse<CategoryEntity>> Create(CategoryCreateUpdateDto dto);
 	public GenericResponse<IQueryable<CategoryEntity>> Read();
-	public Task<GenericResponse<CategoryEntity?>> Update(CategoryEntity dto);
+	public Task<GenericResponse<CategoryEntity?>> Update(CategoryCreateUpdateDto dto);
 	public Task<GenericResponse> Delete(Guid id);
 }
 
@@ -51,20 +51,10 @@ public class CategoryRepository : ICategoryRepository {
 		return new GenericResponse();
 	}
 
-	public async Task<GenericResponse<CategoryEntity?>> Update(CategoryEntity dto) {
+	public async Task<GenericResponse<CategoryEntity?>> Update(CategoryCreateUpdateDto dto) {
 		CategoryEntity? entity = await _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id);
-
 		if (entity == null) return new GenericResponse<CategoryEntity?>(null, UtilitiesStatusCodes.NotFound);
-		entity.Title = dto.Title ?? entity.Title;
-		entity.TitleTr1 = dto.TitleTr1 ?? entity.TitleTr1;
-		entity.TitleTr2 = dto.TitleTr2 ?? entity.TitleTr2;
-		entity.Subtitle = dto.Subtitle ?? entity.Subtitle;
-		entity.Color = dto.Color ?? entity.Color;
-		entity.Link = dto.Link ?? entity.Link;
-		entity.UpdatedAt = DateTime.Now;
-		entity.UseCase = dto.UseCase ?? entity.UseCase;
-		entity.Type = dto.Type ?? entity.Type;
-		entity.ParentId = dto.ParentId ?? entity.ParentId;
+		entity.FillData(dto);
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse<CategoryEntity?>(entity);
 	}

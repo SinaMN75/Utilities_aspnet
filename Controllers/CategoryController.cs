@@ -16,7 +16,7 @@ public class CategoryController : BaseApiController {
 
 	[HttpPut]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Update(CategoryEntity dto) => Result(await _repository.Update(dto));
+	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Update(CategoryCreateUpdateDto dto) => Result(await _repository.Update(dto));
 
 	[HttpDelete("{id:guid}")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
