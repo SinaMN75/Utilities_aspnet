@@ -45,21 +45,6 @@ public class ProductRepository : IProductRepository {
 		EntityEntry<ProductEntity> i = await _dbContext.Set<ProductEntity>().AddAsync(e, ct);
 		await _dbContext.SaveChangesAsync(ct);
 
-		// try {
-		// 	if (e.Teams is not null) {
-		// 		foreach (TeamEntity item in e.Teams) {
-		// 			await _notificationRepository.Create(new NotificationCreateUpdateDto {
-		// 				CreatorUserId = _userId,
-		// 				UserId = item.UserId,
-		// 				Link = e.Id.ToString(),
-		// 				UseCase = "Product",
-		// 				Title = "Product"
-		// 			});
-		// 		}
-		// 	}
-		// }
-		// catch { }
-
 		return new GenericResponse<ProductEntity>(i.Entity);
 	}
 

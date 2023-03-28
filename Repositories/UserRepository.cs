@@ -11,7 +11,6 @@ public interface IUserRepository {
 	Task<GenericResponse<UserEntity?>> VerifyCodeForLogin(VerifyMobileForLoginDto dto);
 	Task<GenericResponse<UserEntity?>> Register(RegisterDto dto);
 	Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model);
-	// Task<GenericResponse> RemovalFromTeam(Guid teamId);
 	Task<GenericResponse> Logout();
 	Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList();
 	Task<GenericResponse> ToggleBlock(string userId);
@@ -133,21 +132,6 @@ public class UserRepository : IUserRepository {
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}
-
-	// public async Task<GenericResponse> RemovalFromTeam(Guid teamId) {
-	// 	UserEntity? user = await ReadByIdMinimal(_userId);
-	//
-	// 	if (user == null)
-	// 		return new GenericResponse(UtilitiesStatusCodes.NotFound, "User notfound");
-	// 	TeamEntity? team = await _dbContext.Set<TeamEntity>().FirstOrDefaultAsync(x => x.UserId == user.Id && x.Id == teamId);
-	// 	if (team == null)
-	// 		return new GenericResponse(UtilitiesStatusCodes.NotFound, "Team notfound");
-	//
-	// 	_dbContext.Set<TeamEntity>().Remove(team);
-	// 	await _dbContext.SaveChangesAsync();
-	//
-	// 	return new GenericResponse();
-	// }
 
 	public async Task<GenericResponse> Logout() {
 		UserEntity? user = await ReadByIdMinimal(_userId);

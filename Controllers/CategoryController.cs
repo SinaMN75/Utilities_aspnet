@@ -9,7 +9,7 @@ public class CategoryController : BaseApiController {
 
 	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Create(CategoryEntity dto) => Result(await _repository.Create(dto));
+	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Create(CategoryCreateUpdateDto dto) => Result(await _repository.Create(dto));
 
 	[HttpGet]
 	public ActionResult<GenericResponse<IQueryable<CategoryEntity>>> Read() => Result(_repository.Read());

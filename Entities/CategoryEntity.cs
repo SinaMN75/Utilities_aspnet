@@ -55,3 +55,21 @@ public class CategoryEntity : BaseEntity {
 	[NotMapped]
 	public bool IsUnique { get; set; } = true;
 }
+
+public class CategoryCreateUpdateDto : BaseEntity {
+	public string? Title { get; set; }
+	public string? TitleTr1 { get; set; }
+	public string? TitleTr2 { get; set; }
+	public string? Subtitle { get; set; }
+	public string? Color { get; set; }
+	public string? Link { get; set; }
+	public string? UseCase { get; set; }
+	public string? Type { get; set; }
+	public double? Latitude { get; set; }
+	public double? Longitude { get; set; }
+	public double? Price { get; set; }
+	public DateTime? Date1 { get; set; }
+	public DateTime? Date2 { get; set; }
+	public Guid? ParentId { get; set; }
+	public bool IsUnique { get; set; } = true;
+}
