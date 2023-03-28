@@ -154,8 +154,6 @@ public class OrderRepository : IOrderRepository {
 		if (dto.ShowMedia.IsTrue()) q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(i => i.Media);
 		if (dto.ShowUser.IsTrue()) q = q.Include(x => x.User).ThenInclude(x => x.Media);
 		if (dto.ShowReports.IsTrue()) q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(i => i.Reports);
-		if (dto.ShowTeams.IsTrue())
-			q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(i => i.Teams)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media);
 		if (dto.ShowVotes.IsTrue()) q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(i => i.Votes);
 		if (dto.ShowVoteFields.IsTrue()) q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(i => i.VoteFields);
 

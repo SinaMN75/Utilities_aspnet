@@ -75,8 +75,7 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 			.Include(x => x.Product).ThenInclude(i => i.Forms)!.ThenInclude(x => x.FormField)
 			.Include(x => x.Product).ThenInclude(i => i.Categories)
 			.Include(x => x.Product).ThenInclude(i => i.Comments.Where(x => x.ParentId == null)).ThenInclude(x => x.Children)
-			.Include(x => x.Product).ThenInclude(i => i.Reports)
-			.Include(x => x.Product).ThenInclude(i => i.Teams)!.ThenInclude(x => x.User)!.ThenInclude(x => x.Media);
+			.Include(x => x.Product).ThenInclude(i => i.Reports);
 		return new GenericResponse<IQueryable<BookmarkEntity>?>(bookmark);
 	}
 
@@ -179,8 +178,8 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 			.Include(x => x.Product).ThenInclude(i => i.Forms)!.ThenInclude(x => x.FormField)
 			.Include(x => x.Product).ThenInclude(i => i.Categories)
 			.Include(x => x.Product).ThenInclude(i => i.Comments.Where(x => x.ParentId == null)).ThenInclude(x => x.Children)
-			.Include(x => x.Product).ThenInclude(i => i.Reports)
-			.Include(x => x.Product).ThenInclude(i => i.Teams)!.ThenInclude(x => x.User)!.ThenInclude(x => x.Media);
+			.Include(x => x.Product).ThenInclude(i => i.Reports);
+			// .Include(x => x.Product).ThenInclude(i => i.Teams)!.ThenInclude(x => x.User)!.ThenInclude(x => x.Media);
 
 		if (folderName.IsNotNullOrEmpty()) bookmark = bookmark.Where(x => x.FolderName == folderName);
 		return new GenericResponse<IQueryable<BookmarkEntity>?>(bookmark);

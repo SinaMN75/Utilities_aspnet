@@ -48,10 +48,6 @@ public class UserController : BaseApiController {
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	public async Task<ActionResult<GenericResponse>> Delete(string id) => Result(await _repository.Delete(id));
 
-	[HttpDelete("DeleteFromTeam/{teamId:guid}")]
-	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse>> DeleteFromTeam(Guid teamId) => Result(await _repository.RemovalFromTeam(teamId));
-
 	[HttpGet("ReadMyBlockList")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	public async Task<ActionResult<GenericResponse<IQueryable<UserEntity>>>> ReadMine() => Result(await _repository.ReadMyBlockList());

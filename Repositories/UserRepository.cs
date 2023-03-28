@@ -11,7 +11,7 @@ public interface IUserRepository {
 	Task<GenericResponse<UserEntity?>> VerifyCodeForLogin(VerifyMobileForLoginDto dto);
 	Task<GenericResponse<UserEntity?>> Register(RegisterDto dto);
 	Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model);
-	Task<GenericResponse> RemovalFromTeam(Guid teamId);
+	// Task<GenericResponse> RemovalFromTeam(Guid teamId);
 	Task<GenericResponse> Logout();
 	Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList();
 	Task<GenericResponse> ToggleBlock(string userId);
@@ -107,11 +107,6 @@ public class UserRepository : IUserRepository {
 
 		string? userId = _httpContextAccessor.HttpContext?.User.Identity?.Name;
 
-		// if (dto.ShowFollowings.IsTrue()) {
-		// List<string?> follows = _dbContext.Set<FollowEntity>().Where(x => x.FollowerUserId == userId).Select(x => x.FollowsUserId).ToList();
-		// q = q.Where(u => follows.Contains(u.Id));
-		// }
-
 		if (dto.UserId != null) q = q.Where(x => x.Id == dto.UserId);
 		if (dto.UserIds != null) q = q.Where(x => dto.UserIds.Contains(x.Id));
 		if (dto.UserName != null) q = q.Where(x => (x.AppUserName ?? "").ToLower().Contains(dto.UserName.ToLower()));
@@ -139,20 +134,20 @@ public class UserRepository : IUserRepository {
 		return new GenericResponse();
 	}
 
-	public async Task<GenericResponse> RemovalFromTeam(Guid teamId) {
-		UserEntity? user = await ReadByIdMinimal(_userId);
-
-		if (user == null)
-			return new GenericResponse(UtilitiesStatusCodes.NotFound, "User notfound");
-		TeamEntity? team = await _dbContext.Set<TeamEntity>().FirstOrDefaultAsync(x => x.UserId == user.Id && x.Id == teamId);
-		if (team == null)
-			return new GenericResponse(UtilitiesStatusCodes.NotFound, "Team notfound");
-
-		_dbContext.Set<TeamEntity>().Remove(team);
-		await _dbContext.SaveChangesAsync();
-
-		return new GenericResponse();
-	}
+	// public async Task<GenericResponse> RemovalFromTeam(Guid teamId) {
+	// 	UserEntity? user = await ReadByIdMinimal(_userId);
+	//
+	// 	if (user == null)
+	// 		return new GenericResponse(UtilitiesStatusCodes.NotFound, "User notfound");
+	// 	TeamEntity? team = await _dbContext.Set<TeamEntity>().FirstOrDefaultAsync(x => x.UserId == user.Id && x.Id == teamId);
+	// 	if (team == null)
+	// 		return new GenericResponse(UtilitiesStatusCodes.NotFound, "Team notfound");
+	//
+	// 	_dbContext.Set<TeamEntity>().Remove(team);
+	// 	await _dbContext.SaveChangesAsync();
+	//
+	// 	return new GenericResponse();
+	// }
 
 	public async Task<GenericResponse> Logout() {
 		UserEntity? user = await ReadByIdMinimal(_userId);

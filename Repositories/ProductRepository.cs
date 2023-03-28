@@ -45,20 +45,20 @@ public class ProductRepository : IProductRepository {
 		EntityEntry<ProductEntity> i = await _dbContext.Set<ProductEntity>().AddAsync(e, ct);
 		await _dbContext.SaveChangesAsync(ct);
 
-		try {
-			if (e.Teams is not null) {
-				foreach (TeamEntity item in e.Teams) {
-					await _notificationRepository.Create(new NotificationCreateUpdateDto {
-						CreatorUserId = _userId,
-						UserId = item.UserId,
-						Link = e.Id.ToString(),
-						UseCase = "Product",
-						Title = "Product"
-					});
-				}
-			}
-		}
-		catch { }
+		// try {
+		// 	if (e.Teams is not null) {
+		// 		foreach (TeamEntity item in e.Teams) {
+		// 			await _notificationRepository.Create(new NotificationCreateUpdateDto {
+		// 				CreatorUserId = _userId,
+		// 				UserId = item.UserId,
+		// 				Link = e.Id.ToString(),
+		// 				UseCase = "Product",
+		// 				Title = "Product"
+		// 			});
+		// 		}
+		// 	}
+		// }
+		// catch { }
 
 		return new GenericResponse<ProductEntity>(i.Entity);
 	}
@@ -81,21 +81,6 @@ public class ProductRepository : IProductRepository {
 
 		EntityEntry<ProductEntity> i = await _dbContext.Set<ProductEntity>().AddAsync(e, ct);
 		await _dbContext.SaveChangesAsync(ct);
-
-		try {
-			if (e.Teams is not null) {
-				foreach (TeamEntity item in e.Teams) {
-					await _notificationRepository.Create(new NotificationCreateUpdateDto {
-						CreatorUserId = _userId,
-						UserId = item.UserId,
-						Link = e.Id.ToString(),
-						UseCase = "Product",
-						Title = "Product"
-					});
-				}
-			}
-		}
-		catch { }
 
 		return new GenericResponse<ProductEntity>(i.Entity);
 	}
@@ -162,7 +147,6 @@ public class ProductRepository : IProductRepository {
 		if (dto.ShowFormFields.IsTrue()) q = q.Include(i => i.Forms)!.ThenInclude(i => i.FormField);
 		if (dto.ShowMedia.IsTrue()) q = q.Include(i => i.Media);
 		if (dto.ShowReports.IsTrue()) q = q.Include(i => i.Reports);
-		if (dto.ShowTeams.IsTrue()) q = q.Include(i => i.Teams)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media);
 		if (dto.ShowVotes.IsTrue()) q = q.Include(i => i.Votes);
 		if (dto.ShowVoteFields.IsTrue()) q = q.Include(i => i.VoteFields);
 		if (dto.ShowCreator.IsTrue()) q = q.Include(i => i.User).ThenInclude(x => x!.Media);
@@ -208,7 +192,6 @@ public class ProductRepository : IProductRepository {
 			.Include(i => i.User).ThenInclude(x => x.Media)
 			.Include(i => i.User).ThenInclude(x => x.Categories)
 			.Include(i => i.Forms)!.ThenInclude(x => x.FormField)
-			.Include(i => i.Teams)!.ThenInclude(x => x.User).ThenInclude(x => x.Media)
 			.Include(i => i.VoteFields)!.ThenInclude(x => x.Votes)
 			.Include(i => i.VisitProducts)!.ThenInclude(i => i.User)
 			.Include(i => i.ProductInsights)
@@ -267,7 +250,6 @@ public class ProductRepository : IProductRepository {
 	public async Task<GenericResponse<ProductEntity>> Update(ProductCreateUpdateDto dto, CancellationToken ct) {
 		ProductEntity? entity = await _dbContext.Set<ProductEntity>()
 			.Include(x => x.Categories)
-			.Include(x => x.Teams)
 			.Where(x => x.Id == dto.Id)
 			.FirstOrDefaultAsync(ct);
 
@@ -280,21 +262,6 @@ public class ProductRepository : IProductRepository {
 		ProductEntity e = await entity.FillData(dto, _dbContext);
 		_dbContext.Update(e);
 		await _dbContext.SaveChangesAsync(ct);
-
-		try {
-			if (entity.Teams is not null) {
-				foreach (TeamEntity item in e.Teams) {
-					await _notificationRepository.Create(new NotificationCreateUpdateDto {
-						CreatorUserId = _userId,
-						UserId = item.UserId,
-						Link = e.Id.ToString(),
-						UseCase = "Product",
-						Title = "Product"
-					});
-				}
-			}
-		}
-		catch { }
 
 		return new GenericResponse<ProductEntity>(e);
 	}
@@ -376,7 +343,7 @@ public static class ProductEntityExtension {
 
 		if (dto.Categories.IsNotNullOrEmpty()) {
 			List<CategoryEntity> listCategory = new();
-			foreach (Guid item in dto.Categories ?? new List<Guid>()) {
+			foreach (Guid item in dto.Categories!) {
 				CategoryEntity? e = await context.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item);
 				if (e != null) listCategory.Add(e);
 			}
@@ -384,16 +351,9 @@ public static class ProductEntityExtension {
 		}
 
 		if (dto.Teams.IsNotNullOrEmpty()) {
-			List<TeamEntity> listTeam = new();
-			foreach (string item in dto.Teams ?? new List<string>()) {
-				UserEntity? e = await context.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == item);
-				if (e != null) {
-					TeamEntity t = new() {UserId = e.Id};
-					await context.Set<TeamEntity>().AddAsync(t);
-					listTeam.Add(t);
-				}
-			}
-			entity.Teams = listTeam;
+			string temp = "";
+			foreach (string userId in dto.Teams!) temp += userId + ",";
+			entity.Teams = temp;
 		}
 
 		if (dto.ProductInsight is not null) {

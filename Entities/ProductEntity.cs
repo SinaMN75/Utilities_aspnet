@@ -59,6 +59,8 @@ public class ProductEntity : BaseEntity {
 	[StringLength(500)]
 	public string? RelatedIds { get; set; }
 
+	public string Teams { get; set; } = "";
+
 	public double? Latitude { get; set; }
 	public double? ResponseTime { get; set; }
 	public double? OnTimeDelivery { get; set; }
@@ -100,7 +102,6 @@ public class ProductEntity : BaseEntity {
 	public IEnumerable<ReportEntity>? Reports { get; set; }
 	public IEnumerable<BookmarkEntity>? Bookmarks { get; set; }
 	public IEnumerable<CommentEntity>? Comments { get; set; }
-	public IEnumerable<TeamEntity>? Teams { get; set; }
 	public IEnumerable<OrderDetailEntity>? OrderDetails { get; set; }
 	public IEnumerable<GroupChatEntity>? GroupChat { get; set; }
 	public IEnumerable<ProductInsight>? ProductInsights { get; set; }
