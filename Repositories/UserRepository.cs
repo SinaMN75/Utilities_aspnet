@@ -80,7 +80,7 @@ public class UserRepository : IUserRepository {
 
 	public async Task<UserEntity?> ReadByIdMinimal(string? idOrUserName)
 		=> await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(u => u.Id == idOrUserName || u.UserName == idOrUserName);
-	
+
 	public async Task<GenericResponse<UserEntity?>> Update(UserCreateUpdateDto dto) {
 		UserEntity? entity = await _dbContext.Set<UserEntity>()
 			.Include(x => x.Categories)
@@ -104,9 +104,47 @@ public class UserRepository : IUserRepository {
 
 		IQueryable<UserEntity> q = dbSet.Where(x => x.DeletedAt == null).AsNoTracking();
 
-		string? userId = _httpContextAccessor.HttpContext?.User.Identity?.Name;
-
 		if (dto.UserId != null) q = q.Where(x => x.Id == dto.UserId);
+		if (dto.Activity != null) q = q.Where(x => x.Activity.Contains(dto.Activity));
+		if (dto.Badge != null) q = q.Where(x => x.Badge.Contains(dto.Badge));
+		if (dto.Bio != null) q = q.Where(x => x.Bio.Contains(dto.Bio));
+		if (dto.Color != null) q = q.Where(x => x.Color.Contains(dto.Color));
+		if (dto.Dribble != null) q = q.Where(x => x.Dribble.Contains(dto.Dribble));
+		if (dto.Email != null) q = q.Where(x => x.Email.Contains(dto.Email));
+		if (dto.Gender != null) q = q.Where(x => x.Gender.Contains(dto.Gender));
+		if (dto.Headline != null) q = q.Where(x => x.Headline.Contains(dto.Headline));
+		if (dto.Instagram != null) q = q.Where(x => x.Instagram.Contains(dto.Instagram));
+		if (dto.Pinterest != null) q = q.Where(x => x.Pinterest.Contains(dto.Pinterest));
+		if (dto.Region != null) q = q.Where(x => x.Region.Contains(dto.Region));
+		if (dto.State != null) q = q.Where(x => x.State.Contains(dto.State));
+		if (dto.Telegram != null) q = q.Where(x => x.Telegram.Contains(dto.Telegram));
+		if (dto.Type != null) q = q.Where(x => x.Type.Contains(dto.Type));
+		if (dto.Website != null) q = q.Where(x => x.Website.Contains(dto.Website));
+		if (dto.AccessLevel != null) q = q.Where(x => x.AccessLevel.Contains(dto.AccessLevel));
+		if (dto.AppEmail != null) q = q.Where(x => x.AppEmail.Contains(dto.AppEmail));
+		if (dto.FirstName != null) q = q.Where(x => x.FirstName.Contains(dto.FirstName));
+		if (dto.LastName != null) q = q.Where(x => x.LastName.Contains(dto.LastName));
+		if (dto.FullName != null) q = q.Where(x => x.FullName.Contains(dto.FullName));
+		if (dto.GenderTr1 != null) q = q.Where(x => x.GenderTr1.Contains(dto.GenderTr1));
+		if (dto.GenderTr2 != null) q = q.Where(x => x.GenderTr2.Contains(dto.GenderTr2));
+		if (dto.PhoneNumber != null) q = q.Where(x => x.PhoneNumber.Contains(dto.PhoneNumber));
+		if (dto.AppUserName != null) q = q.Where(x => x.AppUserName.Contains(dto.AppUserName));
+		if (dto.AppPhoneNumber != null) q = q.Where(x => x.AppPhoneNumber.Contains(dto.AppPhoneNumber));
+		if (dto.WhatsApp != null) q = q.Where(x => x.WhatsApp.Contains(dto.WhatsApp));
+		if (dto.LinkedIn != null) q = q.Where(x => x.LinkedIn.Contains(dto.LinkedIn));
+		if (dto.SoundCloud != null) q = q.Where(x => x.SoundCloud.Contains(dto.SoundCloud));
+		if (dto.StateTr1 != null) q = q.Where(x => x.StateTr1.Contains(dto.StateTr1));
+		if (dto.StateTr2 != null) q = q.Where(x => x.StateTr2.Contains(dto.StateTr2));
+		
+		if (dto.Query != null) q = q.Where(x => x.FirstName.Contains(dto.Query) || 
+		                                        x.LastName.Contains(dto.Query) || 
+		                                        x.FullName.Contains(dto.Query) || 
+		                                        x.UserName.Contains(dto.Query) || 
+		                                        x.AppUserName.Contains(dto.Query) || 
+		                                        x.AppEmail.Contains(dto.Query)
+		                                        
+		                                        );
+
 		if (dto.UserIds != null) q = q.Where(x => dto.UserIds.Contains(x.Id));
 		if (dto.UserName != null) q = q.Where(x => (x.AppUserName ?? "").ToLower().Contains(dto.UserName.ToLower()));
 		if (dto.ShowSuspend.IsTrue()) q = q.Where(x => x.Suspend == true);
@@ -115,11 +153,9 @@ public class UserRepository : IUserRepository {
 
 		List<UserEntity> entity = await q.AsNoTracking().ToListAsync();
 
-		if (userId != null) {
-			foreach (UserEntity item in entity) {
-				item.IsFollowing = await _dbContext.Set<FollowEntity>().AnyAsync(x => x.FollowsUserId == item.Id && x.FollowerUserId == userId);
-			}
-		}
+		if (_userId != null)
+			foreach (UserEntity item in entity)
+				item.IsFollowing = await _dbContext.Set<FollowEntity>().AnyAsync(x => x.FollowsUserId == item.Id && x.FollowerUserId == _userId);
 
 		return new GenericResponse<IEnumerable<UserEntity>>(entity);
 	}
@@ -134,19 +170,17 @@ public class UserRepository : IUserRepository {
 	}
 
 	public async Task<GenericResponse> Logout() {
-		UserEntity? user = await ReadByIdMinimal(_userId);
-		user!.IsLoggedIn = false;
+		UserEntity user = (await ReadByIdMinimal(_userId))!;
+		user.IsLoggedIn = false;
+		user.IsOnline = false;
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}
 
 	public async Task<GenericResponse<UserEntity?>> GetTokenForTest(string mobile) {
 		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == mobile);
-
 		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
-
 		if (user.Suspend) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.UserSuspended);
-
 		user.IsLoggedIn = true;
 		await _dbContext.SaveChangesAsync();
 		JwtSecurityToken token = await CreateToken(user);

@@ -232,6 +232,39 @@ public class UserCreateUpdateDto {
 public class UserFilterDto {
 	public string? UserId { get; set; }
 	public string? UserName { get; set; }
+
+	public string? Query { get; set; }
+	public string? PhoneNumber { get; set; }
+	public string? Email { get; set; }
+	public string? FirstName { get; set; }
+	public string? LastName { get; set; }
+	public string? FullName { get; set; }
+	public string? Bio { get; set; }
+	public string? Headline { get; set; }
+	public string? Website { get; set; }
+	public string? AppUserName { get; set; }
+	public string? AppPhoneNumber { get; set; }
+	public string? AppEmail { get; set; }
+	public string? Instagram { get; set; }
+	public string? Telegram { get; set; }
+	public string? WhatsApp { get; set; }
+	public string? LinkedIn { get; set; }
+	public string? Dribble { get; set; }
+	public string? SoundCloud { get; set; }
+	public string? Pinterest { get; set; }
+	public string? Gender { get; set; } = null!;
+	public string? GenderTr1 { get; set; }
+	public string? GenderTr2 { get; set; }
+	public string? Type { get; set; }
+	public string? Region { get; set; }
+	public string? Activity { get; set; }
+	public string? Color { get; set; }
+	public string? State { get; set; }
+	public string? StateTr1 { get; set; }
+	public string? StateTr2 { get; set; }
+	public string? AccessLevel { get; set; }
+	public string? Badge { get; set; }
+
 	public bool? ShowMedia { get; set; }
 	public bool? ShowCategories { get; set; }
 	public bool? ShowForms { get; set; }
