@@ -31,11 +31,10 @@ public class CommentRepository : ICommentRepository {
 			.Include(x => x.Media)
 			.Include(x => x.LikeComments)
 			.Include(x => x.CommentReacts)
-			.Include(x => x.Children).Where(x => x.DeletedAt == null)
-			.Include(x => x.Children).ThenInclude(x => x.Children).Where(x => x.DeletedAt == null)
-			.Include(x => x.Children).ThenInclude(x => x.Media).Where(x => x.DeletedAt == null)
-			.Include(x => x.Children).ThenInclude(x => x.LikeComments).Where(x => x.DeletedAt == null)
-			.Include(x => x.Children).ThenInclude(x => x.User).ThenInclude(x => x.Media).Where(x => x.DeletedAt == null)
+			.Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Children.Where(x => x.DeletedAt == null))
+			.Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Media).Where(x => x.DeletedAt == null)
+			.Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.LikeComments).Where(x => x.DeletedAt == null)
+			.Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.User).ThenInclude(x => x.Media).Where(x => x.DeletedAt == null)
 			.Where(x => x.ProductId == id && x.ParentId == null && x.DeletedAt == null)
 			.OrderByDescending(x => x.CreatedAt).AsNoTracking();
 		return new GenericResponse<IQueryable<CommentEntity>?>(comment);
@@ -43,19 +42,16 @@ public class CommentRepository : ICommentRepository {
 
 	public GenericResponse<IQueryable<CommentEntity>?> Filter(CommentFilterDto dto) {
 		IQueryable<CommentEntity> q = _dbContext.Set<CommentEntity>();
-		if (!dto.ShowDeleted) {
-			q = q.Where(x => x.DeletedAt == null);
-		}
+		if (!dto.ShowDeleted) q = q.Where(x => x.DeletedAt != null);
 
 		if (dto.ProductId.HasValue) q = q.Where(x => x.ProductId == dto.ProductId);
 		if (dto.Status.HasValue) q = q.Where(x => x.Status == dto.Status);
 		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => x.UserId == dto.UserId);
 
-		q = q.OrderByDescending(x => x.CreatedAt)
-			.Include(x => x.User).ThenInclude(x => x!.Media)
+		q = q.Include(x => x.User).ThenInclude(x => x!.Media)
 			.Include(x => x.Media)
-			.Include(x => x.LikeComments)
-			.Include(x => x.Children)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
+			.Include(x => x.LikeComments.Where(x => x.DeletedAt == null))
+			.Include(x => x.Children.Where(x => x.DeletedAt == null))!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
 			.OrderByDescending(x => x.CreatedAt)
 			.AsNoTracking();
 
@@ -69,9 +65,8 @@ public class CommentRepository : ICommentRepository {
 			.Include(x => x.User).ThenInclude(x => x!.Media)
 			.Include(x => x.Media)
 			.Include(x => x.LikeComments)
-			.Include(x => x.Children).Where(x => x.DeletedAt == null)
-			.Include(x => x.Children).ThenInclude(x => x.User).ThenInclude(x => x.Media)
-			.Include(x => x.Children).ThenInclude(x => x.Media)
+			.Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.User).ThenInclude(x => x.Media)
+			.Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Media)
 			.Where(x => x.Id == id && x.DeletedAt == null)
 			.OrderByDescending(x => x.CreatedAt)
 			.AsNoTracking()
