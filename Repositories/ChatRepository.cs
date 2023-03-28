@@ -76,7 +76,7 @@ public class ChatRepository : IChatRepository
 
     public async Task<GenericResponse<IEnumerable<ChatReadDto>>> FilterByUserId(ChatFilterDto dto)
     {
-        string? userId = _httpContextAccessor.HttpContext!.User.Identity!.Name;
+        string? userId = _userId;
         UserEntity? user = await _dbContext.Set<UserEntity>()
             .Include(x => x.Media)
             .FirstOrDefaultAsync(x => x.Id == dto.UserId);
@@ -220,7 +220,7 @@ public class ChatRepository : IChatRepository
             UseCase = dto.UseCase,
             GroupChatId = dto.GroupChatId,
             ParentId = dto.ParentId,
-            UserId = _httpContextAccessor.HttpContext!.User.Identity!.Name,
+            UserId = _userId,
             Products = products
         };
 
@@ -232,7 +232,7 @@ public class ChatRepository : IChatRepository
     public GenericResponse<IQueryable<GroupChatEntity>?> ReadMyGroupChats()
     {
         IQueryable<GroupChatEntity> e = _dbContext.Set<GroupChatEntity>()
-            .Where(x => x.DeletedAt == null && x.Users.Any(y => y.Id == _httpContextAccessor.HttpContext!.User.Identity!.Name))
+            .Where(x => x.DeletedAt == null && x.Users.Any(y => y.Id == _userId))
             .Include(x => x.Users)
             .Include(x => x.Media)
             .Include(x => x.Products).ThenInclude(x => x.Media)
@@ -272,7 +272,7 @@ public class ChatRepository : IChatRepository
     public GenericResponse<IQueryable<GroupChatEntity>> FilterGroupChats(GroupChatFilterDto dto)
     {
         IQueryable<GroupChatEntity> q = _dbContext.Set<GroupChatEntity>()
-            .Where(x => x.Users.Any(y => y.Id == _httpContextAccessor.HttpContext!.User.Identity!.Name));
+            .Where(x => x.Users.Any(y => y.Id == _userId));
 
         if (dto.UsersIds.IsNotNullOrEmpty()) q = q.Where(x => x.Users.Any(x => x.Id == dto.UsersIds.FirstOrDefault()));
         if (dto.ProductsIds.IsNotNullOrEmpty()) q = q.Where(x => x.Products.Any(x => x.Id == dto.ProductsIds.FirstOrDefault()));
@@ -329,7 +329,7 @@ public class ChatRepository : IChatRepository
 
     public async Task<GenericResponse<IEnumerable<ChatReadDto>?>> ReadByUserId(string id)
     {
-        string? userId = _httpContextAccessor.HttpContext!.User.Identity!.Name;
+        string? userId = _userId;
         UserEntity? user = await _dbContext.Set<UserEntity>()
             .Include(x => x.Media)
             .FirstOrDefaultAsync(x => x.Id == id);
@@ -380,7 +380,7 @@ public class ChatRepository : IChatRepository
 
     public async Task<GenericResponse<IEnumerable<ChatReadDto>?>> Read()
     {
-        string userId = _httpContextAccessor.HttpContext!.User.Identity!.Name!;
+        string userId = _userId!;
         List<string> toUserId = await _dbContext.Set<ChatEntity>()
             .Where(x => x.FromUserId == userId)
             .Include(x => x.Products)!.ThenInclude(x => x.Media)
@@ -451,7 +451,7 @@ public class ChatRepository : IChatRepository
             UseCase = dto.UseCase,
             ChatStatus = dto.ChatStatus,
             Description = dto.Description,
-            CreatorUserId = _httpContextAccessor.HttpContext!.User.Identity!.Name!,
+            CreatorUserId = _userId!,
             Users = users,
             Products = products
         };
@@ -463,7 +463,7 @@ public class ChatRepository : IChatRepository
 
     public async Task<GenericResponse> AddReactionToMessage(Reaction reaction, Guid messageId)
     {
-        string userId = _httpContextAccessor.HttpContext!.User.Identity!.Name!;
+        string userId = _userId!;
         UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == userId);
         if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound, "User Donest Logged In");
 
@@ -497,17 +497,16 @@ public class ChatRepository : IChatRepository
 
     public async Task<GenericResponse> SeenGroupChatMessage(Guid messageId)
     {
-        var userId = _httpContextAccessor.HttpContext!.User.Identity!.Name!;
         var groupMessageChat = await _dbContext.Set<GroupChatMessageEntity>().Where(e => e.Id == messageId).FirstOrDefaultAsync();
         if (groupMessageChat is null)
             return new GenericResponse(UtilitiesStatusCodes.NotFound, "GroupChatMessage Not Found!");
 
-        if (string.IsNullOrEmpty(groupMessageChat.UsersSeen)) groupMessageChat.UsersSeen = userId;
-        else if (!groupMessageChat.UsersSeen.Contains(userId)) groupMessageChat.UsersSeen = groupMessageChat.UsersSeen + $",{userId}";
-        else return new GenericResponse(UtilitiesStatusCodes.Success);
+        if (string.IsNullOrEmpty(groupMessageChat.UsersSeen)) groupMessageChat.UsersSeen = _userId;
+        else if (!groupMessageChat.UsersSeen.Contains(_userId)) groupMessageChat.UsersSeen = groupMessageChat.UsersSeen + $",{_userId}";
+        else return new GenericResponse();
 
         _dbContext.Update(groupMessageChat);
         await _dbContext.SaveChangesAsync();
-        return new GenericResponse(UtilitiesStatusCodes.Success);
+        return new GenericResponse();
     }
 }
