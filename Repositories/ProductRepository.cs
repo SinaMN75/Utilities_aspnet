@@ -149,13 +149,13 @@ public class ProductRepository : IProductRepository {
 		if (dto.OrderByCreaedDateDecending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 
 		if (userId != null) {
-			IEnumerable<ProductEntity> temp = await q.ToListAsync();
+			// IEnumerable<ProductEntity> temp = await q.ToListAsync();
 			UserEntity? user = await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == userId);
-			foreach (ProductEntity p in temp) {
+			foreach (ProductEntity p in q) {
 				if (user.VisitedProducts.Contains(p.Id.ToString())) p.IsSeen = true;
 				if (user.BookmarkedProducts.Contains(p.Id.ToString())) p.IsBookmarked = true;
 			}
-			q = temp.AsQueryable();
+			// q = temp.AsQueryable();
 			if (dto.IsFollowing) q = q.Where(i => user.FollowedUsers.Contains(i.UserId));
 		}
 
