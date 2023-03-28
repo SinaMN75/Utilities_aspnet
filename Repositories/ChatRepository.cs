@@ -26,14 +26,12 @@ public interface IChatRepository
 public class ChatRepository : IChatRepository
 {
     private readonly DbContext _dbContext;
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly string? _userId;
 
     public ChatRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor)
     {
         _dbContext = dbContext;
-        _httpContextAccessor = httpContextAccessor;
-        _userId = _httpContextAccessor.HttpContext!.User.Identity!.Name;
+        _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
     }
 
     public async Task<GenericResponse<ChatReadDto?>> Create(ChatCreateUpdateDto model)
@@ -240,6 +238,12 @@ public class ChatRepository : IChatRepository
             .Include(x => x.Products).ThenInclude(x => x.Comments)
             .Include(x => x.Products).ThenInclude(x => x.User).Where(x => x.DeletedAt == null)
             .AsNoTracking();
+
+        try {
+            e = e.Include(x => x.GroupChatMessage).TakeLast(10);
+        }
+        catch (Exception) {
+        }
 
         return new GenericResponse<IQueryable<GroupChatEntity>?>(e);
     }
