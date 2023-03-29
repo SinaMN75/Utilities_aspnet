@@ -95,7 +95,6 @@ public static class StartupExtension {
 		builder.Services.AddTransient<IVoteRepository, VoteRepository>();
 		builder.Services.AddTransient<IOrderRepository, OrderRepository>();
 		builder.Services.AddTransient<IDiscountRepository, DiscountRepository>();
-		builder.Services.AddTransient<IGlobalSearchRepository, GlobalSearchRepository>();
 		builder.Services.AddTransient<IPaymentRepository, PaymentRepository>();
 		builder.Services.AddTransient<ISmsNotificationRepository, SmsNotificationRepository>();
 	}
