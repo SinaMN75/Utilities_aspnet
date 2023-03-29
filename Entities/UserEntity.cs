@@ -225,6 +225,8 @@ public class UserCreateUpdateDto {
 	public double? Point { get; set; } = 0;
 	public bool? Suspend { get; set; }
 	public bool? ShowContactInfo { get; set; }
+	public bool? IsOnline { get; set; }
+	public bool? IsLoggedIn { get; set; }
 	public DateTime? BirthDate { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 }

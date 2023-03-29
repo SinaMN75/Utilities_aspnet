@@ -73,3 +73,13 @@ public class CategoryCreateUpdateDto : BaseEntity {
 	public Guid? ParentId { get; set; }
 	public bool IsUnique { get; set; } = true;
 }
+
+public class CategoryFilterDto : BaseEntity {
+	public string? Title { get; set; }
+	public string? TitleTr1 { get; set; }
+	public string? TitleTr2 { get; set; }
+	public string? UseCase { get; set; }
+	public string? Type { get; set; }
+	public Guid? ParentId { get; set; }
+	public bool? ShowMedia { get; set; }
+}

@@ -11,8 +11,8 @@ public class CategoryController : BaseApiController {
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Create(CategoryCreateUpdateDto dto) => Result(await _repository.Create(dto));
 
-	[HttpGet]
-	public ActionResult<GenericResponse<IQueryable<CategoryEntity>>> Read() => Result(_repository.Read());
+	[HttpPost("Filter")]
+	public ActionResult<GenericResponse<IQueryable<CategoryEntity>>> Filter(CategoryFilterDto dto) => Result(_repository.Filter(dto));
 
 	[HttpPut]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

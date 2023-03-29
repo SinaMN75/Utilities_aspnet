@@ -11,24 +11,18 @@ public interface IProductRepository {
 
 public class ProductRepository : IProductRepository {
 	private readonly DbContext _dbContext;
-	private readonly IFollowBookmarkRepository _followBookmarkRepository;
 	private readonly IUploadRepository _uploadRepository;
 	private readonly IUserRepository _userRepository;
-	private readonly INotificationRepository _notificationRepository;
 	private readonly string? _userId;
 
 	public ProductRepository(
 		DbContext dbContext,
 		IHttpContextAccessor httpContextAccessor,
-		IFollowBookmarkRepository followBookmarkRepository,
 		IUploadRepository uploadRepository,
-		IUserRepository userRepository,
-		INotificationRepository notificationRepository) {
+		IUserRepository userRepository) {
 		_dbContext = dbContext;
-		_followBookmarkRepository = followBookmarkRepository;
 		_uploadRepository = uploadRepository;
 		_userRepository = userRepository;
-		_notificationRepository = notificationRepository;
 		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 	}
 
@@ -74,9 +68,7 @@ public class ProductRepository : IProductRepository {
 		IQueryable<ProductEntity> q = _dbContext.Set<ProductEntity>();
 		q = q.Where(x => x.DeletedAt == null);
 		if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.Now);
-
-		string? userId = _userId;
-
+		
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
 		if (dto.Subtitle.IsNotNullOrEmpty()) q = q.Where(x => (x.Subtitle ?? "").Contains(dto.Subtitle!));
 		if (dto.Type.IsNotNullOrEmpty()) q = q.Where(x => (x.Type ?? "").Contains(dto.Type!));
@@ -148,17 +140,6 @@ public class ProductRepository : IProductRepository {
 		if (dto.OrderByCreatedDate.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 		if (dto.OrderByCreaedDateDecending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 
-		if (userId != null) {
-			// IEnumerable<ProductEntity> temp = await q.ToListAsync();
-			UserEntity? user = await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == userId);
-			foreach (ProductEntity p in q) {
-				if (user.VisitedProducts.Contains(p.Id.ToString())) p.IsSeen = true;
-				if (user.BookmarkedProducts.Contains(p.Id.ToString())) p.IsBookmarked = true;
-			}
-			// q = temp.AsQueryable();
-			if (dto.IsFollowing) q = q.Where(i => user.FollowedUsers.Contains(i.UserId));
-		}
-
 		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
@@ -183,20 +164,15 @@ public class ProductRepository : IProductRepository {
 			.Include(i => i.VisitProducts)!.ThenInclude(i => i.User)
 			.Include(i => i.ProductInsights)
 			.FirstOrDefaultAsync(i => i.Id == id && i.DeletedAt == null, ct);
-		if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound, "Not Found");
+		if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound);
 
-		string? userId = _userId;
-		if (userId.IsNotNullOrEmpty()) {
-			UserEntity? user = await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == userId, ct);
-			if (user.VisitedProducts.Contains(i.Id.ToString())) i.IsSeen = true;
-			else
-				await _userRepository.Update(new UserCreateUpdateDto {
-					Id = userId,
+		if (_userId.IsNotNullOrEmpty()) {
+			UserEntity? user = await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == _userId, ct);
+			if (!user.VisitedProducts.Contains(i.Id.ToString())) await _userRepository.Update(new UserCreateUpdateDto {
+					Id = _userId,
 					VisitedProducts = user.VisitedProducts + "," + i.Id
 				});
-
-			if (user.BookmarkedProducts.Contains(i.Id.ToString())) i.IsBookmarked = true;
-
+			
 			VisitProducts? vp = await _dbContext.Set<VisitProducts>().FirstOrDefaultAsync(a => a.UserId == user.Id && a.ProductId == i.Id, ct);
 			if (vp is null) {
 				VisitProducts visitProduct = new() {
@@ -212,14 +188,12 @@ public class ProductRepository : IProductRepository {
 			else if (i.VisitProducts != null) i.VisitsCount = i.VisitProducts.Count() + 1;
 			_dbContext.Update(i);
 			await _dbContext.SaveChangesAsync(ct);
-			IQueryable<UserEntity>? listOfFollowingUser = _followBookmarkRepository.GetFollowing(user.Id).Result;
-			i.IsFollowing = listOfFollowingUser?.Any(a => a.Id == i.UserId) ?? false;
 		}
 
 		if (i.ProductInsights?.Any() != null) {
 			List<IGrouping<ChatReaction?, ProductInsight>> psGrouping = i.ProductInsights.GroupBy(g => g.Reaction).ToList();
 			i.ProductInsights = null;
-			List<ProductInsight> productInsights = new List<ProductInsight>();
+			List<ProductInsight> productInsights = new();
 			foreach (IGrouping<ChatReaction?, ProductInsight> item in psGrouping) {
 				item.FirstOrDefault().Count = item.Count();
 				productInsights.Add(item.FirstOrDefault());
@@ -228,8 +202,6 @@ public class ProductRepository : IProductRepository {
 		}
 
 		i.Comments = _dbContext.Set<CommentEntity>().Where(w => w.ProductId == i.Id && w.DeletedAt == null);
-		i.CommentsCount = i.Comments.Count();
-		i.IsSeen = true;
 
 		return new GenericResponse<ProductEntity?>(i);
 	}

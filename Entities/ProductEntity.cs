@@ -107,18 +107,6 @@ public class ProductEntity : BaseEntity {
 	public IEnumerable<ProductInsight>? ProductInsights { get; set; }
 	public IEnumerable<VisitProducts>? VisitProducts { get; set; }
 	public IEnumerable<ChatEntity>? Chats { get; set; }
-
-	[NotMapped]
-	public bool IsFollowing { get; set; }
-
-	[NotMapped]
-	public bool IsBookmarked { get; set; }
-
-	[NotMapped]
-	public int? CommentsCount { get; set; }
-
-	[NotMapped]
-	public bool IsSeen { get; set; }
 }
 
 [Table("ProductsInsight")]
@@ -263,7 +251,6 @@ public class ProductFilterDto {
 	public IEnumerable<Guid>? CategoriesAnd { get; set; }
 	public string? Query { get; set; }
 	public bool ShowExpired { get; set; } = false;
-	public bool IsFollowing { get; set; } = false;
 }
 
 public class ProductInsightDto {

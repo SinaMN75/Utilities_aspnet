@@ -13,9 +13,6 @@ public class UserController : BaseApiController {
 	[HttpPost("LoginWithPassword")]
 	public async Task<ActionResult<GenericResponse>> LoginWithPassword(LoginWithPasswordDto dto) => Result(await _repository.LoginWithPassword(dto));
 
-	[HttpPost("CheckUserName/{userName}")]
-	public async Task<ActionResult<GenericResponse>> CheckUserName(string userName) => Result(await _repository.CheckUserName(userName));
-
 	[HttpPost("GetVerificationCodeForLogin")]
 	public async Task<ActionResult<GenericResponse>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto)
 		=> Result(await _repository.GetVerificationCodeForLogin(dto));
@@ -25,10 +22,6 @@ public class UserController : BaseApiController {
 
 	[HttpPost("GetTokenForTest/{mobile}")]
 	public async Task<ActionResult<GenericResponse>> GetTokenForTest(string mobile) => Result(await _repository.GetTokenForTest(mobile));
-
-	[HttpDelete("Logout")]
-	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse>> Logout() => Result(await _repository.Logout());
 
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	[AllowAnonymous]
@@ -55,8 +48,4 @@ public class UserController : BaseApiController {
 	[HttpPost("ToggleBlock")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	public async Task<ActionResult<GenericResponse>> Create(string userId) => Result(await _repository.ToggleBlock(userId));
-
-	[HttpPost("UserOnlineState")]
-	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse>> UserOnlineState(bool state) => Result(await _repository.OnlineState(state));
 }
