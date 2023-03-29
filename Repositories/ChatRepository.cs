@@ -240,12 +240,11 @@ public class ChatRepository : IChatRepository
             .Where(x => x.DeletedAt == null)
             .AsNoTracking();
 
-        try {
-            e = e.Include(x => x.GroupChatMessage).TakeLast(10);
-        }
-        catch (Exception) {
-            e = e.Include(x => x.GroupChatMessage);
-        }
+        // try {
+        //     // e = e.Include(x => x.GroupChatMessage).TakeLast(10);
+        // }
+        // catch (Exception) {
+        // }
 
         return new GenericResponse<IQueryable<GroupChatEntity>?>(e);
     }

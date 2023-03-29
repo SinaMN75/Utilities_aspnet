@@ -5,7 +5,7 @@ public interface IUserRepository {
 	Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null);
 	Task<GenericResponse<UserEntity?>> Update(UserCreateUpdateDto dto);
 	Task<GenericResponse> Delete(string id);
-	Task<GenericResponse<UserEntity?>> GetTokenForTest(string mobile);
+	Task<GenericResponse<UserEntity?>> GetTokenForTest(string? mobile);
 	Task<GenericResponse<string?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto);
 	Task<GenericResponse<UserEntity?>> VerifyCodeForLogin(VerifyMobileForLoginDto dto);
 	Task<GenericResponse<UserEntity?>> Register(RegisterDto dto);
@@ -86,7 +86,7 @@ public class UserRepository : IUserRepository {
 
 		IQueryable<UserEntity> q = dbSet.Where(x => x.DeletedAt == null).AsNoTracking();
 
-		if (dto.UserNameExact != null) q = q.Where(x => x.Id == dto.UserNameExact);
+		if (dto.UserNameExact != null) q = q.Where(x => x.AppUserName == dto.UserNameExact || x.UserName == dto.UserNameExact);
 		if (dto.UserId != null) q = q.Where(x => x.Id == dto.UserId);
 		if (dto.Activity != null) q = q.Where(x => x.Activity.Contains(dto.Activity));
 		if (dto.Badge != null) q = q.Where(x => x.Badge.Contains(dto.Badge));
@@ -158,12 +158,10 @@ public class UserRepository : IUserRepository {
 		return new GenericResponse();
 	}
 
-	public async Task<GenericResponse<UserEntity?>> GetTokenForTest(string mobile) {
-		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == mobile);
+	public async Task<GenericResponse<UserEntity?>> GetTokenForTest(string? mobile) {
+		string m = mobile ?? "09351902721";
+		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == m);
 		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
-		if (user.Suspend) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.UserSuspended);
-		user.IsLoggedIn = true;
-		await _dbContext.SaveChangesAsync();
 		JwtSecurityToken token = await CreateToken(user);
 		return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result);
 	}

@@ -21,7 +21,7 @@ public class UserController : BaseApiController {
 	public async Task<ActionResult<GenericResponse>> VerifyCodeForLogin(VerifyMobileForLoginDto dto) => Result(await _repository.VerifyCodeForLogin(dto));
 
 	[HttpPost("GetTokenForTest/{mobile}")]
-	public async Task<ActionResult<GenericResponse>> GetTokenForTest(string mobile) => Result(await _repository.GetTokenForTest(mobile));
+	public async Task<ActionResult<GenericResponse>> GetTokenForTest(string? mobile) => Result(await _repository.GetTokenForTest(mobile));
 
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	[AllowAnonymous]
