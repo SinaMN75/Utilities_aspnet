@@ -235,6 +235,7 @@ public class UserFilterDto {
 	public string? UserId { get; set; }
 	public string? UserName { get; set; }
 
+	public string? UserNameExact { get; set; }
 	public string? Query { get; set; }
 	public string? PhoneNumber { get; set; }
 	public string? Email { get; set; }
@@ -266,6 +267,8 @@ public class UserFilterDto {
 	public string? StateTr2 { get; set; }
 	public string? AccessLevel { get; set; }
 	public string? Badge { get; set; }
+	public int PageSize { get; set; } = 100;
+	public int PageNumber { get; set; } = 1;
 
 	public bool? ShowMedia { get; set; }
 	public bool? ShowCategories { get; set; }

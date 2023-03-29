@@ -1,7 +1,7 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
 public interface IUserRepository {
-	Task<GenericResponse<IEnumerable<UserEntity>>> Filter(UserFilterDto dto);
+	Task<GenericResponse<IQueryable<UserEntity>>> Filter(UserFilterDto dto);
 	Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null);
 	Task<GenericResponse<UserEntity?>> Update(UserCreateUpdateDto dto);
 	Task<GenericResponse> Delete(string id);
@@ -18,7 +18,6 @@ public class UserRepository : IUserRepository {
 	private readonly DbContext _dbContext;
 	private readonly UserManager<UserEntity> _userManager;
 	private readonly ISmsNotificationRepository _sms;
-	private readonly IHttpContextAccessor _httpContextAccessor;
 	private readonly string? _userId;
 
 	public UserRepository(
@@ -29,7 +28,6 @@ public class UserRepository : IUserRepository {
 		_dbContext = dbContext;
 		_userManager = userManager;
 		_sms = sms;
-		_httpContextAccessor = httpContextAccessor;
 		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 	}
 
@@ -77,7 +75,7 @@ public class UserRepository : IUserRepository {
 		return new GenericResponse<UserEntity?>(entity);
 	}
 
-	public async Task<GenericResponse<IEnumerable<UserEntity>>> Filter(UserFilterDto dto) {
+	public async Task<GenericResponse<IQueryable<UserEntity>>> Filter(UserFilterDto dto) {
 		IQueryable<UserEntity> dbSet = _dbContext.Set<UserEntity>().AsNoTracking();
 
 		if (dto.ShowMedia.IsTrue()) dbSet = dbSet.Include(u => u.Media);
@@ -88,6 +86,7 @@ public class UserRepository : IUserRepository {
 
 		IQueryable<UserEntity> q = dbSet.Where(x => x.DeletedAt == null).AsNoTracking();
 
+		if (dto.UserNameExact != null) q = q.Where(x => x.Id == dto.UserNameExact);
 		if (dto.UserId != null) q = q.Where(x => x.Id == dto.UserId);
 		if (dto.Activity != null) q = q.Where(x => x.Activity.Contains(dto.Activity));
 		if (dto.Badge != null) q = q.Where(x => x.Badge.Contains(dto.Badge));
@@ -126,8 +125,7 @@ public class UserRepository : IUserRepository {
 		                                        x.UserName.Contains(dto.Query) || 
 		                                        x.AppUserName.Contains(dto.Query) || 
 		                                        x.AppEmail.Contains(dto.Query)
-		                                        
-		                                        );
+		);
 
 		if (dto.UserIds != null) q = q.Where(x => dto.UserIds.Contains(x.Id));
 		if (dto.UserName != null) q = q.Where(x => (x.AppUserName ?? "").ToLower().Contains(dto.UserName.ToLower()));
@@ -140,8 +138,15 @@ public class UserRepository : IUserRepository {
 		if (_userId != null)
 			foreach (UserEntity item in entity)
 				item.IsFollowing = await _dbContext.Set<FollowEntity>().AnyAsync(x => x.FollowsUserId == item.Id && x.FollowerUserId == _userId);
+		
+		int totalCount = await q.CountAsync();
+		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
-		return new GenericResponse<IEnumerable<UserEntity>>(entity);
+		return new GenericResponse<IQueryable<UserEntity>>(q) {
+			TotalCount = totalCount,
+			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
+			PageSize = dto.PageSize
+		};
 	}
 
 	public async Task<GenericResponse> Delete(string id) {
@@ -300,7 +305,7 @@ public class UserRepository : IUserRepository {
 
 	public async Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList() {
 		UserEntity? user = await ReadByIdMinimal(_userId);
-		GenericResponse<IEnumerable<UserEntity>> blockedUsers = await Filter(new UserFilterDto {
+		GenericResponse<IQueryable<UserEntity>> blockedUsers = await Filter(new UserFilterDto {
 			ShowMedia = true,
 			UserIds = user?.BlockedUsers.Split(",")
 		});
