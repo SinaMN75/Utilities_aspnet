@@ -309,13 +309,22 @@ public static class ProductEntityExtension {
 			entity.Categories = listCategory;
 		}
 
-		if (dto.Teams.IsNotNullOrEmpty()) {
-			string temp = "";
-			foreach (string userId in dto.Teams!) temp += userId + ",";
-			entity.Teams = temp;
-		}
+        string temp = "";
+        dto.Teams?.ToList().ForEach(item => temp += item + ",");
+        if (entity.Teams != temp)
+        {
+            if (dto.Teams.IsNullOrEmpty())
+            {
+                entity.Teams = "";
+            }
+            else
+            {
+                //Todo: MohamadHosein Is Deleted Once What
+                entity.Teams = temp;
+            }
+        }
 
-		if (dto.ProductInsight is not null) {
+        if (dto.ProductInsight is not null) {
 			List<ProductInsight> productInsights = new();
 			ProductInsightDto? pInsight = dto.ProductInsight;
 			UserEntity? e = await context.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == pInsight.UserId);
