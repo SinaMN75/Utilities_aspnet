@@ -30,6 +30,7 @@ public static class BoolExtension {
 
 public static class EnumerableExtension {
 	public static bool IsNotNullOrEmpty<T>(this IEnumerable<T>? list) => list != null && list.Any();
+	public static bool IsNotNull<T>(this IEnumerable<T>? list) => list != null;
 	public static bool IsNullOrEmpty<T>(this IEnumerable<T>? list) => list == null || !list.Any();
 }
 

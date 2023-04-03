@@ -300,7 +300,7 @@ public static class ProductEntityExtension {
 			else entity.VoteCount -= dto.ScoreMinus;
 		}
 
-		if (dto.Categories.IsNotNullOrEmpty()) {
+		if (dto.Categories.IsNotNull()) {
 			List<CategoryEntity> listCategory = new();
 			foreach (Guid item in dto.Categories!) {
 				CategoryEntity? e = await context.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item);
@@ -309,20 +309,11 @@ public static class ProductEntityExtension {
 			entity.Categories = listCategory;
 		}
 
-        string temp = "";
-        dto.Teams?.ToList().ForEach(item => temp += item + ",");
-        if (entity.Teams != temp)
-        {
-            if (dto.Teams.IsNullOrEmpty())
-            {
-                entity.Teams = "";
-            }
-            else
-            {
-                //Todo: MohamadHosein Is Deleted Once What
-                entity.Teams = temp;
-            }
-        }
+		if (dto.Teams.IsNotNull()) {
+			string temp = "";
+			foreach (string userId in dto.Teams!) temp += userId + ",";
+			entity.Teams = temp;
+		}
 
         if (dto.ProductInsight is not null) {
 			List<ProductInsight> productInsights = new();
