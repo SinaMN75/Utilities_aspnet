@@ -16,6 +16,15 @@ public class MediaEntity : BaseEntity {
 
 	[StringLength(500)]
 	public string? Size { get; set; }
+	
+	[StringLength(500)]
+	public string? Time { get; set; }
+	
+	[StringLength(500)]
+	public string? Artist { get; set; }	
+	
+	[StringLength(500)]
+	public string? Album { get; set; }
 
 	[NotMapped]
 	public string Url => $"{Server.ServerAddress}/Medias/{FileName}";
@@ -86,6 +95,9 @@ public class UploadDto {
 	public string? UserId { get; set; }
 	public string? Title { get; set; }
 	public string? Size { get; set; }
+	public string? Time { get; set; }
+	public string? Artist { get; set; }
+	public string? Album { get; set; }
 	public Guid? ProductId { get; set; }
 	public Guid? ContentId { get; set; }
 	public Guid? CategoryId { get; set; }
@@ -103,4 +115,7 @@ public class UpdateMediaDto {
 	public string? UseCase { get; set; }
 	public string? Title { get; set; }
 	public string? Size { get; set; }
+	public string? Time { get; set; }
+	public string? Artist { get; set; }
+	public string? Album { get; set; }
 }
