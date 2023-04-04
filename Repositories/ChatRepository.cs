@@ -13,7 +13,7 @@ public interface IChatRepository
     Task<GenericResponse<GroupChatEntity?>> UpdateGroupChat(GroupChatCreateUpdateDto dto);
     Task<GenericResponse> DeleteGroupChat(Guid id);
     Task<GenericResponse<GroupChatMessageEntity?>> CreateGroupChatMessage(GroupChatMessageCreateUpdateDto dto);
-    GenericResponse<IQueryable<GroupChatEntity>?> ReadMyGroupChats();
+    GenericResponse<IQueryable<MyGroupChatsDto>?> ReadMyGroupChats();
     Task<GenericResponse<GroupChatMessageEntity?>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto);
     Task<GenericResponse> DeleteGroupChatMessage(Guid id);
     GenericResponse<IQueryable<GroupChatEntity>> FilterGroupChats(GroupChatFilterDto dto);
@@ -226,7 +226,7 @@ public class ChatRepository : IChatRepository
         return new GenericResponse<GroupChatMessageEntity?>(e.Entity);
     }
 
-    public GenericResponse<IQueryable<GroupChatEntity>?> ReadMyGroupChats()
+    public GenericResponse<IQueryable<MyGroupChatsDto>?> ReadMyGroupChats()
     {
         IQueryable<GroupChatEntity> e = _dbContext.Set<GroupChatEntity>()
             .Where(x => x.DeletedAt == null && x.Users.Any(y => y.Id == _userId))
@@ -239,13 +239,15 @@ public class ChatRepository : IChatRepository
             .Where(x => x.DeletedAt == null)
             .AsNoTracking();
 
-        // try {
-        //     // e = e.Include(x => x.GroupChatMessage).TakeLast(10);
-        // }
-        // catch (Exception) {
-        // }
 
-        return new GenericResponse<IQueryable<GroupChatEntity>?>(e);
+        var myGroupChats = new List<MyGroupChatsDto>();
+        e.ForEachAsync(item => myGroupChats.Add(new MyGroupChatsDto
+        {
+            GroupChat = item,
+            CountOfUnreadMessages = _dbContext.Set<SeenUsers>().Where(w => w.Fk_GroupChat == item.Id).Count()
+        }));
+
+        return new GenericResponse<IQueryable<MyGroupChatsDto>?>(myGroupChats.AsQueryable());
     }
 
     public async Task<GenericResponse<GroupChatMessageEntity?>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto)
@@ -328,6 +330,7 @@ public class ChatRepository : IChatRepository
             .Include(x => x.Products)!.ThenInclude(x => x.Media)
             .Include(x => x.Parent)!.ThenInclude(x => x.Media)
             .Include(x => x.User).ThenInclude(x => x.Media)
+            .OrderBy(o => o.CreatedAt)
             .AsNoTracking();
         return new GenericResponse<IQueryable<GroupChatMessageEntity>?>(e);
     }
@@ -506,12 +509,29 @@ public class ChatRepository : IChatRepository
         if (groupMessageChat is null)
             return new GenericResponse(UtilitiesStatusCodes.NotFound, "GroupChatMessage Not Found!");
 
-        if (string.IsNullOrEmpty(groupMessageChat.UsersSeen)) groupMessageChat.UsersSeen = _userId;
-        else if (!groupMessageChat.UsersSeen.Contains(_userId)) groupMessageChat.UsersSeen = groupMessageChat.UsersSeen + $",{_userId}";
-        else return new GenericResponse();
+        var groupChat = await _dbContext.Set<GroupChatEntity>().Where(w => w.Id == groupMessageChat.GroupChatId).FirstOrDefaultAsync();
+        if (groupChat is null)
+            return new GenericResponse(UtilitiesStatusCodes.NotFound, "GroupChate Not Found!");
 
-        _dbContext.Update(groupMessageChat);
+        var seenUsers = await _dbContext.Set<SeenUsers>().Where(w => w.Fk_GroupChat == groupChat.Id && w.Fk_UserId == _userId).FirstOrDefaultAsync();
+
+        if (seenUsers is null)
+            await _dbContext.Set<SeenUsers>().AddAsync(new SeenUsers
+            {
+                CreatedAt = DateTime.Now,
+                Fk_GroupChat = groupChat.Id,
+                Fk_UserId = _userId,
+                Fk_GroupChatMessage = messageId
+            });
+        else
+        {
+            if (seenUsers.Fk_GroupChatMessage == messageId) return new GenericResponse();
+
+            seenUsers.Fk_GroupChatMessage = messageId;
+            _dbContext.Update(seenUsers);
+        }
         await _dbContext.SaveChangesAsync();
+
         return new GenericResponse();
     }
 }

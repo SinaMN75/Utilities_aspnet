@@ -92,10 +92,19 @@ public class GroupChatMessageEntity : BaseEntity {
 
 	public GroupChatMessageEntity? Parent { get; set; }
 	public Guid? ParentId { get; set; }
-	public string? UsersSeen { get; set; }
-
+	public SeenUsers? SeenUsers { get; set; }
+	public Guid? SeenUsersId { get; set; }
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<ProductEntity?>? Products { get; set; }
+}
+
+[Table("SeenUsers")]
+public class SeenUsers : BaseEntity
+{
+    public Guid? Fk_GroupChat { get; set; }
+    public string? Fk_UserId { get; set; }
+    public Guid? Fk_GroupChatMessage { get; set; }
+
 }
 
 public class ChatReadDto {
@@ -172,4 +181,10 @@ public class GroupChatMessageCreateUpdateDto {
 	public Guid? GroupChatId { get; set; }
 	public Guid? ParentId { get; set; }
 	public IEnumerable<Guid>? Products { get; set; } = new List<Guid>();
+}
+
+public class MyGroupChatsDto
+{
+	public GroupChatEntity GroupChat { get; set; }
+	public int CountOfUnreadMessages { get; set; }
 }
