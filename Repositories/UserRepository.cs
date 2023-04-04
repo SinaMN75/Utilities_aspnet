@@ -63,7 +63,7 @@ public class UserRepository : IUserRepository {
 			}
 		}
 		catch { }
-		
+
 		return new GenericResponse<UserEntity?>(entity);
 	}
 
@@ -119,14 +119,15 @@ public class UserRepository : IUserRepository {
 		if (dto.SoundCloud != null) q = q.Where(x => x.SoundCloud.Contains(dto.SoundCloud));
 		if (dto.StateTr1 != null) q = q.Where(x => x.StateTr1.Contains(dto.StateTr1));
 		if (dto.StateTr2 != null) q = q.Where(x => x.StateTr2.Contains(dto.StateTr2));
-		
-		if (dto.Query != null) q = q.Where(x => x.FirstName.Contains(dto.Query) || 
-		                                        x.LastName.Contains(dto.Query) || 
-		                                        x.FullName.Contains(dto.Query) || 
-		                                        x.UserName.Contains(dto.Query) || 
-		                                        x.AppUserName.Contains(dto.Query) || 
-		                                        x.AppEmail.Contains(dto.Query)
-		);
+
+		if (dto.Query != null)
+			q = q.Where(x => x.FirstName.Contains(dto.Query) ||
+			                 x.LastName.Contains(dto.Query) ||
+			                 x.FullName.Contains(dto.Query) ||
+			                 x.UserName.Contains(dto.Query) ||
+			                 x.AppUserName.Contains(dto.Query) ||
+			                 x.AppEmail.Contains(dto.Query)
+			);
 
 		if (dto.UserIds != null) q = q.Where(x => dto.UserIds.Contains(x.Id));
 		if (dto.UserName != null) q = q.Where(x => (x.AppUserName ?? "").ToLower().Contains(dto.UserName.ToLower()));
@@ -139,7 +140,7 @@ public class UserRepository : IUserRepository {
 		if (_userId != null)
 			foreach (UserEntity item in entity)
 				item.IsFollowing = await _dbContext.Set<FollowEntity>().AnyAsync(x => x.FollowsUserId == item.Id && x.FollowerUserId == _userId);
-		
+
 		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
@@ -164,7 +165,7 @@ public class UserRepository : IUserRepository {
 		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == m);
 		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
 		JwtSecurityToken token = await CreateToken(user);
-		return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result);
+		return new GenericResponse<UserEntity?>(ReadByIdMinimal(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result);
 	}
 
 	private async Task<JwtSecurityToken> CreateToken(UserEntity user) {
@@ -460,6 +461,9 @@ public class UserRepository : IUserRepository {
 		return OtpResult.Incorrect;
 	}
 
-	public async Task<UserEntity?> ReadByIdMinimal(string? idOrUserName)
-		=> await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(u => u.Id == idOrUserName || u.UserName == idOrUserName);
+	public async Task<UserEntity?> ReadByIdMinimal(string? idOrUserName, string? token = null) {
+		UserEntity? e = await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(u => u.Id == idOrUserName || u.UserName == idOrUserName);
+		e.Token = token;
+		return e;
+	}
 }
