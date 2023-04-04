@@ -90,6 +90,9 @@ public class GroupChatMessageEntity : BaseEntity {
 
 	public UserEntity? User { get; set; }
 	public string? UserId { get; set; }
+	
+	public UserEntity? ForwardedFrom { get; set; }
+	public string? ForwardedFromUserId { get; set; }
 
 	public GroupChatMessageEntity? Parent { get; set; }
 	public Guid? ParentId { get; set; }
@@ -179,6 +182,7 @@ public class GroupChatMessageCreateUpdateDto {
 	public string? Message { get; set; }
 	public string? Type { get; set; }
 	public string? UseCase { get; set; }
+	public string? ForwardedFromUserId { get; set; }
 	public Guid? GroupChatId { get; set; }
 	public Guid? ParentId { get; set; }
 	public IEnumerable<Guid>? Products { get; set; } = new List<Guid>();

@@ -205,7 +205,8 @@ public class ChatRepository : IChatRepository
             GroupChatId = dto.GroupChatId,
             ParentId = dto.ParentId,
             UserId = _userId,
-            Products = products
+            Products = products,
+            ForwardedFromUserId = dto.ForwardedFromUserId
         };
 
         EntityEntry<GroupChatMessageEntity> e = await _dbContext.Set<GroupChatMessageEntity>().AddAsync(entity);
@@ -317,6 +318,7 @@ public class ChatRepository : IChatRepository
             .Include(x => x.Products)!.ThenInclude(x => x.Media)
             .Include(x => x.Parent)!.ThenInclude(x => x.Media)
             .Include(x => x.User).ThenInclude(x => x.Media)
+            .Include(x => x.ForwardedFrom).ThenInclude(x => x.Media)
             .OrderBy(o => o.CreatedAt)
             .AsNoTracking();
         return new GenericResponse<IQueryable<GroupChatMessageEntity>?>(e);
