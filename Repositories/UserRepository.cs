@@ -109,6 +109,7 @@ public class UserRepository : IUserRepository {
 		if (dto.LastName != null) q = q.Where(x => x.LastName.Contains(dto.LastName));
 		if (dto.FullName != null) q = q.Where(x => x.FullName.Contains(dto.FullName));
 		if (dto.GenderTr1 != null) q = q.Where(x => x.GenderTr1.Contains(dto.GenderTr1));
+		if (dto.UseCase != null) q = q.Where(x => x.UseCase.Contains(dto.UseCase));
 		if (dto.GenderTr2 != null) q = q.Where(x => x.GenderTr2.Contains(dto.GenderTr2));
 		if (dto.PhoneNumber != null) q = q.Where(x => x.PhoneNumber.Contains(dto.PhoneNumber));
 		if (dto.AppUserName != null) q = q.Where(x => x.AppUserName.Contains(dto.AppUserName));
@@ -347,6 +348,7 @@ public class UserRepository : IUserRepository {
 		entity.Gender = dto.Gender ?? entity.Gender;
 		entity.GenderTr1 = dto.GenderTr1 ?? entity.GenderTr1;
 		entity.GenderTr2 = dto.GenderTr2 ?? entity.GenderTr2;
+		entity.UseCase = dto.UseCase ?? entity.UseCase;
 		entity.UserName = dto.UserName ?? entity.UserName;
 		entity.Email = dto.Email ?? entity.Email;
 		entity.PhoneNumber = dto.PhoneNumber ?? entity.PhoneNumber;

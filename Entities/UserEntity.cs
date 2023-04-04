@@ -52,6 +52,9 @@ public class UserEntity : IdentityUser {
 	public string? Website { get; set; }
 
 	[StringLength(500)]
+	public string? UseCase { get; set; }
+	
+	[StringLength(500)]
 	public string? Type { get; set; }
 
 	[StringLength(500)]
@@ -194,7 +197,6 @@ public class UserCreateUpdateDto {
 	public string? Bio { get; set; }
 	public string? Headline { get; set; }
 	public string? Website { get; set; }
-	public string? Password { get; set; }
 	public string? AppUserName { get; set; }
 	public string? AppPhoneNumber { get; set; }
 	public string? AppEmail { get; set; }
@@ -208,6 +210,7 @@ public class UserCreateUpdateDto {
 	public string? Gender { get; set; } = null!;
 	public string? GenderTr1 { get; set; }
 	public string? GenderTr2 { get; set; }
+	public string? UseCase { get; set; }
 	public string? Type { get; set; }
 	public string? Region { get; set; }
 	public string? Activity { get; set; }
@@ -258,6 +261,7 @@ public class UserFilterDto {
 	public string? Gender { get; set; } = null!;
 	public string? GenderTr1 { get; set; }
 	public string? GenderTr2 { get; set; }
+	public string? UseCase { get; set; }
 	public string? Type { get; set; }
 	public string? Region { get; set; }
 	public string? Activity { get; set; }
@@ -275,7 +279,6 @@ public class UserFilterDto {
 	public bool? ShowForms { get; set; }
 	public bool? ShowProducts { get; set; }
 	public bool? ShowTransactions { get; set; }
-	public bool? ShowFollowings { get; set; }
 	public bool? ShowSuspend { get; set; }
 	public bool? OrderByUserName { get; set; }
 	public IEnumerable<string>? UserIds { get; set; }

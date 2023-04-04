@@ -128,8 +128,7 @@ public class ChatRepository : IChatRepository
     public async Task<GenericResponse> Delete(Guid id)
     {
         ChatEntity? e = await _dbContext.Set<ChatEntity>().FirstOrDefaultAsync(x => x.Id == id);
-        if (e == null) return new GenericResponse<ChatEntity?>(null, UtilitiesStatusCodes.NotFound);
-        _dbContext.Remove(e);
+        e.DeletedAt = DateTime.Now;
         await _dbContext.SaveChangesAsync();
         return new GenericResponse();
     }
