@@ -135,26 +135,6 @@ public class ChatRepository : IChatRepository
 
     public async Task<GenericResponse<GroupChatEntity?>> CreateGroupChat(GroupChatCreateUpdateDto dto)
     {
-        if (dto.ReadIfExist.IsTrue())
-        {
-            Guid currentproductid = dto.ProductIds.FirstOrDefault();
-            string currentuserid = dto.UserIds.FirstOrDefault();
-            if (currentproductid != null)
-            {
-                GroupChatEntity? u = await _dbContext.Set<GroupChatEntity>()
-                    .Where(x => x.Products.Any(x => x.Id == currentproductid))
-                    .Include(x => x.Users)
-                    .Include(x => x.Media)
-                    .Include(x => x.Products).ThenInclude(x => x.Media)
-                    .Include(x => x.Products).ThenInclude(x => x.Categories)
-                    .FirstOrDefaultAsync(x => x.Users.Any(x => x.Id == currentuserid));
-
-                if (u == null) return await CreateGroupChatLogic(dto);
-
-                return new GenericResponse<GroupChatEntity?>(u);
-            }
-            return await CreateGroupChatLogic(dto);
-        }
         return await CreateGroupChatLogic(dto);
     }
 
@@ -165,18 +145,25 @@ public class ChatRepository : IChatRepository
             .Include(x => x.Products)
             .FirstOrDefaultAsync(x => x.Id == dto.Id);
 
-        if (dto.UserIds != null)
+        if (dto.UserIds.IsNotNull())
         {
             List<UserEntity> users = new();
-            foreach (string id in dto.UserIds) users.Add(await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id));
+            foreach (string id in dto.UserIds!) users.Add((await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
             e.Users = users;
         }
 
-        if (dto.ProductIds != null)
+        if (dto.Products.IsNotNull())
         {
             List<ProductEntity> products = new();
-            foreach (Guid id in dto.ProductIds) products.Add(await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id));
+            foreach (Guid id in dto.Products!) products.Add((await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
             e.Products = products;
+        }
+        
+        if (dto.Categories.IsNotNull())
+        {
+            List<CategoryEntity> list = new();
+            foreach (Guid id in dto.Categories!) list.Add((await _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
+            e.Categories = list;
         }
 
         e.Department = dto.Department ?? e.Department;
@@ -442,10 +429,12 @@ public class ChatRepository : IChatRepository
     private async Task<GenericResponse<GroupChatEntity?>> CreateGroupChatLogic(GroupChatCreateUpdateDto dto)
     {
         List<UserEntity> users = new();
-        foreach (string id in dto.UserIds) users.Add(await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id));
+        if (dto.UserIds.IsNotNull()) 
+            foreach (string id in dto.UserIds!) users.Add((await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
 
         List<ProductEntity> products = new();
-        foreach (Guid id in dto.ProductIds) products.Add(await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id));
+        if (dto.Products.IsNotNull()) foreach (Guid id in dto.Products!) 
+            products.Add((await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
 
         GroupChatEntity entity = new()
         {
@@ -463,6 +452,15 @@ public class ChatRepository : IChatRepository
             Users = users,
             Products = products
         };
+        
+        if (dto.Categories.IsNotNull()) {
+            List<CategoryEntity> listCategory = new();
+            foreach (Guid item in dto.Categories!) {
+                CategoryEntity? ce = await _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item);
+                if (ce != null) listCategory.Add(ce);
+            }
+            entity.Categories = listCategory;
+        }
 
         EntityEntry<GroupChatEntity> e = await _dbContext.Set<GroupChatEntity>().AddAsync(entity);
         await _dbContext.SaveChangesAsync();

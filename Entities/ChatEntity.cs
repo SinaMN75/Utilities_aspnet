@@ -71,6 +71,7 @@ public class GroupChatEntity : BaseEntity {
 	public IEnumerable<UserEntity>? Users { get; set; }
 	public IEnumerable<ProductEntity>? Products { get; set; }
 	public IEnumerable<GroupChatMessageEntity>? GroupChatMessage { get; set; }
+	public IEnumerable<CategoryEntity?>? Categories { get; set; }
 }
 
 [Table("GroupChatMessage")]
@@ -166,11 +167,11 @@ public class GroupChatCreateUpdateDto {
 	public string? Type { get; set; }
 	public string? UseCase { get; set; }
 	public string? Department { get; set; }
-	public bool? ReadIfExist { get; set; } = true;
 	public ChatStatus? ChatStatus { get; set; }
 	public Priority? Priority { get; set; }
 	public IEnumerable<string>? UserIds { get; set; } = new List<string>();
-	public IEnumerable<Guid>? ProductIds { get; set; } = new List<Guid>();
+	public IEnumerable<Guid>? Products { get; set; } = new List<Guid>();
+	public IEnumerable<Guid>? Categories { get; set; } = new List<Guid>();
 }
 
 public class GroupChatMessageCreateUpdateDto {

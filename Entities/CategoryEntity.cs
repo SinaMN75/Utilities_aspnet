@@ -51,6 +51,9 @@ public class CategoryEntity : BaseEntity {
 
 	[JsonIgnore]
 	public IEnumerable<OrderDetailEntity>? OrderDetails { get; set; }
+	
+	[JsonIgnore]
+	public IEnumerable<GroupChatEntity?>? GroupChats { get; set; }
 
 	[NotMapped]
 	public bool IsUnique { get; set; } = true;
