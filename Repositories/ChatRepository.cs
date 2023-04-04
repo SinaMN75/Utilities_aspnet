@@ -379,11 +379,13 @@ public class ChatRepository : IChatRepository
     {
         string userId = _userId!;
         List<string> toUserId = await _dbContext.Set<ChatEntity>()
+            .Where(x => x.DeletedAt == null)
             .Where(x => x.FromUserId == userId)
             .Include(x => x.Products)!.ThenInclude(x => x.Media)
             .Include(x => x.Parent)
             .Include(x => x.Media).Select(x => x.ToUserId).ToListAsync();
         List<string> fromUserId = await _dbContext.Set<ChatEntity>()
+            .Where(x => x.DeletedAt == null)
             .Where(x => x.ToUserId == userId)
             .Include(x => x.Parent)
             .Include(x => x.Products)!.ThenInclude(x => x.Media)
