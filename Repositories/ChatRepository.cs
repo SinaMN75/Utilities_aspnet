@@ -158,7 +158,7 @@ public class ChatRepository : IChatRepository
             foreach (Guid id in dto.Products!) products.Add((await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
             e.Products = products;
         }
-        
+
         if (dto.Categories.IsNotNull())
         {
             List<CategoryEntity> list = new();
@@ -229,11 +229,25 @@ public class ChatRepository : IChatRepository
 
 
         var myGroupChats = new List<MyGroupChatsDto>();
-        e.ForEachAsync(item => myGroupChats.Add(new MyGroupChatsDto
+
+        foreach (var item in e)
         {
-            GroupChat = item,
-            CountOfUnreadMessages = _dbContext.Set<SeenUsers>().Where(w => w.Fk_GroupChat == item.Id).Count()
-        }));
+            int countOfMessage = 0;
+            var seenUsers = _dbContext.Set<SeenUsers>().Where(w => w.Fk_GroupChat == item.Id).FirstOrDefault();
+            var groupchatMessages = _dbContext.Set<GroupChatMessageEntity>().Where(w => w.GroupChatId == item.Id);
+            if (seenUsers is null)
+                countOfMessage = groupchatMessages.Count();
+            else
+            {
+                var LastSeenMessage = groupchatMessages.Where(w => w.Id == seenUsers.Fk_GroupChatMessage).FirstOrDefault();
+                countOfMessage = groupchatMessages.Where(w => w.CreatedAt > LastSeenMessage.CreatedAt).Count();
+            }
+            myGroupChats.Add(new MyGroupChatsDto
+            {
+                GroupChat = item,
+                CountOfUnreadMessages = countOfMessage
+            });
+        }
 
         return new GenericResponse<IQueryable<MyGroupChatsDto>?>(myGroupChats.AsQueryable());
     }
@@ -433,12 +447,12 @@ public class ChatRepository : IChatRepository
     private async Task<GenericResponse<GroupChatEntity?>> CreateGroupChatLogic(GroupChatCreateUpdateDto dto)
     {
         List<UserEntity> users = new();
-        if (dto.UserIds.IsNotNull()) 
+        if (dto.UserIds.IsNotNull())
             foreach (string id in dto.UserIds!) users.Add((await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
 
         List<ProductEntity> products = new();
-        if (dto.Products.IsNotNull()) foreach (Guid id in dto.Products!) 
-            products.Add((await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
+        if (dto.Products.IsNotNull()) foreach (Guid id in dto.Products!)
+                products.Add((await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
 
         GroupChatEntity entity = new()
         {
@@ -456,10 +470,12 @@ public class ChatRepository : IChatRepository
             Users = users,
             Products = products
         };
-        
-        if (dto.Categories.IsNotNull()) {
+
+        if (dto.Categories.IsNotNull())
+        {
             List<CategoryEntity> listCategory = new();
-            foreach (Guid item in dto.Categories!) {
+            foreach (Guid item in dto.Categories!)
+            {
                 CategoryEntity? ce = await _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item);
                 if (ce != null) listCategory.Add(ce);
             }
