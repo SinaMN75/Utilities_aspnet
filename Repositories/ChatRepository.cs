@@ -318,6 +318,22 @@ public class ChatRepository : IChatRepository
             .Include(x => x.Products)!.ThenInclude(x => x.Categories)
             .Include(x => x.GroupChatMessage)
             .Include(x => x.Media).FirstOrDefaultAsync(x => x.Id == id);
+
+        if(e != null)
+        {
+            int countOfMessage = 0;
+            var seenUsers = _dbContext.Set<SeenUsers>().Where(w => w.Fk_GroupChat == e.Id).FirstOrDefault();
+            var groupchatMessages = _dbContext.Set<GroupChatMessageEntity>().Where(w => w.GroupChatId == e.Id);
+            if (seenUsers is null)
+                countOfMessage = groupchatMessages.Count();
+            else
+            {
+                var LastSeenMessage = groupchatMessages.Where(w => w.Id == seenUsers.Fk_GroupChatMessage).FirstOrDefault();
+                countOfMessage = groupchatMessages.Where(w => w.CreatedAt > LastSeenMessage.CreatedAt).Count();
+            }
+            e.CountOfUnreadMessages = countOfMessage;
+        }
+
         return new GenericResponse<GroupChatEntity>(e);
     }
 
