@@ -30,6 +30,7 @@ public class CategoryEntity : BaseEntity {
 	public double? Longitude { get; set; }
 	public double? Price { get; set; }
 	public double? Value { get; set; }
+	public double? Stock { get; set; }
 	public DateTime? Date1 { get; set; }
 	public DateTime? Date2 { get; set; }
 
@@ -73,6 +74,7 @@ public class CategoryCreateUpdateDto : BaseEntity {
 	public double? Longitude { get; set; }
 	public double? Price { get; set; }
 	public double? Value { get; set; }
+	public double? Stock { get; set; }
 	public DateTime? Date1 { get; set; }
 	public DateTime? Date2 { get; set; }
 	public Guid? ParentId { get; set; }

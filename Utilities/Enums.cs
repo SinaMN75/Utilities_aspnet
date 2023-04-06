@@ -59,14 +59,14 @@ public enum PayType {
 	PayAtHome,
 	Cash = 101,
 	Stripe = 102,
-	Coin = 103, //not used yet
-	Paypal = 104, //not used yet
-	Visa = 105 //not used yet
+	Coin = 103,
+	Paypal = 104,
+	Visa = 105
 }
 
 public enum SendType {
 	Pishtaz,
-	Custome,
+	Custom,
 	Tipax
 }
 
