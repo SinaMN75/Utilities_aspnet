@@ -10,11 +10,12 @@ public interface INotificationRepository {
 
 public class NotificationRepository : INotificationRepository {
 	private readonly DbContext _dbContext;
-	private readonly IHttpContextAccessor _httpContextAccessor;
+	private readonly string? _userId;
 
 	public NotificationRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) {
 		_dbContext = dbContext;
-		_httpContextAccessor = httpContextAccessor;
+		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
+
 	}
 
 	public GenericResponse<IQueryable<NotificationEntity>> Read() {
@@ -23,7 +24,7 @@ public class NotificationRepository : INotificationRepository {
 			.Include(x => x.CreatorUser).ThenInclude(x => x!.Media)
 			.Include(x => x.CreatorUser).ThenInclude(x => x!.Categories)
 			.Include(x => x.User)
-			.Where(x => (x.UserId == null || x.UserId == _httpContextAccessor.HttpContext!.User.Identity!.Name) && x.DeletedAt == null)
+			.Where(x => (x.UserId == null || x.UserId == _userId) && x.DeletedAt == null)
 			.OrderByDescending(x => x.CreatedAt)
 			.AsNoTracking()
 			.Take(100);
@@ -68,7 +69,7 @@ public class NotificationRepository : INotificationRepository {
 			.Include(x => x.Media)
 			.Include(x => x.CreatorUser).ThenInclude(x => x!.Media)
 			.Include(x => x.CreatorUser).ThenInclude(x => x!.Categories)
-			.Where(x => (x.UserId == null || x.UserId == _httpContextAccessor.HttpContext!.User.Identity!.Name) && x.DeletedAt == null)
+			.Where(x => (x.UserId == null || x.UserId == _userId) && x.DeletedAt == null)
 			.Where(x => ids.Contains(x.Id))
 			.OrderByDescending(x => x.CreatedAt);
 

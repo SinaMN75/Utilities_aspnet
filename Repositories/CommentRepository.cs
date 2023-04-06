@@ -13,16 +13,16 @@ public interface ICommentRepository {
 
 public class CommentRepository : ICommentRepository {
 	private readonly DbContext _dbContext;
-	private readonly IHttpContextAccessor _httpContextAccessor;
 	private readonly INotificationRepository _notificationRepository;
+	private readonly string? _userId;
 
 	public CommentRepository(
 		DbContext dbContext,
 		IHttpContextAccessor httpContextAccessor,
 		INotificationRepository notificationRepository) {
 		_dbContext = dbContext;
-		_httpContextAccessor = httpContextAccessor;
 		_notificationRepository = notificationRepository;
+		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 	}
 
 	public GenericResponse<IQueryable<CommentEntity>?> ReadByProductId(Guid id) {
@@ -76,8 +76,6 @@ public class CommentRepository : ICommentRepository {
 	}
 
 	public async Task<GenericResponse<CommentEntity?>> Create(CommentCreateUpdateDto dto) {
-		string userId = _httpContextAccessor.HttpContext!.User.Identity!.Name!;
-
 		CommentEntity comment = new() {
 			CreatedAt = DateTime.Now,
 			UpdatedAt = DateTime.Now,
@@ -85,7 +83,7 @@ public class CommentRepository : ICommentRepository {
 			ProductId = dto.ProductId,
 			Score = dto.Score,
 			ParentId = dto.ParentId,
-			UserId = userId,
+			UserId = _userId,
 			Status = dto.Status
 		};
 		await _dbContext.AddAsync(comment);
@@ -97,7 +95,7 @@ public class CommentRepository : ICommentRepository {
 				.Include(x => x.User)
 				.FirstOrDefault(x => x.Id == comment.ProductId);
 
-			if (product != null && product.UserId != userId) {
+			if (product != null && product.UserId != _userId) {
 				string? linkMedia = product.Media?.OrderBy(x => x.CreatedAt).Select(x => x.FileName).FirstOrDefault();
 
 				await _notificationRepository.Create(new NotificationCreateUpdateDto {
@@ -116,10 +114,9 @@ public class CommentRepository : ICommentRepository {
 	}
 
 	public async Task<GenericResponse<CommentEntity?>> ToggleLikeComment(Guid commentId) {
-		string userId = _httpContextAccessor.HttpContext!.User.Identity!.Name!;
 		CommentEntity? comment = await _dbContext.Set<CommentEntity>().FirstOrDefaultAsync(x => x.Id == commentId);
 		LikeCommentEntity? oldLikeComment = await _dbContext.Set<LikeCommentEntity>()
-			.FirstOrDefaultAsync(x => x.CommentId == commentId && x.UserId == userId);
+			.FirstOrDefaultAsync(x => x.CommentId == commentId && x.UserId == _userId);
 		comment.Score ??= 0;
 		if (oldLikeComment != null) {
 			comment.Score -= 1;
@@ -128,7 +125,7 @@ public class CommentRepository : ICommentRepository {
 		}
 		else {
 			comment.Score += 1;
-			await _dbContext.AddAsync(new LikeCommentEntity {UserId = userId, CommentId = commentId});
+			await _dbContext.AddAsync(new LikeCommentEntity {UserId = _userId, CommentId = commentId});
 			await _dbContext.SaveChangesAsync();
 			UserEntity? commectUser = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == comment.UserId);
 			if (commectUser != null) {
@@ -166,14 +163,13 @@ public class CommentRepository : ICommentRepository {
 	}
 
 	public async Task<GenericResponse> AddReactionToComment(Guid commentId, Reaction reaction) {
-		string? userId = _httpContextAccessor.HttpContext!.User.Identity!.Name!;
-		UserEntity? user = await _dbContext.Set<UserEntity>().Where(w => w.Id == userId).FirstOrDefaultAsync();
+		UserEntity? user = await _dbContext.Set<UserEntity>().Where(w => w.Id == _userId).FirstOrDefaultAsync();
 		if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound, "User Donest Logged In");
 
 		CommentEntity? comment = await _dbContext.Set<CommentEntity>().Where(w => w.Id == commentId).FirstOrDefaultAsync();
 		if (comment is null) return new GenericResponse(UtilitiesStatusCodes.NotFound, "Comment Not Found");
 
-		CommentReacts? oldReaction = await _dbContext.Set<CommentReacts>().Where(w => w.UserId == userId && w.CommentId == comment.Id).FirstOrDefaultAsync();
+		CommentReacts? oldReaction = await _dbContext.Set<CommentReacts>().Where(w => w.UserId == _userId && w.CommentId == comment.Id).FirstOrDefaultAsync();
 		if (oldReaction is null) {
 			CommentReacts? react = new CommentReacts {
 				CommentId = comment.Id,

@@ -10,11 +10,13 @@ public interface IDiscountRepository {
 
 public class DiscountRepository : IDiscountRepository {
 	private readonly DbContext _dbContext;
-	private readonly IHttpContextAccessor _httpContextAccessor;
+	private readonly string? _userId;
+
 
 	public DiscountRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) {
 		_dbContext = dbContext;
-		_httpContextAccessor = httpContextAccessor;
+		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
+
 	}
 
 	public async Task<GenericResponse<DiscountEntity>> Create(DiscountEntity dto) {
@@ -70,12 +72,11 @@ public class DiscountRepository : IDiscountRepository {
 	}
 
 	public async Task<GenericResponse<DiscountEntity?>> ReadDiscountCode(string code) {
-		string userId = _httpContextAccessor.HttpContext?.User.Identity?.Name!;
 		DiscountEntity? discountEntity = await _dbContext.Set<DiscountEntity>().FirstOrDefaultAsync(p => p.Code!.ToLower().Trim() == code.ToLower().Trim());
 		if (discountEntity == null) throw new ArgumentException("Code not found!");
 
 		IQueryable<OrderEntity> orders = _dbContext.Set<OrderEntity>()
-			.Where(p => p.UserId == userId && p.DiscountCode == code && p.Status != OrderStatuses.Canceled);
+			.Where(p => p.UserId == _userId && p.DiscountCode == code && p.Status != OrderStatuses.Canceled);
 		return orders.Count() >= discountEntity.NumberUses
 			? new GenericResponse<DiscountEntity?>(null, UtilitiesStatusCodes.Forbidden, "Maximum use of this code!")
 			: new GenericResponse<DiscountEntity?>(discountEntity);

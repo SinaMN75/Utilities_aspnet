@@ -18,7 +18,7 @@ public interface IOrderRepository {
 		Guid id,
 		TransactionStatus transactionStatus,
 		string stripeData,
-		double? SendPrice);
+		double? sendPrice);
 }
 
 public class OrderRepository : IOrderRepository {

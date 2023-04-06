@@ -9,16 +9,18 @@ public interface IReportRepository {
 
 public class ReportRepository : IReportRepository {
 	private readonly DbContext _dbContext;
-	private readonly IHttpContextAccessor _httpContextAccessor;
+	private readonly string? _userId;
+
 
 	public ReportRepository(DbContext context, IHttpContextAccessor httpContextAccessor) {
 		_dbContext = context;
-		_httpContextAccessor = httpContextAccessor;
+		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
+
 	}
 
 	public async Task<GenericResponse<ReportEntity?>> Create(ReportEntity dto) {
 		ReportEntity entity = new() {
-			CreatorUserId = _httpContextAccessor.HttpContext!.User.Identity!.Name!,
+			CreatorUserId = _userId,
 			Title = dto.Title,
 			Description = dto.Description
 		};

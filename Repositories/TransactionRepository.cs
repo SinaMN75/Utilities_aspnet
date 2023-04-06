@@ -8,15 +8,15 @@ public interface ITransactionRepository {
 
 public class TransactionRepository : ITransactionRepository {
 	private readonly DbContext _dbContext;
-	private readonly IHttpContextAccessor _httpContextAccessor;
+	private readonly string? _userId;
 
 	public TransactionRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) {
 		_dbContext = dbContext;
-		_httpContextAccessor = httpContextAccessor;
+		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 	}
 
 	public async Task<GenericResponse<TransactionEntity>> Create(TransactionEntity entity) {
-		entity.UserId ??= _httpContextAccessor.HttpContext?.User.Identity?.Name;
+		entity.UserId ??= _userId;
 		await _dbContext.Set<TransactionEntity>().AddAsync(entity);
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse<TransactionEntity>(entity);
@@ -26,7 +26,7 @@ public class TransactionRepository : ITransactionRepository {
 
 	public GenericResponse<IQueryable<TransactionEntity>> ReadMine() {
 		IQueryable<TransactionEntity> i = _dbContext.Set<TransactionEntity>()
-			.Where(i => i.UserId == _httpContextAccessor.HttpContext!.User.Identity!.Name);
+			.Where(i => i.UserId == _userId);
 		return new GenericResponse<IQueryable<TransactionEntity>>(i);
 	}
 }

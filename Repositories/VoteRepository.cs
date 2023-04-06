@@ -9,11 +9,12 @@ public interface IVoteRepository {
 
 public class VoteRepository : IVoteRepository {
 	private readonly DbContext _dbContext;
-	private readonly IHttpContextAccessor _httpContextAccessor;
+	private readonly string? _userId;
 
 	public VoteRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) {
 		_dbContext = dbContext;
-		_httpContextAccessor = httpContextAccessor;
+		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
+
 	}
 
 	public async Task<GenericResponse<IEnumerable<VoteFieldEntity>>> CreateUpdateVoteFields(VoteFieldCreateUpdateDto dto) {
@@ -56,10 +57,9 @@ public class VoteRepository : IVoteRepository {
 	}
 
 	public async Task<GenericResponse> CreateUpdateVote(VoteCreateUpdateDto dto) {
-		string? userId = _httpContextAccessor.HttpContext?.User.Identity?.Name;
 		foreach (VoteDto item in dto.Votes!) {
 			VoteEntity? update = await _dbContext.Set<VoteEntity>()
-				.FirstOrDefaultAsync(x => x.ProductId == dto.ProductId && x.VoteFieldId == item.VoteFieldId && x.UserId == userId);
+				.FirstOrDefaultAsync(x => x.ProductId == dto.ProductId && x.VoteFieldId == item.VoteFieldId && x.UserId == _userId);
 			if (update != null) {
 				update.Score = item.Score;
 				ProductEntity pp = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
@@ -73,7 +73,7 @@ public class VoteRepository : IVoteRepository {
 					ProductId = dto.ProductId,
 					Score = item.Score,
 					VoteFieldId = item.VoteFieldId,
-					UserId = userId
+					UserId = _userId
 				});
 				ProductEntity pp = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
 				if (pp.VoteCount == null) pp.VoteCount = item.Score;
