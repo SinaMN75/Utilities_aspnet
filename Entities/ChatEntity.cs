@@ -1,6 +1,4 @@
-﻿using Stripe;
-
-namespace Utilities_aspnet.Entities;
+﻿namespace Utilities_aspnet.Entities;
 
 [Table("Chats")]
 public class ChatEntity : BaseEntity {

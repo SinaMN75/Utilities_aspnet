@@ -22,6 +22,7 @@ public class TransactionEntity : BaseEntity {
 
 	public UserEntity? User { get; set; }
 	public string? UserId { get; set; }
-	public ProductEntity? Product { get; set; }
-	public Guid? ProductId { get; set; }
+	
+	public OrderEntity? Order { get; set; }
+	public Guid? OrderId { get; set; }
 }
