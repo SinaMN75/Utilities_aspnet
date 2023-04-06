@@ -1,25 +1,27 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
 public interface IPaymentRepository {
-	Task<GenericResponse<string?>> IncreaseWalletBalance(double amount, string zarinPalMerchantId);
-	Task<GenericResponse<string?>> PayOrderZarinPal(Guid orderId, string zarinPalMerchantId);
-	Task<GenericResponse> WalletCallBack(int amount, string authority, string status, string userId, string zarinPalMerchantId);
-	Task<GenericResponse> CallBack(Guid orderId, string authority, string status, string zarinPalMerchantId);
+	Task<GenericResponse<string?>> IncreaseWalletBalance(double amount);
+	Task<GenericResponse<string?>> PayOrderZarinPal(Guid orderId);
+	Task<GenericResponse> WalletCallBack(int amount, string authority, string status, string userId);
+	Task<GenericResponse> CallBack(Guid orderId, string authority, string status);
 }
 
 public class PaymentRepository : IPaymentRepository {
 	private readonly DbContext _dbContext;
 	private readonly string? _userId;
+	private readonly AppSettings _appSettings = new();
 
-	public PaymentRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) {
+	public PaymentRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IConfiguration config) {
 		_dbContext = dbContext;
+		config.GetSection("AppSettings").Bind(_appSettings);
 		_userId = httpContextAccessor.HttpContext?.User.Identity?.Name;
 	}
 
-	public async Task<GenericResponse<string?>> IncreaseWalletBalance(double amount, string zarinPalMerchantId) {
+	public async Task<GenericResponse<string?>> IncreaseWalletBalance(double amount) {
 		try {
 			UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
-			Payment payment = new(zarinPalMerchantId, amount.ToInt());
+			Payment payment = new(_appSettings.PaymentSettings!.Id, amount.ToInt());
 			string callbackUrl = $"{Server.ServerAddress}/Payment/WalletCallBack/{user?.Id}/{amount}";
 			string desc = $"شارژ کیف پول به مبلغ {amount}";
 			PaymentRequestResponse? result = payment.PaymentRequest(desc, callbackUrl, "", user?.PhoneNumber).Result;
@@ -46,11 +48,11 @@ public class PaymentRepository : IPaymentRepository {
 		}
 	}
 
-	public async Task<GenericResponse<string?>> PayOrderZarinPal(Guid orderId, string zarinPalMerchantId) {
+	public async Task<GenericResponse<string?>> PayOrderZarinPal(Guid orderId) {
 		try {
 			OrderEntity order = (await _dbContext.Set<OrderEntity>().FirstOrDefaultAsync(x => x.Id == orderId))!;
 			UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
-			Payment payment = new(zarinPalMerchantId, order.TotalPrice.ToInt());
+			Payment payment = new(_appSettings.PaymentSettings!.Id, order.TotalPrice.ToInt());
 			string callbackUrl = $"{Server.ServerAddress}/Payment/CallBack/{orderId}";
 			string desc = $"خرید محصول {order.Description}";
 			PaymentRequestResponse? result = payment.PaymentRequest(desc, callbackUrl, "", user?.PhoneNumber).Result;
@@ -81,14 +83,13 @@ public class PaymentRepository : IPaymentRepository {
 		int amount,
 		string authority,
 		string status,
-		string userId,
-		string zarinPalMerchantId) {
+		string userId) {
 		if (userId.IsNullOrEmpty()) {
 			return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 		}
 
 		UserEntity user = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == userId))!;
-		Payment payment = new(zarinPalMerchantId, amount);
+		Payment payment = new(_appSettings.PaymentSettings!.Id, amount);
 		if (!status.Equals("OK")) {
 			return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 		}
@@ -111,10 +112,9 @@ public class PaymentRepository : IPaymentRepository {
 	public async Task<GenericResponse> CallBack(
 		Guid orderId,
 		string authority,
-		string status,
-		string zarinPalMerchantId) {
+		string status) {
 		OrderEntity order = (await _dbContext.Set<OrderEntity>().FirstOrDefaultAsync(x => x.Id == orderId))!;
-		Payment payment = new(zarinPalMerchantId, order.TotalPrice.ToInt());
+		Payment payment = new(_appSettings.PaymentSettings!.Id, order.TotalPrice.ToInt());
 		if (!status.Equals("OK")) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 		PaymentVerificationResponse? verify = payment.Verification(authority).Result;
 		TransactionEntity? pay = await _dbContext.Set<TransactionEntity>().FirstOrDefaultAsync(x => x.Authority == authority);

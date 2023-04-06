@@ -2,6 +2,7 @@
 
 public class AppSettings {
 	public SmsPanelSettings? SmsPanelSettings { get; set; }
+	public PaymentSettings? PaymentSettings { get; set; }
 	public PushNotificationSetting PushNotificationSetting { get; set; } = null!;
 	public string? AndroidMinimumVersion { get; set; }
 	public string? AndroidLatestVersion { get; set; }
@@ -21,6 +22,10 @@ public class SmsPanelSettings {
 	public string? SmsSecret { get; set; }
 	public int? OtpId { get; set; }
 	public string? PatternCode { get; set; }
+}
+
+public class PaymentSettings {
+	public string? Id { get; set; }
 }
 
 public class PushNotificationSetting {
