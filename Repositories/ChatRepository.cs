@@ -13,7 +13,7 @@ public interface IChatRepository
     Task<GenericResponse<GroupChatEntity?>> UpdateGroupChat(GroupChatCreateUpdateDto dto);
     Task<GenericResponse> DeleteGroupChat(Guid id);
     Task<GenericResponse<GroupChatMessageEntity?>> CreateGroupChatMessage(GroupChatMessageCreateUpdateDto dto);
-    GenericResponse<IQueryable<MyGroupChatsDto>?> ReadMyGroupChats();
+    GenericResponse<IQueryable<GroupChatEntity>?> ReadMyGroupChats();
     Task<GenericResponse<GroupChatMessageEntity?>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto);
     Task<GenericResponse> DeleteGroupChatMessage(Guid id);
     GenericResponse<IQueryable<GroupChatEntity>> FilterGroupChats(GroupChatFilterDto dto);
@@ -214,7 +214,7 @@ public class ChatRepository : IChatRepository
         return new GenericResponse<GroupChatMessageEntity?>(e.Entity);
     }
 
-    public GenericResponse<IQueryable<MyGroupChatsDto>?> ReadMyGroupChats()
+    public GenericResponse<IQueryable<GroupChatEntity>?> ReadMyGroupChats()
     {
         IQueryable<GroupChatEntity> e = _dbContext.Set<GroupChatEntity>()
             .Where(x => x.DeletedAt == null && x.Users.Any(y => y.Id == _userId))
@@ -228,7 +228,7 @@ public class ChatRepository : IChatRepository
             .AsNoTracking();
 
 
-        var myGroupChats = new List<MyGroupChatsDto>();
+        var myGroupChats = new List<GroupChatEntity>();
 
         foreach (var item in e)
         {
@@ -242,14 +242,11 @@ public class ChatRepository : IChatRepository
                 var LastSeenMessage = groupchatMessages.Where(w => w.Id == seenUsers.Fk_GroupChatMessage).FirstOrDefault();
                 countOfMessage = groupchatMessages.Where(w => w.CreatedAt > LastSeenMessage.CreatedAt).Count();
             }
-            myGroupChats.Add(new MyGroupChatsDto
-            {
-                GroupChat = item,
-                CountOfUnreadMessages = countOfMessage
-            });
+            item.CountOfUnreadMessages = countOfMessage;
+            myGroupChats.Add(item);
         }
 
-        return new GenericResponse<IQueryable<MyGroupChatsDto>?>(myGroupChats.AsQueryable());
+        return new GenericResponse<IQueryable<GroupChatEntity>?>(myGroupChats.AsQueryable());
     }
 
     public async Task<GenericResponse<GroupChatMessageEntity?>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto)

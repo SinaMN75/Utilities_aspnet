@@ -72,6 +72,8 @@ public class GroupChatEntity : BaseEntity {
 	public IEnumerable<ProductEntity>? Products { get; set; }
 	public IEnumerable<GroupChatMessageEntity>? GroupChatMessage { get; set; }
 	public IEnumerable<CategoryEntity?>? Categories { get; set; }
+	[NotMapped]
+    public int CountOfUnreadMessages { get; set; }
 }
 
 [Table("GroupChatMessage")]
@@ -186,10 +188,4 @@ public class GroupChatMessageCreateUpdateDto {
 	public Guid? GroupChatId { get; set; }
 	public Guid? ParentId { get; set; }
 	public IEnumerable<Guid>? Products { get; set; } = new List<Guid>();
-}
-
-public class MyGroupChatsDto
-{
-	public GroupChatEntity GroupChat { get; set; }
-	public int CountOfUnreadMessages { get; set; }
 }
