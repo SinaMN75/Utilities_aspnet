@@ -83,18 +83,9 @@ public class OrderDetailCreateUpdateDto {
 public class OrderFilterDto {
 	public Guid? Id { get; set; }
 	public bool? ShowProducts { get; set; } = false;
-	public bool? ShowMedia { get; set; } = false;
-	public bool? ShowForms { get; set; } = false;
 	public bool? ShowCategories { get; set; } = false;
 	public bool? ShowUser { get; set; } = false;
-	public string? Description { get; set; }
 	public OrderStatuses? Status { get; set; }
-	public double? TotalPrice { get; set; }
-	public double? DiscountPrice { get; set; }
-	public int? DiscountPercent { get; set; }
-	public string? ProductUseCase { get; set; }
-	public string? DiscountCode { get; set; }
-	public double? SendPrice { get; set; }
 	public SendType? SendType { get; set; }
 	public PayType? PayType { get; set; }
 	public string? PayNumber { get; set; }

@@ -87,8 +87,7 @@ public class OrderRepository : IOrderRepository {
 	}
 
 	public async Task<GenericResponse<OrderEntity?>> Update(OrderCreateUpdateDto dto) {
-		OrderEntity? oldOrder =
-			await _dbContext.Set<OrderEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id && (x.UserId == _userId || x.ProductOwnerId == _userId));
+		OrderEntity? oldOrder = await _dbContext.Set<OrderEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id);
 		if (oldOrder == null) return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.NotFound);
 
 		oldOrder.Description = dto.Description ?? oldOrder.Description;
@@ -103,26 +102,6 @@ public class OrderRepository : IOrderRepository {
 		oldOrder.DiscountPercent = dto.DiscountPercent ?? oldOrder.DiscountPercent;
 		oldOrder.UpdatedAt = DateTime.Now;
 		oldOrder.ProductUseCase = dto.ProductUseCase ?? oldOrder.ProductUseCase;
-
-		if (dto.OrderDetails != null)
-			foreach (OrderDetailCreateUpdateDto item in dto.OrderDetails) {
-				OrderDetailEntity? oldOrderDetail = await _dbContext.Set<OrderDetailEntity>().FirstOrDefaultAsync(x => x.Id == item.Id);
-				if (oldOrderDetail != null) {
-					ProductEntity? product = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == item.ProductId);
-					if (product != null) {
-						if (product.Stock < item.Count) throw new ArgumentException("failed request! this request is more than stock!");
-
-						if (dto.Status == OrderStatuses.Paid)
-							if (product.Stock > 0) product.Stock -= item.Count;
-							else throw new ArgumentException("product's stock equals zero!");
-					}
-
-					oldOrderDetail.ProductId = item.ProductId;
-					oldOrderDetail.Price = item.Price ?? product?.Price;
-					oldOrderDetail.Count = item.Count;
-				}
-			}
-
 		await _dbContext.SaveChangesAsync();
 
 		return new GenericResponse<OrderEntity?>(oldOrder);
@@ -131,20 +110,14 @@ public class OrderRepository : IOrderRepository {
 	public GenericResponse<IQueryable<OrderEntity>> Filter(OrderFilterDto dto) {
 		IQueryable<OrderEntity> q = _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails.Where(x => x.DeletedAt == null));
 
-		if (dto.ShowProducts.IsTrue()) q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product);
-		if (dto.ShowCategories.IsTrue()) q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(i => i.Categories);
-		if (dto.ShowForms.IsTrue()) q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(i => i.Forms);
-		if (dto.ShowMedia.IsTrue()) q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(i => i.Media);
-		if (dto.ShowUser.IsTrue()) q = q.Include(x => x.User).ThenInclude(x => x.Media);
+		if (dto.ShowProducts.IsTrue()) {
+			q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(x => x.Media);
+			q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(i => i.Categories);
+			q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(i => i.User);
+			q = q.Include(x => x.User).ThenInclude(x => x.Media);
+		}
 		if (dto.Id.HasValue) q = q.Where(x => x.Id == dto.Id);
-		if (dto.Description.IsNotNullOrEmpty()) q = q.Where(x => (x.Description ?? "").Contains(dto.Description!));
-		if (dto.ProductUseCase.IsNotNullOrEmpty()) q = q.Where(x => (x.ProductUseCase ?? "").Contains(dto.ProductUseCase!));
 		if (dto.Status.HasValue) q = q.Where(x => x.Status == dto.Status);
-		if (dto.TotalPrice.HasValue) q = q.Where(x => x.TotalPrice.ToInt() == dto.TotalPrice.ToInt());
-		if (dto.DiscountPrice.HasValue) q = q.Where(x => x.DiscountPrice.ToInt() == dto.DiscountPrice.ToInt());
-		if (dto.DiscountPercent.HasValue) q = q.Where(x => x.DiscountPercent == dto.DiscountPercent);
-		if (dto.DiscountCode.IsNotNullOrEmpty()) q = q.Where(x => (x.DiscountCode ?? "").Contains(dto.DiscountCode!));
-		if (dto.SendPrice.HasValue) q = q.Where(x => x.SendPrice.ToInt() == dto.SendPrice.ToInt());
 		if (dto.SendType.HasValue) q = q.Where(x => x.SendType == dto.SendType);
 		if (dto.PayType.HasValue) q = q.Where(x => x.PayType == dto.PayType);
 		if (dto.PayDateTime.HasValue) q = q.Where(x => x.PayDateTime == dto.PayDateTime);
@@ -223,7 +196,7 @@ public class OrderRepository : IOrderRepository {
 		OrderDetailEntity? e = await _dbContext.Set<OrderDetailEntity>()
 			.Include(e => e.Order).ThenInclude(d => d.OrderDetails).ThenInclude(d1 => d1.Product)
 			.FirstOrDefaultAsync(x => x.Id == id);
-		
+
 		if (e == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
 		e.DeletedAt = DateTime.Now;
 
