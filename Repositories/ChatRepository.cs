@@ -135,6 +135,17 @@ public class ChatRepository : IChatRepository
 
     public async Task<GenericResponse<GroupChatEntity?>> CreateGroupChat(GroupChatCreateUpdateDto dto)
     {
+        if (dto.ReadIfExist.IsTrue()) {
+            GroupChatEntity? e = await _dbContext.Set<GroupChatEntity>().AsNoTracking()
+                .Include(x => x.Users)!.ThenInclude(x => x.Media)
+                .Include(x => x.Products)!.ThenInclude(x => x.Media)
+                .Include(x => x.Products)!.ThenInclude(x => x.Categories)
+                .Include(x => x.GroupChatMessage)
+                .Include(x => x.Media)
+                .FirstOrDefaultAsync(x => x.Id == dto.Id);
+            if (e == null) return await CreateGroupChatLogic(dto);
+            return new GenericResponse<GroupChatEntity?>(e);
+        }
         return await CreateGroupChatLogic(dto);
     }
 
@@ -483,6 +494,7 @@ public class ChatRepository : IChatRepository
             Users = users,
             Products = products
         };
+        if (dto.Id != null) entity.Id = (Guid) dto.Id;
 
         if (dto.Categories.IsNotNull())
         {

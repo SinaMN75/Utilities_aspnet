@@ -170,6 +170,7 @@ public class GroupChatCreateUpdateDto {
 	public string? Type { get; set; }
 	public string? UseCase { get; set; }
 	public string? Department { get; set; }
+	public bool? ReadIfExist { get; set; }
 	public ChatStatus? ChatStatus { get; set; }
 	public Priority? Priority { get; set; }
 	public IEnumerable<string>? UserIds { get; set; } = new List<string>();
