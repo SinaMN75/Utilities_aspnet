@@ -9,11 +9,11 @@ public class FollowBookmarkController : BaseApiController {
 
 	[HttpPost("ReadFollowers/{userId}")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public ActionResult<GenericResponse<IEnumerable<UserEntity>>> ReadFollowers(string userId) => Result(_repository.GetFollowers(userId));
+	public async Task<ActionResult<GenericResponse<IEnumerable<UserEntity>>>> ReadFollowers(string userId) => Result(await _repository.GetFollowers(userId));
 
 	[HttpPost("ReadFollowings/{userId}")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public ActionResult<GenericResponse<IQueryable<UserEntity>>> ReadFollowings(string userId) => Result(_repository.GetFollowing(userId));
+	public async Task<ActionResult<GenericResponse<IEnumerable<UserEntity>>>> ReadFollowings(string userId) => Result(await _repository.GetFollowing(userId));
 
 	[HttpPost("ToggleFolllow")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -34,8 +34,4 @@ public class FollowBookmarkController : BaseApiController {
 
 	[HttpPost("ReadBookmarks")]
 	public ActionResult<GenericResponse<IEnumerable<BookmarkEntity>?>> ReadBookmarks(string? userId) => Result(_repository.ReadBookmarks(userId));
-
-	[HttpGet("ReadBookmarksByFolderName")]
-	public ActionResult<GenericResponse<IEnumerable<BookmarkEntity>?>> ReadBookmarksByFolderName(string userId, string? folderName = null)
-		=> Result(_repository.ReadBookmarksByFolderName(folderName, userId));
 }

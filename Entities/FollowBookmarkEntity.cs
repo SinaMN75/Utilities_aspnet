@@ -1,21 +1,21 @@
 ﻿namespace Utilities_aspnet.Entities;
 
-[Table("Follows")]
-public class FollowEntity : BaseEntity {
-	/// <summary>
-	/// دنبال شده
-	/// </summary>
-	public string? FollowerUserId { get; set; }
-
-	public UserEntity? FollowerUser { get; set; }
-
-	/// <summary>
-	/// دنبال کننده
-	/// </summary>
-	public string? FollowsUserId { get; set; }
-
-	public UserEntity? FollowsUser { get; set; }
-}
+// [Table("Follows")]
+// public class FollowEntity : BaseEntity {
+// 	/// <summary>
+// 	/// دنبال شده
+// 	/// </summary>
+// 	public string? FollowerUserId { get; set; }
+//
+// 	public UserEntity? FollowerUser { get; set; }
+//
+// 	/// <summary>
+// 	/// دنبال کننده
+// 	/// </summary>
+// 	public string? FollowsUserId { get; set; }
+//
+// 	public UserEntity? FollowsUser { get; set; }
+// }
 
 [Table("Bookmarks")]
 public class BookmarkEntity : BaseEntity {
@@ -37,25 +37,7 @@ public class BookmarkEntity : BaseEntity {
 
 	[JsonIgnore]
 	public Guid? CategoryId { get; set; }
-
-	public IEnumerable<BookmarkFolderEntity>? BookmarkFolders { get; set; }
-
-	public IEnumerable<MediaEntity>? Media { get; set; }
-}
-
-[Table("BookmarkFolderEntity")]
-public class BookmarkFolderEntity : BaseEntity {
-	[JsonIgnore]
-	public UserEntity? User { get; set; }
-
-	[JsonIgnore]
-	public string? UserId { get; set; }
-
-	[StringLength(500)]
-	public string? Title { get; set; }
-
-	public IEnumerable<BookmarkEntity>? Bookmarks { get; set; }
-
+	
 	public IEnumerable<MediaEntity>? Media { get; set; }
 }
 
@@ -63,12 +45,6 @@ public class BookmarkCreateDto {
 	public string? FolderName { get; set; }
 	public Guid? ProductId { get; set; }
 	public Guid? CategoryId { get; set; }
-}
-
-public class BookmarkFolderCreateUpdateDto {
-	public Guid? Id { get; set; }
-	public string? Title { get; set; }
-	public IEnumerable<Guid>? BookmarkIds { get; set; }
 }
 
 public class FollowCreateDto {

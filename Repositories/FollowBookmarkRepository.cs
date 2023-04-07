@@ -1,19 +1,13 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
 public interface IFollowBookmarkRepository {
-	GenericResponse<IQueryable<UserEntity>> GetFollowers(string id);
-	GenericResponse<IQueryable<UserEntity>> GetFollowing(string id);
-	Task<GenericResponse<FollowEntity?>> ToggleFollow(FollowCreateDto dto);
+	Task<GenericResponse<IQueryable<UserEntity>>> GetFollowers(string id);
+	Task<GenericResponse<IQueryable<UserEntity>>> GetFollowing(string id);
+	Task<GenericResponse> ToggleFollow(FollowCreateDto dto);
 	Task<GenericResponse> RemoveFollowings(string targetUserId, FollowCreateDto dto);
 	GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarks(string? userId);
 	Task<GenericResponse<BookmarkEntity?>> ToggleBookmark(BookmarkCreateDto dto);
 	Task<GenericResponse<BookmarkEntity?>> UpdateBookmark(Guid bookmarkId, BookmarkCreateDto dto);
-	GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarksByFolderName(string? folderName, string userId);
-
-	Task<GenericResponse<BookmarkFolderEntity>> CreateBookmarkFolder(BookmarkFolderCreateUpdateDto dto);
-	GenericResponse<IQueryable<BookmarkFolderEntity>> ReadBookmarkFolder();
-	Task<GenericResponse<BookmarkFolderEntity>> UpdateBookmarkFolder(BookmarkFolderCreateUpdateDto dto);
-	Task<GenericResponse> DeleteBookmarkFolder(Guid id);
 }
 
 public class FollowBookmarkRepository : IFollowBookmarkRepository {
@@ -83,163 +77,97 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 		return new GenericResponse<IQueryable<BookmarkEntity>?>(bookmark);
 	}
 
-	public GenericResponse<IQueryable<UserEntity>> GetFollowers(string id) {
-		IQueryable<UserEntity?> followers = _dbContext.Set<FollowEntity>()
-			.Where(x => x.FollowsUserId == id)
-			.Include(x => x.FollowerUser).ThenInclude(x => x.Media)
-			.Include(x => x.FollowerUser).ThenInclude(x => x.Categories).ThenInclude(x => x.Media)
-			.AsNoTracking().Select(x => x.FollowerUser);
-
-		return new GenericResponse<IQueryable<UserEntity>>(followers);
-	}
-
-	public GenericResponse<IQueryable<UserEntity>> GetFollowing(string id) {
-		IQueryable<UserEntity?> followings = _dbContext.Set<FollowEntity>()
-			.Where(x => x.FollowerUserId == id)
-			.Include(x => x.FollowsUser).ThenInclude(x => x.Media)
-			.Include(x => x.FollowsUser).ThenInclude(x => x.Categories).ThenInclude(x => x.Media)
-			.AsNoTracking()
-			.Select(x => x.FollowsUser);
-
-		return new GenericResponse<IQueryable<UserEntity>>(followings);
-	}
-
-	public async Task<GenericResponse<FollowEntity?>> ToggleFollow(FollowCreateDto parameters) {
+	public async Task<GenericResponse<IQueryable<UserEntity>>> GetFollowers(string id) {
 		UserEntity myUser = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId))!;
+		GenericResponse<IQueryable<UserEntity>> q = await _userRepository.Filter(new UserFilterDto {
+				UserIds = myUser.FollowedUsers.Split(","),
+				ShowCategories = true,
+				ShowMedia = true
+			}
+		);
+		return new GenericResponse<IQueryable<UserEntity>>(q.Result!);
+	}
 
-		FollowEntity? follow = await _dbContext.Set<FollowEntity>()
-			.FirstOrDefaultAsync(x => x.FollowerUserId == _userId && x.FollowsUserId == parameters.UserId);
+	public async Task<GenericResponse<IQueryable<UserEntity>>> GetFollowing(string id) {
+		UserEntity myUser = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId))!;
+		GenericResponse<IQueryable<UserEntity>> q = await _userRepository.Filter(new UserFilterDto {
+				UserIds = myUser.FollowingUsers.Split(","),
+				ShowCategories = true,
+				ShowMedia = true
+			}
+		);
+		return new GenericResponse<IQueryable<UserEntity>>(q.Result!);
+	}
 
-		if (follow != null) {
-			_dbContext.Set<FollowEntity>().Remove(follow);
-			await _dbContext.SaveChangesAsync();
+	public async Task<GenericResponse> ToggleFollow(FollowCreateDto parameters) {
+		UserEntity myUser = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId))!;
+		UserEntity targetUser = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == parameters.UserId))!;
+
+		// FollowEntity? follow = await _dbContext.Set<FollowEntity>()
+		// .FirstOrDefaultAsync(x => x.FollowerUserId == _userId && x.FollowsUserId == parameters.UserId);
+
+		// if (follow != null) {
+		// _dbContext.Set<FollowEntity>().Remove(follow);
+		// await _dbContext.SaveChangesAsync();
+		// }
+		// else {
+		// follow = new FollowEntity {FollowerUserId = _userId, FollowsUserId = parameters.UserId};
+		// await _dbContext.Set<FollowEntity>().AddAsync(follow);
+		// await _dbContext.SaveChangesAsync();
+
+		// if (targetUser != null) {
+		// 	targetUser.Point += 1;
+		// 	await _dbContext.SaveChangesAsync();
+		// }
+
+		try {
+			GenericResponse<IQueryable<NotificationEntity>> notification = _notificationRepository.Filter(new NotificationFilterDto {
+				UserId = parameters.UserId,
+				CreatorUserId = _userId,
+				UseCase = "Follow"
+			});
+			if (notification.Result.IsNullOrEmpty())
+				await _notificationRepository.Create(new NotificationCreateUpdateDto {
+					UserId = parameters.UserId,
+					Message = "You are being followed by " + myUser.UserName,
+					Title = "Follow",
+					UseCase = "Follow",
+					CreatorUserId = _userId
+				});
+		}
+		catch { }
+
+		if (myUser.FollowingUsers.Contains(parameters.UserId)) {
+			await _userRepository.Update(new UserCreateUpdateDto {
+				Id = _userId,
+				FollowingUsers = myUser.FollowingUsers.Replace($",{parameters.UserId}", "")
+			});
+
+			await _userRepository.Update(new UserCreateUpdateDto {
+				Id = parameters.UserId,
+				FollowedUsers = targetUser.FollowedUsers.Replace($",{parameters.UserId}", "")
+			});
 		}
 		else {
-			follow = new FollowEntity {FollowerUserId = _userId, FollowsUserId = parameters.UserId};
-			await _dbContext.Set<FollowEntity>().AddAsync(follow);
-			await _dbContext.SaveChangesAsync();
+			await _userRepository.Update(new UserCreateUpdateDto {
+				Id = _userId,
+				FollowingUsers = myUser.FollowingUsers + "," + parameters.UserId
+			});
 
-			UserEntity? followsUser = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == parameters.UserId);
-
-			if (followsUser != null) {
-				followsUser.Point += 1;
-				await _dbContext.SaveChangesAsync();
-			}
-
-			try {
-				GenericResponse<IQueryable<NotificationEntity>> notification = _notificationRepository.Filter(new NotificationFilterDto {
-					UserId = parameters.UserId,
-					CreatorUserId = _userId,
-					UseCase = "Follow"
-				});
-				if (notification.Result.IsNullOrEmpty())
-					await _notificationRepository.Create(new NotificationCreateUpdateDto {
-						UserId = parameters.UserId,
-						Message = "You are being followed by " + myUser.UserName,
-						Title = "Follow",
-						UseCase = "Follow",
-						CreatorUserId = _userId
-					});
-			}
-			catch { }
-
-			if (myUser.FollowedUsers.Contains(parameters.UserId)) {
-				await _userRepository.Update(new UserCreateUpdateDto {
-					Id = _userId,
-					FollowedUsers = myUser.FollowedUsers.Replace($",{parameters.UserId}", "")
-				});
-			}
-			else {
-				await _userRepository.Update(new UserCreateUpdateDto {
-					Id = _userId,
-					FollowedUsers = myUser.FollowedUsers + "," + parameters.UserId
-				});
-			}
+			await _userRepository.Update(new UserCreateUpdateDto {
+				Id = parameters.UserId,
+				FollowingUsers = targetUser.FollowedUsers + "," + parameters.UserId
+			});
 		}
-
-		return new GenericResponse<FollowEntity?>(follow);
+		return new GenericResponse();
 	}
 
 	public async Task<GenericResponse> RemoveFollowings(string userId, FollowCreateDto parameters) {
-		FollowEntity? following = await _dbContext.Set<FollowEntity>()
-			.Where(x => x.FollowerUserId == parameters.UserId && x.FollowsUserId == userId).FirstOrDefaultAsync();
-		if (following != null) {
-			_dbContext.Set<FollowEntity>().Remove(following);
-			await _dbContext.SaveChangesAsync();
-		}
-
-		return new GenericResponse(UtilitiesStatusCodes.Success);
-	}
-
-	public GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarksByFolderName(string? folderName, string userId) {
-		IQueryable<BookmarkEntity> bookmark = _dbContext.Set<BookmarkEntity>().Include(x => x.Media)
-			.Where(x => x.UserId == userId)
-			.Include(x => x.Product).ThenInclude(x => x.Media)
-			.Include(x => x.Product).ThenInclude(i => i.Votes)
-			.Include(x => x.Product).ThenInclude(i => i.User).ThenInclude(x => x.Media)
-			.Include(x => x.Product).ThenInclude(i => i.Bookmarks)
-			.Include(x => x.Product).ThenInclude(i => i.Forms)!.ThenInclude(x => x.FormField)
-			.Include(x => x.Product).ThenInclude(i => i.Categories)
-			.Include(x => x.Product).ThenInclude(i => i.Comments.Where(x => x.ParentId == null)).ThenInclude(x => x.Children)
-			.Include(x => x.Product).ThenInclude(i => i.Reports);
-		// .Include(x => x.Product).ThenInclude(i => i.Teams)!.ThenInclude(x => x.User)!.ThenInclude(x => x.Media);
-
-		if (folderName.IsNotNullOrEmpty()) bookmark = bookmark.Where(x => x.FolderName == folderName);
-		return new GenericResponse<IQueryable<BookmarkEntity>?>(bookmark);
-	}
-
-	public async Task<GenericResponse<BookmarkFolderEntity>> CreateBookmarkFolder(BookmarkFolderCreateUpdateDto dto) {
-		BookmarkFolderEntity e = new() {
-			UserId = _userId,
-			Title = dto.Title,
-			CreatedAt = DateTime.Now,
-			UpdatedAt = DateTime.Now,
-		};
-
-		if (dto.BookmarkIds.IsNotNullOrEmpty()) {
-			List<BookmarkEntity> list = new();
-			foreach (Guid item in dto.BookmarkIds!) {
-				BookmarkEntity? be = await _dbContext.Set<BookmarkEntity>().FirstOrDefaultAsync(x => x.Id == item);
-				if (e != null) list.Add(be);
-			}
-			e.Bookmarks = list;
-		}
-
-		EntityEntry<BookmarkFolderEntity> i = await _dbContext.Set<BookmarkFolderEntity>().AddAsync(e);
-		await _dbContext.SaveChangesAsync();
-		return new GenericResponse<BookmarkFolderEntity>(i.Entity);
-	}
-
-	public GenericResponse<IQueryable<BookmarkFolderEntity>> ReadBookmarkFolder() => new(_dbContext.Set<BookmarkFolderEntity>()
-		                                                                                     .Where(x => x.DeletedAt == null)
-		                                                                                     .Include(x => x.Media)
-		                                                                                     .Include(x => x.Bookmarks)!
-		                                                                                     .ThenInclude(x => x.Product)
-		                                                                                     .ThenInclude(x => x.Media)
-		                                                                                     .AsNoTracking());
-
-	public async Task<GenericResponse<BookmarkFolderEntity>> UpdateBookmarkFolder(BookmarkFolderCreateUpdateDto dto) {
-		BookmarkFolderEntity e = (await _dbContext.Set<BookmarkFolderEntity>().Where(x => x.Id == dto.Id).FirstOrDefaultAsync())!;
-		e.Title = dto.Title ?? e.Title;
-		e.UpdatedAt = DateTime.Now;
-
-		if (dto.BookmarkIds.IsNotNullOrEmpty()) {
-			List<BookmarkEntity> list = new();
-			foreach (Guid item in dto.BookmarkIds!)
-				if (e != null)
-					list.Add((await _dbContext.Set<BookmarkEntity>().FirstOrDefaultAsync(x => x.Id == item))!);
-			e.Bookmarks = list;
-		}
-
-		_dbContext.Update(e);
-		await _dbContext.SaveChangesAsync();
-		return new GenericResponse<BookmarkFolderEntity>(e);
-	}
-
-	public async Task<GenericResponse> DeleteBookmarkFolder(Guid id) {
-		BookmarkFolderEntity e = (await _dbContext.Set<BookmarkFolderEntity>().FirstOrDefaultAsync(i => i.Id == id))!;
-		e.DeletedAt = DateTime.Now;
-		await _dbContext.SaveChangesAsync();
+		UserEntity myUser = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId))!;
+		await _userRepository.Update(new UserCreateUpdateDto {
+			Id = parameters.UserId,
+			FollowedUsers = myUser.FollowedUsers.Replace($",{parameters.UserId}", "")
+		});
 		return new GenericResponse();
 	}
 
