@@ -1,4 +1,7 @@
-﻿namespace Utilities_aspnet.Repositories;
+﻿using System.Linq;
+using System.Net.WebSockets;
+
+namespace Utilities_aspnet.Repositories;
 
 public interface IChatRepository
 {
@@ -360,6 +363,20 @@ public class ChatRepository : IChatRepository
             .Include(x => x.ForwardedFromUser).ThenInclude(x => x.Media)
             .OrderBy(o => o.CreatedAt)
             .AsNoTracking();
+
+        var tempGroupChatsMessage = e.ToList();
+        var messageSeen = _dbContext.Set<SeenUsers>().Where(w => w.Fk_GroupChat == id);
+        foreach (var item in e)
+        {
+            var usersSeen = messageSeen.Where(w => w.Fk_GroupChatMessage == item.Id);
+            foreach (var seenTbl in usersSeen)
+            {
+                var user = _dbContext.Set<UserEntity>().Where(w => w.Id == seenTbl.Fk_UserId).FirstOrDefault();
+                if (user is not null)
+                    item.MessageSeenBy.Add(user);
+            }
+        }
+
         return new GenericResponse<IQueryable<GroupChatMessageEntity>?>(e);
     }
 
