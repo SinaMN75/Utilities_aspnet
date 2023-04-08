@@ -91,7 +91,7 @@ public class GroupChatMessageEntity : BaseEntity {
 	public UserEntity? User { get; set; }
 	public string? UserId { get; set; }
 	
-	public UserEntity? ForwardedFrom { get; set; }
+	public UserEntity? ForwardedFromUser { get; set; }
 	public string? ForwardedFromUserId { get; set; }
 
 	public GroupChatMessageEntity? Parent { get; set; }

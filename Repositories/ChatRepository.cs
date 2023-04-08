@@ -356,7 +356,7 @@ public class ChatRepository : IChatRepository
             .Include(x => x.Products)!.ThenInclude(x => x.Media)
             .Include(x => x.Parent)!.ThenInclude(x => x.Media)
             .Include(x => x.User).ThenInclude(x => x.Media)
-            .Include(x => x.ForwardedFrom).ThenInclude(x => x.Media)
+            .Include(x => x.ForwardedFromUser).ThenInclude(x => x.Media)
             .OrderBy(o => o.CreatedAt)
             .AsNoTracking();
         return new GenericResponse<IQueryable<GroupChatMessageEntity>?>(e);
