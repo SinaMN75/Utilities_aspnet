@@ -1,4 +1,7 @@
-﻿namespace Utilities_aspnet.Repositories;
+﻿using System.Linq;
+using System.Net.WebSockets;
+
+namespace Utilities_aspnet.Repositories;
 
 public interface IChatRepository
 {
@@ -135,7 +138,8 @@ public class ChatRepository : IChatRepository
 
     public async Task<GenericResponse<GroupChatEntity?>> CreateGroupChat(GroupChatCreateUpdateDto dto)
     {
-        if (dto.ReadIfExist.IsTrue()) {
+        if (dto.ReadIfExist.IsTrue())
+        {
             GroupChatEntity? e = await _dbContext.Set<GroupChatEntity>().AsNoTracking()
                 .Include(x => x.Users)!.ThenInclude(x => x.Media)
                 .Include(x => x.Products)!.ThenInclude(x => x.Media)
@@ -229,7 +233,7 @@ public class ChatRepository : IChatRepository
     {
         IQueryable<GroupChatEntity> e = _dbContext.Set<GroupChatEntity>()
             .Where(x => x.DeletedAt == null && x.Users.Any(y => y.Id == _userId))
-            .Include(x => x.Users)
+            .Include(x => x.Users).ThenInclude(x => x.Media)
             .Include(x => x.Media)
             .Include(x => x.Products).ThenInclude(x => x.Media)
             .Include(x => x.Products).ThenInclude(x => x.Categories)
@@ -330,7 +334,7 @@ public class ChatRepository : IChatRepository
             .Include(x => x.GroupChatMessage)
             .Include(x => x.Media).FirstOrDefaultAsync(x => x.Id == id);
 
-        if(e != null)
+        if (e != null)
         {
             int countOfMessage = 0;
             var seenUsers = _dbContext.Set<SeenUsers>().Where(w => w.Fk_GroupChat == e.Id).FirstOrDefault();
@@ -359,7 +363,23 @@ public class ChatRepository : IChatRepository
             .Include(x => x.ForwardedFromUser).ThenInclude(x => x.Media)
             .OrderBy(o => o.CreatedAt)
             .AsNoTracking();
-        return new GenericResponse<IQueryable<GroupChatMessageEntity>?>(e);
+
+        var tempGroupChatsMessage = e.ToList();
+        var messageSeen = _dbContext.Set<SeenUsers>().Where(w => w.Fk_GroupChat == id);
+        foreach (var item in tempGroupChatsMessage)
+        {
+            var usersMessage = new List<UserEntity>();
+            foreach (var seenTbl in messageSeen)
+            {
+                var lastMessageThatUserSeened = e.FirstOrDefault(f => f.Id == seenTbl.Fk_GroupChatMessage);
+                var user = _dbContext.Set<UserEntity>().Where(w => w.Id == seenTbl.Fk_UserId).FirstOrDefault();
+                if (user is not null && (lastMessageThatUserSeened?.CreatedAt > item.CreatedAt || lastMessageThatUserSeened?.Id == item.Id))
+                    usersMessage.Add(user);
+            }
+            item.MessageSeenBy = usersMessage;
+        }
+
+        return new GenericResponse<IQueryable<GroupChatMessageEntity>?>(tempGroupChatsMessage.AsQueryable());
     }
 
     public async Task<GenericResponse<IEnumerable<ChatReadDto>?>> ReadByUserId(string id)
@@ -494,7 +514,7 @@ public class ChatRepository : IChatRepository
             Users = users,
             Products = products
         };
-        if (dto.Id != null) entity.Id = (Guid) dto.Id;
+        if (dto.Id != null) entity.Id = (Guid)dto.Id;
 
         if (dto.Categories.IsNotNull())
         {

@@ -100,6 +100,8 @@ public class GroupChatMessageEntity : BaseEntity {
 	public Guid? SeenUsersId { get; set; }
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<ProductEntity?>? Products { get; set; }
+	[NotMapped]
+	public List<UserEntity>? MessageSeenBy { get; set; }
 }
 
 [Table("SeenUsers")]
