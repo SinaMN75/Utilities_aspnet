@@ -366,19 +366,20 @@ public class ChatRepository : IChatRepository
 
         var tempGroupChatsMessage = e.ToList();
         var messageSeen = _dbContext.Set<SeenUsers>().Where(w => w.Fk_GroupChat == id);
-        foreach (var item in e)
+        foreach (var item in tempGroupChatsMessage)
         {
-            var usersSeen = messageSeen.Where(w => w.Fk_GroupChatMessage == item.Id);
-            foreach (var seenTbl in usersSeen)
+            var usersMessage = new List<UserEntity>();
+            foreach (var seenTbl in messageSeen)
             {
                 var lastMessageThatUserSeened = e.FirstOrDefault(f => f.Id == seenTbl.Fk_GroupChatMessage);
                 var user = _dbContext.Set<UserEntity>().Where(w => w.Id == seenTbl.Fk_UserId).FirstOrDefault();
                 if (user is not null && (lastMessageThatUserSeened?.CreatedAt > item.CreatedAt || lastMessageThatUserSeened?.Id == item.Id))
-                    item.MessageSeenBy.Add(user);
+                    usersMessage.Add(user);
             }
+            item.MessageSeenBy = usersMessage;
         }
 
-        return new GenericResponse<IQueryable<GroupChatMessageEntity>?>(e);
+        return new GenericResponse<IQueryable<GroupChatMessageEntity>?>(tempGroupChatsMessage.AsQueryable());
     }
 
     public async Task<GenericResponse<IEnumerable<ChatReadDto>?>> ReadByUserId(string id)
