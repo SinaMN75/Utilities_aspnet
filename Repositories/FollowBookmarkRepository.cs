@@ -4,7 +4,7 @@ public interface IFollowBookmarkRepository {
 	Task<GenericResponse<IQueryable<UserEntity>>> GetFollowers(string id);
 	Task<GenericResponse<IQueryable<UserEntity>>> GetFollowing(string id);
 	Task<GenericResponse> ToggleFollow(FollowCreateDto dto);
-	Task<GenericResponse> RemoveFollowings(string targetUserId, FollowCreateDto dto);
+	Task<GenericResponse> RemoveFollowings(FollowCreateDto dto);
 	GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarks(string? userId);
 	Task<GenericResponse<BookmarkEntity?>> ToggleBookmark(BookmarkCreateDto dto);
 	Task<GenericResponse<BookmarkEntity?>> UpdateBookmark(Guid bookmarkId, BookmarkCreateDto dto);
@@ -33,12 +33,13 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 			                      x.CategoryId != null && x.CategoryId == dto.CategoryId) &&
 			                     x.UserId == _userId);
 		if (oldBookmark == null) {
-			BookmarkEntity bookmark = new() {UserId = _userId};
-			if (dto.ProductId.HasValue) bookmark.ProductId = dto.ProductId;
-			bookmark.FolderName = dto.FolderName;
-			await _dbContext.Set<BookmarkEntity>().AddAsync(bookmark);
+			BookmarkEntity e = new() {UserId = _userId};
+			if (dto.ProductId.HasValue) e.ProductId = dto.ProductId;
+			e.FolderName = dto.FolderName;
+			e.ParentId = dto.ParentId;
+			await _dbContext.Set<BookmarkEntity>().AddAsync(e);
 			await _dbContext.SaveChangesAsync();
-			return new GenericResponse<BookmarkEntity?>(bookmark, UtilitiesStatusCodes.Success);
+			return new GenericResponse<BookmarkEntity?>(e);
 		}
 		MediaEntity? media = await _dbContext.Set<MediaEntity>().FirstOrDefaultAsync(x => x.BookmarkId == oldBookmark.Id);
 		if (media != null) _dbContext.Set<MediaEntity>().Remove(media);
@@ -73,7 +74,17 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 			.Include(x => x.Product).ThenInclude(i => i.Forms)!.ThenInclude(x => x.FormField)
 			.Include(x => x.Product).ThenInclude(i => i.Categories)
 			.Include(x => x.Product).ThenInclude(i => i.Comments.Where(x => x.ParentId == null)).ThenInclude(x => x.Children)
-			.Include(x => x.Product).ThenInclude(i => i.Reports);
+			.Include(x => x.Product).ThenInclude(i => i.Reports)
+			.Include(x => x.Children).ThenInclude(x => x.Product)
+			.Include(x => x.Children).Include(x => x.Product).ThenInclude(x => x.Media)
+			.Include(x => x.Children).Include(x => x.Product).ThenInclude(i => i.Votes)
+			.Include(x => x.Children).Include(x => x.Product).ThenInclude(i => i.User).ThenInclude(x => x.Media)
+			.Include(x => x.Children).Include(x => x.Product).ThenInclude(i => i.Bookmarks)
+			.Include(x => x.Children).Include(x => x.Product).ThenInclude(i => i.Forms)!.ThenInclude(x => x.FormField)
+			.Include(x => x.Children).Include(x => x.Product).ThenInclude(i => i.Categories)
+			.Include(x => x.Children).Include(x => x.Product).ThenInclude(i => i.Comments.Where(x => x.ParentId == null)).ThenInclude(x => x.Children)
+			.Include(x => x.Children).Include(x => x.Product).ThenInclude(i => i.Reports);
+
 		return new GenericResponse<IQueryable<BookmarkEntity>?>(bookmark);
 	}
 
@@ -162,7 +173,7 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 		return new GenericResponse();
 	}
 
-	public async Task<GenericResponse> RemoveFollowings(string userId, FollowCreateDto parameters) {
+	public async Task<GenericResponse> RemoveFollowings(FollowCreateDto parameters) {
 		UserEntity myUser = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId))!;
 		await _userRepository.Update(new UserCreateUpdateDto {
 			Id = parameters.UserId,
@@ -172,13 +183,11 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 	}
 
 	public async Task<GenericResponse<BookmarkEntity?>> UpdateBookmark(Guid bookmarkId, BookmarkCreateDto dto) {
-		BookmarkEntity? oldBookmark = await _dbContext.Set<BookmarkEntity>()
-			.FirstOrDefaultAsync(x => x.Id == bookmarkId);
-		if (oldBookmark is null) {
-			return new GenericResponse<BookmarkEntity?>(null, UtilitiesStatusCodes.NotFound);
-		}
+		BookmarkEntity? oldBookmark = await _dbContext.Set<BookmarkEntity>().FirstOrDefaultAsync(x => x.Id == bookmarkId);
+		if (oldBookmark is null) return new GenericResponse<BookmarkEntity?>(null, UtilitiesStatusCodes.NotFound);
 
 		oldBookmark.FolderName = dto.FolderName ?? oldBookmark.FolderName;
+		oldBookmark.ParentId = dto.ParentId;
 		_dbContext.Set<BookmarkEntity>().Update(oldBookmark);
 		await _dbContext.SaveChangesAsync();
 

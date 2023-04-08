@@ -37,6 +37,12 @@ public class BookmarkEntity : BaseEntity {
 
 	[JsonIgnore]
 	public Guid? CategoryId { get; set; }
+
+	public Guid? ParentId { get; set; }
+	public BookmarkEntity? Parent { get; set; }
+	
+	[InverseProperty("Parent")]
+	public IEnumerable<BookmarkEntity>? Children { get; set; }
 	
 	public IEnumerable<MediaEntity>? Media { get; set; }
 }
@@ -45,6 +51,7 @@ public class BookmarkCreateDto {
 	public string? FolderName { get; set; }
 	public Guid? ProductId { get; set; }
 	public Guid? CategoryId { get; set; }
+	public Guid? ParentId { get; set; }
 }
 
 public class FollowCreateDto {

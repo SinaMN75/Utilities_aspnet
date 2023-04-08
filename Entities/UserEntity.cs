@@ -224,7 +224,7 @@ public class UserCreateUpdateDto {
 	public string? VisitedProducts { get; set; }
 	public string? BookmarkedProducts { get; set; }
 	public string? FollowedUsers { get; set; }
-	public string FollowingUsers { get; set; }
+	public string? FollowingUsers { get; set; }
 	public string? BlockedUsers { get; set; }
 	public double? Wallet { get; set; }
 	public double? Point { get; set; } = 0;
