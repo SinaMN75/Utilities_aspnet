@@ -371,8 +371,9 @@ public class ChatRepository : IChatRepository
             var usersSeen = messageSeen.Where(w => w.Fk_GroupChatMessage == item.Id);
             foreach (var seenTbl in usersSeen)
             {
+                var lastMessageThatUserSeened = e.FirstOrDefault(f => f.Id == seenTbl.Fk_GroupChatMessage);
                 var user = _dbContext.Set<UserEntity>().Where(w => w.Id == seenTbl.Fk_UserId).FirstOrDefault();
-                if (user is not null)
+                if (user is not null && (lastMessageThatUserSeened?.CreatedAt > item.CreatedAt || lastMessageThatUserSeened?.Id == item.Id))
                     item.MessageSeenBy.Add(user);
             }
         }
