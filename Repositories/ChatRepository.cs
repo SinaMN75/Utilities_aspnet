@@ -135,7 +135,8 @@ public class ChatRepository : IChatRepository
 
     public async Task<GenericResponse<GroupChatEntity?>> CreateGroupChat(GroupChatCreateUpdateDto dto)
     {
-        if (dto.ReadIfExist.IsTrue()) {
+        if (dto.ReadIfExist.IsTrue())
+        {
             GroupChatEntity? e = await _dbContext.Set<GroupChatEntity>().AsNoTracking()
                 .Include(x => x.Users)!.ThenInclude(x => x.Media)
                 .Include(x => x.Products)!.ThenInclude(x => x.Media)
@@ -229,7 +230,7 @@ public class ChatRepository : IChatRepository
     {
         IQueryable<GroupChatEntity> e = _dbContext.Set<GroupChatEntity>()
             .Where(x => x.DeletedAt == null && x.Users.Any(y => y.Id == _userId))
-            .Include(x => x.Users)
+            .Include(x => x.Users).ThenInclude(x => x.Media)
             .Include(x => x.Media)
             .Include(x => x.Products).ThenInclude(x => x.Media)
             .Include(x => x.Products).ThenInclude(x => x.Categories)
@@ -330,7 +331,7 @@ public class ChatRepository : IChatRepository
             .Include(x => x.GroupChatMessage)
             .Include(x => x.Media).FirstOrDefaultAsync(x => x.Id == id);
 
-        if(e != null)
+        if (e != null)
         {
             int countOfMessage = 0;
             var seenUsers = _dbContext.Set<SeenUsers>().Where(w => w.Fk_GroupChat == e.Id).FirstOrDefault();
@@ -494,7 +495,7 @@ public class ChatRepository : IChatRepository
             Users = users,
             Products = products
         };
-        if (dto.Id != null) entity.Id = (Guid) dto.Id;
+        if (dto.Id != null) entity.Id = (Guid)dto.Id;
 
         if (dto.Categories.IsNotNull())
         {
