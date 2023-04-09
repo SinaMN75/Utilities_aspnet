@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using System.Net.WebSockets;
-
-namespace Utilities_aspnet.Repositories;
+﻿namespace Utilities_aspnet.Repositories;
 
 public interface IChatRepository
 {
@@ -221,7 +218,7 @@ public class ChatRepository : IChatRepository
             ParentId = dto.ParentId,
             UserId = _userId,
             Products = products,
-            ForwardedFromUserId = dto.ForwardedFromUserId
+            ForwardedMessageId = dto.ForwardedMessageId,
         };
 
         EntityEntry<GroupChatMessageEntity> e = await _dbContext.Set<GroupChatMessageEntity>().AddAsync(entity);
@@ -358,9 +355,12 @@ public class ChatRepository : IChatRepository
             .Where(x => x.GroupChatId == id && x.DeletedAt == null)
             .Include(x => x.Media)
             .Include(x => x.Products)!.ThenInclude(x => x.Media)
-            .Include(x => x.Parent)!.ThenInclude(x => x.Media)
+            .Include(x => x.Parent).ThenInclude(x => x.Media)
             .Include(x => x.User).ThenInclude(x => x.Media)
-            .Include(x => x.ForwardedFromUser).ThenInclude(x => x.Media)
+            .Include(x => x.ForwardedMessage).ThenInclude(x => x.Media)
+            .Include(x => x.ForwardedMessage).ThenInclude(x => x.Products)!.ThenInclude(x => x.Media)
+            .Include(x => x.ForwardedMessage).ThenInclude(x => x.Parent)!.ThenInclude(x => x.Media)
+            .Include(x => x.ForwardedMessage).ThenInclude(x => x.User).ThenInclude(x => x.Media)
             .OrderBy(o => o.CreatedAt)
             .AsNoTracking();
 
