@@ -92,9 +92,11 @@ public class GroupChatMessageEntity : BaseEntity {
 	public UserEntity? User { get; set; }
 	public string? UserId { get; set; }
 
+	[ForeignKey(nameof(ForwardedMessageId))]
 	public GroupChatMessageEntity? ForwardedMessage { get; set; }
 	public Guid? ForwardedMessageId { get; set; }
 
+	[ForeignKey(nameof(ParentId))]
 	public GroupChatMessageEntity? Parent { get; set; }
 	public Guid? ParentId { get; set; }
 
