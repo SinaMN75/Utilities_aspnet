@@ -135,15 +135,16 @@ public class ChatRepository : IChatRepository
 
     public async Task<GenericResponse<GroupChatEntity?>> CreateGroupChat(GroupChatCreateUpdateDto dto)
     {
-        if (dto.ReadIfExist.IsTrue())
-        {
+        if (dto.IsPrivateChat.IsTrue()) {
+            string firstUserId = dto.UserIds.ToList()[0];
+            string secondUserId = dto.UserIds.ToList()[1];
             GroupChatEntity? e = await _dbContext.Set<GroupChatEntity>().AsNoTracking()
                 .Include(x => x.Users)!.ThenInclude(x => x.Media)
                 .Include(x => x.Products)!.ThenInclude(x => x.Media)
                 .Include(x => x.Products)!.ThenInclude(x => x.Categories)
                 .Include(x => x.GroupChatMessage)
                 .Include(x => x.Media)
-                .FirstOrDefaultAsync(x => x.Id == dto.Id);
+                .FirstOrDefaultAsync(x => x.Users.Any(x => x.Id == firstUserId) && x.Users.Any(x => x.Id == secondUserId));
             if (e == null) return await CreateGroupChatLogic(dto);
             return new GenericResponse<GroupChatEntity?>(e);
         }

@@ -94,10 +94,12 @@ public class GroupChatMessageEntity : BaseEntity {
 
 	[ForeignKey(nameof(ForwardedMessageId))]
 	public GroupChatMessageEntity? ForwardedMessage { get; set; }
+
 	public Guid? ForwardedMessageId { get; set; }
 
 	[ForeignKey(nameof(ParentId))]
 	public GroupChatMessageEntity? Parent { get; set; }
+
 	public Guid? ParentId { get; set; }
 
 	public SeenUsers? SeenUsers { get; set; }
@@ -177,6 +179,7 @@ public class GroupChatCreateUpdateDto {
 	public string? UseCase { get; set; }
 	public string? Department { get; set; }
 	public bool? ReadIfExist { get; set; }
+	public bool? IsPrivateChat { get; set; }
 	public ChatStatus? ChatStatus { get; set; }
 	public Priority? Priority { get; set; }
 	public IEnumerable<string>? UserIds { get; set; } = new List<string>();
