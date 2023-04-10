@@ -135,7 +135,7 @@ public class ChatRepository : IChatRepository
 
     public async Task<GenericResponse<GroupChatEntity?>> CreateGroupChat(GroupChatCreateUpdateDto dto)
     {
-        if (dto.IsPrivateChat.IsTrue()) {
+        if (dto.Type == ChatType.Private) {
             string firstUserId = dto.UserIds.ToList()[0];
             string secondUserId = dto.UserIds.ToList()[1];
             GroupChatEntity? e = await _dbContext.Set<GroupChatEntity>().AsNoTracking()
@@ -144,7 +144,9 @@ public class ChatRepository : IChatRepository
                 .Include(x => x.Products)!.ThenInclude(x => x.Categories)
                 .Include(x => x.GroupChatMessage)
                 .Include(x => x.Media)
-                .FirstOrDefaultAsync(x => x.Users.Any(x => x.Id == firstUserId) && x.Users.Any(x => x.Id == secondUserId));
+                .FirstOrDefaultAsync(x => x.Users.Count() == 2 &&
+                                          x.Users.Any(x => x.Id == firstUserId) &&
+                                          x.Users.Any(x => x.Id == secondUserId));
             if (e == null) return await CreateGroupChatLogic(dto);
             return new GenericResponse<GroupChatEntity?>(e);
         }
@@ -185,7 +187,6 @@ public class ChatRepository : IChatRepository
         e.Type = dto.Type ?? e.Type;
         e.Value = dto.Value ?? e.Value;
         e.UpdatedAt = DateTime.Now;
-        e.UseCase = dto.UseCase ?? e.UseCase;
         e.Description = dto.Description ?? e.Description;
         e.ChatStatus = dto.ChatStatus ?? e.ChatStatus;
 
@@ -296,9 +297,8 @@ public class ChatRepository : IChatRepository
         if (dto.ProductsIds.IsNotNullOrEmpty()) q = q.Where(x => x.Products.Any(x => x.Id == dto.ProductsIds.FirstOrDefault()));
         if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => x.Title == dto.Title);
         if (dto.Description.IsNotNullOrEmpty()) q = q.Where(x => x.Description == dto.Description);
-        if (dto.Type.IsNotNullOrEmpty()) q = q.Where(x => x.Type == dto.Type);
+        if (dto.Type.HasValue) q = q.Where(x => x.Type == dto.Type);
         if (dto.Value.IsNotNullOrEmpty()) q = q.Where(x => x.Value == dto.Value);
-        if (dto.UseCase.IsNotNullOrEmpty()) q = q.Where(x => x.UseCase == dto.UseCase);
         if (dto.Department.IsNotNullOrEmpty()) q = q.Where(x => x.Department == dto.Department);
         if (dto.ChatStatus.HasValue) q = q.Where(x => x.ChatStatus == dto.ChatStatus);
         if (dto.Priority.HasValue) q = q.Where(x => x.Priority == dto.Priority);
@@ -508,7 +508,6 @@ public class ChatRepository : IChatRepository
             Value = dto.Value,
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now,
-            UseCase = dto.UseCase,
             ChatStatus = dto.ChatStatus,
             Description = dto.Description,
             CreatorUserId = _userId!,

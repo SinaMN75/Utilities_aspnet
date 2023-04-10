@@ -1,4 +1,6 @@
-﻿namespace Utilities_aspnet.Entities;
+﻿using Microsoft.VisualBasic.CompilerServices;
+
+namespace Utilities_aspnet.Entities;
 
 [Table("Chats")]
 public class ChatEntity : BaseEntity {
@@ -50,18 +52,14 @@ public class GroupChatEntity : BaseEntity {
 	public string? Value { get; set; }
 
 	[StringLength(500)]
-	public string? Type { get; set; }
-
-	[StringLength(500)]
-	public string? UseCase { get; set; }
-
-	[StringLength(500)]
 	public string? Department { get; set; }
 
 	[StringLength(500)]
 	public string? CreatorUserId { get; set; }
 
 	public ChatStatus? ChatStatus { get; set; }
+	
+	public ChatType? Type { get; set; }
 
 	public Priority? Priority { get; set; }
 
@@ -145,10 +143,9 @@ public class GroupChatFilterDto {
 	public string? Title { get; set; }
 	public string? Description { get; set; }
 	public string? Value { get; set; }
-	public string? Type { get; set; }
-	public string? UseCase { get; set; }
 	public string? Department { get; set; }
 	public ChatStatus? ChatStatus { get; set; }
+	public ChatType? Type { get; set; }
 	public Priority? Priority { get; set; }
 	public bool? ShowUsers { get; set; }
 	public bool? ShowProducts { get; set; }
@@ -175,12 +172,11 @@ public class GroupChatCreateUpdateDto {
 	public string? Title { get; set; }
 	public string? Description { get; set; }
 	public string? Value { get; set; }
-	public string? Type { get; set; }
-	public string? UseCase { get; set; }
 	public string? Department { get; set; }
 	public bool? ReadIfExist { get; set; }
 	public bool? IsPrivateChat { get; set; }
 	public ChatStatus? ChatStatus { get; set; }
+	public ChatType? Type { get; set; }
 	public Priority? Priority { get; set; }
 	public IEnumerable<string>? UserIds { get; set; } = new List<string>();
 	public IEnumerable<Guid>? Products { get; set; } = new List<Guid>();

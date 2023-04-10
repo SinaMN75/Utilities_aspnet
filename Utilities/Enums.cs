@@ -124,6 +124,14 @@ public enum ChatStatus {
 	Deleted = 104
 }
 
+public enum ChatType {
+	Private = 100,
+	PublicGroup = 101,
+	PrivateGroup = 102,
+	PublicChannel = 103,
+	PrivateChannel = 104
+}
+
 public enum Priority {
 	VeryHigh = 100,
 	High = 101,
