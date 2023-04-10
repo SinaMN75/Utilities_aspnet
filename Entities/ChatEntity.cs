@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualBasic.CompilerServices;
-
-namespace Utilities_aspnet.Entities;
+﻿namespace Utilities_aspnet.Entities;
 
 [Table("Chats")]
 public class ChatEntity : BaseEntity {
@@ -173,8 +171,6 @@ public class GroupChatCreateUpdateDto {
 	public string? Description { get; set; }
 	public string? Value { get; set; }
 	public string? Department { get; set; }
-	public bool? ReadIfExist { get; set; }
-	public bool? IsPrivateChat { get; set; }
 	public ChatStatus? ChatStatus { get; set; }
 	public ChatType? Type { get; set; }
 	public Priority? Priority { get; set; }
