@@ -135,7 +135,8 @@ public class ChatRepository : IChatRepository
 
     public async Task<GenericResponse<GroupChatEntity?>> CreateGroupChat(GroupChatCreateUpdateDto dto)
     {
-        if (dto.Type == ChatType.Private) {
+        if (dto.Type == ChatType.Private)
+        {
             string firstUserId = dto.UserIds.ToList()[0];
             string secondUserId = dto.UserIds.ToList()[1];
             GroupChatEntity? e = await _dbContext.Set<GroupChatEntity>().AsNoTracking()
@@ -588,13 +589,14 @@ public class ChatRepository : IChatRepository
             });
         else
         {
-            if (seenUsers.Fk_GroupChatMessage == messageId) return new GenericResponse();
+            var lastMessageSeen = await _dbContext.Set<GroupChatMessageEntity>().FirstOrDefaultAsync(f => f.Id == seenUsers.Fk_GroupChatMessage);
+            if (lastMessageSeen?.CreatedAt > groupMessageChat.CreatedAt || seenUsers.Fk_GroupChatMessage == messageId) return new GenericResponse();
 
             seenUsers.Fk_GroupChatMessage = messageId;
             _dbContext.Update(seenUsers);
         }
-        await _dbContext.SaveChangesAsync();
 
+        await _dbContext.SaveChangesAsync();
         return new GenericResponse();
     }
 }
