@@ -21,6 +21,7 @@ public interface IChatRepository
     GenericResponse<IQueryable<GroupChatMessageEntity>?> ReadGroupChatMessages(Guid id);
     Task<GenericResponse> AddReactionToMessage(Reaction reaction, Guid messageId);
     Task<GenericResponse> SeenGroupChatMessage(Guid messageId);
+    Task<GenericResponse> ExitFromGroup(Guid id);
 }
 
 public class ChatRepository : IChatRepository
@@ -598,5 +599,20 @@ public class ChatRepository : IChatRepository
 
         await _dbContext.SaveChangesAsync();
         return new GenericResponse();
+    }
+
+    public async Task<GenericResponse> ExitFromGroup(Guid id)
+    {
+        var groupChat = await _dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(f => f.Id == id);
+        if (groupChat is null) return new GenericResponse(UtilitiesStatusCodes.NotFound, "Group Chat not Founded");
+
+        if (!groupChat.Users.Any(a => a.Id == _userId)) return new GenericResponse(UtilitiesStatusCodes.UserNotFound, "User Not Founded in GroupChat");
+
+        var user = await _dbContext.Set<UserEntity>().Where(w => w.Id == _userId).FirstOrDefaultAsync();
+
+        var result = groupChat.Users.ToList().Remove(user);
+
+        if (result) return new GenericResponse(UtilitiesStatusCodes.Success);
+        else return new GenericResponse(UtilitiesStatusCodes.BadRequest);
     }
 }

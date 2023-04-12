@@ -51,7 +51,7 @@ public class ChatController : BaseApiController {
 	public ActionResult<GenericResponse<GroupChatMessageEntity?>> ReadGroupChatMessages(Guid id) => Result(_repository.ReadGroupChatMessages(id));
 
 	[HttpPost("SeenGroupChatMessage/{id:guid}")]
-	public async Task<ActionResult<GenericResponse>> SeenGroupChatMessage(Guid id) => Result(await _repository.SeenGroupChatMessage(id));
+	public async Task<ActionResult<GenericResponse>> SeenGroupChatMesDeleteGroupChatsage(Guid id) => Result(await _repository.SeenGroupChatMessage(id));
 
 	[HttpGet("ReadGroupChatById/{id:guid}")]
 	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> ReadGroupChatById(Guid id) => Result(await _repository.ReadGroupChatById(id));
@@ -66,4 +66,7 @@ public class ChatController : BaseApiController {
 
 	[HttpDelete("DeleteGroupChatMessage/{id}")]
 	public async Task<ActionResult<GenericResponse>> DeleteGroupChatMessage(Guid id) => Result(await _repository.DeleteGroupChatMessage(id));
+
+	[HttpPost("ExitFromGroup/{id:guid}")]
+	public async Task<ActionResult<GenericResponse>> ExitFromGroup(Guid id) => Result(await _repository.ExitFromGroup(id));
 }
