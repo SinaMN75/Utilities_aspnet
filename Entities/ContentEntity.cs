@@ -28,15 +28,3 @@ public class ContentReadDto : BaseEntity {
 	public string? Type { get; set; }
 	public IEnumerable<MediaReadDto>? Media { get; set; }
 }
-
-public static class ContentEntityExtension {
-	public static IQueryable<ContentReadDto> MapContentReadDto(this IQueryable<ContentEntity> e) {
-		return e.Select(x => new ContentReadDto {
-			Id = x.Id,
-			Title = x.Title,
-			Type = x.Type,
-			UseCase = x.UseCase,
-			Media = x.Media!.MapContentReadDto()
-		});
-	}
-}

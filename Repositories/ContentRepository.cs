@@ -19,7 +19,20 @@ public class ContentRepository : IContentRepository {
 	}
 
 	public GenericResponse<IQueryable<ContentReadDto>> Read() {
-		IQueryable<ContentReadDto> e = _dbContext.Set<ContentEntity>().AsNoTracking().Where(x => x.DeletedAt == null).MapContentReadDto();
+		IQueryable<ContentReadDto> e = _dbContext.Set<ContentEntity>()
+			.AsNoTracking()
+			.Where(x => x.DeletedAt == null)
+			.Select(x => new ContentReadDto {
+				Title = x.Title,
+				Type = x.Type,
+				UseCase = x.UseCase,
+				Media = x.Media!.Select(y => new MediaReadDto {
+					Link = y.Link,
+					UseCase = y.UseCase,
+					Title = y.Title,
+					FileName = y.FileName
+				})
+			});
 		return new GenericResponse<IQueryable<ContentReadDto>>(e);
 	}
 

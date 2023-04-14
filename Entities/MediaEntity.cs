@@ -131,18 +131,3 @@ public class UpdateMediaDto {
 	public string? Artist { get; set; }
 	public string? Album { get; set; }
 }
-
-public static class MediaEntityExtension {
-	public static IQueryable<MediaReadDto> MapContentReadDto(this IQueryable<MediaEntity> e) {
-		return e.Select(y => new MediaReadDto {
-			Link = y.Link,
-			UseCase = y.UseCase,
-			Album = y.Album,
-			Artist = y.Artist,
-			Size = y.Size,
-			Time = y.Time,
-			Title = y.Title,
-			FileName = y.FileName
-		});
-	}
-}
