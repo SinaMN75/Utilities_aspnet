@@ -17,7 +17,7 @@ public class ContentEntity : BaseEntity {
 	[StringLength(500)]
 	public string? Type { get; set; }
 
-	public IQueryable<MediaEntity>? Media { get; set; }
+	public IEnumerable<MediaEntity>? Media { get; set; }
 }
 
 public class ContentReadDto : BaseEntity {
