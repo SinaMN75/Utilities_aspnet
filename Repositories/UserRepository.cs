@@ -366,7 +366,8 @@ public class UserRepository : IUserRepository {
 		entity.AccessLevel = dto.AccessLevel ?? entity.AccessLevel;
 		entity.VisitedProducts = dto.VisitedProducts ?? entity.VisitedProducts;
 		entity.BookmarkedProducts = dto.BookmarkedProducts ?? entity.BookmarkedProducts;
-		entity.FollowingUsers = dto.FollowedUsers ?? entity.FollowingUsers;
+		entity.FollowingUsers = dto.FollowingUsers ?? entity.FollowingUsers;
+		entity.FollowedUsers = dto.FollowedUsers ?? entity.FollowedUsers;
 		entity.BlockedUsers = dto.BlockedUsers ?? entity.BlockedUsers;
 		entity.Badge = dto.Badge ?? entity.Badge;
 		entity.UpdatedAt = DateTime.Now;

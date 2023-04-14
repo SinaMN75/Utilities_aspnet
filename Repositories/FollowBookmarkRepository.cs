@@ -167,7 +167,7 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 
 			await _userRepository.Update(new UserCreateUpdateDto {
 				Id = parameters.UserId,
-				FollowingUsers = targetUser.FollowedUsers + "," + parameters.UserId
+				FollowedUsers = targetUser.FollowedUsers + "," + parameters.UserId
 			});
 		}
 		return new GenericResponse();
