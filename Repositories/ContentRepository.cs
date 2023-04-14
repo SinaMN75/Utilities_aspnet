@@ -24,6 +24,8 @@ public class ContentRepository : IContentRepository {
 			.Where(x => x.DeletedAt == null)
 			.Select(x => new ContentReadDto {
 				Title = x.Title,
+				SubTitle = x.SubTitle,
+				Description = x.Description,
 				Type = x.Type,
 				UseCase = x.UseCase,
 				Media = x.Media!.Select(y => new MediaReadDto {
