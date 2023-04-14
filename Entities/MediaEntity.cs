@@ -16,13 +16,13 @@ public class MediaEntity : BaseEntity {
 
 	[StringLength(500)]
 	public string? Size { get; set; }
-	
+
 	[StringLength(500)]
 	public string? Time { get; set; }
-	
+
 	[StringLength(500)]
-	public string? Artist { get; set; }	
-	
+	public string? Artist { get; set; }
+
 	[StringLength(500)]
 	public string? Album { get; set; }
 
@@ -90,6 +90,18 @@ public class MediaEntity : BaseEntity {
 	public BookmarkEntity? Bookmark { get; set; }
 }
 
+public class MediaReadDto : BaseEntity {
+	public string? FileName { get; set; }
+	public string? UseCase { get; set; }
+	public string? Link { get; set; }
+	public string? Title { get; set; }
+	public string? Size { get; set; }
+	public string? Time { get; set; }
+	public string? Artist { get; set; }
+	public string? Album { get; set; }
+	public string Url => $"{Server.ServerAddress}/Medias/{FileName}";
+}
+
 public class UploadDto {
 	public string? UseCase { get; set; }
 	public string? UserId { get; set; }
@@ -118,4 +130,19 @@ public class UpdateMediaDto {
 	public string? Time { get; set; }
 	public string? Artist { get; set; }
 	public string? Album { get; set; }
+}
+
+public static class MediaEntityExtension {
+	public static IQueryable<MediaReadDto> MapContentReadDto(this IQueryable<MediaEntity> e) {
+		return e.Select(y => new MediaReadDto {
+			Link = y.Link,
+			UseCase = y.UseCase,
+			Album = y.Album,
+			Artist = y.Artist,
+			Size = y.Size,
+			Time = y.Time,
+			Title = y.Title,
+			FileName = y.FileName
+		});
+	}
 }

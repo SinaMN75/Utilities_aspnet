@@ -8,7 +8,7 @@ public class ContentController : BaseApiController {
 	public ContentController(IContentRepository repository) => _repository = repository;
 
 	[HttpGet]
-	public ActionResult<GenericResponse<IQueryable<ContentEntity>>> Read() => Result(_repository.Read());
+	public ActionResult<GenericResponse<IQueryable<ContentReadDto>>> Read() => Result(_repository.Read());
 
 	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

@@ -2,7 +2,7 @@
 
 public interface IContentRepository {
 	Task<GenericResponse<ContentEntity>> Create(ContentEntity dto);
-	GenericResponse<IQueryable<ContentEntity>> Read();
+	GenericResponse<IQueryable<ContentReadDto>> Read();
 	Task<GenericResponse<ContentEntity>> Update(ContentEntity dto);
 	Task<GenericResponse> Delete(Guid id);
 }
@@ -18,9 +18,10 @@ public class ContentRepository : IContentRepository {
 		return new GenericResponse<ContentEntity>(i.Entity);
 	}
 
-	public GenericResponse<IQueryable<ContentEntity>> Read() => new(_dbContext.Set<ContentEntity>()
-		                                                                .Where(x => x.DeletedAt == null)
-		                                                                .Include(x => x.Media).AsNoTracking());
+	public GenericResponse<IQueryable<ContentReadDto>> Read() {
+		IQueryable<ContentReadDto> e = _dbContext.Set<ContentEntity>().AsNoTracking().Where(x => x.DeletedAt == null).MapContentReadDto();
+		return new GenericResponse<IQueryable<ContentReadDto>>(e);
+	}
 
 	public async Task<GenericResponse<ContentEntity>> Update(ContentEntity dto) {
 		ContentEntity? e = await _dbContext.Set<ContentEntity>().Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
