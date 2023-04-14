@@ -1,9 +1,9 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
 public interface IContentRepository {
-	Task<GenericResponse<ContentEntity>> Create(ContentEntity dto);
+	Task<GenericResponse<ContentReadDto>> Create(ContentCreateUpdateDto dto);
 	GenericResponse<IQueryable<ContentReadDto>> Read();
-	Task<GenericResponse<ContentEntity>> Update(ContentEntity dto);
+	Task<GenericResponse<ContentReadDto>> Update(ContentCreateUpdateDto dto);
 	Task<GenericResponse> Delete(Guid id);
 }
 
@@ -12,10 +12,10 @@ public class ContentRepository : IContentRepository {
 
 	public ContentRepository(DbContext dbContext) => _dbContext = dbContext;
 
-	public async Task<GenericResponse<ContentEntity>> Create(ContentEntity dto) {
-		EntityEntry<ContentEntity> i = await _dbContext.Set<ContentEntity>().AddAsync(dto);
+	public async Task<GenericResponse<ContentReadDto>> Create(ContentCreateUpdateDto dto) {
+		EntityEntry<ContentEntity> e = await _dbContext.Set<ContentEntity>().AddAsync(dto.Map());
 		await _dbContext.SaveChangesAsync();
-		return new GenericResponse<ContentEntity>(i.Entity);
+		return new GenericResponse<ContentReadDto>(e.Entity.Map());
 	}
 
 	public GenericResponse<IQueryable<ContentReadDto>> Read() {
@@ -38,16 +38,15 @@ public class ContentRepository : IContentRepository {
 		return new GenericResponse<IQueryable<ContentReadDto>>(e);
 	}
 
-	public async Task<GenericResponse<ContentEntity>> Update(ContentEntity dto) {
-		ContentEntity? e = await _dbContext.Set<ContentEntity>().Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
-		if (e == null) return new GenericResponse<ContentEntity>(new ContentEntity());
+	public async Task<GenericResponse<ContentReadDto>> Update(ContentCreateUpdateDto dto) {
+		ContentEntity? e = await _dbContext.Set<ContentEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id);
 		e.UseCase = dto.UseCase ?? e.UseCase;
 		e.Title = dto.Title ?? e.Title;
 		e.SubTitle = dto.SubTitle ?? e.SubTitle;
 		e.Description = dto.Description ?? e.Description;
 		_dbContext.Update(e);
 		await _dbContext.SaveChangesAsync();
-		return new GenericResponse<ContentEntity>(e);
+		return new GenericResponse<ContentReadDto>(e.Map());
 	}
 
 	public async Task<GenericResponse> Delete(Guid id) {
