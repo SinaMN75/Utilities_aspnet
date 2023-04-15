@@ -80,8 +80,8 @@ public static class StartupExtension {
 
 		builder.Services.AddElmah<XmlFileErrorLog>(options => {
 			options.LogPath = "~/log";
+			options.Path = "elmah";
 		});
-		builder.Services.AddElmah(options => options.Path = "elmah");
 
 		builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 		builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();

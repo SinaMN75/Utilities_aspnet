@@ -31,22 +31,56 @@ public class CategoryRepository : ICategoryRepository {
 			return new GenericResponse<CategoryEntity>(i);
 		}
 	}
-	
+
 	public GenericResponse<IQueryable<CategoryEntity>> Filter(CategoryFilterDto dto) {
-		IQueryable<CategoryEntity> q = _dbContext.Set<CategoryEntity>();
-		q = q.Where(x => x.DeletedAt == null && x.ParentId == null);
+		IQueryable<CategoryEntity> q = _dbContext.Set<CategoryEntity>()
+			.Where(x => x.DeletedAt == null && x.ParentId == null)
+			.Select(x => new CategoryEntity {
+				Color = x.Color,
+				Date1 = x.Date1,
+				Date2 = x.Date2,
+				Id = x.Id,
+				Latitude = x.Latitude,
+				Link = x.Link,
+				Price = x.Price,
+				Stock = x.Stock,
+				Subtitle = x.Subtitle,
+				Title = x.Title,
+				Type = x.Type,
+				Value = x.Value,
+				TitleTr1 = x.TitleTr1,
+				TitleTr2 = x.TitleTr2,
+				UseCase = x.UseCase,
+				Longitude = x.Longitude,
+				Media = x.Media.Where(x => x.DeletedAt == null).Select(y => new MediaEntity {Id = y.Id, UseCase = y.UseCase, Title = y.Title}),
+				Children = x.Children.Where(x => x.DeletedAt == null).Select(y => new CategoryEntity {
+					Color = y.Color,
+					Date1 = y.Date1,
+					Date2 = y.Date2,
+					Id = y.Id,
+					Latitude = y.Latitude,
+					Link = y.Link,
+					Price = y.Price,
+					Stock = y.Stock,
+					Subtitle = y.Subtitle,
+					Title = y.Title,
+					Type = y.Type,
+					Value = y.Value,
+					TitleTr1 = y.TitleTr1,
+					TitleTr2 = y.TitleTr2,
+					UseCase = y.UseCase,
+					Longitude = y.Longitude,
+					Media = y.Media.Select(z => new MediaEntity {Id = y.Id, UseCase = z.UseCase, Title = z.Title})
+				}),
+			});
 
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
 		if (dto.Type.IsNotNullOrEmpty()) q = q.Where(x => (x.Type ?? "").Contains(dto.Type!));
-		if (dto.UseCase.IsNotNullOrEmpty()) q = q.Where(x => x.UseCase.Contains(dto.UseCase));
-		if (dto.TitleTr1.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr1.Contains(dto.TitleTr1));
-		if (dto.TitleTr2.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr2.Contains(dto.TitleTr2));
-		if (dto.TitleTr2.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr2.Contains(dto.TitleTr2));
+		if (dto.UseCase.IsNotNullOrEmpty()) q = q.Where(x => x.UseCase!.Contains(dto.UseCase!));
+		if (dto.TitleTr1.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr1!.Contains(dto.TitleTr1!));
+		if (dto.TitleTr2.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr2!.Contains(dto.TitleTr2!));
+		if (dto.TitleTr2.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr2!.Contains(dto.TitleTr2!));
 		if (dto.ParentId != null) q = q.Where(x => x.ParentId == dto.ParentId);
-
-		if (dto.ShowMedia.IsTrue()) q = q.Include(x => x.Media);
-
-		q = q.Include(i => i.Children.Where(x => x.DeletedAt == null)).ThenInclude(i => i.Media.Where(i => i.DeletedAt == null));
 
 		return new GenericResponse<IQueryable<CategoryEntity>>(q);
 	}
