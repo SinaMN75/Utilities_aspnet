@@ -76,10 +76,10 @@ public class CategoryRepository : ICategoryRepository {
 
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
 		if (dto.Type.IsNotNullOrEmpty()) q = q.Where(x => (x.Type ?? "").Contains(dto.Type!));
-		if (dto.UseCase.IsNotNullOrEmpty()) q = q.Where(x => x.UseCase!.Contains(dto.UseCase!));
-		if (dto.TitleTr1.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr1!.Contains(dto.TitleTr1!));
-		if (dto.TitleTr2.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr2!.Contains(dto.TitleTr2!));
-		if (dto.TitleTr2.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr2!.Contains(dto.TitleTr2!));
+		if (dto.UseCase.IsNotNullOrEmpty()) q = q.Where(x => x.UseCase.Contains(dto.UseCase!));
+		if (dto.TitleTr1.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr1.Contains(dto.TitleTr1!));
+		if (dto.TitleTr2.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr2.Contains(dto.TitleTr2!));
+		if (dto.TitleTr2.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr2.Contains(dto.TitleTr2!));
 		if (dto.ParentId != null) q = q.Where(x => x.ParentId == dto.ParentId);
 
 		return new GenericResponse<IQueryable<CategoryEntity>>(q);

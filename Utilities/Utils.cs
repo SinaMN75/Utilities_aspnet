@@ -1,7 +1,4 @@
-﻿using ElmahCore;
-using ElmahCore.Mvc;
-
-namespace Utilities_aspnet.Utilities;
+﻿namespace Utilities_aspnet.Utilities;
 
 public static class StartupExtension {
 	public static void SetupUtilities<T>(
@@ -77,12 +74,7 @@ public static class StartupExtension {
 			options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
 			options.UseCamelCasing(true);
 		});
-
-		builder.Services.AddElmah<XmlFileErrorLog>(options => {
-			options.LogPath = "~/log";
-			options.Path = "elmah";
-		});
-
+		
 		builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 		builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 		builder.Services.AddTransient<AppSettings>();
@@ -165,14 +157,13 @@ public static class StartupExtension {
 	public static void UseUtilitiesServices(this WebApplication app) {
 		app.UseIpRateLimiting();
 		app.UseCors(option => option.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-		app.UseElmahExceptionPage();
+		app.UseDeveloperExceptionPage();
 		app.UseResponseCaching();
 		app.UseUtilitiesSwagger();
 		app.UseStaticFiles();
 		app.UseAuthentication();
 		app.UseRouting();
 		app.UseAuthorization();
-		app.UseElmah();
 
 		app.MapHub<ChatHub>("/hubs/ChatHub");
 	}
