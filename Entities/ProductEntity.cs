@@ -78,7 +78,6 @@ public class ProductEntity : BaseEntity {
 	public double? DiscountPrice { get; set; }
 	public int? DiscountPercent { get; set; }
 	public int? VisitsCount { get; set; }
-	public bool? IsForSale { get; set; }
 	public bool? Enabled { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
@@ -214,7 +213,7 @@ public class ProductFilterDto {
 	public double? ResponseTime { get; set; }
 	public double? OnTimeDelivery { get; set; }
 	public bool? Enabled { get; set; }
-	public bool? IsForSale { get; set; }
+	public bool? IsFollowing { get; set; }
 	public bool? HasDiscount { get; set; }
 	public bool? ShowMedia { get; set; } = false;
 	public bool? ShowForms { get; set; } = false;
@@ -227,7 +226,6 @@ public class ProductFilterDto {
 	public bool? ShowReports { get; set; } = false;
 	public bool? ShowComments { get; set; } = false;
 	public bool? ShowOrders { get; set; } = false;
-	public bool? ShowTeams { get; set; } = false;
 	public bool? ShowCreator { get; set; } = false;
 	public bool? ShowCategoryMedia { get; set; } = false;
 	public bool? OrderByVotes { get; set; } = false;

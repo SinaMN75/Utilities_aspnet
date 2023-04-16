@@ -68,7 +68,7 @@ public class ProductRepository : IProductRepository {
 		IQueryable<ProductEntity> q = _dbContext.Set<ProductEntity>();
 		q = q.Where(x => x.DeletedAt == null);
 		if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.Now);
-		
+
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
 		if (dto.Subtitle.IsNotNullOrEmpty()) q = q.Where(x => (x.Subtitle ?? "").Contains(dto.Subtitle!));
 		if (dto.Type.IsNotNullOrEmpty()) q = q.Where(x => (x.Type ?? "").Contains(dto.Type!));
@@ -92,7 +92,6 @@ public class ProductRepository : IProductRepository {
 		if (dto.HasDiscount.IsTrue()) q = q.Where(x => x.DiscountPercent != null || x.DiscountPrice != null);
 		if (dto.EndPriceRange.HasValue) q = q.Where(x => x.Price <= dto.EndPriceRange);
 		if (dto.Enabled.HasValue) q = q.Where(x => x.Enabled == dto.Enabled);
-		if (dto.IsForSale.HasValue) q = q.Where(x => x.IsForSale == dto.IsForSale);
 		if (dto.VisitsCount.HasValue) q = q.Where(x => x.VisitsCount == dto.VisitsCount);
 		if (dto.Length.HasValue) q = q.Where(x => x.Length.ToInt() == dto.Length.ToInt());
 		if (dto.ResponseTime.HasValue) q = q.Where(x => x.ResponseTime.ToInt() == dto.ResponseTime.ToInt());
@@ -116,7 +115,7 @@ public class ProductRepository : IProductRepository {
 			                 (x.Description ?? "").Contains(dto.Query!));
 
 		if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories);
-		if (dto.ShowCategoriesFormFields.IsTrue()) q = q.Include(i => i.Categories).ThenInclude(i => i.FormFields);
+		if (dto.ShowCategoriesFormFields.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.FormFields);
 		if (dto.ShowCategoryMedia.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.Media);
 		if (dto.ShowComments.IsTrue()) q = q.Include(i => i.Comments)!.ThenInclude(i => i.LikeComments);
 		if (dto.ShowOrders.IsTrue()) q = q.Include(i => i.OrderDetails);
@@ -129,8 +128,8 @@ public class ProductRepository : IProductRepository {
 		if (dto.ShowCreator.IsTrue()) q = q.Include(i => i.User).ThenInclude(x => x!.Media);
 		if (dto.ShowCreator.IsTrue()) q = q.Include(i => i.User).ThenInclude(x => x!.Categories);
 		if (dto.ShowVisitProducts.IsTrue()) q = q.Include(i => i.VisitProducts);
-		if (dto.Categories != null && dto.Categories.Any()) q = q.Where(x => x.Categories.Any(y => dto.Categories.ToList().Contains(y.Id)));
-		if (dto.CategoriesAnd != null && dto.CategoriesAnd.Any()) q = q.Where(x => x.Categories.All(y => dto.CategoriesAnd.ToList().Contains(y.Id)));
+		if (dto.Categories != null && dto.Categories.Any()) q = q.Where(x => x.Categories!.Any(y => dto.Categories.ToList().Contains(y.Id)));
+		if (dto.CategoriesAnd != null && dto.CategoriesAnd.Any()) q = q.Where(x => x.Categories!.All(y => dto.CategoriesAnd.ToList().Contains(y.Id)));
 		if (dto.OrderByVotes.IsTrue()) q = q.OrderBy(x => x.VoteCount);
 		if (dto.OrderByVotesDecending.IsTrue()) q = q.OrderByDescending(x => x.VoteCount);
 		if (dto.OrderByAtoZ.IsTrue()) q = q.OrderBy(x => x.Title);
@@ -139,6 +138,11 @@ public class ProductRepository : IProductRepository {
 		if (dto.OrderByPriceDecending.IsTrue()) q = q.OrderByDescending(x => x.Price);
 		if (dto.OrderByCreatedDate.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 		if (dto.OrderByCreaedDateDecending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
+
+		if (_userId.IsNotNullOrEmpty()) {
+			UserEntity user = (await _userRepository.ReadByIdMinimal(_userId))!;
+			if (dto.IsFollowing.IsTrue()) q = q.Where(i => user.FollowingUsers.Contains(i.UserId!));
+		}
 
 		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
@@ -168,11 +172,12 @@ public class ProductRepository : IProductRepository {
 
 		if (_userId.IsNotNullOrEmpty()) {
 			UserEntity? user = await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == _userId, ct);
-			if (!user.VisitedProducts.Contains(i.Id.ToString())) await _userRepository.Update(new UserCreateUpdateDto {
+			if (!user.VisitedProducts.Contains(i.Id.ToString()))
+				await _userRepository.Update(new UserCreateUpdateDto {
 					Id = _userId,
 					VisitedProducts = user.VisitedProducts + "," + i.Id
 				});
-			
+
 			VisitProducts? vp = await _dbContext.Set<VisitProducts>().FirstOrDefaultAsync(a => a.UserId == user.Id && a.ProductId == i.Id, ct);
 			if (vp is null) {
 				VisitProducts visitProduct = new() {
@@ -261,7 +266,6 @@ public static class ProductEntityExtension {
 		entity.Description = dto.Description ?? entity.Description;
 		entity.UseCase = dto.UseCase ?? entity.UseCase;
 		entity.Price = dto.Price ?? entity.Price;
-		entity.IsForSale = dto.IsForSale ?? entity.IsForSale;
 		entity.Enabled = dto.Enabled ?? entity.Enabled;
 		entity.VisitsCount = dto.VisitsCount ?? entity.VisitsCount;
 		entity.Length = dto.Length ?? entity.Length;
@@ -315,7 +319,7 @@ public static class ProductEntityExtension {
 			entity.Teams = temp;
 		}
 
-        if (dto.ProductInsight is not null) {
+		if (dto.ProductInsight is not null) {
 			List<ProductInsight> productInsights = new();
 			ProductInsightDto? pInsight = dto.ProductInsight;
 			UserEntity? e = await context.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == pInsight.UserId);

@@ -12,6 +12,7 @@ public interface IUserRepository {
 	Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model);
 	Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList();
 	Task<GenericResponse> ToggleBlock(string userId);
+	Task<UserEntity?> ReadByIdMinimal(string? idOrUserName, string? token = null);
 }
 
 public class UserRepository : IUserRepository {
