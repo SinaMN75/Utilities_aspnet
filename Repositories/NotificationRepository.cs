@@ -15,7 +15,6 @@ public class NotificationRepository : INotificationRepository {
 	public NotificationRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) {
 		_dbContext = dbContext;
 		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
-
 	}
 
 	public GenericResponse<IQueryable<NotificationEntity>> Read() {
@@ -37,6 +36,7 @@ public class NotificationRepository : INotificationRepository {
 			.Include(x => x.Media)
 			.Include(x => x.CreatorUser).ThenInclude(x => x!.Media)
 			.Include(x => x.CreatorUser).ThenInclude(x => x!.Categories)
+			.Include(x => x.Product).ThenInclude(x => x!.Media)
 			.OrderByDescending(x => x.CreatedAt);
 
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));

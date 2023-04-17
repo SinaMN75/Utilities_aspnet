@@ -50,6 +50,7 @@ public class CommentRepository : ICommentRepository {
 
 		q = q.Include(x => x.User).ThenInclude(x => x!.Media)
 			.Include(x => x.Media)
+			.Include(x => x.Product).ThenInclude(x => x.Media)
 			.Include(x => x.LikeComments.Where(x => x.DeletedAt == null))
 			.Include(x => x.Children.Where(x => x.DeletedAt == null))!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
 			.OrderByDescending(x => x.CreatedAt)
@@ -96,15 +97,14 @@ public class CommentRepository : ICommentRepository {
 				.FirstOrDefault(x => x.Id == comment.ProductId);
 
 			if (product != null && product.UserId != _userId) {
-				string? linkMedia = product.Media?.OrderBy(x => x.CreatedAt).Select(x => x.FileName).FirstOrDefault();
-
 				await _notificationRepository.Create(new NotificationCreateUpdateDto {
 					UserId = product.UserId,
 					Message = dto.Comment ?? "",
 					Title = "Comment",
 					UseCase = "Comment",
 					CreatorUserId = comment.UserId,
-					Link = product.Id.ToString()
+					Link = product.Id.ToString(),
+					ProductId = product.Id
 				});
 			}
 		}

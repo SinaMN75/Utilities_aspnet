@@ -42,15 +42,8 @@ public class UserRepository : IUserRepository {
 			.Include(u => u.Products!.Where(x => x.DeletedAt == null)).ThenInclude(x => x.VoteFields)
 			.FirstOrDefaultAsync(u => isUserId ? u.Id == idOrUserName : u.UserName == idOrUserName);
 
-		if (entity == null)
-			return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
-
-		// entity.CountProducts = entity.Products?.Count();
-		// List<FollowEntity> follower = await _dbContext.Set<FollowEntity>().Where(x => x.FollowsUserId == entity.Id).ToListAsync();
-		// entity.CountFollowers = follower.Count;
-		// List<FollowEntity> following = await _dbContext.Set<FollowEntity>().Where(x => x.FollowerUserId == entity.Id).ToListAsync();
-		// entity.CountFollowing = following.Count;
-
+		if (entity == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
+		
 		entity.IsAdmin = await _userManager.IsInRoleAsync(entity, "Admin");
 		entity.Token = token;
 		entity.GrowthRate = GetGrowthRate(entity.Id).Result;
@@ -59,14 +52,6 @@ public class UserRepository : IUserRepository {
 
 		entity.CountFollowing = entity.FollowingUsers.Split(",").Length;
 		entity.CountFollowers = entity.FollowedUsers.Split(",").Length;
-
-		// try {
-		// 	if (_userId != null) {
-		// 		entity.IsFollowing = await _dbContext.Set<FollowEntity>()
-		// 			.AnyAsync(x => x.FollowsUserId == entity.Id && x.FollowerUserId == _userId);
-		// 	}
-		// }
-		// catch { }
 
 		return new GenericResponse<UserEntity?>(entity);
 	}
@@ -138,11 +123,6 @@ public class UserRepository : IUserRepository {
 		if (dto.ShowSuspend.IsTrue()) q = q.Where(x => x.Suspend == true);
 
 		if (dto.OrderByUserName.IsTrue()) q = q.OrderBy(x => x.UserName);
-
-		// List<UserEntity> entity = await q.AsNoTracking().ToListAsync();
-		// if (_userId != null)
-		// 	foreach (UserEntity item in entity)
-		// 		item.IsFollowing = await _dbContext.Set<FollowEntity>().AnyAsync(x => x.FollowsUserId == item.Id && x.FollowerUserId == _userId);
 
 		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
@@ -390,31 +370,7 @@ public class UserRepository : IUserRepository {
 		IEnumerable<CommentEntity> myComments = await _dbContext.Set<CommentEntity>().Where(x => x.UserId == id).ToListAsync();
 		IEnumerable<Guid> productIds = await _dbContext.Set<ProductEntity>().Where(x => x.UserId == id).Select(x => x.Id).ToListAsync();
 		IEnumerable<CommentEntity> comments = await _dbContext.Set<CommentEntity>().Where(x => productIds.Contains(x.ProductId ?? Guid.Empty)).ToListAsync();
-
-		// IEnumerable<FollowEntity> follower = await _dbContext.Set<FollowEntity>().Where(x => x.FollowsUserId == id).ToListAsync();
-		// IEnumerable<FollowEntity> following = await _dbContext.Set<FollowEntity>().Where(x => x.FollowerUserId == id).ToListAsync();
-
-		DateTime saturday = DateTime.Today.AddDays(-(int) DateTime.Today.DayOfWeek + (int) DayOfWeek.Saturday);
-		DateTime sunday = DateTime.Today.AddDays(-(int) DateTime.Today.DayOfWeek);
-		DateTime monday = DateTime.Today.AddDays(-(int) DateTime.Today.DayOfWeek + (int) DayOfWeek.Monday);
-		DateTime tuesday = DateTime.Today.AddDays(-(int) DateTime.Today.DayOfWeek + (int) DayOfWeek.Tuesday);
-		DateTime wednesday = DateTime.Today.AddDays(-(int) DateTime.Today.DayOfWeek + (int) DayOfWeek.Wednesday);
-		DateTime thursday = DateTime.Today.AddDays(-(int) DateTime.Today.DayOfWeek + (int) DayOfWeek.Thursday);
-
 		GrowthRateReadDto dto = new() {
-			// InterActive1 = myComments.Count(x => x.CreatedAt?.Date == saturday) + following.Count(x => x.CreatedAt?.Date == saturday),
-			// InterActive2 = myComments.Count(x => x.CreatedAt?.Date == sunday) + following.Count(x => x.CreatedAt?.Date == sunday),
-			// InterActive3 = myComments.Count(x => x.CreatedAt?.Date == monday) + following.Count(x => x.CreatedAt?.Date == monday),
-			// InterActive4 = myComments.Count(x => x.CreatedAt?.Date == tuesday) + following.Count(x => x.CreatedAt?.Date == tuesday),
-			// InterActive5 = myComments.Count(x => x.CreatedAt?.Date == wednesday) + following.Count(x => x.CreatedAt?.Date == wednesday),
-			// InterActive6 = myComments.Count(x => x.CreatedAt?.Date == thursday) + following.Count(x => x.CreatedAt?.Date == thursday),
-			// InterActive7 = 0,
-			// Feedback1 = comments.Count(x => x.CreatedAt?.Date == saturday) + follower.Count(x => x.CreatedAt?.Date == saturday),
-			// Feedback2 = comments.Count(x => x.CreatedAt?.Date == sunday) + follower.Count(x => x.CreatedAt?.Date == sunday),
-			// Feedback3 = comments.Count(x => x.CreatedAt?.Date == monday) + follower.Count(x => x.CreatedAt?.Date == monday),
-			// Feedback4 = comments.Count(x => x.CreatedAt?.Date == tuesday) + follower.Count(x => x.CreatedAt?.Date == tuesday),
-			// Feedback5 = comments.Count(x => x.CreatedAt?.Date == wednesday) + follower.Count(x => x.CreatedAt?.Date == wednesday),
-			// Feedback6 = comments.Count(x => x.CreatedAt?.Date == thursday) + follower.Count(x => x.CreatedAt?.Date == thursday),
 			Feedback7 = 0,
 			Id = id
 		};

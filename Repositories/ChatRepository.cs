@@ -358,11 +358,14 @@ public class ChatRepository : IChatRepository
             .Where(x => x.GroupChatId == id && x.DeletedAt == null)
             .Include(x => x.Media)
             .Include(x => x.Products)!.ThenInclude(x => x.Media)
+            .Include(x => x.Products)!.ThenInclude(x => x.User).ThenInclude(x => x.Media)
             .Include(x => x.Parent).ThenInclude(x => x.Media)
+            .Include(x => x.Parent).ThenInclude(x => x.Products).ThenInclude(x => x.Media)
+            .Include(x => x.Parent).ThenInclude(x => x.User).ThenInclude(x => x.Media)
             .Include(x => x.User).ThenInclude(x => x.Media)
             .Include(x => x.ForwardedMessage).ThenInclude(x => x.Media)
             .Include(x => x.ForwardedMessage).ThenInclude(x => x.Products)!.ThenInclude(x => x.Media)
-            .Include(x => x.ForwardedMessage).ThenInclude(x => x.Parent)!.ThenInclude(x => x.Media)
+            .Include(x => x.ForwardedMessage).ThenInclude(x => x.Parent).ThenInclude(x => x.Media)
             .Include(x => x.ForwardedMessage).ThenInclude(x => x.User).ThenInclude(x => x.Media)
             .OrderBy(o => o.CreatedAt)
             .AsNoTracking();
@@ -375,7 +378,7 @@ public class ChatRepository : IChatRepository
             foreach (var seenTbl in messageSeen)
             {
                 var lastMessageThatUserSeened = e.FirstOrDefault(f => f.Id == seenTbl.Fk_GroupChatMessage);
-                var user = _dbContext.Set<UserEntity>().Where(w => w.Id == seenTbl.Fk_UserId).FirstOrDefault();
+                var user = _dbContext.Set<UserEntity>().Where(w => w.Id == seenTbl.Fk_UserId).Include(x => x.Media).FirstOrDefault();
                 if (user is not null && (lastMessageThatUserSeened?.CreatedAt > item.CreatedAt || lastMessageThatUserSeened?.Id == item.Id))
                     usersMessage.Add(user);
             }

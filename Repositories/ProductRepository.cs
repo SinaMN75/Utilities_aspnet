@@ -140,8 +140,10 @@ public class ProductRepository : IProductRepository {
 		if (dto.OrderByCreaedDateDecending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 
 		if (_userId.IsNotNullOrEmpty()) {
-			UserEntity user = (await _userRepository.ReadByIdMinimal(_userId))!;
-			if (dto.IsFollowing.IsTrue()) q = q.Where(i => user.FollowingUsers.Contains(i.UserId!));
+			if (dto.IsFollowing.IsTrue()) {
+				UserEntity user = (await _userRepository.ReadByIdMinimal(_userId))!;
+				q = q.Where(i => user.FollowingUsers.Contains(i.UserId!));
+			}
 		}
 
 		int totalCount = await q.CountAsync();
@@ -217,11 +219,9 @@ public class ProductRepository : IProductRepository {
 			.Where(x => x.Id == dto.Id)
 			.FirstOrDefaultAsync(ct);
 
-		if (entity == null)
-			return new GenericResponse<ProductEntity>(new ProductEntity());
+		if (entity == null) return new GenericResponse<ProductEntity>(new ProductEntity());
 
-		if (dto.ProductInsight is not null)
-			dto.ProductInsight.UserId = _userId;
+		if (dto.ProductInsight is not null) dto.ProductInsight.UserId = _userId;
 
 		ProductEntity e = await entity.FillData(dto, _dbContext);
 		_dbContext.Update(e);

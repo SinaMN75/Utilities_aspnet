@@ -28,6 +28,9 @@ public class NotificationEntity : BaseEntity {
 
 	[ForeignKey(nameof(CreatorUserId))]
 	public UserEntity? CreatorUser { get; set; }
+
+	public ProductEntity? Product { get; set; }
+	public Guid? ProductId { get; set; }
 }
 
 public class NotificationCreateUpdateDto {
@@ -37,6 +40,7 @@ public class NotificationCreateUpdateDto {
 	public string? Message { get; set; }
 	public string? Link { get; set; }
 	public string? UseCase { get; set; }
+	public Guid? ProductId { get; set; }
 }
 
 public class NotificationFilterDto {
