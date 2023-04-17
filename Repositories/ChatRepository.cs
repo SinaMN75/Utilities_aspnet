@@ -249,7 +249,7 @@ public class ChatRepository : IChatRepository
         foreach (var item in e)
         {
             int countOfMessage = 0;
-            var seenUsers = _dbContext.Set<SeenUsers>().Where(w => w.Fk_GroupChat == item.Id).FirstOrDefault();
+            var seenUsers = _dbContext.Set<SeenUsers>().FirstOrDefault(w => w.Fk_GroupChat == item.Id && w.Fk_UserId == _userId);
             var groupchatMessages = _dbContext.Set<GroupChatMessageEntity>().Where(w => w.GroupChatId == item.Id);
             if (seenUsers is null)
                 countOfMessage = groupchatMessages.Count();
@@ -337,7 +337,7 @@ public class ChatRepository : IChatRepository
         if (e != null)
         {
             int countOfMessage = 0;
-            var seenUsers = _dbContext.Set<SeenUsers>().Where(w => w.Fk_GroupChat == e.Id).FirstOrDefault();
+            var seenUsers = _dbContext.Set<SeenUsers>().FirstOrDefault(w => w.Fk_GroupChat == e.Id && w.Fk_UserId == _userId);
             var groupchatMessages = _dbContext.Set<GroupChatMessageEntity>().Where(w => w.GroupChatId == e.Id);
             if (seenUsers is null)
                 countOfMessage = groupchatMessages.Count();
@@ -359,13 +359,13 @@ public class ChatRepository : IChatRepository
             .Include(x => x.Media)
             .Include(x => x.Products)!.ThenInclude(x => x.Media)
             .Include(x => x.Products)!.ThenInclude(x => x.User).ThenInclude(x => x.Media)
-            .Include(x => x.Parent).ThenInclude(x => x.Media)
-            .Include(x => x.Parent).ThenInclude(x => x.Products).ThenInclude(x => x.Media)
+            .Include(x => x.Parent)!.ThenInclude(x => x.Media)
+            .Include(x => x.Parent)!.ThenInclude(x => x.Products).ThenInclude(x => x.Media)
             .Include(x => x.Parent).ThenInclude(x => x.User).ThenInclude(x => x.Media)
-            .Include(x => x.User).ThenInclude(x => x.Media)
-            .Include(x => x.ForwardedMessage).ThenInclude(x => x.Media)
+            .Include(x => x.User)!.ThenInclude(x => x.Media)
+            .Include(x => x.ForwardedMessage)!.ThenInclude(x => x.Media)
             .Include(x => x.ForwardedMessage).ThenInclude(x => x.Products)!.ThenInclude(x => x.Media)
-            .Include(x => x.ForwardedMessage).ThenInclude(x => x.Parent).ThenInclude(x => x.Media)
+            .Include(x => x.ForwardedMessage)!.ThenInclude(x => x.Parent)!.ThenInclude(x => x.Media)
             .Include(x => x.ForwardedMessage).ThenInclude(x => x.User).ThenInclude(x => x.Media)
             .OrderBy(o => o.CreatedAt)
             .AsNoTracking();
