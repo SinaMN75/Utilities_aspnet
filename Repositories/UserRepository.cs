@@ -48,7 +48,10 @@ public class UserRepository : IUserRepository {
 		entity.Token = token;
 		entity.GrowthRate = GetGrowthRate(entity.Id).Result;
 
-		if (entity.FollowingUsers.Contains(entity.Id)) entity.IsFollowing = true;
+		if (_userId.IsNotNullOrEmpty()) {
+			UserEntity myUser = (await ReadByIdMinimal(_userId))!;
+			if (myUser.FollowingUsers.Contains(entity.Id)) entity.IsFollowing = true;
+		}
 
 		foreach (string i in entity.FollowingUsers.Split(","))
 			if (i.Length >= 10)
