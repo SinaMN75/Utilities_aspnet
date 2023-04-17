@@ -117,10 +117,10 @@ public class UserEntity : IdentityUser {
 	public int? CountProducts { get; set; }
 
 	[NotMapped]
-	public int? CountFollowers { get; set; }
+	public int? CountFollowers { get; set; } = 0;
 
 	[NotMapped]
-	public int? CountFollowing { get; set; }
+	public int? CountFollowing { get; set; } = 0;
 
 	[NotMapped]
 	public bool IsAdmin { get; set; }

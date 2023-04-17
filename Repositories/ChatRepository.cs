@@ -240,7 +240,7 @@ public class ChatRepository : IChatRepository
             .Include(x => x.Products).ThenInclude(x => x.Categories)
             .Include(x => x.Products).ThenInclude(x => x.Comments)
             .Include(x => x.Products).ThenInclude(x => x.User)
-            .Include(x => x.GroupChatMessage.TakeLast(1))
+            .Include(x => x.GroupChatMessage.Take(1))
             .Where(x => x.DeletedAt == null)
             .AsNoTracking();
 
