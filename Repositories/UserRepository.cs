@@ -43,15 +43,19 @@ public class UserRepository : IUserRepository {
 			.FirstOrDefaultAsync(u => isUserId ? u.Id == idOrUserName : u.UserName == idOrUserName);
 
 		if (entity == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
-		
+
 		entity.IsAdmin = await _userManager.IsInRoleAsync(entity, "Admin");
 		entity.Token = token;
 		entity.GrowthRate = GetGrowthRate(entity.Id).Result;
 
 		if (entity.FollowingUsers.Contains(entity.Id)) entity.IsFollowing = true;
 
-		entity.CountFollowing = entity.FollowingUsers.Split(",").Length;
-		entity.CountFollowers = entity.FollowedUsers.Split(",").Length;
+		foreach (string i in entity.FollowingUsers.Split(","))
+			if (i.Length >= 10)
+				entity.CountFollowing += 1;
+		foreach (string i in entity.FollowedUsers.Split(","))
+			if (i.Length >= 10)
+				entity.CountFollowers += 1;
 
 		return new GenericResponse<UserEntity?>(entity);
 	}
