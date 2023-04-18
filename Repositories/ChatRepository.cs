@@ -148,7 +148,8 @@ public class ChatRepository : IChatRepository
                 .Include(x => x.Media)
                 .FirstOrDefaultAsync(x => x.Users.Count() == 2 &&
                                           x.Users.Any(x => x.Id == firstUserId) &&
-                                          x.Users.Any(x => x.Id == secondUserId));
+                                          x.Users.Any(x => x.Id == secondUserId) &&
+                                          x.DeletedAt == null);
             if (e == null) return await CreateGroupChatLogic(dto);
             return new GenericResponse<GroupChatEntity?>(e);
         }

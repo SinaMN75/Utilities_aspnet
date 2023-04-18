@@ -39,14 +39,7 @@ public class ContentReadDto {
 }
 
 public static class ContentExtension {
-	public static ContentReadDto Map(this ContentEntity e) => new() {
-		Description = e.Description,
-		Title = e.Title,
-		Type = e.Type,
-		SubTitle = e.SubTitle,
-		UseCase = e.UseCase
-	};
-	
+
 	public static ContentEntity Map(this ContentCreateUpdateDto e) => new() {
 		Description = e.Description,
 		Title = e.Title,
