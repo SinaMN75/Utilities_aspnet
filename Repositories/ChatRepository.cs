@@ -212,26 +212,24 @@ public class ChatRepository : IChatRepository {
 
 	public async Task<GenericResponse<IQueryable<GroupChatEntity>?>> ReadMyGroupChats() {
 		List<GroupChatEntity> e = await _dbContext.Set<GroupChatEntity>().AsNoTracking().Where(x => x.DeletedAt == null)
-			.Where(x => x.DeletedAt == null && x.Users.Any(y => y.Id == _userId))
-			.Include(x => x.Users).ThenInclude(x => x.Media)
+			.Where(x => x.DeletedAt == null && x.Users!.Any(y => y.Id == _userId))
+			.Include(x => x.Users)!.ThenInclude(x => x.Media)
 			.Include(x => x.Media)
-			.Include(x => x.Products).ThenInclude(x => x.Media)
-			.Include(x => x.Products).ThenInclude(x => x.Categories)
-			.Include(x => x.Products).ThenInclude(x => x.Comments)
-			.Include(x => x.Products).ThenInclude(x => x.User)
-			.Include(x => x.GroupChatMessage.OrderByDescending(y => y.CreatedAt).Take(1)).ThenInclude(x => x.Media)
+			.Include(x => x.Products)!.ThenInclude(x => x.Media)
+			.Include(x => x.Products)!.ThenInclude(x => x.Categories)
+			.Include(x => x.Products)!.ThenInclude(x => x.Comments)
+			.Include(x => x.Products)!.ThenInclude(x => x.User)
+			.Include(x => x.GroupChatMessage!.OrderByDescending(y => y.CreatedAt).Take(1)).ThenInclude(x => x.Media)
 			.ToListAsync();
 		
-		foreach (GroupChatEntity groupChatEntity in e) {
-			if (groupChatEntity.Type == ChatType.Private) {
-				if (groupChatEntity.Users.First().Id == _userId) {
-					UserEntity u = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == groupChatEntity.Users.Last().Id))!;
-					groupChatEntity.Title = u.AppUserName;
-				}
-				else {
-					UserEntity u = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == groupChatEntity.Users.First().Id))!;
-					groupChatEntity.Title = u.AppUserName;
-				}
+		foreach (GroupChatEntity groupChatEntity in e.Where(groupChatEntity => groupChatEntity.Type == ChatType.Private)) {
+			if (groupChatEntity.Users!.First().Id == _userId) {
+				UserEntity u = (await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == groupChatEntity.Users!.Last().Id))!;
+				groupChatEntity.Title = u.AppUserName;
+			}
+			else {
+				UserEntity u = (await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == groupChatEntity.Users!.First().Id))!;
+				groupChatEntity.Title = u.AppUserName;
 			}
 		}
 
