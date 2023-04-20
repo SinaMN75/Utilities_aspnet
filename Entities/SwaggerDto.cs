@@ -71,24 +71,14 @@ public class CommentReadDto : BaseEntity {
 	public IEnumerable<CommentReadDto>? Children { get; set; }
 	public IEnumerable<MediaReadDto>? Media { get; set; }
 	public IEnumerable<LikeCommentReadDto>? LikeComments { get; set; }
-	public IEnumerable<ReportReadDto>? Reports { get; set; }
 	public IEnumerable<CommentReacts>? CommentReacts { get; set; }
 	public bool IsLiked { get; set; }
-}
-
-public class CommentReactsReadDto : BaseEntity {
-	public Reaction? Reaction { get; set; }
-	public string? UserId { get; set; }
-	public CommentReadDto? Comment { get; set; }
-	public Guid? CommentId { get; set; }
 }
 
 public class LikeCommentReadDto : BaseEntity {
 	public double? Score { get; set; } = 0;
 	public UserReadDto? User { get; set; }
 	public string? UserId { get; set; }
-	public CommentReadDto? Comment { get; set; }
-	public Guid? CommentId { get; set; }
 }
 
 public class ContentReadDto {
@@ -122,12 +112,6 @@ public class FormFieldReadDto : BaseEntity {
 	public string? UseCase { get; set; }
 	public bool? IsRequired { get; set; } = false;
 	public FormFieldType? Type { get; set; }
-	public Guid? ParentId { get; set; }
-	public FormFieldReadDto? Parent { get; set; }
-	public IEnumerable<FormFieldReadDto>? Children { get; set; }
-	public Guid? CategoryId { get; set; }
-	public CategoryReadDto? Category { get; set; }
-	public IEnumerable<FormReadDto>? Forms { get; set; }
 }
 
 public class MediaReadDto : BaseEntity {
@@ -189,7 +173,6 @@ public class OrderDetailReadDto : BaseEntity {
 	public Guid? ProductId { get; set; }
 	public CategoryReadDto? Category { get; set; }
 	public Guid? CategoryId { get; set; }
-	public IEnumerable<FormReadDto>? Forms { get; set; }
 }
 
 public class ProductReadDto : BaseEntity {
@@ -252,20 +235,13 @@ public class ProductReadDto : BaseEntity {
 public class ReportReadDto : BaseEntity {
 	public string? Title { get; set; }
 	public string? Description { get; set; }
-	public string? CreatorUserId { get; set; }
 	public UserReadDto? CreatorUser { get; set; }
-	public string? UserId { get; set; }
 	public UserReadDto? User { get; set; }
-	public Guid? ProductId { get; set; }
 	public ProductReadDto? Product { get; set; }
 	public CommentReadDto? Comment { get; set; }
-	public Guid? CommentId { get; set; }
 	public ChatReadDto? Chat { get; set; }
-	public Guid? ChatId { get; set; }
 	public GroupChatMessageReadDto? GroupChatMessage { get; set; }
-	public Guid? GroupChatMessageId { get; set; }
 	public GroupChatReadDto? GroupChat { get; set; }
-	public Guid? GroupChatId { get; set; }
 	public ReportType ReportType { get; set; } = ReportType.All;
 }
 
@@ -328,9 +304,7 @@ public class UserReadDto : IdentityUser {
 	public string? AccessLevel { get; set; }
 	public string? Badge { get; set; }
 	public bool IsOnline { get; set; } = false;
-	public IEnumerable<FormReadDto>? FormBuilders { get; set; }
 	public IEnumerable<MediaReadDto>? Media { get; set; }
-	public IEnumerable<ProductReadDto>? Products { get; set; }
 	public IEnumerable<CategoryReadDto>? Categories { get; set; }
 	public bool IsFollowing { get; set; } = false;
 	public int? CountProducts { get; set; }
@@ -338,5 +312,4 @@ public class UserReadDto : IdentityUser {
 	public int? CountFollowing { get; set; } = 0;
 	public bool IsAdmin { get; set; }
 	public string? Token { get; set; }
-	public GrowthRateReadDto? GrowthRate { get; set; }
 }
