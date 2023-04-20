@@ -125,7 +125,7 @@ public class PaymentRepository : IPaymentRepository {
 			_dbContext.Set<TransactionEntity>().Update(pay);
 		}
 		order.Status = OrderStatuses.Paid;
-		
+
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}

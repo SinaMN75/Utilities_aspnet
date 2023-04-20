@@ -74,7 +74,7 @@ public static class StartupExtension {
 			options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
 			options.UseCamelCasing(true);
 		});
-		
+
 		builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 		builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 		builder.Services.AddTransient<AppSettings>();

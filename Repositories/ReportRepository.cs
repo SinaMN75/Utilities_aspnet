@@ -11,11 +11,9 @@ public class ReportRepository : IReportRepository {
 	private readonly DbContext _dbContext;
 	private readonly string? _userId;
 
-
 	public ReportRepository(DbContext context, IHttpContextAccessor httpContextAccessor) {
 		_dbContext = context;
 		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
-
 	}
 
 	public async Task<GenericResponse<ReportEntity?>> Create(ReportEntity dto) {

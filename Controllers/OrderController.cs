@@ -14,20 +14,20 @@ public class OrderController : BaseApiController {
 
 	[HttpPut]
 	public async Task<ActionResult<GenericResponse<OrderEntity?>>> Update(OrderCreateUpdateDto dto) => Result(await _repository.Update(dto));
-	
+
 	[HttpPost("Filter")]
 	public ActionResult<GenericResponse<IEnumerable<OrderEntity>>> Filter(OrderFilterDto dto) => Result(_repository.Filter(dto));
-	
+
 	[HttpGet("{id:guid}")]
 	public async Task<ActionResult<GenericResponse<OrderEntity>>> ReadById(Guid id) => Result(await _repository.ReadById(id));
-	
+
 	[HttpDelete("{id:guid}")]
 	public async Task<ActionResult<GenericResponse<OrderEntity>>> Delete(Guid id) => Result(await _repository.Delete(id));
-	
+
 	[HttpPost("CreateOrderDetailToOrder")]
 	public async Task<ActionResult<GenericResponse<OrderEntity>>> CreateOrderDetailToOrder(OrderDetailCreateUpdateDto dto)
 		=> Result(await _repository.CreateOrderDetail(dto));
-	
+
 	[HttpDelete("DeleteOrderDetail")]
 	public async Task<ActionResult<GenericResponse<OrderEntity>>> DeleteOrderDetail(Guid id) => Result(await _repository.DeleteOrderDetail(id));
 }

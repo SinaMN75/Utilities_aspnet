@@ -56,7 +56,7 @@ public class GroupChatEntity : BaseEntity {
 	public string? CreatorUserId { get; set; }
 
 	public ChatStatus? ChatStatus { get; set; }
-	
+
 	public ChatType? Type { get; set; }
 
 	public Priority? Priority { get; set; }

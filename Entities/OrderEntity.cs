@@ -50,7 +50,7 @@ public class OrderDetailEntity : BaseEntity {
 
 	public CategoryEntity? Category { get; set; }
 	public Guid? CategoryId { get; set; }
-	
+
 	public IEnumerable<FormEntity>? Forms { get; set; }
 }
 

@@ -53,7 +53,7 @@ public class UserEntity : IdentityUser {
 
 	[StringLength(500)]
 	public string? UseCase { get; set; }
-	
+
 	[StringLength(500)]
 	public string? Type { get; set; }
 

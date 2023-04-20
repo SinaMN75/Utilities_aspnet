@@ -40,10 +40,10 @@ public class BookmarkEntity : BaseEntity {
 
 	public Guid? ParentId { get; set; }
 	public BookmarkEntity? Parent { get; set; }
-	
+
 	[InverseProperty("Parent")]
 	public IEnumerable<BookmarkEntity>? Children { get; set; }
-	
+
 	public IEnumerable<MediaEntity>? Media { get; set; }
 }
 

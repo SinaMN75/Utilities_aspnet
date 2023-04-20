@@ -12,11 +12,9 @@ public class DiscountRepository : IDiscountRepository {
 	private readonly DbContext _dbContext;
 	private readonly string? _userId;
 
-
 	public DiscountRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) {
 		_dbContext = dbContext;
 		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
-
 	}
 
 	public async Task<GenericResponse<DiscountEntity>> Create(DiscountEntity dto) {
