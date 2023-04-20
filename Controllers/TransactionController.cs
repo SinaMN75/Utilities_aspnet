@@ -9,11 +9,11 @@ public class TransactionController : BaseApiController {
 	public TransactionController(ITransactionRepository repository) => _repository = repository;
 
 	[HttpPost]
-	public async Task<ActionResult<GenericResponse<TransactionReadDto>>> Create(TransactionEntity dto) => Result(await _repository.Create(dto));
+	public async Task<ActionResult<GenericResponse<TransactionEntity>>> Create(TransactionEntity dto) => Result(await _repository.Create(dto));
 
 	[HttpGet]
-	public ActionResult<GenericResponse<IQueryable<TransactionReadDto>>> Read() => Result(_repository.Read());
+	public ActionResult<GenericResponse<IQueryable<TransactionEntity>>> Read() => Result(_repository.Read());
 
 	[HttpGet("Mine")]
-	public ActionResult<GenericResponse<IQueryable<TransactionReadDto>>> ReadMine() => Result(_repository.ReadMine());
+	public ActionResult<GenericResponse<IQueryable<TransactionEntity>>> ReadMine() => Result(_repository.ReadMine());
 }

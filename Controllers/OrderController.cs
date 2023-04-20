@@ -10,24 +10,24 @@ public class OrderController : BaseApiController {
 	public OrderController(IOrderRepository repository) => _repository = repository;
 
 	[HttpPost]
-	public async Task<ActionResult<GenericResponse<OrderReadDto?>>> Create(OrderCreateUpdateDto dto) => Result(await _repository.Create(dto));
+	public async Task<ActionResult<GenericResponse<OrderEntity?>>> Create(OrderCreateUpdateDto dto) => Result(await _repository.Create(dto));
 
 	[HttpPut]
-	public async Task<ActionResult<GenericResponse<OrderReadDto?>>> Update(OrderCreateUpdateDto dto) => Result(await _repository.Update(dto));
+	public async Task<ActionResult<GenericResponse<OrderEntity?>>> Update(OrderCreateUpdateDto dto) => Result(await _repository.Update(dto));
 
 	[HttpPost("Filter")]
-	public ActionResult<GenericResponse<IEnumerable<OrderReadDto>>> Filter(OrderFilterDto dto) => Result(_repository.Filter(dto));
+	public ActionResult<GenericResponse<IEnumerable<OrderEntity>>> Filter(OrderFilterDto dto) => Result(_repository.Filter(dto));
 
 	[HttpGet("{id:guid}")]
-	public async Task<ActionResult<GenericResponse<OrderReadDto>>> ReadById(Guid id) => Result(await _repository.ReadById(id));
+	public async Task<ActionResult<GenericResponse<OrderEntity>>> ReadById(Guid id) => Result(await _repository.ReadById(id));
 
 	[HttpDelete("{id:guid}")]
-	public async Task<ActionResult<GenericResponse<OrderReadDto>>> Delete(Guid id) => Result(await _repository.Delete(id));
+	public async Task<ActionResult<GenericResponse<OrderEntity>>> Delete(Guid id) => Result(await _repository.Delete(id));
 
 	[HttpPost("CreateOrderDetailToOrder")]
-	public async Task<ActionResult<GenericResponse<OrderReadDto>>> CreateOrderDetailToOrder(OrderDetailCreateUpdateDto dto)
+	public async Task<ActionResult<GenericResponse<OrderEntity>>> CreateOrderDetailToOrder(OrderDetailCreateUpdateDto dto)
 		=> Result(await _repository.CreateOrderDetail(dto));
 
 	[HttpDelete("DeleteOrderDetail")]
-	public async Task<ActionResult<GenericResponse<OrderReadDto>>> DeleteOrderDetail(Guid id) => Result(await _repository.DeleteOrderDetail(id));
+	public async Task<ActionResult<GenericResponse<OrderEntity>>> DeleteOrderDetail(Guid id) => Result(await _repository.DeleteOrderDetail(id));
 }

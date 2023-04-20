@@ -26,16 +26,16 @@ public class UserController : BaseApiController {
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	[AllowAnonymous]
 	[HttpPost("Filter")]
-	public async Task<ActionResult<GenericResponse<IEnumerable<UserReadDto>>>> Filter(UserFilterDto dto) => Result(await _repository.Filter(dto));
+	public async Task<ActionResult<GenericResponse<IEnumerable<UserEntity>>>> Filter(UserFilterDto dto) => Result(await _repository.Filter(dto));
 
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	[AllowAnonymous]
 	[HttpGet("{id}")]
-	public async Task<ActionResult<GenericResponse<UserReadDto?>>> ReadById(string id) => Result(await _repository.ReadById(id));
+	public async Task<ActionResult<GenericResponse<UserEntity?>>> ReadById(string id) => Result(await _repository.ReadById(id));
 
 	[HttpPut]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse<UserReadDto>>> Update(UserCreateUpdateDto dto) => Result(await _repository.Update(dto));
+	public async Task<ActionResult<GenericResponse<UserEntity>>> Update(UserCreateUpdateDto dto) => Result(await _repository.Update(dto));
 
 	[HttpDelete("{id}")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -43,7 +43,7 @@ public class UserController : BaseApiController {
 
 	[HttpGet("ReadMyBlockList")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse<IQueryable<UserReadDto>>>> ReadMine() => Result(await _repository.ReadMyBlockList());
+	public async Task<ActionResult<GenericResponse<IQueryable<UserEntity>>>> ReadMine() => Result(await _repository.ReadMyBlockList());
 
 	[HttpPost("ToggleBlock")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

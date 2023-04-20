@@ -8,15 +8,15 @@ public class ContentController : BaseApiController {
 	public ContentController(IContentRepository repository) => _repository = repository;
 
 	[HttpGet]
-	public ActionResult<GenericResponse<IQueryable<ContentReadDto>>> Read() => Result(_repository.Read());
+	public ActionResult<GenericResponse<IQueryable<ContentEntity>>> Read() => Result(_repository.Read());
 
 	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse<ContentReadDto>>> Create(ContentCreateUpdateDto dto) => Result(await _repository.Create(dto));
+	public async Task<ActionResult<GenericResponse<ContentEntity>>> Create(ContentCreateUpdateDto dto) => Result(await _repository.Create(dto));
 
 	[HttpPut]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse<ContentReadDto>>> Update(ContentCreateUpdateDto dto) => Result(await _repository.Update(dto));
+	public async Task<ActionResult<GenericResponse<ContentEntity>>> Update(ContentCreateUpdateDto dto) => Result(await _repository.Update(dto));
 
 	[HttpDelete("{id:guid}")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
