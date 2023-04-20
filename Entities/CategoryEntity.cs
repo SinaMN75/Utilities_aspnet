@@ -55,7 +55,7 @@ public class CategoryEntity : BaseEntity {
 	public IEnumerable<OrderDetailEntity>? OrderDetails { get; set; }
 
 	[JsonIgnore]
-	public IEnumerable<GroupChatEntity?>? GroupChats { get; set; }
+	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
 }
 
 public class CategoryCreateUpdateDto {

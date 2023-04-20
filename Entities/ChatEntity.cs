@@ -65,7 +65,7 @@ public class GroupChatEntity : BaseEntity {
 	public IEnumerable<UserEntity>? Users { get; set; }
 	public IEnumerable<ProductEntity>? Products { get; set; }
 	public IEnumerable<GroupChatMessageEntity>? GroupChatMessage { get; set; }
-	public IEnumerable<CategoryEntity?>? Categories { get; set; }
+	public IEnumerable<CategoryEntity>? Categories { get; set; }
 
 	[NotMapped]
 	public int CountOfUnreadMessages { get; set; }

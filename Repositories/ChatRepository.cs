@@ -12,7 +12,7 @@ public interface IChatRepository {
 	Task<GenericResponse<GroupChatEntity?>> UpdateGroupChat(GroupChatCreateUpdateDto dto);
 	Task<GenericResponse> DeleteGroupChat(Guid id);
 	Task<GenericResponse<GroupChatMessageEntity?>> CreateGroupChatMessage(GroupChatMessageCreateUpdateDto dto);
-	GenericResponse<IQueryable<GroupChatEntity>?> ReadMyGroupChats();
+	Task<GenericResponse<IQueryable<GroupChatEntity>?>> ReadMyGroupChats();
 	Task<GenericResponse<GroupChatMessageEntity?>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto);
 	Task<GenericResponse> DeleteGroupChatMessage(Guid id);
 	GenericResponse<IQueryable<GroupChatEntity>> FilterGroupChats(GroupChatFilterDto dto);
@@ -210,8 +210,8 @@ public class ChatRepository : IChatRepository {
 		return new GenericResponse<GroupChatMessageEntity?>(e.Entity);
 	}
 
-	public GenericResponse<IQueryable<GroupChatEntity>?> ReadMyGroupChats() {
-		IQueryable<GroupChatEntity> e = _dbContext.Set<GroupChatEntity>()
+	public async Task<GenericResponse<IQueryable<GroupChatEntity>?>> ReadMyGroupChats() {
+		List<GroupChatEntity> e = await _dbContext.Set<GroupChatEntity>().AsNoTracking().Where(x => x.DeletedAt == null)
 			.Where(x => x.DeletedAt == null && x.Users.Any(y => y.Id == _userId))
 			.Include(x => x.Users).ThenInclude(x => x.Media)
 			.Include(x => x.Media)
@@ -220,8 +220,20 @@ public class ChatRepository : IChatRepository {
 			.Include(x => x.Products).ThenInclude(x => x.Comments)
 			.Include(x => x.Products).ThenInclude(x => x.User)
 			.Include(x => x.GroupChatMessage.OrderByDescending(y => y.CreatedAt).Take(1)).ThenInclude(x => x.Media)
-			.Where(x => x.DeletedAt == null)
-			.AsNoTracking();
+			.ToListAsync();
+		
+		foreach (GroupChatEntity groupChatEntity in e) {
+			if (groupChatEntity.Type == ChatType.Private) {
+				if (groupChatEntity.Users.First().Id == _userId) {
+					UserEntity u = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == groupChatEntity.Users.Last().Id))!;
+					groupChatEntity.Title = u.AppUserName;
+				}
+				else {
+					UserEntity u = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == groupChatEntity.Users.First().Id))!;
+					groupChatEntity.Title = u.AppUserName;
+				}
+			}
+		}
 
 		var myGroupChats = new List<GroupChatEntity>();
 

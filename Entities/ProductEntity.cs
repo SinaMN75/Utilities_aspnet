@@ -218,9 +218,7 @@ public class ProductFilterDto {
 	public bool? ShowFormFields { get; set; } = false;
 	public bool? ShowCategories { get; set; } = false;
 	public bool? ShowCategoriesFormFields { get; set; } = false;
-	public bool? ShowVoteFields { get; set; } = false;
 	public bool? ShowVisitProducts { get; set; } = false;
-	public bool? ShowVotes { get; set; } = false;
 	public bool? ShowReports { get; set; } = false;
 	public bool? ShowComments { get; set; } = false;
 	public bool? ShowOrders { get; set; } = false;
