@@ -58,7 +58,8 @@ public class CategoryEntity : BaseEntity {
 	public IEnumerable<GroupChatEntity?>? GroupChats { get; set; }
 }
 
-public class CategoryCreateUpdateDto : BaseEntity {
+public class CategoryCreateUpdateDto {
+	public Guid? Id { get; set; }
 	public string? Title { get; set; }
 	public string? TitleTr1 { get; set; }
 	public string? TitleTr2 { get; set; }

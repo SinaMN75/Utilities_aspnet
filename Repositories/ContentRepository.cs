@@ -28,22 +28,9 @@ public class ContentRepository : IContentRepository {
 	}
 
 	public GenericResponse<IQueryable<ContentEntity>> Read() {
-		IQueryable<ContentEntity> e = _dbContext.Set<ContentEntity>()
-			.AsNoTracking()
-			.Where(x => x.DeletedAt == null)
-			.Select(x => new ContentEntity {
-				Title = x.Title,
-				SubTitle = x.SubTitle,
-				Description = x.Description,
-				Type = x.Type,
-				UseCase = x.UseCase,
-				Media = x.Media!.Select(y => new MediaEntity {
-					Link = y.Link,
-					UseCase = y.UseCase,
-					Title = y.Title,
-					FileName = y.FileName
-				})
-			});
+		IQueryable<ContentEntity> e = _dbContext.Set<ContentEntity>().AsNoTracking()
+			.Include(x => x.Media!.Where(y => y.DeletedAt == null))
+			.Where(x => x.DeletedAt == null);
 		return new GenericResponse<IQueryable<ContentEntity>>(e);
 	}
 
