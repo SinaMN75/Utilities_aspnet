@@ -123,8 +123,6 @@ public class ProductRepository : IProductRepository {
 		if (dto.ShowFormFields.IsTrue()) q = q.Include(i => i.Forms)!.ThenInclude(i => i.FormField);
 		if (dto.ShowMedia.IsTrue()) q = q.Include(i => i.Media);
 		if (dto.ShowReports.IsTrue()) q = q.Include(i => i.Reports);
-		if (dto.ShowVotes.IsTrue()) q = q.Include(i => i.Votes);
-		if (dto.ShowVoteFields.IsTrue()) q = q.Include(i => i.VoteFields);
 		if (dto.ShowCreator.IsTrue()) q = q.Include(i => i.User).ThenInclude(x => x!.Media);
 		if (dto.ShowCreator.IsTrue()) q = q.Include(i => i.User).ThenInclude(x => x!.Categories);
 		if (dto.ShowVisitProducts.IsTrue()) q = q.Include(i => i.VisitProducts);
@@ -161,12 +159,10 @@ public class ProductRepository : IProductRepository {
 			.Include(i => i.Media)
 			.Include(i => i.Categories)!.ThenInclude(x => x.Media)
 			.Include(i => i.Reports)
-			.Include(i => i.Votes)
 			.Include(i => i.Comments)!.ThenInclude(x => x.LikeComments)
 			.Include(i => i.User).ThenInclude(x => x.Media)
 			.Include(i => i.User).ThenInclude(x => x.Categories)
 			.Include(i => i.Forms)!.ThenInclude(x => x.FormField)
-			.Include(i => i.VoteFields)!.ThenInclude(x => x.Votes)
 			.Include(i => i.VisitProducts)!.ThenInclude(i => i.User)
 			.Include(i => i.ProductInsights)
 			.FirstOrDefaultAsync(i => i.Id == id && i.DeletedAt == null, ct);

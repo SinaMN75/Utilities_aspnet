@@ -13,7 +13,16 @@ public class ContentRepository : IContentRepository {
 	public ContentRepository(DbContext dbContext) => _dbContext = dbContext;
 
 	public async Task<GenericResponse<ContentEntity>> Create(ContentCreateUpdateDto dto) {
-		EntityEntry<ContentEntity> e = await _dbContext.Set<ContentEntity>().AddAsync(dto.Map());
+		ContentEntity entity = new() {
+			Description = dto.Description,
+			Title = dto.Title,
+			Type = dto.Type,
+			SubTitle = dto.SubTitle,
+			UseCase = dto.UseCase,
+			CreatedAt = DateTime.Now,
+			UpdatedAt = DateTime.Now
+		};
+		EntityEntry<ContentEntity> e = await _dbContext.Set<ContentEntity>().AddAsync(entity);
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse<ContentEntity>(e.Entity);
 	}

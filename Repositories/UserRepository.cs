@@ -38,8 +38,6 @@ public class UserRepository : IUserRepository {
 			.Include(u => u.Media)
 			.Include(u => u.Categories)!.ThenInclude(u => u.Media)
 			.Include(u => u.Products!.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Media)
-			.Include(u => u.Products!.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Votes)
-			.Include(u => u.Products!.Where(x => x.DeletedAt == null)).ThenInclude(x => x.VoteFields)
 			.FirstOrDefaultAsync(u => isUserId ? u.Id == idOrUserName : u.UserName == idOrUserName);
 
 		if (entity == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);

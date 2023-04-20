@@ -61,6 +61,8 @@ public class CategoryRepository : ICategoryRepository {
 			TitleTr2 = x.TitleTr2,
 			UseCase = x.UseCase,
 			Longitude = x.Longitude,
+			CreatedAt = x.CreatedAt,
+			UpdatedAt = x.UpdatedAt,
 			Media = dto.ShowMedia.IsTrue()
 				? x.Media!.Where(y => y.DeletedAt == null).Select(y => new MediaEntity {Id = y.Id, UseCase = y.UseCase, Title = y.Title})
 				: null,

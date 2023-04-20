@@ -96,8 +96,6 @@ public class ProductEntity : BaseEntity {
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<FormEntity>? Forms { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
-	public IEnumerable<VoteFieldEntity>? VoteFields { get; set; }
-	public IEnumerable<VoteEntity>? Votes { get; set; }
 	public IEnumerable<ReportEntity>? Reports { get; set; }
 	public IEnumerable<BookmarkEntity>? Bookmarks { get; set; }
 	public IEnumerable<CommentEntity>? Comments { get; set; }

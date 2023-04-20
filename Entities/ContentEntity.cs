@@ -37,14 +37,3 @@ public class ContentReadDto {
 	public string? Type { get; set; }
 	public IEnumerable<MediaReadDto>? Media { get; set; }
 }
-
-public static class ContentExtension {
-
-	public static ContentEntity Map(this ContentCreateUpdateDto e) => new() {
-		Description = e.Description,
-		Title = e.Title,
-		Type = e.Type,
-		SubTitle = e.SubTitle,
-		UseCase = e.UseCase
-	};
-}
