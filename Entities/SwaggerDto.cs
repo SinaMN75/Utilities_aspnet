@@ -6,6 +6,7 @@ public class GroupChatReadDto : BaseEntity {
 	public string? Value { get; set; }
 	public string? Department { get; set; }
 	public string? CreatorUserId { get; set; }
+	public int CountOfUnreadMessages { get; set; }
 	public ChatStatus? ChatStatus { get; set; }
 	public ChatType? Type { get; set; }
 	public Priority? Priority { get; set; }
@@ -14,7 +15,6 @@ public class GroupChatReadDto : BaseEntity {
 	public IEnumerable<ProductReadDto>? Products { get; set; }
 	public IEnumerable<GroupChatReadDto>? GroupChatMessage { get; set; }
 	public IEnumerable<CategoryReadDto>? Categories { get; set; }
-	public int CountOfUnreadMessages { get; set; }
 }
 
 public class CategoryReadDto : BaseEntity {
@@ -33,8 +33,6 @@ public class CategoryReadDto : BaseEntity {
 	public double? Stock { get; set; }
 	public DateTime? Date1 { get; set; }
 	public DateTime? Date2 { get; set; }
-	public Guid? ParentId { get; set; }
-	public CategoryReadDto? Parent { get; set; }
 	public IEnumerable<CategoryReadDto>? Children { get; set; }
 	public IEnumerable<MediaReadDto>? Media { get; set; }
 }
@@ -43,31 +41,23 @@ public class GroupChatMessageReadDto : BaseEntity {
 	public string? Message { get; set; }
 	public string? Type { get; set; }
 	public string? UseCase { get; set; }
-	public GroupChatReadDto? GroupChat { get; set; }
-	public Guid? GroupChatId { get; set; }
-	public UserReadDto? User { get; set; }
 	public string? UserId { get; set; }
+	public GroupChatReadDto? GroupChat { get; set; }
+	public UserReadDto? User { get; set; }
 	public GroupChatMessageReadDto? ForwardedMessage { get; set; }
-	public Guid? ForwardedMessageId { get; set; }
 	public GroupChatMessageReadDto? Parent { get; set; }
-	public Guid? ParentId { get; set; }
 	public SeenUsers? SeenUsers { get; set; }
-	public Guid? SeenUsersId { get; set; }
 	public IEnumerable<MediaReadDto>? Media { get; set; }
 	public IEnumerable<ProductReadDto?>? Products { get; set; }
-	public List<UserReadDto>? MessageSeenBy { get; set; }
+	public IEnumerable<UserReadDto>? MessageSeenBy { get; set; }
 }
 
 public class CommentReadDto : BaseEntity {
 	public double? Score { get; set; } = 0;
 	public string? Comment { get; set; }
 	public ChatStatus? Status { get; set; }
-	public Guid? ParentId { get; set; }
-	public CommentReadDto? Parent { get; set; }
 	public UserReadDto? User { get; set; }
-	public string? UserId { get; set; }
 	public ProductReadDto? Product { get; set; }
-	public Guid? ProductId { get; set; }
 	public IEnumerable<CommentReadDto>? Children { get; set; }
 	public IEnumerable<MediaReadDto>? Media { get; set; }
 	public IEnumerable<LikeCommentReadDto>? LikeComments { get; set; }
@@ -134,9 +124,7 @@ public class NotificationReadDto : BaseEntity {
 	public SeenStatus? SeenStatus { get; set; }
 	public bool? Visited { get; set; }
 	public IEnumerable<MediaReadDto>? Media { get; set; }
-	public string? UserId { get; set; }
 	public UserReadDto? User { get; set; }
-	public string? CreatorUserId { get; set; }
 	public UserReadDto? CreatorUser { get; set; }
 	public ProductReadDto? Product { get; set; }
 	public Guid? ProductId { get; set; }
@@ -168,11 +156,8 @@ public class OrderDetailReadDto : BaseEntity {
 	public double? Price { get; set; }
 	public int? Count { get; set; }
 	public OrderReadDto? Order { get; set; }
-	public Guid? OrderId { get; set; }
 	public ProductReadDto? Product { get; set; }
-	public Guid? ProductId { get; set; }
 	public CategoryReadDto? Category { get; set; }
-	public Guid? CategoryId { get; set; }
 }
 
 public class ProductReadDto : BaseEntity {
@@ -227,9 +212,20 @@ public class ProductReadDto : BaseEntity {
 	public IEnumerable<FormReadDto>? Forms { get; set; }
 	public IEnumerable<CategoryReadDto>? Categories { get; set; }
 	public IEnumerable<CommentReadDto>? Comments { get; set; }
-	public IEnumerable<OrderDetailReadDto>? OrderDetails { get; set; }
-	public IEnumerable<ProductInsight>? ProductInsights { get; set; }
-	public IEnumerable<VisitProducts>? VisitProducts { get; set; }
+	public IEnumerable<ProductInsightReadDto>? ProductInsights { get; set; }
+	public IEnumerable<VisitProductsReadDto>? VisitProducts { get; set; }
+}
+
+public class ProductInsightReadDto : BaseEntity {
+	public ChatReaction? Reaction { get; set; }
+	public UserReadDto? User { get; set; }
+	public ProductReadDto? Product { get; set; }
+	public int? Count { get; set; } = 0;
+}
+
+public class VisitProductsReadDto : BaseEntity {
+	public UserReadDto? User { get; set; }
+	public ProductReadDto? Product { get; set; }
 }
 
 public class ReportReadDto : BaseEntity {
