@@ -8,10 +8,10 @@ public class CommentController : BaseApiController {
 	public CommentController(ICommentRepository commentRepository) => _repository = commentRepository;
 
 	[HttpGet("{id:guid}")]
-	public async Task<ActionResult<GenericResponse<CommentEntity>>> Read(Guid id) => Result(await _repository.Read(id));
+	public async Task<ActionResult<GenericResponse<CommentReadDto>>> Read(Guid id) => Result(await _repository.Read(id));
 
 	[HttpGet("ReadByProductId/{id:guid}")]
-	public ActionResult<GenericResponse<IQueryable<CommentEntity>?>> ReadByProductId(Guid id) => Result(_repository.ReadByProductId(id));
+	public ActionResult<GenericResponse<IQueryable<CommentReadDto>?>> ReadByProductId(Guid id) => Result(_repository.ReadByProductId(id));
 
 	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -19,11 +19,11 @@ public class CommentController : BaseApiController {
 
 	[HttpPost("Filter")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public ActionResult<GenericResponse<CommentEntity>> Filter(CommentFilterDto dto) => Result(_repository.Filter(dto));
+	public ActionResult<GenericResponse<CommentReadDto>> Filter(CommentFilterDto dto) => Result(_repository.Filter(dto));
 
 	[HttpPost("ToggleLikeComment/{commentId:guid}")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse<CommentEntity?>>> ToggleLikeComment(Guid commentId)
+	public async Task<ActionResult<GenericResponse<CommentReadDto?>>> ToggleLikeComment(Guid commentId)
 		=> Result(await _repository.ToggleLikeComment(commentId));
 
 	[HttpPost("AddReactionToComment/{commentId:guid}/{reaction}")]

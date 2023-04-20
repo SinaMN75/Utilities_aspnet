@@ -8,14 +8,14 @@ public class ReportController : BaseApiController {
 	public ReportController(IReportRepository repository) => _repository = repository;
 
 	[HttpPost("Filter")]
-	public ActionResult<GenericResponse<IEnumerable<ReportEntity>>> Read(ReportFilterDto parameters) => Result(_repository.Read(parameters));
+	public ActionResult<GenericResponse<IEnumerable<ReportReadDto>>> Read(ReportFilterDto parameters) => Result(_repository.Read(parameters));
 
 	[HttpGet("{id:guid}")]
-	public async Task<ActionResult<GenericResponse<ReportEntity>>> ReadById(Guid id) => Result(await _repository.ReadById(id));
+	public async Task<ActionResult<GenericResponse<ReportReadDto>>> ReadById(Guid id) => Result(await _repository.ReadById(id));
 
 	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse<ReportEntity?>>> Create(ReportEntity parameters) => Result(await _repository.Create(parameters));
+	public async Task<ActionResult<GenericResponse<ReportReadDto?>>> Create(ReportEntity parameters) => Result(await _repository.Create(parameters));
 
 	[HttpDelete]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

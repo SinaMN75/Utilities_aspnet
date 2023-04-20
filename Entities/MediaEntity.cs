@@ -90,18 +90,6 @@ public class MediaEntity : BaseEntity {
 	public BookmarkEntity? Bookmark { get; set; }
 }
 
-public class MediaReadDto : BaseEntity {
-	public string? FileName { get; set; }
-	public string? UseCase { get; set; }
-	public string? Link { get; set; }
-	public string? Title { get; set; }
-	public string? Size { get; set; }
-	public string? Time { get; set; }
-	public string? Artist { get; set; }
-	public string? Album { get; set; }
-	public string Url => $"{Server.ServerAddress}/Medias/{FileName}";
-}
-
 public class UploadDto {
 	public string? UseCase { get; set; }
 	public string? UserId { get; set; }
