@@ -61,8 +61,12 @@ public class CommentReadDto : BaseEntity {
 	public IEnumerable<CommentReadDto>? Children { get; set; }
 	public IEnumerable<MediaReadDto>? Media { get; set; }
 	public IEnumerable<LikeCommentReadDto>? LikeComments { get; set; }
-	public IEnumerable<CommentReacts>? CommentReacts { get; set; }
+	public IEnumerable<CommentReactsReadDto>? CommentReacts { get; set; }
 	public bool IsLiked { get; set; }
+}
+
+public class CommentReactsReadDto : BaseEntity {
+	public Reaction? Reaction { get; set; }
 }
 
 public class LikeCommentReadDto : BaseEntity {
@@ -225,7 +229,6 @@ public class ProductInsightReadDto : BaseEntity {
 
 public class VisitProductsReadDto : BaseEntity {
 	public UserReadDto? User { get; set; }
-	public ProductReadDto? Product { get; set; }
 }
 
 public class ReportReadDto : BaseEntity {
