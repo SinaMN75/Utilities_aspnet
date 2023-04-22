@@ -24,33 +24,23 @@ public class GenericResponse {
 }
 
 public static class BoolExtension {
-	public static bool IsNullOrFalse(this bool? value) => value == null && value == false;
 	public static bool IsTrue(this bool? value) => value != null && value != false;
 }
 
 public static class EnumerableExtension {
 	public static bool IsNotNullOrEmpty<T>(this IEnumerable<T>? list) => list != null && list.Any();
 	public static bool IsNotNull<T>(this IEnumerable<T>? list) => list != null;
-	public static bool IsNullOrEmpty<T>(this IEnumerable<T>? list) => list == null || !list.Any();
 }
 
 public static class NumberExtension {
-	public static bool IsNumerical(this string value) => Regex.IsMatch(value, @"^\d+$");
 	public static int ToInt(this double value) => (int) value;
 	public static int ToInt(this double? value) => (int) (value ?? 0.0);
-
-	public static int ToInt(this string? value) {
-		try {
-			return int.Parse(value ?? "0");
-		}
-		catch (Exception e) {
-			return 0;
-		}
-	}
 }
 
 public static class StringExtension {
 	public static bool IsEmail(this string email) => Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.(com|net|org|gov)$", RegexOptions.IgnoreCase);
+	public static bool IsNotNullOrEmpty(this string? s) => s is {Length: > 0};
+	public static bool IsNullOrEmpty(this string? s) => string.IsNullOrEmpty(s);
 }
 
 public class Utils {
@@ -63,18 +53,5 @@ public class Utils {
 		};
 
 		return otp;
-	}
-
-	public static AgeCategory CalculateAgeCategories(DateTime birthDate) {
-		int age = DateTime.Today.Year - birthDate.Year;
-		AgeCategory ageCategory = AgeCategory.None;
-		ageCategory = age switch {
-			< 13 => AgeCategory.Kids,
-			> 13 and < 18 => AgeCategory.Tennager,
-			> 18 and < 26 => AgeCategory.Young,
-			> 26 => ageCategory = AgeCategory.Adult,
-			_ => ageCategory
-		};
-		return ageCategory;
 	}
 }
