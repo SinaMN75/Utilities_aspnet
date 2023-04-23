@@ -25,7 +25,10 @@ public static class StartupExtension {
 
 	private static void AddUtilitiesServices<T>(this WebApplicationBuilder builder, string connectionStrings, DatabaseType databaseType) where T : DbContext {
 		builder.Services.AddOptions();
-		builder.Services.AddMemoryCache();
+		builder.Services.AddOutputCache(x => {
+			x.AddPolicy("default", new Cache10Seconds());
+			x.AddPolicy("1d", new CachePolicy1Day());
+		});
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 		builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
 		builder.Services.Configure<IpRateLimitPolicies>(builder.Configuration.GetSection("IpRateLimitPolicies"));
@@ -39,7 +42,6 @@ public static class StartupExtension {
 			options.Providers.Add<BrotliCompressionProvider>();
 			options.Providers.Add<GzipCompressionProvider>();
 		});
-		builder.Services.AddResponseCaching();
 		builder.Services.AddScoped<DbContext, T>();
 
 		builder.Services.AddDbContext<T>(options => {
@@ -156,12 +158,11 @@ public static class StartupExtension {
 	public static void UseUtilitiesServices(this WebApplication app) {
 		app.UseIpRateLimiting();
 		app.UseCors(option => option.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+		app.UseOutputCache();
 		app.UseDeveloperExceptionPage();
-		app.UseResponseCaching();
 		app.UseUtilitiesSwagger();
 		app.UseStaticFiles();
 		app.UseAuthentication();
-		app.UseRouting();
 		app.UseAuthorization();
 
 		app.MapHub<ChatHub>("/hubs/ChatHub");
@@ -173,5 +174,33 @@ public static class StartupExtension {
 			c.DocExpansion(DocExpansion.None);
 			c.DefaultModelsExpandDepth(-1);
 		});
+	}
+}
+
+internal class Cache10Seconds : IOutputCachePolicy {
+	public ValueTask ServeFromCacheAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
+	public ValueTask ServeResponseAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
+
+	public ValueTask CacheRequestAsync(OutputCacheContext context, CancellationToken cancellation) {
+		context.AllowCacheLookup = true;
+		context.AllowCacheStorage = true;
+		context.AllowLocking = true;
+		context.EnableOutputCaching = true;
+		context.ResponseExpirationTimeSpan = TimeSpan.FromSeconds(10);
+		return ValueTask.CompletedTask;
+	}
+}
+
+internal class CachePolicy1Day : IOutputCachePolicy {
+	public ValueTask ServeFromCacheAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
+	public ValueTask ServeResponseAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
+
+	public ValueTask CacheRequestAsync(OutputCacheContext context, CancellationToken cancellation) {
+		context.AllowCacheLookup = true;
+		context.AllowCacheStorage = true;
+		context.AllowLocking = true;
+		context.EnableOutputCaching = true;
+		context.ResponseExpirationTimeSpan = TimeSpan.FromDays(1);
+		return ValueTask.CompletedTask;
 	}
 }

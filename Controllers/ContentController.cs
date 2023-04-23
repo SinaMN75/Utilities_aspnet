@@ -7,6 +7,7 @@ public class ContentController : BaseApiController {
 
 	public ContentController(IContentRepository repository) => _repository = repository;
 
+	[OutputCache(PolicyName = "1d")]
 	[HttpGet]
 	public ActionResult<GenericResponse<IQueryable<ContentEntity>>> Read() => Result(_repository.Read());
 
