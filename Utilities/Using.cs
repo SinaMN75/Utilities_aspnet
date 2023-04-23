@@ -42,3 +42,4 @@ global using Ghasedak.Core;
 global using System.Security.Cryptography;
 global using AspNetCoreRateLimit;
 global using Utilities_aspnet.Hubs;
+global using Microsoft.AspNetCore.SignalR;

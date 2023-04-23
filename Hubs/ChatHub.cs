@@ -1,12 +1,4 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Utilities_aspnet.Hubs {
+﻿namespace Utilities_aspnet.Hubs {
 	public class ChatHub : Hub {
 		private readonly DbContext _context;
 
