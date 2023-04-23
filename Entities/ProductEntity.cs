@@ -242,7 +242,7 @@ public class ProductFilterDto {
 	public ProductStatus? Status { get; set; }
 	public Currency? Currency { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
-	public IEnumerable<Guid>? CategoriesAnd { get; set; }
+	public IEnumerable<string>? UserIds { get; set; }
 	public string? Query { get; set; }
 	public bool ShowExpired { get; set; } = false;
 }

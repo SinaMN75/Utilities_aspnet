@@ -113,6 +113,9 @@ public class ProductRepository : IProductRepository {
 			                 (x.Author ?? "").Contains(dto.Query!) ||
 			                 (x.Details ?? "").Contains(dto.Query!) ||
 			                 (x.Description ?? "").Contains(dto.Query!));
+		
+		if (dto.Categories.IsNotNullOrEmpty()) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
+		if (dto.UserIds.IsNotNullOrEmpty()) q = q.Where(x => dto.UserIds!.Contains(x.UserId));
 
 		if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories);
 		if (dto.ShowCategoriesFormFields.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.FormFields);
@@ -126,8 +129,6 @@ public class ProductRepository : IProductRepository {
 		if (dto.ShowCreator.IsTrue()) q = q.Include(i => i.User).ThenInclude(x => x!.Media);
 		if (dto.ShowCreator.IsTrue()) q = q.Include(i => i.User).ThenInclude(x => x!.Categories);
 		if (dto.ShowVisitProducts.IsTrue()) q = q.Include(i => i.VisitProducts);
-		if (dto.Categories != null && dto.Categories.Any()) q = q.Where(x => x.Categories!.Any(y => dto.Categories.ToList().Contains(y.Id)));
-		if (dto.CategoriesAnd != null && dto.CategoriesAnd.Any()) q = q.Where(x => x.Categories!.All(y => dto.CategoriesAnd.ToList().Contains(y.Id)));
 		if (dto.OrderByVotes.IsTrue()) q = q.OrderBy(x => x.VoteCount);
 		if (dto.OrderByVotesDecending.IsTrue()) q = q.OrderByDescending(x => x.VoteCount);
 		if (dto.OrderByAtoZ.IsTrue()) q = q.OrderBy(x => x.Title);

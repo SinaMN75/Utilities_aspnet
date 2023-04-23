@@ -79,25 +79,24 @@ public static class StartupExtension {
 
 		builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 		builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-		builder.Services.AddTransient<AppSettings>();
-		builder.Services.AddTransient<ISmsNotificationRepository, SmsNotificationRepository>();
-		builder.Services.AddTransient<IReportRepository, ReportRepository>();
-		builder.Services.AddTransient<IUserRepository, UserRepository>();
-		builder.Services.AddTransient<IMediaRepository, MediaRepository>();
-		builder.Services.AddTransient<IUploadRepository, UploadRepository>();
-		builder.Services.AddTransient<IFollowBookmarkRepository, FollowBookmarkRepository>();
-		builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
-		builder.Services.AddTransient<IProductRepository, ProductRepository>();
-		builder.Services.AddTransient<IChatRepository, ChatRepository>();
-		builder.Services.AddTransient<INotificationRepository, NotificationRepository>();
-		builder.Services.AddTransient<IFormRepository, FormRepository>();
-		builder.Services.AddTransient<ICommentRepository, CommentRepository>();
-		builder.Services.AddTransient<ITransactionRepository, TransactionRepository>();
-		builder.Services.AddTransient<IContentRepository, ContentRepository>();
-		builder.Services.AddTransient<IOrderRepository, OrderRepository>();
-		builder.Services.AddTransient<IDiscountRepository, DiscountRepository>();
-		builder.Services.AddTransient<IPaymentRepository, PaymentRepository>();
-		builder.Services.AddTransient<ISmsNotificationRepository, SmsNotificationRepository>();
+		builder.Services.AddScoped<AppSettings>();
+		builder.Services.AddScoped<IReportRepository, ReportRepository>();
+		builder.Services.AddScoped<IUserRepository, UserRepository>();
+		builder.Services.AddScoped<IMediaRepository, MediaRepository>();
+		builder.Services.AddScoped<IUploadRepository, UploadRepository>();
+		builder.Services.AddScoped<IFollowBookmarkRepository, FollowBookmarkRepository>();
+		builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+		builder.Services.AddScoped<IProductRepository, ProductRepository>();
+		builder.Services.AddScoped<IChatRepository, ChatRepository>();
+		builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+		builder.Services.AddScoped<IFormRepository, FormRepository>();
+		builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+		builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+		builder.Services.AddScoped<IContentRepository, ContentRepository>();
+		builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+		builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
+		builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+		builder.Services.AddScoped<ISmsNotificationRepository, SmsNotificationRepository>();
 	}
 
 	private static void AddUtilitiesSwagger(this WebApplicationBuilder builder, IServiceProvider? serviceProvider) {
