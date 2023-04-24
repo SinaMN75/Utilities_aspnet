@@ -40,6 +40,7 @@ global using Zarinpal.Models;
 global using System.IO.Compression;
 global using Ghasedak.Core;
 global using System.Security.Cryptography;
-global using AspNetCoreRateLimit;
 global using Utilities_aspnet.Hubs;
 global using Microsoft.AspNetCore.SignalR;
+global using System.Threading.RateLimiting;
+global using Microsoft.AspNetCore.RateLimiting;

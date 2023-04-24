@@ -30,10 +30,16 @@ public static class StartupExtension {
 			x.AddPolicy("1d", new CachePolicy1Day());
 		});
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
-		builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
-		builder.Services.Configure<IpRateLimitPolicies>(builder.Configuration.GetSection("IpRateLimitPolicies"));
-		builder.Services.AddInMemoryRateLimiting();
 
+		builder.Services.AddRateLimiter(x => {
+			x.AddFixedWindowLimiter(policyName: "fixed", y => {
+				y.PermitLimit = 10;
+				y.Window = TimeSpan.FromSeconds(1);
+				y.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+				y.QueueLimit = 2;
+			});
+		});
+		
 		builder.Services.AddCors(c => c.AddPolicy("AllowOrigin", option => option.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 		builder.Services.Configure<BrotliCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
 		builder.Services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
@@ -77,7 +83,6 @@ public static class StartupExtension {
 			options.UseCamelCasing(true);
 		});
 
-		builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 		builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 		builder.Services.AddScoped<AppSettings>();
 		builder.Services.AddScoped<IReportRepository, ReportRepository>();
@@ -155,7 +160,6 @@ public static class StartupExtension {
 	}
 
 	public static void UseUtilitiesServices(this WebApplication app) {
-		app.UseIpRateLimiting();
 		app.UseCors(option => option.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 		app.UseOutputCache();
 		app.UseDeveloperExceptionPage();
