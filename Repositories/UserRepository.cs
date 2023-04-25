@@ -12,6 +12,7 @@ public interface IUserRepository {
 	Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model);
 	Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList();
 	Task<GenericResponse> ToggleBlock(string userId);
+	Task<GenericResponse> TransferWalletToWallet(TransferFromWalletToWalletDto dto);
 	Task<UserEntity?> ReadByIdMinimal(string? idOrUserName, string? token = null);
 }
 
@@ -307,6 +308,16 @@ public class UserRepository : IUserRepository {
 		if (user.BlockedUsers.Contains(userId))
 			await Update(new UserCreateUpdateDto {Id = user.Id, BlockedUsers = user.BlockedUsers.Replace($",{userId}", "")});
 		else await Update(new UserCreateUpdateDto {Id = user.Id, BlockedUsers = user.BlockedUsers + "," + userId});
+		return new GenericResponse();
+	}
+
+	public async Task<GenericResponse> TransferWalletToWallet(TransferFromWalletToWalletDto dto) {
+		UserEntity fromUser = (await ReadByIdMinimal(dto.FromUserId))!;
+		UserEntity toUser = (await ReadByIdMinimal(dto.ToUserId))!;
+
+		if (fromUser.Wallet <= dto.Amount) return new GenericResponse(UtilitiesStatusCodes.NotEnoughMoney);
+		await Update(new UserCreateUpdateDto {Id = fromUser.Id, Wallet = fromUser.Wallet - dto.Amount});
+		await Update(new UserCreateUpdateDto {Id = toUser.Id, Wallet = toUser.Wallet + dto.Amount});
 		return new GenericResponse();
 	}
 
