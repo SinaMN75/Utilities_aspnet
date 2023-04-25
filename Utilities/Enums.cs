@@ -24,8 +24,13 @@ public enum UtilitiesStatusCodes {
 	UserNotFound = 605,
 	MultipleSeller = 607,
 	OrderPayed = 608,
-	ZeroPayed = 609,
 	OutOfStock = 610,
+	NotEnoughMoney  = 611,
+}
+
+public enum NotoficationType {
+	WalletMoneyGain = 100,
+	WalletMoneyLost = 101,
 }
 
 public enum OtpResult {

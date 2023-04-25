@@ -285,3 +285,9 @@ public class UserFilterDto {
 	public bool? OrderByUserName { get; set; }
 	public IEnumerable<string>? UserIds { get; set; }
 }
+
+public class TransferFromWalletToWalletDto {
+	public string FromUserId { get; set; } = null!;
+	public string ToUserId { get; set; } = null!;
+	public double Amount { get; set; }
+}
