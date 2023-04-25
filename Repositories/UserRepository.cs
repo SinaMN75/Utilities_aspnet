@@ -71,16 +71,8 @@ public class UserRepository : IUserRepository {
 	}
 
 	public async Task<GenericResponse<IQueryable<UserEntity>>> Filter(UserFilterDto dto) {
-		IQueryable<UserEntity> dbSet = _dbContext.Set<UserEntity>().AsNoTracking();
-
-		if (dto.ShowMedia.IsTrue()) dbSet = dbSet.Include(u => u.Media);
-		if (dto.ShowCategories.IsTrue()) dbSet = dbSet.Include(u => u.Categories);
-		if (dto.ShowForms.IsTrue()) dbSet = dbSet.Include(u => u.FormBuilders);
-		if (dto.ShowTransactions.IsTrue()) dbSet = dbSet.Include(u => u.Transactions);
-		if (dto.ShowProducts.IsTrue()) dbSet = dbSet.Include(u => u.Products!.Where(x => x.DeletedAt == null)).ThenInclude(u => u.Media);
-
-		IQueryable<UserEntity> q = dbSet.Where(x => x.DeletedAt == null).AsNoTracking();
-
+		IQueryable<UserEntity> q = _dbContext.Set<UserEntity>().Where(x => x.DeletedAt == null).AsNoTracking();
+		
 		if (dto.UserNameExact != null) q = q.Where(x => x.AppUserName == dto.UserNameExact || x.UserName == dto.UserNameExact);
 		if (dto.UserId != null) q = q.Where(x => x.Id == dto.UserId);
 		if (dto.Activity != null) q = q.Where(x => x.Activity.Contains(dto.Activity));
@@ -127,13 +119,19 @@ public class UserRepository : IUserRepository {
 		if (dto.UserIds != null) q = q.Where(x => dto.UserIds.Contains(x.Id));
 		if (dto.UserName != null) q = q.Where(x => (x.AppUserName ?? "").ToLower().Contains(dto.UserName.ToLower()));
 		if (dto.ShowSuspend.IsTrue()) q = q.Where(x => x.Suspend == true);
-
+		
 		if (dto.OrderByUserName.IsTrue()) q = q.OrderBy(x => x.UserName);
+		
+		if (dto.ShowMedia.IsTrue()) q = q.Include(u => u.Media);
+		if (dto.ShowCategories.IsTrue()) q = q.Include(u => u.Categories);
+		if (dto.ShowForms.IsTrue()) q = q.Include(u => u.FormBuilders);
+		if (dto.ShowTransactions.IsTrue()) q = q.Include(u => u.Transactions);
+		if (dto.ShowProducts.IsTrue()) q = q.Include(u => u.Products!.Where(x => x.DeletedAt == null)).ThenInclude(u => u.Media);
 
 		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
-		return new GenericResponse<IQueryable<UserEntity>>(q) {
+		return new GenericResponse<IQueryable<UserEntity>>(q.AsSingleQuery()) {
 			TotalCount = totalCount,
 			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
 			PageSize = dto.PageSize
