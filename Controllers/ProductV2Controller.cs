@@ -24,6 +24,12 @@ public class ProductV2Controller : BaseApiController {
 
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	[AllowAnonymous]
+	[OutputCache(PolicyName = "default")]
+	[HttpGet]
+	public async Task<ActionResult<GenericResponse<IQueryable<ProductEntity>>>> Read([FromQuery] ProductFilterDto dto) => Result(await _repository.Filter(dto));
+
+	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+	[AllowAnonymous]
 	[HttpGet("{id:guid}")]
 	public async Task<ActionResult<GenericResponse<ProductEntity>>> ReadById(Guid id, CancellationToken ct) => Result(await _repository.ReadById(id, ct));
 

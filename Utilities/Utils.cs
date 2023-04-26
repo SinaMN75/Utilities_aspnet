@@ -25,10 +25,7 @@ public static class StartupExtension {
 
 	private static void AddUtilitiesServices<T>(this WebApplicationBuilder builder, string connectionStrings, DatabaseType databaseType) where T : DbContext {
 		builder.Services.AddOptions();
-		builder.Services.AddOutputCache(x => {
-			x.AddPolicy("default", new Cache10Seconds());
-			x.AddPolicy("1d", new CachePolicy1Day());
-		});
+		builder.Services.AddOutputCache(x => x.AddPolicy("default", new DefaultOutputCachePolicy()));
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
 		builder.Services.AddRateLimiter(x => {
@@ -39,7 +36,7 @@ public static class StartupExtension {
 				y.QueueLimit = 2;
 			});
 		});
-		
+
 		builder.Services.AddCors(c => c.AddPolicy("AllowOrigin", option => option.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 		builder.Services.Configure<BrotliCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
 		builder.Services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
@@ -181,7 +178,7 @@ public static class StartupExtension {
 	}
 }
 
-internal class Cache10Seconds : IOutputCachePolicy {
+internal class DefaultOutputCachePolicy : IOutputCachePolicy {
 	public ValueTask ServeFromCacheAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
 	public ValueTask ServeResponseAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
 
@@ -190,21 +187,8 @@ internal class Cache10Seconds : IOutputCachePolicy {
 		context.AllowCacheStorage = true;
 		context.AllowLocking = true;
 		context.EnableOutputCaching = true;
-		context.ResponseExpirationTimeSpan = TimeSpan.FromSeconds(10);
-		return ValueTask.CompletedTask;
-	}
-}
-
-internal class CachePolicy1Day : IOutputCachePolicy {
-	public ValueTask ServeFromCacheAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
-	public ValueTask ServeResponseAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
-
-	public ValueTask CacheRequestAsync(OutputCacheContext context, CancellationToken cancellation) {
-		context.AllowCacheLookup = true;
-		context.AllowCacheStorage = true;
-		context.AllowLocking = true;
-		context.EnableOutputCaching = true;
-		context.ResponseExpirationTimeSpan = TimeSpan.FromDays(1);
+		context.ResponseExpirationTimeSpan = TimeSpan.FromSeconds(60);
+		context.CacheVaryByRules.QueryKeys = "*";
 		return ValueTask.CompletedTask;
 	}
 }
