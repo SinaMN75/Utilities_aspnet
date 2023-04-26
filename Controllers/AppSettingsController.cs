@@ -8,6 +8,7 @@ public class AppSettingsController : BaseApiController {
 	public AppSettingsController(IConfiguration config) => _config = config;
 
 	[HttpGet]
+	[OutputCache(PolicyName = "default")]
 	public ActionResult<GenericResponse<EnumDto>> Read() {
 		AppSettings appSettings = new();
 		_config.GetSection("AppSettings").Bind(appSettings);

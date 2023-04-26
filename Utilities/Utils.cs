@@ -189,6 +189,7 @@ internal class DefaultOutputCachePolicy : IOutputCachePolicy {
 		context.EnableOutputCaching = true;
 		context.ResponseExpirationTimeSpan = TimeSpan.FromSeconds(60);
 		context.CacheVaryByRules.QueryKeys = "*";
+		context.CacheVaryByRules.VaryByHost = true;
 		return ValueTask.CompletedTask;
 	}
 }

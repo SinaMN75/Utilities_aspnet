@@ -27,6 +27,10 @@ public class UserController : BaseApiController {
 	[AllowAnonymous]
 	[HttpPost("Filter")]
 	public async Task<ActionResult<GenericResponse<IEnumerable<UserEntity>>>> Filter(UserFilterDto dto) => Result(await _repository.Filter(dto));
+	
+	[HttpGet]
+	[OutputCache(PolicyName = "default")]
+	public async Task<ActionResult<GenericResponse<IEnumerable<UserEntity>>>> Read([FromQuery] UserFilterDto dto) => Result(await _repository.Filter(dto));
 
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	[AllowAnonymous]
