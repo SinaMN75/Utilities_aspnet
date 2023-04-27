@@ -213,6 +213,7 @@ public class ProductFilterDto {
 	public bool? Enabled { get; set; }
 	public bool? IsFollowing { get; set; }
 	public bool? IsBookmarked { get; set; }
+	public bool? IsMyBoughtList { get; set; }
 	public bool? HasDiscount { get; set; }
 	public bool? ShowMedia { get; set; } = false;
 	public bool? ShowForms { get; set; } = false;
@@ -251,4 +252,9 @@ public class ProductFilterDto {
 public class ProductInsightDto {
 	public ChatReaction? Reaction { get; set; }
 	public string? UserId { get; set; }
+}
+
+public class SimpleSellDto {
+	public string BuyerUserId { get; set; }
+	public Guid ProductId { get; set; }
 }

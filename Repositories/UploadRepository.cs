@@ -50,6 +50,7 @@ public class UploadRepository : IUploadRepository {
 					CreatedAt = DateTime.Now,
 					UseCase = model.UseCase,
 					Title = model.Title,
+					IsPrivate = model.IsPrivate,
 					Size = model.Size,
 					NotificationId = model.NotificationId,
 					GroupChatId = model.GroupChatId,

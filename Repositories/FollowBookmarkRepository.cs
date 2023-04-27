@@ -112,23 +112,6 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 		UserEntity myUser = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId))!;
 		UserEntity targetUser = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == parameters.UserId))!;
 
-		// FollowEntity? follow = await _dbContext.Set<FollowEntity>()
-		// .FirstOrDefaultAsync(x => x.FollowerUserId == _userId && x.FollowsUserId == parameters.UserId);
-
-		// if (follow != null) {
-		// _dbContext.Set<FollowEntity>().Remove(follow);
-		// await _dbContext.SaveChangesAsync();
-		// }
-		// else {
-		// follow = new FollowEntity {FollowerUserId = _userId, FollowsUserId = parameters.UserId};
-		// await _dbContext.Set<FollowEntity>().AddAsync(follow);
-		// await _dbContext.SaveChangesAsync();
-
-		// if (targetUser != null) {
-		// 	targetUser.Point += 1;
-		// 	await _dbContext.SaveChangesAsync();
-		// }
-
 		try {
 			GenericResponse<IQueryable<NotificationEntity>> notification = _notificationRepository.Filter(new NotificationFilterDto {
 				UserId = parameters.UserId,

@@ -41,4 +41,8 @@ public class ProductV2Controller : BaseApiController {
 	[HttpDelete("{id:guid}")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	public async Task<IActionResult> Delete(Guid id, CancellationToken ct) => Result(await _repository.Delete(id, ct));
+
+	[HttpPost("SimpleSell")]
+	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+	public async Task<ActionResult<GenericResponse<ProductEntity>>> SimpleSell(SimpleSellDto dto) => Result(await _repository.SimpleSell(dto));
 }

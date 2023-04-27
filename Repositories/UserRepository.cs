@@ -363,6 +363,7 @@ public class UserRepository : IUserRepository {
 		entity.BookmarkedProducts = dto.BookmarkedProducts ?? entity.BookmarkedProducts;
 		entity.FollowingUsers = dto.FollowingUsers ?? entity.FollowingUsers;
 		entity.FollowedUsers = dto.FollowedUsers ?? entity.FollowedUsers;
+		entity.BoughtProduts = dto.BoughtProduts ?? entity.BoughtProduts;
 		entity.BlockedUsers = dto.BlockedUsers ?? entity.BlockedUsers;
 		entity.Badge = dto.Badge ?? entity.Badge;
 		entity.UpdatedAt = DateTime.Now;

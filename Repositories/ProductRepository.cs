@@ -7,6 +7,7 @@ public interface IProductRepository {
 	Task<GenericResponse<ProductEntity?>> ReadById(Guid id, CancellationToken ct);
 	Task<GenericResponse<ProductEntity>> Update(ProductCreateUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
+	Task<GenericResponse> SimpleSell(SimpleSellDto dto);
 }
 
 public class ProductRepository : IProductRepository {
@@ -142,6 +143,7 @@ public class ProductRepository : IProductRepository {
 			UserEntity user = (await _userRepository.ReadByIdMinimal(_userId))!;
 			if (dto.IsFollowing.IsTrue()) q = q.Where(i => user.FollowingUsers.Contains(i.UserId!));
 			if (dto.IsBookmarked.IsTrue()) q = q.Where(i => user.BookmarkedProducts.Contains(i.Id.ToString()));
+			if (dto.IsMyBoughtList.IsTrue()) q = q.Where(i => user.BoughtProduts.Contains(i.Id.ToString()));
 		}
 
 		int totalCount = await q.CountAsync();
@@ -235,6 +237,15 @@ public class ProductRepository : IProductRepository {
 			return new GenericResponse(message: "Deleted");
 		}
 		return new GenericResponse(UtilitiesStatusCodes.NotFound, "Notfound");
+	}
+
+	public async Task<GenericResponse> SimpleSell(SimpleSellDto dto) {
+		UserEntity buyer = (await _userRepository.ReadByIdMinimal(dto.BuyerUserId))!;
+		await _userRepository.Update(new UserCreateUpdateDto {
+			Id = dto.BuyerUserId,
+			BoughtProduts = buyer.BoughtProduts + "," + dto.ProductId
+		});
+		return new GenericResponse();
 	}
 }
 

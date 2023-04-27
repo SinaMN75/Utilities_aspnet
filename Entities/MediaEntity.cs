@@ -25,6 +25,8 @@ public class MediaEntity : BaseEntity {
 
 	[StringLength(500)]
 	public string? Album { get; set; }
+	
+	public bool? IsPrivate { get; set; }
 
 	[NotMapped]
 	public string Url => $"{Server.ServerAddress}/Medias/{FileName}";
@@ -98,6 +100,7 @@ public class UploadDto {
 	public string? Time { get; set; }
 	public string? Artist { get; set; }
 	public string? Album { get; set; }
+	public bool? IsPrivate { get; set; }
 	public Guid? ProductId { get; set; }
 	public Guid? ContentId { get; set; }
 	public Guid? CategoryId { get; set; }

@@ -89,7 +89,8 @@ public class UserEntity : IdentityUser {
 	public string FollowingUsers { get; set; } = "";
 	public string FollowedUsers { get; set; } = "";
 	public string BlockedUsers { get; set; } = "";
-
+	public string BoughtProduts { get; set; } = "";
+	
 	public double? Wallet { get; set; } = 0;
 	public double? Point { get; set; } = 0;
 	public bool? ShowContactInfo { get; set; }
@@ -223,6 +224,7 @@ public class UserCreateUpdateDto {
 	public string? Badge { get; set; }
 	public string? VisitedProducts { get; set; }
 	public string? BookmarkedProducts { get; set; }
+	public string? BoughtProduts { get; set; }
 	public string? FollowedUsers { get; set; }
 	public string? FollowingUsers { get; set; }
 	public string? BlockedUsers { get; set; }
