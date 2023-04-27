@@ -212,6 +212,7 @@ public class ProductFilterDto {
 	public double? OnTimeDelivery { get; set; }
 	public bool? Enabled { get; set; }
 	public bool? IsFollowing { get; set; }
+	public bool? IsBookmarked { get; set; }
 	public bool? HasDiscount { get; set; }
 	public bool? ShowMedia { get; set; } = false;
 	public bool? ShowForms { get; set; } = false;

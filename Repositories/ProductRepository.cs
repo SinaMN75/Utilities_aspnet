@@ -113,7 +113,7 @@ public class ProductRepository : IProductRepository {
 			                 (x.Author ?? "").Contains(dto.Query!) ||
 			                 (x.Details ?? "").Contains(dto.Query!) ||
 			                 (x.Description ?? "").Contains(dto.Query!));
-		
+
 		if (dto.Categories.IsNotNullOrEmpty()) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
 		if (dto.UserIds.IsNotNullOrEmpty()) q = q.Where(x => dto.UserIds!.Contains(x.UserId));
 
@@ -139,10 +139,9 @@ public class ProductRepository : IProductRepository {
 		if (dto.OrderByCreaedDateDecending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 
 		if (_userId.IsNotNullOrEmpty()) {
-			if (dto.IsFollowing.IsTrue()) {
-				UserEntity user = (await _userRepository.ReadByIdMinimal(_userId))!;
-				q = q.Where(i => user.FollowingUsers.Contains(i.UserId!));
-			}
+			UserEntity user = (await _userRepository.ReadByIdMinimal(_userId))!;
+			if (dto.IsFollowing.IsTrue()) q = q.Where(i => user.FollowingUsers.Contains(i.UserId!));
+			if (dto.IsBookmarked.IsTrue()) q = q.Where(i => user.BookmarkedProducts.Contains(i.Id.ToString()));
 		}
 
 		int totalCount = await q.CountAsync();
