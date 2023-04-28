@@ -127,8 +127,6 @@ public class ProductRepository : IProductRepository {
 		if (dto.ShowFormFields.IsTrue()) q = q.Include(i => i.Forms)!.ThenInclude(i => i.FormField);
 		if (dto.ShowMedia.IsTrue()) q = q.Include(i => i.Media);
 		if (dto.ShowReports.IsTrue()) q = q.Include(i => i.Reports);
-		if (dto.ShowCreator.IsTrue()) q = q.Include(i => i.User).ThenInclude(x => x!.Media);
-		if (dto.ShowCreator.IsTrue()) q = q.Include(i => i.User).ThenInclude(x => x!.Categories);
 		if (dto.ShowVisitProducts.IsTrue()) q = q.Include(i => i.VisitProducts);
 		if (dto.OrderByVotes.IsTrue()) q = q.OrderBy(x => x.VoteCount);
 		if (dto.OrderByVotesDecending.IsTrue()) q = q.OrderByDescending(x => x.VoteCount);
@@ -138,7 +136,11 @@ public class ProductRepository : IProductRepository {
 		if (dto.OrderByPriceDecending.IsTrue()) q = q.OrderByDescending(x => x.Price);
 		if (dto.OrderByCreatedDate.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 		if (dto.OrderByCreaedDateDecending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
-
+		if (dto.ShowCreator.IsTrue()) {
+			q = q.Include(i => i.User).ThenInclude(x => x!.Media);
+			q = q.Include(i => i.User).ThenInclude(x => x!.Categories);
+		}
+		
 		if (_userId.IsNotNullOrEmpty()) {
 			UserEntity user = (await _userRepository.ReadByIdMinimal(_userId))!;
 			if (dto.IsFollowing.IsTrue()) q = q.Where(i => user.FollowingUsers.Contains(i.UserId!));

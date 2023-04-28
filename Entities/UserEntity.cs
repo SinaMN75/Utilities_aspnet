@@ -84,21 +84,13 @@ public class UserEntity : IdentityUser {
 	[StringLength(500)]
 	public string? GenderTr2 { get; set; }
 
-	public string VisitedProducts { get; set; } = "";
-	public string BookmarkedProducts { get; set; } = "";
-	public string FollowingUsers { get; set; } = "";
-	public string FollowedUsers { get; set; } = "";
-	public string BlockedUsers { get; set; } = "";
-	public string BoughtProduts { get; set; } = "";
-	
 	public double? Wallet { get; set; } = 0;
 	public double? Point { get; set; } = 0;
 	public bool? ShowContactInfo { get; set; }
-	public bool IsLoggedIn { get; set; }
 	public DateTime? Birthdate { get; set; }
 	public DateTime? CreatedAt { get; set; }
 	public DateTime? UpdatedAt { get; set; }
-	public DateTime? DeletedAt { get; set; }
+	
 	public string? AccessLevel { get; set; }
 	public string? Badge { get; set; }
 	public bool IsOnline { get; set; } = false;
@@ -110,6 +102,30 @@ public class UserEntity : IdentityUser {
 	public IEnumerable<TransactionEntity>? Transactions { get; set; }
 	public IEnumerable<LikeCommentEntity>? LikeComments { get; set; }
 	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
+	
+	[JsonIgnore]
+	public string VisitedProducts { get; set; } = "";
+
+	[JsonIgnore]
+	public string BookmarkedProducts { get; set; } = "";
+
+	[JsonIgnore]
+	public string FollowingUsers { get; set; } = "";
+
+	[JsonIgnore]
+	public string FollowedUsers { get; set; } = "";
+
+	[JsonIgnore]
+	public string BlockedUsers { get; set; } = "";
+
+	[JsonIgnore]
+	public string BoughtProduts { get; set; } = "";
+	
+	[JsonIgnore]
+	public bool IsLoggedIn { get; set; }
+	
+	[JsonIgnore]
+	public DateTime? DeletedAt { get; set; }
 
 	[NotMapped]
 	public bool IsFollowing { get; set; } = false;
