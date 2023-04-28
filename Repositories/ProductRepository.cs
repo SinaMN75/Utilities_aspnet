@@ -241,10 +241,12 @@ public class ProductRepository : IProductRepository {
 
 	public async Task<GenericResponse> SimpleSell(SimpleSellDto dto) {
 		UserEntity buyer = (await _userRepository.ReadByIdMinimal(dto.BuyerUserId))!;
-		await _userRepository.Update(new UserCreateUpdateDto {
-			Id = dto.BuyerUserId,
-			BoughtProduts = buyer.BoughtProduts + "," + dto.ProductId
-		});
+		if (!buyer.BoughtProduts.Contains(dto.ProductId.ToString())) {
+			await _userRepository.Update(new UserCreateUpdateDto {
+				Id = dto.BuyerUserId,
+				BoughtProduts = buyer.BoughtProduts + "," + dto.ProductId
+			});
+		}
 		return new GenericResponse();
 	}
 }

@@ -232,7 +232,7 @@ public class ProductFilterDto {
 	public bool? OrderByZtoA { get; set; } = false;
 	public bool? OrderByPriceAccending { get; set; } = false;
 	public bool? OrderByPriceDecending { get; set; } = false;
-	public bool? OrderByCreatedDate { get; set; } = false;
+	public bool? OrderByCreatedDate { get; set; } = true;
 	public bool? OrderByCreaedDateDecending { get; set; } = false;
 	public bool? HasComment { get; set; } = false;
 	public bool? HasOrder { get; set; } = false;
