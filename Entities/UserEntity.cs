@@ -90,19 +90,29 @@ public class UserEntity : IdentityUser {
 	public DateTime? Birthdate { get; set; }
 	public DateTime? CreatedAt { get; set; }
 	public DateTime? UpdatedAt { get; set; }
-	
+
 	public string? AccessLevel { get; set; }
 	public string? Badge { get; set; }
 	public bool IsOnline { get; set; } = false;
-
-	public IEnumerable<FormEntity>? FormBuilders { get; set; }
-	public IEnumerable<MediaEntity>? Media { get; set; }
-	public IEnumerable<ProductEntity>? Products { get; set; }
-	public IEnumerable<CategoryEntity>? Categories { get; set; }
-	public IEnumerable<TransactionEntity>? Transactions { get; set; }
-	public IEnumerable<LikeCommentEntity>? LikeComments { get; set; }
-	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
 	
+	public IEnumerable<MediaEntity>? Media { get; set; }
+	public IEnumerable<CategoryEntity>? Categories { get; set; }
+
+	[JsonIgnore]
+	public IEnumerable<FormEntity>? FormBuilders { get; set; }
+	
+	[JsonIgnore]
+	public IEnumerable<ProductEntity>? Products { get; set; }
+	
+	[JsonIgnore]
+	public IEnumerable<TransactionEntity>? Transactions { get; set; }
+
+	[JsonIgnore]
+	public IEnumerable<LikeCommentEntity>? LikeComments { get; set; }
+
+	[JsonIgnore]
+	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
+
 	[JsonIgnore]
 	public string VisitedProducts { get; set; } = "";
 
@@ -120,10 +130,10 @@ public class UserEntity : IdentityUser {
 
 	[JsonIgnore]
 	public string BoughtProduts { get; set; } = "";
-	
+
 	[JsonIgnore]
 	public bool IsLoggedIn { get; set; }
-	
+
 	[JsonIgnore]
 	public DateTime? DeletedAt { get; set; }
 
