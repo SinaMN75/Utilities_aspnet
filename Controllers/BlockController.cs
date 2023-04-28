@@ -9,6 +9,7 @@ public class BlockController : BaseApiController {
 	public BlockController(IUserRepository repository) => _repository = repository;
 
 	[HttpGet("ReadMine")]
+	[OutputCache(PolicyName = "default")]
 	public async Task<ActionResult<GenericResponse<IQueryable<UserEntity>>>> ReadMine() => Result(await _repository.ReadMyBlockList());
 
 	[HttpPost]

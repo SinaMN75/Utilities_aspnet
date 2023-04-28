@@ -35,6 +35,7 @@ public class UserController : BaseApiController {
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	[AllowAnonymous]
 	[HttpGet("{id}")]
+	[OutputCache(PolicyName = "default")]
 	public async Task<ActionResult<GenericResponse<UserEntity?>>> ReadById(string id) => Result(await _repository.ReadById(id));
 
 	[HttpPut]
@@ -47,6 +48,7 @@ public class UserController : BaseApiController {
 
 	[HttpGet("ReadMyBlockList")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+	[OutputCache(PolicyName = "10s")]
 	public async Task<ActionResult<GenericResponse<IQueryable<UserEntity>>>> ReadMine() => Result(await _repository.ReadMyBlockList());
 
 	[HttpPost("ToggleBlock")]

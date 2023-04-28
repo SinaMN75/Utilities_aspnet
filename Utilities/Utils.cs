@@ -25,7 +25,10 @@ public static class StartupExtension {
 
 	private static void AddUtilitiesServices<T>(this WebApplicationBuilder builder, string connectionStrings, DatabaseType databaseType) where T : DbContext {
 		builder.Services.AddOptions();
-		builder.Services.AddOutputCache(x => x.AddPolicy("default", new DefaultOutputCachePolicy()));
+		builder.Services.AddOutputCache(x => {
+			x.AddPolicy("default", new DefaultOutputCachePolicy());
+			x.AddPolicy("10s", new ShortOutputCachePolicy());
+		});
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
 		builder.Services.AddRateLimiter(x => {
@@ -66,13 +69,7 @@ public static class StartupExtension {
 
 		builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 		builder.Services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")));
-		builder.Services.AddControllersWithViews(option => {
-			option.EnableEndpointRouting = false;
-			option.CacheProfiles.Add("default", new CacheProfile {
-				Duration = 10,
-				Location = ResponseCacheLocation.Any
-			});
-		}).AddNewtonsoftJson(options => {
+		builder.Services.AddControllersWithViews(option => option.EnableEndpointRouting = false).AddNewtonsoftJson(options => {
 			options.SerializerSettings.ContractResolver = new DefaultContractResolver();
 			options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
 			options.SerializerSettings.PreserveReferencesHandling = PreserveReferencesHandling.None;
@@ -190,6 +187,23 @@ internal class DefaultOutputCachePolicy : IOutputCachePolicy {
 		context.ResponseExpirationTimeSpan = TimeSpan.FromSeconds(60);
 		context.CacheVaryByRules.QueryKeys = "*";
 		context.CacheVaryByRules.VaryByHost = true;
+		return ValueTask.CompletedTask;
+	}
+}
+
+internal class ShortOutputCachePolicy : IOutputCachePolicy {
+	public ValueTask ServeFromCacheAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
+	public ValueTask ServeResponseAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
+
+	public ValueTask CacheRequestAsync(OutputCacheContext context, CancellationToken cancellation) {
+		context.AllowCacheLookup = true;
+		context.AllowCacheStorage = true;
+		context.AllowLocking = true;
+		context.EnableOutputCaching = true;
+		context.ResponseExpirationTimeSpan = TimeSpan.FromSeconds(10);
+		context.CacheVaryByRules.QueryKeys = "*";
+		context.CacheVaryByRules.VaryByHost = true;
+		context.CacheVaryByRules.HeaderNames = "*";
 		return ValueTask.CompletedTask;
 	}
 }

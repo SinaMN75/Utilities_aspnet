@@ -126,7 +126,6 @@ public class ProductRepository : IProductRepository {
 		if (dto.ShowForms.IsTrue()) q = q.Include(i => i.Forms);
 		if (dto.ShowFormFields.IsTrue()) q = q.Include(i => i.Forms)!.ThenInclude(i => i.FormField);
 		if (dto.ShowMedia.IsTrue()) q = q.Include(i => i.Media);
-		if (dto.ShowReports.IsTrue()) q = q.Include(i => i.Reports);
 		if (dto.ShowVisitProducts.IsTrue()) q = q.Include(i => i.VisitProducts);
 		if (dto.OrderByVotes.IsTrue()) q = q.OrderBy(x => x.VoteCount);
 		if (dto.OrderByVotesDecending.IsTrue()) q = q.OrderByDescending(x => x.VoteCount);

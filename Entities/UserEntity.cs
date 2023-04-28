@@ -306,9 +306,6 @@ public class UserFilterDto {
 
 	public bool? ShowMedia { get; set; }
 	public bool? ShowCategories { get; set; }
-	public bool? ShowForms { get; set; }
-	public bool? ShowProducts { get; set; }
-	public bool? ShowTransactions { get; set; }
 	public bool? ShowSuspend { get; set; }
 	public bool? OrderByUserName { get; set; }
 	public IEnumerable<string>? UserIds { get; set; }

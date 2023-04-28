@@ -8,9 +8,11 @@ public class CommentController : BaseApiController {
 	public CommentController(ICommentRepository commentRepository) => _repository = commentRepository;
 
 	[HttpGet("{id:guid}")]
+	[OutputCache(PolicyName = "10s")]
 	public async Task<ActionResult<GenericResponse<CommentEntity>>> Read(Guid id) => Result(await _repository.Read(id));
 
 	[HttpGet("ReadByProductId/{id:guid}")]
+	[OutputCache(PolicyName = "10s")]
 	public ActionResult<GenericResponse<IQueryable<CommentEntity>?>> ReadByProductId(Guid id) => Result(_repository.ReadByProductId(id));
 
 	[HttpPost]

@@ -9,9 +9,11 @@ public class ChatController : BaseApiController {
 	public ChatController(IChatRepository repository) => _repository = repository;
 
 	[HttpGet]
+	[OutputCache(PolicyName = "10s")]
 	public async Task<ActionResult<GenericResponse<IEnumerable<ChatEntity>?>>> Read() => Result(await _repository.Read());
 
 	[HttpGet("{userId}")]
+	[OutputCache(PolicyName = "10s")]
 	public async Task<ActionResult<GenericResponse<IEnumerable<ChatEntity>?>>> ReadById(string userId) => Result(await _repository.ReadByUserId(userId));
 
 	[HttpPost]
@@ -45,15 +47,18 @@ public class ChatController : BaseApiController {
 		=> Result(await _repository.CreateGroupChatMessage(dto));
 
 	[HttpGet("ReadMyGroupChats")]
+	[OutputCache(PolicyName = "10s")]
 	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> ReadMyGroupChats() => Result(await _repository.ReadMyGroupChats());
 
 	[HttpGet("ReadGroupChatMessages/{id:guid}")]
+	[OutputCache(PolicyName = "10s")]
 	public ActionResult<GenericResponse<GroupChatMessageEntity?>> ReadGroupChatMessages(Guid id) => Result(_repository.ReadGroupChatMessages(id));
 
 	[HttpPost("SeenGroupChatMessage/{id:guid}")]
 	public async Task<ActionResult<GenericResponse>> SeenGroupChatMesDeleteGroupChatsage(Guid id) => Result(await _repository.SeenGroupChatMessage(id));
 
 	[HttpGet("ReadGroupChatById/{id:guid}")]
+	[OutputCache(PolicyName = "10s")]
 	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> ReadGroupChatById(Guid id) => Result(await _repository.ReadGroupChatById(id));
 
 	[HttpPost("AddReactionToMessage/{emoji}/{messageId:guid}")]

@@ -123,9 +123,6 @@ public class UserRepository : IUserRepository {
 		
 		if (dto.ShowMedia.IsTrue()) q = q.Include(u => u.Media);
 		if (dto.ShowCategories.IsTrue()) q = q.Include(u => u.Categories);
-		if (dto.ShowForms.IsTrue()) q = q.Include(u => u.FormBuilders);
-		if (dto.ShowTransactions.IsTrue()) q = q.Include(u => u.Transactions);
-		if (dto.ShowProducts.IsTrue()) q = q.Include(u => u.Products!.Where(x => x.DeletedAt == null)).ThenInclude(u => u.Media);
 
 		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);

@@ -12,8 +12,10 @@ public class TransactionController : BaseApiController {
 	public async Task<ActionResult<GenericResponse<TransactionEntity>>> Create(TransactionEntity dto) => Result(await _repository.Create(dto));
 
 	[HttpGet]
+	[OutputCache(PolicyName = "default")]
 	public ActionResult<GenericResponse<IQueryable<TransactionEntity>>> Read() => Result(_repository.Read());
 
 	[HttpGet("Mine")]
+	[OutputCache(PolicyName = "default")]
 	public ActionResult<GenericResponse<IQueryable<TransactionEntity>>> ReadMine() => Result(_repository.ReadMine());
 }

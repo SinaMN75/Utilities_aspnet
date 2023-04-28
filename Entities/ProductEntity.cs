@@ -96,13 +96,25 @@ public class ProductEntity : BaseEntity {
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<FormEntity>? Forms { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
+
+	[JsonIgnore]
 	public IEnumerable<ReportEntity>? Reports { get; set; }
+
+	[JsonIgnore]
 	public IEnumerable<BookmarkEntity>? Bookmarks { get; set; }
+
 	public IEnumerable<CommentEntity>? Comments { get; set; }
+
+	[JsonIgnore]
 	public IEnumerable<OrderDetailEntity>? OrderDetails { get; set; }
+
+	[JsonIgnore]
 	public IEnumerable<GroupChatEntity>? GroupChat { get; set; }
+
 	public IEnumerable<ProductInsight>? ProductInsights { get; set; }
 	public IEnumerable<VisitProducts>? VisitProducts { get; set; }
+
+	[JsonIgnore]
 	public IEnumerable<ChatEntity>? Chats { get; set; }
 }
 
@@ -221,7 +233,6 @@ public class ProductFilterDto {
 	public bool? ShowCategories { get; set; } = false;
 	public bool? ShowCategoriesFormFields { get; set; } = false;
 	public bool? ShowVisitProducts { get; set; } = false;
-	public bool? ShowReports { get; set; } = false;
 	public bool? ShowComments { get; set; } = false;
 	public bool? ShowOrders { get; set; } = false;
 	public bool? ShowCreator { get; set; } = false;

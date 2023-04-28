@@ -2,13 +2,13 @@
 
 [ApiController]
 [Route("api/[controller]")]
+[OutputCache(PolicyName = "default")]
 public class AppSettingsController : BaseApiController {
 	private readonly IConfiguration _config;
 
 	public AppSettingsController(IConfiguration config) => _config = config;
 
 	[HttpGet]
-	[OutputCache(PolicyName = "default")]
 	public ActionResult<GenericResponse<EnumDto>> Read() {
 		AppSettings appSettings = new();
 		_config.GetSection("AppSettings").Bind(appSettings);

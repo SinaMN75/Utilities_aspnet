@@ -2,13 +2,13 @@ namespace Utilities_aspnet.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[OutputCache(PolicyName = "default")]
 public class ContentController : BaseApiController {
 	private readonly IContentRepository _repository;
 
 	public ContentController(IContentRepository repository) => _repository = repository;
 
 	[HttpGet]
-	[OutputCache(PolicyName = "default")]
 	public ActionResult<GenericResponse<IQueryable<ContentEntity>>> Read() => Result(_repository.Read());
 
 	[HttpPost]
