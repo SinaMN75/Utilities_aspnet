@@ -38,7 +38,6 @@ public class UserRepository : IUserRepository {
 		UserEntity? entity = await _dbContext.Set<UserEntity>()
 			.Include(u => u.Media)
 			.Include(u => u.Categories)!.ThenInclude(u => u.Media)
-			.Include(u => u.Products!.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Media)
 			.FirstOrDefaultAsync(u => isUserId ? u.Id == idOrUserName : u.UserName == idOrUserName);
 
 		if (entity == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
