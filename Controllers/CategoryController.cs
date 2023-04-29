@@ -11,6 +11,11 @@ public class CategoryController : BaseApiController {
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Create(CategoryCreateUpdateDto dto) => Result(await _repository.Create(dto));
 
+	[HttpPost]
+	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+	public async Task<ActionResult<GenericResponse<CategoryEntity>>> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto)
+		=> Result(await _repository.BulkCreate(dto));
+
 	[HttpGet]
 	[OutputCache(PolicyName = "default")]
 	public ActionResult<GenericResponse<IQueryable<CategoryEntity>>> Read([FromQuery] CategoryFilterDto dto) => Result(_repository.Filter(dto));
