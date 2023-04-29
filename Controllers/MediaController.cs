@@ -3,9 +3,9 @@
 [ApiController]
 [Route("api/[controller]")]
 public class MediaController : BaseApiController {
-	private readonly IUploadRepository _repository;
+	private readonly IMediaRepository _repository;
 
-	public MediaController(IUploadRepository repository) => _repository = repository;
+	public MediaController(IMediaRepository repository) => _repository = repository;
 
 	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

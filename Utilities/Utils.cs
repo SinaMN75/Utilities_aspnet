@@ -82,7 +82,6 @@ public static class StartupExtension {
 		builder.Services.AddScoped<IReportRepository, ReportRepository>();
 		builder.Services.AddScoped<IUserRepository, UserRepository>();
 		builder.Services.AddScoped<IMediaRepository, MediaRepository>();
-		builder.Services.AddScoped<IUploadRepository, UploadRepository>();
 		builder.Services.AddScoped<IFollowBookmarkRepository, FollowBookmarkRepository>();
 		builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 		builder.Services.AddScoped<IProductRepository, ProductRepository>();

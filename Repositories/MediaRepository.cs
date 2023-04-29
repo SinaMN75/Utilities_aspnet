@@ -1,19 +1,118 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
 public interface IMediaRepository {
-	void SaveMedia(IFormFile image, string name, string folder);
-	string GetFileName(Guid guid, string ext = ".png");
-	string GetFileUrl(string name, string folder);
+	Task<GenericResponse<IEnumerable<MediaEntity>?>> Upload(UploadDto model);
+	Task<GenericResponse<MediaEntity?>> UpdateMedia(Guid id, UpdateMediaDto model);
+	Task<GenericResponse> Delete(Guid id);
 }
 
 public class MediaRepository : IMediaRepository {
 	private readonly IWebHostEnvironment _env;
+	private readonly DbContext _dbContext;
 
-	public MediaRepository(IWebHostEnvironment env) => _env = env;
+	public MediaRepository(IWebHostEnvironment env, DbContext dbContext) {
+		_env = env;
+		_dbContext = dbContext;
+	}
 
-	public string GetFileName(Guid guid, string ext = ".png") => guid.ToString("N") + ext;
+	public async Task<GenericResponse<IEnumerable<MediaEntity>?>> Upload(UploadDto model) {
+		List<MediaEntity> medias = new();
 
-	public string GetFileUrl(string name, string folder) => Path.Combine(folder, name);
+		if (model.Files != null) {
+			foreach (IFormFile file in model.Files) {
+				string folder = "";
+				if (model.UserId != null) {
+					folder = "Users";
+					List<MediaEntity> userMedia = _dbContext.Set<MediaEntity>().Where(x => x.UserId == model.UserId).ToList();
+					if (userMedia.Any()) {
+						_dbContext.Set<MediaEntity>().RemoveRange(userMedia);
+						await _dbContext.SaveChangesAsync();
+					}
+				}
+
+				string name = Guid.NewGuid() + Path.GetExtension(file.FileName);
+
+				List<string> allowedExtensions = new() {".png", ".gif", ".jpg", ".jpeg", ".mp4", ".mp3", ".pdf", ".aac"};
+				if (!allowedExtensions.Contains(Path.GetExtension(file.FileName.ToLower()))) {
+					return new GenericResponse<IEnumerable<MediaEntity>?>(null, UtilitiesStatusCodes.BadRequest);
+				}
+
+				MediaEntity media = new() {
+					FileName = Path.Combine(folder, name),
+					UserId = model.UserId,
+					ProductId = model.ProductId,
+					ContentId = model.ContentId,
+					CategoryId = model.CategoryId,
+					ChatId = model.ChatId,
+					CommentId = model.CommentId,
+					BookmarkId = model.BookmarkId,
+					CreatedAt = DateTime.Now,
+					UseCase = model.UseCase,
+					Title = model.Title,
+					IsPrivate = model.IsPrivate,
+					Size = model.Size,
+					NotificationId = model.NotificationId,
+					GroupChatId = model.GroupChatId,
+					GroupChatMessageId = model.GroupChatMessageId
+				};
+				await _dbContext.Set<MediaEntity>().AddAsync(media);
+				await _dbContext.SaveChangesAsync();
+				medias.Add(media);
+
+				SaveMedia(file, name, folder);
+			}
+		}
+		if (model.Links != null) {
+			foreach (MediaEntity media in model.Links.Select(link => new MediaEntity {
+				         Link = link,
+				         UserId = model.UserId,
+				         ProductId = model.ProductId,
+				         ContentId = model.ContentId,
+				         CategoryId = model.CategoryId,
+				         ChatId = model.ChatId,
+				         CommentId = model.CommentId,
+				         CreatedAt = DateTime.Now,
+				         UseCase = model.UseCase,
+				         Title = model.Title,
+				         Size = model.Size,
+				         NotificationId = model.NotificationId
+			         })) {
+				await _dbContext.Set<MediaEntity>().AddAsync(media);
+				await _dbContext.SaveChangesAsync();
+				medias.Add(media);
+			}
+		}
+
+		return new GenericResponse<IEnumerable<MediaEntity>?>(medias);
+	}
+
+	public async Task<GenericResponse> Delete(Guid id) {
+		MediaEntity? media = await _dbContext.Set<MediaEntity>().FirstOrDefaultAsync(x => x.Id == id);
+		if (media == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
+		try {
+			File.Delete(Path.Combine(_env.WebRootPath, "Medias", media.FileName!));
+		}
+		catch (Exception) { }
+		_dbContext.Set<MediaEntity>().Remove(media);
+		await _dbContext.SaveChangesAsync();
+		return new GenericResponse();
+	}
+
+	public async Task<GenericResponse<MediaEntity?>> UpdateMedia(Guid id, UpdateMediaDto model) {
+		MediaEntity? media = await _dbContext.Set<MediaEntity>().FirstOrDefaultAsync(x => x.Id == id);
+		if (media is null)
+			throw new Exception("media is not found");
+
+		media.Title = model.Title ?? media.Title;
+		media.Size = model.Size ?? media.Size;
+		media.UpdatedAt = DateTime.Now;
+		media.UseCase = model.UseCase ?? media.UseCase;
+
+		_dbContext.Set<MediaEntity>().Update(media);
+		await _dbContext.SaveChangesAsync();
+
+		return new GenericResponse<MediaEntity?>(media);
+	}
 
 	public void SaveMedia(IFormFile image, string name, string folder) {
 		string webRoot = _env.WebRootPath;

@@ -12,17 +12,17 @@ public interface IProductRepository {
 
 public class ProductRepository : IProductRepository {
 	private readonly DbContext _dbContext;
-	private readonly IUploadRepository _uploadRepository;
+	private readonly IMediaRepository _mediaRepository;
 	private readonly IUserRepository _userRepository;
 	private readonly string? _userId;
 
 	public ProductRepository(
 		DbContext dbContext,
 		IHttpContextAccessor httpContextAccessor,
-		IUploadRepository uploadRepository,
+		IMediaRepository mediaRepository,
 		IUserRepository userRepository) {
 		_dbContext = dbContext;
-		_uploadRepository = uploadRepository;
+		_mediaRepository = mediaRepository;
 		_userRepository = userRepository;
 		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 	}
@@ -46,9 +46,7 @@ public class ProductRepository : IProductRepository {
 	public async Task<GenericResponse<ProductEntity>> CreateWithFiles(ProductCreateUpdateDto dto, CancellationToken ct) {
 		ProductEntity entity = new();
 		if (dto.Upload is not null) {
-			foreach (UploadDto uploadDto in dto.Upload) {
-				await _uploadRepository.Upload(uploadDto);
-			}
+			foreach (UploadDto uploadDto in dto.Upload) await _mediaRepository.Upload(uploadDto);
 		}
 
 		if (dto.ProductInsight is not null)
@@ -139,7 +137,7 @@ public class ProductRepository : IProductRepository {
 			q = q.Include(i => i.User).ThenInclude(x => x!.Media);
 			q = q.Include(i => i.User).ThenInclude(x => x!.Categories);
 		}
-		
+
 		if (_userId.IsNotNullOrEmpty()) {
 			UserEntity user = (await _userRepository.ReadByIdMinimal(_userId))!;
 			if (dto.IsFollowing.IsTrue()) q = q.Where(i => user.FollowingUsers.Contains(i.UserId!));
