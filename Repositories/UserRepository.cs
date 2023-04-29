@@ -127,7 +127,7 @@ public class UserRepository : IUserRepository {
 		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
-		return new GenericResponse<IQueryable<UserEntity>>(q.OrderBy(x => x.CreatedAt)) {
+		return new GenericResponse<IQueryable<UserEntity>>(q.AsSingleQuery()) {
 			TotalCount = totalCount,
 			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
 			PageSize = dto.PageSize
