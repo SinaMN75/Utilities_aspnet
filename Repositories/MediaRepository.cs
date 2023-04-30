@@ -51,6 +51,9 @@ public class MediaRepository : IMediaRepository {
 					Title = model.Title,
 					IsPrivate = model.IsPrivate,
 					Size = model.Size,
+					Time = model.Time,
+					Artist = model.Artist,
+					Album = model.Album,
 					NotificationId = model.NotificationId,
 					GroupChatId = model.GroupChatId,
 					GroupChatMessageId = model.GroupChatMessageId
