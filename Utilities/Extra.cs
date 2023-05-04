@@ -75,12 +75,12 @@ public class Utils
             if (reciever.BlockedUsers.IsNotNullOrEmpty())
             {
                 isBlocked = reciever.BlockedUsers.Contains(sender.Id);
-                utilCode = UtilitiesStatusCodes.UserSenderBlocked;
+                if(isBlocked) utilCode = UtilitiesStatusCodes.UserSenderBlocked;
             }
             else if (sender.BlockedUsers.IsNotNullOrEmpty() && !isBlocked)
             {
                 isBlocked = sender.BlockedUsers.Contains(reciever.Id);
-                utilCode = UtilitiesStatusCodes.UserRecieverBlocked;
+                if (isBlocked) utilCode = UtilitiesStatusCodes.UserRecieverBlocked;                
             }
         }
         return new Tuple<bool, UtilitiesStatusCodes>(isBlocked,utilCode);
