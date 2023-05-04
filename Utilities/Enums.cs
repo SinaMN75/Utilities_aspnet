@@ -26,6 +26,8 @@ public enum UtilitiesStatusCodes {
 	OrderPayed = 608,
 	OutOfStock = 610,
 	NotEnoughMoney  = 611,
+	UserRecieverBlocked = 612,
+	UserSenderBlocked = 613
 }
 
 public enum NotoficationType {
