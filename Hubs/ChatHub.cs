@@ -95,6 +95,33 @@ namespace Utilities_aspnet.Hubs
             }
         }
 
+        /// <summary>
+        /// about types
+        /// 1 = is typing
+        /// 2 = recording voice
+        /// 3 = sending file
+        /// 4 = none
+        /// </summary
+        public async Task SendingState(string sender, string receiver, int type)
+        {
+            string fileName = Path.Combine(uploadsFolder, $"sending state - {DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss")}");
+            FileInfo log = new FileInfo(fileName);
+            using (StreamWriter sw = log.CreateText())
+            {
+                sw.WriteLine($"sender : {sender}, reviever: {receiver} type :{type}");
+                UserEntity? user = await _context.Set<UserEntity>().FirstOrDefaultAsync(u => u.Id == receiver);
+                sw.WriteLine($"reciever id : {user.Id}");
+                if (user != null)
+                {
+                    if (user.IsOnline)
+                    {
+                        await Clients.User(user.Id).SendAsync("MessageState", sender, type);
+                        sw.WriteLine("sended to client");
+                    }
+                }
+            }
+        }
+
         //public async Task SendEditedMessageToReceiver(
         //	string sender,
         //	string receiver,
