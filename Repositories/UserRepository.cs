@@ -126,24 +126,25 @@ public class UserRepository : IUserRepository {
 		if (dto.ShowMedia.IsTrue()) q = q.Include(u => u.Media);
 		if (dto.ShowCategories.IsTrue()) q = q.Include(u => u.Categories);
 
-        if (!dto.ShowBlockedUser.IsTrue())
-        {
-            var senderUser = _dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == _userId);
-            var list = q.ToList();
-            if (senderUser is not null || list.IsNotNullOrEmpty())
-            {
-                var listOfBlockedUser = list.Where(a => a.BlockedUsers.Contains(senderUser.Id)).Select(s => s.Id).ToList();
+		//ToCheck WithSina : in query am kheili sangine
+    //    if (!dto.ShowBlockedUser.IsTrue())
+    //    {
+    //        var senderUser = _dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == _userId);
+    //        var list = q.ToList();
+    //        if (senderUser is not null || list.IsNotNullOrEmpty())
+    //        {
+    //            var listOfBlockedUser = list.Where(a => a.BlockedUsers.Contains(senderUser.Id)).Select(s => s.Id).ToList();
 
-                if (senderUser.BlockedUsers.IsNotNullOrEmpty())
-                {
-                    var usersThatBlockedBySenderUser = senderUser.BlockedUsers.Split(",");
-                    var filterdList =  usersThatBlockedBySenderUser.Where(w => w.IsNotNullOrEmpty());
-                    listOfBlockedUser.AddRange(filterdList);
-                }
-				var tempQ = list.Where(w => listOfBlockedUser.Any(a => a != w.Id));
-				q = tempQ.AsQueryable();
-            }
-        }
+    //            if (senderUser.BlockedUsers.IsNotNullOrEmpty())
+    //            {
+    //                var usersThatBlockedBySenderUser = senderUser.BlockedUsers.Split(",");
+    //                var filterdList =  usersThatBlockedBySenderUser.Where(w => w.IsNotNullOrEmpty());
+    //                listOfBlockedUser.AddRange(filterdList);
+    //            }
+				//var tempQ = list.Where(w => listOfBlockedUser.Any(a => a != w.Id));
+				//q = tempQ.AsQueryable();
+    //        }
+    //    }
 
         int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
