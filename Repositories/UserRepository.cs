@@ -1,4 +1,6 @@
-﻿namespace Utilities_aspnet.Repositories;
+﻿using Utilities_aspnet.Utilities;
+
+namespace Utilities_aspnet.Repositories;
 
 public interface IUserRepository {
 	Task<GenericResponse<IQueryable<UserEntity>>> Filter(UserFilterDto dto);
@@ -123,6 +125,11 @@ public class UserRepository : IUserRepository {
 		
 		if (dto.ShowMedia.IsTrue()) q = q.Include(u => u.Media);
 		if (dto.ShowCategories.IsTrue()) q = q.Include(u => u.Categories);
+
+		if (!dto.ShowBlockedUser.IsTrue())
+		{
+			q = q.RemoveBlockedUsers(_dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == _userId));
+        }
 
 		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);

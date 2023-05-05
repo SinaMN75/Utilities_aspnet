@@ -1,3 +1,6 @@
+using System.Reflection;
+using System.Runtime.CompilerServices;
+
 namespace Utilities_aspnet.Utilities;
 
 public class GenericResponse<T> : GenericResponse
@@ -36,6 +39,25 @@ public static class EnumerableExtension
 {
     public static bool IsNotNullOrEmpty<T>(this IEnumerable<T>? list) => list != null && list.Any();
     public static bool IsNotNull<T>(this IEnumerable<T>? list) => list != null;
+    public static IQueryable<UserEntity>? RemoveBlockedUsers(this IQueryable<UserEntity>? inputList, UserEntity? senderUser)
+    {
+        var list = inputList?.ToList();
+        if (senderUser is null || list.IsNullOrEmpty())
+            return list.AsQueryable();
+
+        var listOfBlockedUser = list.Where(a => a.BlockedUsers.Contains(senderUser.Id)).Select(s => s.Id).ToList();
+
+        if (senderUser.BlockedUsers.IsNotNullOrEmpty())
+        {
+            var usersThatBlockedBySenderUser = senderUser.BlockedUsers.Split(",");
+            usersThatBlockedBySenderUser.Where(w => w.Length > 0);
+            listOfBlockedUser.AddRange(usersThatBlockedBySenderUser);
+        }
+
+        list.Where(w => listOfBlockedUser.Any(a => a != w.Id));
+
+        return list.AsQueryable();
+    }
 }
 
 public static class NumberExtension
@@ -66,7 +88,7 @@ public class Utils
         return otp;
     }
 
-    public static Tuple<bool,UtilitiesStatusCodes> IsBlockedUser(UserEntity? reciever, UserEntity? sender)
+    public static Tuple<bool, UtilitiesStatusCodes> IsBlockedUser(UserEntity? reciever, UserEntity? sender)
     {
         bool isBlocked = false;
         UtilitiesStatusCodes utilCode = UtilitiesStatusCodes.Success;
@@ -75,14 +97,14 @@ public class Utils
             if (reciever.BlockedUsers.IsNotNullOrEmpty())
             {
                 isBlocked = reciever.BlockedUsers.Contains(sender.Id);
-                if(isBlocked) utilCode = UtilitiesStatusCodes.UserSenderBlocked;
+                if (isBlocked) utilCode = UtilitiesStatusCodes.UserSenderBlocked;
             }
             else if (sender.BlockedUsers.IsNotNullOrEmpty() && !isBlocked)
             {
                 isBlocked = sender.BlockedUsers.Contains(reciever.Id);
-                if (isBlocked) utilCode = UtilitiesStatusCodes.UserRecieverBlocked;                
+                if (isBlocked) utilCode = UtilitiesStatusCodes.UserRecieverBlocked;
             }
         }
-        return new Tuple<bool, UtilitiesStatusCodes>(isBlocked,utilCode);
+        return new Tuple<bool, UtilitiesStatusCodes>(isBlocked, utilCode);
     }
 }

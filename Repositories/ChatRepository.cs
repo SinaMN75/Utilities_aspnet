@@ -37,13 +37,8 @@ public class ChatRepository : IChatRepository
 
     public async Task<GenericResponse<ChatReadDto?>> Create(ChatCreateUpdateDto model)
     {
-
         UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == model.UserId);
         if (user == null) return new GenericResponse<ChatReadDto?>(null, UtilitiesStatusCodes.BadRequest);
-
-        var blockedState = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == model.UserId), _dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == _userId));
-        if (blockedState.Item1)
-            return new GenericResponse<ChatReadDto?>(null, blockedState.Item2);
 
         List<UserEntity?> users = new();
         foreach (string id in model.Users ?? new List<string>()) users.Add(await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id));
@@ -145,6 +140,11 @@ public class ChatRepository : IChatRepository
         {
             string firstUserId = dto.UserIds.ToList()[0];
             string secondUserId = dto.UserIds.ToList()[1];
+
+            var blockedState = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == firstUserId), _dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == secondUserId));
+            if (blockedState.Item1)
+                return new GenericResponse<GroupChatEntity?>(null, blockedState.Item2);
+
             GroupChatEntity? e = await _dbContext.Set<GroupChatEntity>().AsNoTracking()
                 .Include(x => x.Users)!.ThenInclude(x => x.Media)
                 .Include(x => x.Products)!.ThenInclude(x => x.Media)
