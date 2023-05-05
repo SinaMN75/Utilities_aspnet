@@ -126,12 +126,27 @@ public class UserRepository : IUserRepository {
 		if (dto.ShowMedia.IsTrue()) q = q.Include(u => u.Media);
 		if (dto.ShowCategories.IsTrue()) q = q.Include(u => u.Categories);
 
-		if (!dto.ShowBlockedUser.IsTrue())
-		{
-			q = q.RemoveBlockedUsers(_dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == _userId));
+        if (!dto.ShowBlockedUser.IsTrue())
+        {
+            var senderUser = _dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == _userId);
+            var list = q;
+
+            if (senderUser is not null || list.IsNotNullOrEmpty())
+            {
+                var listOfBlockedUser = list.Where(a => a.BlockedUsers.Contains(senderUser.Id)).Select(s => s.Id).ToList();
+
+                if (senderUser.BlockedUsers.IsNotNullOrEmpty())
+                {
+                    var usersThatBlockedBySenderUser = senderUser.BlockedUsers.Split(",");
+                    usersThatBlockedBySenderUser.Where(w => w.Length > 0);
+                    listOfBlockedUser.AddRange(usersThatBlockedBySenderUser);
+                }
+
+                q = q.Where(w => listOfBlockedUser.Any(a => a != w.Id));
+            }
         }
 
-		int totalCount = await q.CountAsync();
+        int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
 		return new GenericResponse<IQueryable<UserEntity>>(q.AsSingleQuery()) {

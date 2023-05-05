@@ -171,7 +171,11 @@ public class ChatRepository : IChatRepository
         if (dto.UserIds.IsNotNull())
         {
             List<UserEntity> users = new();
-            foreach (string id in dto.UserIds!) users.Add((await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
+            foreach (string id in dto.UserIds!)
+            {
+                var isBlocked = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == id), _dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == _userId));
+                if (!isBlocked.Item1) users.Add((await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
+            }
             e.Users = users;
         }
 
@@ -518,7 +522,10 @@ public class ChatRepository : IChatRepository
         List<UserEntity> users = new();
         if (dto.UserIds.IsNotNull())
             foreach (string id in dto.UserIds!)
-                users.Add((await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
+            {
+                var isBlocked = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == id), _dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == _userId));
+                if (!isBlocked.Item1) users.Add((await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
+            }
 
         List<ProductEntity> products = new();
         if (dto.Products.IsNotNull())

@@ -237,7 +237,8 @@ public class ProductFilterDto {
 	public bool? ShowOrders { get; set; } = false;
 	public bool? ShowCreator { get; set; } = false;
 	public bool? ShowCategoryMedia { get; set; } = false;
-	public bool? OrderByVotes { get; set; } = false;
+    public bool? ShowBlockedUsers { get; set; }
+    public bool? OrderByVotes { get; set; } = false;
 	public bool? OrderByVotesDecending { get; set; } = false;
 	public bool? OrderByAtoZ { get; set; } = false;
 	public bool? OrderByZtoA { get; set; } = false;

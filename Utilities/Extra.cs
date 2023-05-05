@@ -36,25 +36,6 @@ public static class EnumerableExtension
 {
     public static bool IsNotNullOrEmpty<T>(this IEnumerable<T>? list) => list != null && list.Any();
     public static bool IsNotNull<T>(this IEnumerable<T>? list) => list != null;
-    public static IQueryable<UserEntity>? RemoveBlockedUsers(this IQueryable<UserEntity>? inputList, UserEntity? senderUser)
-    {
-        var list = inputList?.ToList();
-        if (senderUser is null || list.IsNullOrEmpty())
-            return list.AsQueryable();
-
-        var listOfBlockedUser = list.Where(a => a.BlockedUsers.Contains(senderUser.Id)).Select(s => s.Id).ToList();
-
-        if (senderUser.BlockedUsers.IsNotNullOrEmpty())
-        {
-            var usersThatBlockedBySenderUser = senderUser.BlockedUsers.Split(",");
-            usersThatBlockedBySenderUser.Where(w => w.Length > 0);
-            listOfBlockedUser.AddRange(usersThatBlockedBySenderUser);
-        }
-
-        list.Where(w => listOfBlockedUser.Any(a => a != w.Id));
-
-        return list.AsQueryable();
-    }
 }
 
 public static class NumberExtension

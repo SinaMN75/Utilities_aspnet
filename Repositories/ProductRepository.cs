@@ -138,7 +138,19 @@ public class ProductRepository : IProductRepository {
 			q = q.Include(i => i.User).ThenInclude(x => x!.Categories);
 		}
 
-		if (_userId.IsNotNullOrEmpty()) {
+        if (!dto.ShowBlockedUsers.IsTrue())
+        {
+            var listOfProductThatHaveOwner = q.Where(w => w.UserId.IsNotNullOrEmpty()).ToList();
+
+            foreach (var product in listOfProductThatHaveOwner)
+            {
+                var blockedState = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == product.UserId), _dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == _userId));
+                if (blockedState.Item1) listOfProductThatHaveOwner.Remove(product);
+            }
+            q = listOfProductThatHaveOwner.AsQueryable();
+        }
+
+        if (_userId.IsNotNullOrEmpty()) {
 			UserEntity user = (await _userRepository.ReadByIdMinimal(_userId))!;
 			if (dto.IsFollowing.IsTrue()) q = q.Where(i => user.FollowingUsers.Contains(i.UserId!));
 			if (dto.IsBookmarked.IsTrue()) q = q.Where(i => user.BookmarkedProducts.Contains(i.Id.ToString()));
