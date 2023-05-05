@@ -1,6 +1,3 @@
-using System.Reflection;
-using System.Runtime.CompilerServices;
-
 namespace Utilities_aspnet.Utilities;
 
 public class GenericResponse<T> : GenericResponse
