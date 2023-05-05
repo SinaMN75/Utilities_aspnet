@@ -72,7 +72,7 @@ public class UserRepository : IUserRepository {
 	}
 
 	public async Task<GenericResponse<IQueryable<UserEntity>>> Filter(UserFilterDto dto) {
-		IQueryable<UserEntity> q = _dbContext.Set<UserEntity>().Where(x => x.DeletedAt == null).AsNoTracking();
+		IQueryable<UserEntity> q = _dbContext.Set<UserEntity>().Where(x => x.DeletedAt == null);
 		
 		if (dto.UserNameExact != null) q = q.Where(x => x.AppUserName == dto.UserNameExact || x.UserName == dto.UserNameExact);
 		if (dto.UserId != null) q = q.Where(x => x.Id == dto.UserId);
@@ -129,8 +129,7 @@ public class UserRepository : IUserRepository {
         if (!dto.ShowBlockedUser.IsTrue())
         {
             var senderUser = _dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == _userId);
-            var list = q;
-
+            var list = q.ToList();
             if (senderUser is not null || list.IsNotNullOrEmpty())
             {
                 var listOfBlockedUser = list.Where(a => a.BlockedUsers.Contains(senderUser.Id)).Select(s => s.Id).ToList();
@@ -138,15 +137,15 @@ public class UserRepository : IUserRepository {
                 if (senderUser.BlockedUsers.IsNotNullOrEmpty())
                 {
                     var usersThatBlockedBySenderUser = senderUser.BlockedUsers.Split(",");
-                    usersThatBlockedBySenderUser.Where(w => w.Length > 0);
-                    listOfBlockedUser.AddRange(usersThatBlockedBySenderUser);
+                    var filterdList =  usersThatBlockedBySenderUser.Where(w => w.IsNotNullOrEmpty());
+                    listOfBlockedUser.AddRange(filterdList);
                 }
-
-                q = q.Where(w => listOfBlockedUser.Any(a => a != w.Id));
+				var tempQ = list.Where(w => listOfBlockedUser.Any(a => a != w.Id));
+				q = tempQ.AsQueryable();
             }
         }
 
-        int totalCount = await q.CountAsync();
+        int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
 		return new GenericResponse<IQueryable<UserEntity>>(q.AsSingleQuery()) {

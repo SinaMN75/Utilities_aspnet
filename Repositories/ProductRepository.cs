@@ -138,17 +138,18 @@ public class ProductRepository : IProductRepository {
 			q = q.Include(i => i.User).ThenInclude(x => x!.Categories);
 		}
 
-        if (!dto.ShowBlockedUsers.IsTrue())
-        {
-            var listOfProductThatHaveOwner = q.Where(w => w.UserId.IsNotNullOrEmpty()).ToList();
-
-            foreach (var product in listOfProductThatHaveOwner)
-            {
-                var blockedState = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == product.UserId), _dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == _userId));
-                if (blockedState.Item1) listOfProductThatHaveOwner.Remove(product);
-            }
-            q = listOfProductThatHaveOwner.AsQueryable();
-        }
+        //ToCheck : in query besyar query sanginiye va momkene moshkel saz beshe ba in structure i ke darim
+        //     if (!dto.ShowBlockedUsers.IsTrue())
+        //     {
+        //		   var list = q.ToList();
+        //		   var tempList = q.ToList();
+        //         foreach (var product in list)
+        //         {
+        //             var blockedState = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == product.UserId), _dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == _userId));
+        //             if (blockedState.Item1) tempList.Remove(product);
+        //         }
+        //         q = tempList.AsQueryable();
+        //     }
 
         if (_userId.IsNotNullOrEmpty()) {
 			UserEntity user = (await _userRepository.ReadByIdMinimal(_userId))!;
@@ -157,7 +158,7 @@ public class ProductRepository : IProductRepository {
 			if (dto.IsMyBoughtList.IsTrue()) q = q.Where(i => user.BoughtProduts.Contains(i.Id.ToString()));
 		}
 
-		int totalCount = await q.CountAsync();
+		int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
 		return new GenericResponse<IQueryable<ProductEntity>>(q.AsSingleQuery()) {
