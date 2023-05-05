@@ -90,6 +90,12 @@ namespace Utilities_aspnet.Hubs
                         await Clients.User(user.Id).SendAsync("MessageReceived", sender, message);
                         sw.WriteLine("sended to client");
                     }
+                    else
+                    {
+                        message = message + "template";
+                        await Clients.User(user.Id).SendAsync("MessageReceived", sender, message);
+                        sw.WriteLine("sended to client");
+                    }
                     //Todo: else => push notification for receiver
                 }
             }
