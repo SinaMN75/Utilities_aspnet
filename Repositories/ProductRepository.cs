@@ -377,6 +377,7 @@ public static class ProductEntityExtension {
 					ProductId = dto.Id,
 					Title = item.Title ?? "",
 					Value = item.Value ?? "",
+					CreatedAt = DateTime.UtcNow
 				});
 			}
 			entity.AdditionalInformation = listAdditionalInfo;
