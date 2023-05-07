@@ -119,7 +119,6 @@ public class ProductEntity : BaseEntity
 
     [JsonIgnore]
     public IEnumerable<ChatEntity>? Chats { get; set; }
-    public IEnumerable<AdditionalInformation>? AdditionalInformation { get; set; }
 }
 
 [Table("ProductsInsight")]
@@ -142,21 +141,6 @@ public class VisitProducts : BaseEntity
     public string? UserId { get; set; }
     public ProductEntity? Product { get; set; }
     public Guid? ProductId { get; set; }
-}
-
-[Table("AdditionalInformation")]
-public class AdditionalInformation : BaseEntity
-{
-    public string? Title { get; set; }
-    public string? Value { get; set; }
-    public ProductEntity? Product { get; set; }
-    public Guid? ProductId { get; set; }
-}
-
-public class AdditionalInformationDto
-{
-    public string? Title { get; set; }
-    public string? Value { get; set; }
 }
 
 public class ProductCreateUpdateDto
@@ -214,7 +198,6 @@ public class ProductCreateUpdateDto
     public IEnumerable<Guid>? Categories { get; set; }
     public IEnumerable<string>? Teams { get; set; }
     public IEnumerable<UploadDto>? Upload { get; set; }
-    public IEnumerable<AdditionalInformationDto>? AdditionalInformationDtos { get; set; }
 }
 
 public class ProductFilterDto

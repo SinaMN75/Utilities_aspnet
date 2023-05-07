@@ -376,22 +376,6 @@ public static class ProductEntityExtension {
 			entity.ProductInsights = productInsights;
 		}
 
-		if(dto.AdditionalInformationDtos.IsNotNull())
-		{
-			List<AdditionalInformation> listAdditionalInfo = new();
-			foreach(var item in dto.AdditionalInformationDtos)
-			{
-				listAdditionalInfo.Add(new AdditionalInformation
-				{
-					ProductId = dto.Id,
-					Title = item.Title ?? "",
-					Value = item.Value ?? "",
-					CreatedAt = DateTime.UtcNow
-				});
-			}
-			entity.AdditionalInformation = listAdditionalInfo;
-		}
-
 		return entity;
 	}
 }
