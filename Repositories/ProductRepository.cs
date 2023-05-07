@@ -133,6 +133,14 @@ public class ProductRepository : IProductRepository {
 		if (dto.OrderByPriceDecending.IsTrue()) q = q.OrderByDescending(x => x.Price);
 		if (dto.OrderByCreatedDate.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 		if (dto.OrderByCreaedDateDecending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
+		if (dto.OrderByAgeCategory.IsTrue()) q = q.OrderBy(o => o.AgeCategory);
+		if (dto.OrderByMostUsedHashtag.IsTrue()) q = q.OrderBy(o => o.Categories.GroupBy(g => g.UseCase.ToLower() == "tag").Select(s => s.Count()));
+		if (dto.OrderByFavorites.IsTrue())
+		{
+			var user = _dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == _userId);
+			var bookmarked = user?.BookmarkedProducts.Split(",").ToList();
+			if (bookmarked is not null) q = q.OrderBy(o => o.Bookmarks.OrderBy(ob => bookmarked.IndexOf(ob.Id.ToString())));
+		}
 		if (dto.ShowCreator.IsTrue()) {
 			q = q.Include(i => i.User).ThenInclude(x => x!.Media);
 			q = q.Include(i => i.User).ThenInclude(x => x!.Categories);
@@ -309,6 +317,7 @@ public static class ProductEntityExtension {
 		entity.DeletedAt = dto.DeletedAt ?? entity.DeletedAt;
 		entity.UpdatedAt = DateTime.Now;
 		entity.ExpireDate = dto.ExpireDate ?? entity.ExpireDate;
+		entity.AgeCategory = dto.AgeCategory ?? entity.AgeCategory;		
 
 		if (dto.VisitsCountPlus.HasValue) {
 			if (entity.VisitsCount == null) entity.VisitsCount = 1;
@@ -382,6 +391,7 @@ public static class ProductEntityExtension {
 			}
 			entity.AdditionalInformation = listAdditionalInfo;
 		}
+
 		return entity;
 	}
 }
