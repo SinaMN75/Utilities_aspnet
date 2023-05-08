@@ -113,6 +113,9 @@ public class UserRepository : IUserRepository {
 			                 x.AppUserName.Contains(dto.Query) ||
 			                 x.AppEmail.Contains(dto.Query)
 			);
+		
+		if (dto.Categories.IsNotNullOrEmpty()) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
+
 
 		if (dto.UserIds != null) q = q.Where(x => dto.UserIds.Contains(x.Id));
 		if (dto.UserName != null) q = q.Where(x => (x.AppUserName ?? "").ToLower().Contains(dto.UserName.ToLower()));

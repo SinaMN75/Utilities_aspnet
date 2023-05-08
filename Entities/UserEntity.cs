@@ -310,6 +310,7 @@ public class UserFilterDto {
     public bool? ShowBlockedUser { get; set; }
     public bool? OrderByUserName { get; set; }
 	public IEnumerable<string>? UserIds { get; set; }
+	public IEnumerable<Guid>? Categories { get; set; }
 }
 
 public class TransferFromWalletToWalletDto {
