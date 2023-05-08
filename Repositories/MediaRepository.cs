@@ -20,25 +20,15 @@ public class MediaRepository : IMediaRepository {
 
 		if (model.Files != null) {
 			foreach (IFormFile file in model.Files) {
-				string folder = "";
-				if (model.UserId != null) {
-					folder = "Users";
-					List<MediaEntity> userMedia = _dbContext.Set<MediaEntity>().Where(x => x.UserId == model.UserId).ToList();
-					if (userMedia.Any()) {
-						_dbContext.Set<MediaEntity>().RemoveRange(userMedia);
-						await _dbContext.SaveChangesAsync();
-					}
-				}
 
 				string name = Guid.NewGuid() + Path.GetExtension(file.FileName);
 
 				List<string> allowedExtensions = new() {".png", ".gif", ".jpg", ".jpeg", ".mp4", ".mp3", ".pdf", ".aac"};
-				if (!allowedExtensions.Contains(Path.GetExtension(file.FileName.ToLower()))) {
+				if (!allowedExtensions.Contains(Path.GetExtension(file.FileName.ToLower())))
 					return new GenericResponse<IEnumerable<MediaEntity>?>(null, UtilitiesStatusCodes.BadRequest);
-				}
 
 				MediaEntity media = new() {
-					FileName = Path.Combine(folder, name),
+					FileName = name,
 					UserId = model.UserId,
 					ProductId = model.ProductId,
 					ContentId = model.ContentId,
@@ -61,8 +51,7 @@ public class MediaRepository : IMediaRepository {
 				await _dbContext.Set<MediaEntity>().AddAsync(media);
 				await _dbContext.SaveChangesAsync();
 				medias.Add(media);
-
-				SaveMedia(file, name, folder);
+				SaveMedia(file, name);
 			}
 		}
 		if (model.Links != null) {
@@ -117,11 +106,11 @@ public class MediaRepository : IMediaRepository {
 		return new GenericResponse<MediaEntity?>(media);
 	}
 
-	public void SaveMedia(IFormFile image, string name, string folder) {
+	public void SaveMedia(IFormFile image, string name) {
 		string webRoot = _env.WebRootPath;
 		string nullPath = Path.Combine(webRoot, "Medias", "null.png");
-		string path = Path.Combine(webRoot, "Medias", folder, name);
-		string uploadDir = Path.Combine(webRoot, "Medias", folder);
+		string path = Path.Combine(webRoot, "Medias", name);
+		string uploadDir = Path.Combine(webRoot, "Medias");
 		if (!Directory.Exists(uploadDir))
 			Directory.CreateDirectory(uploadDir);
 		try {
