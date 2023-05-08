@@ -4,7 +4,6 @@ public interface IUserRepository {
 	Task<GenericResponse<IQueryable<UserEntity>>> Filter(UserFilterDto dto);
 	Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null);
 	Task<GenericResponse<UserEntity?>> Update(UserCreateUpdateDto dto);
-	Task<GenericResponse> Delete(string id);
 	Task<GenericResponse<UserEntity?>> GetTokenForTest(string? mobile);
 	Task<GenericResponse<string?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto);
 	Task<GenericResponse<UserEntity?>> VerifyCodeForLogin(VerifyMobileForLoginDto dto);
@@ -152,15 +151,6 @@ public class UserRepository : IUserRepository {
 			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
 			PageSize = dto.PageSize
 		};
-	}
-
-	public async Task<GenericResponse> Delete(string id) {
-		UserEntity? user = await ReadByIdMinimal(id);
-		if (user == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
-		user.DeletedAt = DateTime.Now;
-		_dbContext.Set<UserEntity>().Update(user);
-		await _dbContext.SaveChangesAsync();
-		return new GenericResponse();
 	}
 
 	public async Task<GenericResponse<UserEntity?>> GetTokenForTest(string? mobile) {
