@@ -136,10 +136,10 @@ public class ChatRepository : IChatRepository
 
     public async Task<GenericResponse<GroupChatEntity?>> CreateGroupChat(GroupChatCreateUpdateDto dto)
     {
-        if (dto.Type == ChatType.Private)
+        if (dto.Type == ChatType.Private && dto.UserIds!.Count() == 2)
         {
-            string firstUserId = dto.UserIds.ToList()[0];
-            string secondUserId = dto.UserIds.ToList()[1];
+            string firstUserId = dto.UserIds!.ToList()[0];
+            string secondUserId = dto.UserIds!.ToList()[1];
 
             var blockedState = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == firstUserId), _dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == secondUserId));
             if (blockedState.Item1)
