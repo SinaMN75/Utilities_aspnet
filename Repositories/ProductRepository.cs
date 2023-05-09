@@ -144,9 +144,21 @@ public class ProductRepository : IProductRepository
         if (dto.OrderByMostUsedHashtag.IsTrue()) q = q.OrderBy(o => o.Categories.Count(c => c.UseCase.ToLower() == "tag"));
         //if (dto.OrderByFavorites.IsTrue())
         //{
+        //    q = q.Include(i => i.Bookmarks);
         //    var user = _dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == _userId);
-        //    var bookmarked = user?.BookmarkedProducts.Split(",").ToList();
-        //    if (bookmarked is not null) q = q.OrderBy(o => o.Bookmarks.OrderBy(ob => bookmarked.IndexOf(ob.Id.ToString())));
+        //    if (user.BookmarkedProducts.IsNotNullOrEmpty())
+        //    {
+        //        var bookmarked = user?.BookmarkedProducts.Split(",").ToList();
+        //        bookmarked.RemoveAt(0);
+        //        if (bookmarked is not null)
+        //        {
+        //            foreach (var item in q.Where(w=>w.Bookmarks != null && w.Bookmarks.Count() != 0))
+        //            {
+        //                item.Bookmarks = item.Bookmarks.OrderBy(o => bookmarked.IndexOf(o.Id.ToString()));
+        //            }
+        //            q = q.OrderBy(o => o.Bookmarks);
+        //        }
+        //    }
         //}
         if (dto.ShowCreator.IsTrue())
         {
