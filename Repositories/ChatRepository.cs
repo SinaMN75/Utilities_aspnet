@@ -136,10 +136,10 @@ public class ChatRepository : IChatRepository
 
     public async Task<GenericResponse<GroupChatEntity?>> CreateGroupChat(GroupChatCreateUpdateDto dto)
     {
-        if (dto.Type == ChatType.Private)
+        if (dto.Type == ChatType.Private && dto.UserIds!.Count() == 2)
         {
-            string firstUserId = dto.UserIds.ToList()[0];
-            string secondUserId = dto.UserIds.ToList()[1];
+            string firstUserId = dto.UserIds!.ToList()[0];
+            string secondUserId = dto.UserIds!.ToList()[1];
 
             var blockedState = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == firstUserId), _dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == secondUserId));
             if (blockedState.Item1)
@@ -149,11 +149,11 @@ public class ChatRepository : IChatRepository
                 .Include(x => x.Users)!.ThenInclude(x => x.Media)
                 .Include(x => x.Products)!.ThenInclude(x => x.Media)
                 .Include(x => x.Products)!.ThenInclude(x => x.Categories)
-                .Include(x => x.GroupChatMessage)
                 .Include(x => x.Media)
                 .FirstOrDefaultAsync(x => x.Users.Count() == 2 &&
                                           x.Users.Any(x => x.Id == firstUserId) &&
                                           x.Users.Any(x => x.Id == secondUserId) &&
+                                          x.Type == ChatType.Private &&
                                           x.DeletedAt == null);
             if (e == null) return await CreateGroupChatLogic(dto);
             return new GenericResponse<GroupChatEntity?>(e);

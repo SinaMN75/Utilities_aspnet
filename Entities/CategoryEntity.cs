@@ -31,6 +31,7 @@ public class CategoryEntity : BaseEntity {
 	public double? Price { get; set; }
 	public double? Value { get; set; }
 	public double? Stock { get; set; }
+	public int? Order{ get; set; }
 	public DateTime? Date1 { get; set; }
 	public DateTime? Date2 { get; set; }
 
@@ -73,6 +74,7 @@ public class CategoryCreateUpdateDto {
 	public double? Price { get; set; }
 	public double? Value { get; set; }
 	public double? Stock { get; set; }
+	public int? Order{ get; set; }
 	public DateTime? Date1 { get; set; }
 	public DateTime? Date2 { get; set; }
 	public Guid? ParentId { get; set; }
@@ -86,4 +88,8 @@ public class CategoryFilterDto {
 	public string? UseCase { get; set; }
 	public string? Type { get; set; }
 	public Guid? ParentId { get; set; }
+	public bool? OrderByOrder { get; set; }
+	public bool? OrderByOrderDecending { get; set; }
+	public bool? OrderByCreatedAt { get; set; }
+	public bool? OrderByCreatedAtDecending { get; set; }
 }
