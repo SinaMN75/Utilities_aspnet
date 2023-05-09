@@ -456,20 +456,23 @@ public class UserRepository : IUserRepository {
     public async Task<GenericResponse<UserAddresses>> AddUserAddress(UserAddressDto userAddressDto)
     {
 		var userAddresses = _dbContext.Set<UserAddresses>().Where(w => w.UserId == _userId).ToList();
-		if (userAddresses.Any(a => a.PostalCode.Contains(userAddressDto.PostalCode))) return new GenericResponse<UserAddresses>(new UserAddresses(), UtilitiesStatusCodes.BadRequest);
+		if (userAddresses.Any(a => a.PostalCode.Contains(userAddressDto.PostalCode) && a.Id != userAddressDto.Id)) return new GenericResponse<UserAddresses>(null, UtilitiesStatusCodes.BadRequest);
 		UserAddresses? e = await _dbContext.Set<UserAddresses>().FirstOrDefaultAsync(f=>f.Id == userAddressDto.Id);
-		if(e is null)		
-			userAddresses.Add(new UserAddresses
-			{
-				Address = userAddressDto.Address,
-				CreatedAt = DateTime.UtcNow,
-				Pelak = userAddressDto.Pelak,
-				PostalCode = userAddressDto.PostalCode,
-				RecieverFullName = userAddressDto.RecieverFullName,
-				RecieverPhoneNumber = userAddressDto.RecieverPhoneNumber,
-				Unit = userAddressDto.Unit,
-				UserId = _userId,
-			});
+		if(e is null)
+		{
+            e = new UserAddresses
+            {
+                Address = userAddressDto.Address,
+                CreatedAt = DateTime.UtcNow,
+                Pelak = userAddressDto.Pelak,
+                PostalCode = userAddressDto.PostalCode,
+                RecieverFullName = userAddressDto.RecieverFullName,
+                RecieverPhoneNumber = userAddressDto.RecieverPhoneNumber,
+                Unit = userAddressDto.Unit,
+                UserId = _userId,
+            };
+			await _dbContext.Set<UserAddresses>().AddAsync(e);
+        }
 		else
 		{
 			e.PostalCode = userAddressDto.PostalCode ?? e.PostalCode;
@@ -479,6 +482,7 @@ public class UserRepository : IUserRepository {
 			e.UpdatedAt = DateTime.UtcNow;
 			e.RecieverFullName = userAddressDto.RecieverFullName ?? e.RecieverFullName;
 			e.RecieverPhoneNumber = userAddressDto.RecieverPhoneNumber ?? e.RecieverPhoneNumber;
+			_dbContext.Update(e);
 		}
 		_dbContext.SaveChanges();
 		return new GenericResponse<UserAddresses>(e, UtilitiesStatusCodes.Success);
