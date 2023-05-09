@@ -52,7 +52,12 @@ public class CategoryRepository : ICategoryRepository {
 		if (dto.TitleTr2.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr2!.Contains(dto.TitleTr2!));
 		if (dto.ParentId != null) q = q.Where(x => x.ParentId == dto.ParentId);
 
-		return new GenericResponse<IEnumerable<CategoryEntity>>(q);
+		if (dto.OrderByOrder.IsTrue()) q = q.OrderBy(x => x.Order);
+		if (dto.OrderByOrderDecending.IsTrue()) q = q.OrderByDescending(x => x.Order);
+		if (dto.OrderByCreatedAt.IsTrue()) q = q.OrderBy(x => x.CreatedAt);
+		if (dto.OrderByCreatedAtDecending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
+
+		return new GenericResponse<IEnumerable<CategoryEntity>>(q.AsNoTracking());
 	}
 
 	public async Task<GenericResponse> Delete(Guid id) {
@@ -90,6 +95,7 @@ public static class CategoryEntityExtension {
 		entity.Date2 = dto.Date2 ?? entity.Date2;
 		entity.Color = dto.Color ?? entity.Color;
 		entity.Value = dto.Value ?? entity.Value;
+		entity.Order = dto.Order ?? entity.Order;
 		entity.Stock = dto.Stock ?? entity.Stock;
 		entity.ParentId = dto.ParentId ?? entity.ParentId;
 		return entity;

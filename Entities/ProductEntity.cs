@@ -245,7 +245,6 @@ public class ProductFilterDto
     public bool? ShowOrders { get; set; } = false;
     public bool? ShowCreator { get; set; } = false;
     public bool? ShowCategoryMedia { get; set; } = false;
-    public bool? ShowBlockedUsers { get; set; }
     public bool? OrderByVotes { get; set; } = false;
     public bool? OrderByVotesDecending { get; set; } = false;
     public bool? OrderByAtoZ { get; set; } = false;
@@ -254,7 +253,6 @@ public class ProductFilterDto
     public bool? OrderByPriceDecending { get; set; } = false;
     public bool? OrderByCreatedDate { get; set; } = true;
     public bool? OrderByCreaedDateDecending { get; set; } = false;
-    public bool? OrderByFavorites { get; set; }
     public bool? OrderByMostUsedHashtag { get; set; }
     public bool? OrderByAgeCategory { get; set; }
     public bool? HasComment { get; set; } = false;
