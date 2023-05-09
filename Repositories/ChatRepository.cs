@@ -18,7 +18,7 @@ public interface IChatRepository
     Task<GenericResponse> DeleteGroupChatMessage(Guid id);
     GenericResponse<IQueryable<GroupChatEntity>> FilterGroupChats(GroupChatFilterDto dto);
     Task<GenericResponse<GroupChatEntity>> ReadGroupChatById(Guid id);
-    GenericResponse<IQueryable<GroupChatMessageEntity>?> ReadGroupChatMessages(Guid id);
+    GenericResponse<IQueryable<GroupChatMessageEntity>?> ReadGroupChatMessages(Guid id, int pageSize, int pageNumber);
     Task<GenericResponse> AddReactionToMessage(Reaction reaction, Guid messageId);
     Task<GenericResponse> SeenGroupChatMessage(Guid messageId);
     Task<GenericResponse> ExitFromGroup(Guid id);
@@ -375,9 +375,9 @@ public class ChatRepository : IChatRepository
         return new GenericResponse<GroupChatEntity>(e);
     }
 
-    public GenericResponse<IQueryable<GroupChatMessageEntity>?> ReadGroupChatMessages(Guid id)
+    public GenericResponse<IQueryable<GroupChatMessageEntity>?> ReadGroupChatMessages(Guid id, int pageSize, int pageNumber)
     {
-        IQueryable<GroupChatMessageEntity> e = _dbContext.Set<GroupChatMessageEntity>()
+        IQueryable<GroupChatMessageEntity> q = _dbContext.Set<GroupChatMessageEntity>()
             .Where(x => x.GroupChatId == id && x.DeletedAt == null)
             .Include(x => x.Media)
             .Include(x => x.Products)!.ThenInclude(x => x.Media)
@@ -392,15 +392,18 @@ public class ChatRepository : IChatRepository
             .Include(x => x.ForwardedMessage).ThenInclude(x => x.User).ThenInclude(x => x.Media)
             .OrderBy(o => o.CreatedAt)
             .AsNoTracking();
+        
+        int totalCount = q.Count();
+        q = q.Skip((pageNumber - 1) * pageSize).Take(pageSize);
 
-        var tempGroupChatsMessage = e.ToList();
+        var tempGroupChatsMessage = q.ToList();
         var messageSeen = _dbContext.Set<SeenUsers>().Where(w => w.Fk_GroupChat == id);
         foreach (var item in tempGroupChatsMessage)
         {
             var usersMessage = new List<UserEntity>();
             foreach (var seenTbl in messageSeen)
             {
-                var lastMessageThatUserSeened = e.FirstOrDefault(f => f.Id == seenTbl.Fk_GroupChatMessage);
+                var lastMessageThatUserSeened = q.FirstOrDefault(f => f.Id == seenTbl.Fk_GroupChatMessage);
                 var user = _dbContext.Set<UserEntity>().Where(w => w.Id == seenTbl.Fk_UserId).Include(x => x.Media).FirstOrDefault();
                 if (user is not null && (lastMessageThatUserSeened?.CreatedAt > item.CreatedAt || lastMessageThatUserSeened?.Id == item.Id))
                     usersMessage.Add(user);
@@ -408,7 +411,11 @@ public class ChatRepository : IChatRepository
             item.MessageSeenBy = usersMessage;
         }
 
-        return new GenericResponse<IQueryable<GroupChatMessageEntity>?>(tempGroupChatsMessage.AsQueryable());
+        return new GenericResponse<IQueryable<GroupChatMessageEntity>?>(tempGroupChatsMessage.AsQueryable()) {
+            TotalCount = totalCount,
+            PageCount = totalCount % pageSize == 0 ? totalCount / pageSize : totalCount / pageSize + 1,
+            PageSize = pageSize
+        };
     }
 
     public async Task<GenericResponse<IEnumerable<ChatReadDto>?>> ReadByUserId(string id)

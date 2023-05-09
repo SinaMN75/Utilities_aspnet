@@ -52,7 +52,8 @@ public class ChatController : BaseApiController {
 
 	[HttpGet("ReadGroupChatMessages/{id:guid}")]
 	[OutputCache(PolicyName = "10s")]
-	public ActionResult<GenericResponse<GroupChatMessageEntity?>> ReadGroupChatMessages(Guid id) => Result(_repository.ReadGroupChatMessages(id));
+	public ActionResult<GenericResponse<GroupChatMessageEntity?>> ReadGroupChatMessages(Guid id, [FromQuery] int pageSize = 100, [FromQuery] int pageNumber = 1)
+		=> Result(_repository.ReadGroupChatMessages(id, pageSize, pageNumber));
 
 	[HttpPost("SeenGroupChatMessage/{id:guid}")]
 	public async Task<ActionResult<GenericResponse>> SeenGroupChatMesDeleteGroupChatsage(Guid id) => Result(await _repository.SeenGroupChatMessage(id));
