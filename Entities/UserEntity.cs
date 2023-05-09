@@ -138,6 +138,7 @@ public class UserEntity : IdentityUser
 
     [JsonIgnore]
     public DateTime? DeletedAt { get; set; }
+    public bool IsPrivate { get; set; }
 
     [NotMapped]
     public bool IsFollowing { get; set; } = false;
@@ -176,6 +177,7 @@ public class UserAddresses : BaseEntity
     public UserEntity? User { get; set; }
     public string? UserId { get; set; }
     public bool IsDefault { get; set; }
+    public bool IsDeleted { get; set; }
 
 }
 public class UserAddressDto
@@ -300,6 +302,7 @@ public class UserCreateUpdateDto
     public bool? ShowContactInfo { get; set; }
     public bool? IsOnline { get; set; }
     public bool? IsLoggedIn { get; set; }
+    public bool? IsPrivate { get; set; }
     public DateTime? BirthDate { get; set; }
     public IEnumerable<Guid>? Categories { get; set; }
 }

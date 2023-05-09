@@ -15,6 +15,7 @@ public interface IUserRepository {
 	Task<UserEntity?> ReadByIdMinimal(string? idOrUserName, string? token = null);
 	Task<GenericResponse<UserAddresses>> AddUserAddress(UserAddressDto UserAddressDto);
 	Task<GenericResponse<IEnumerable<UserAddresses>>> GetMyAddresses();
+    Task<GenericResponse> DeleteAddress(Guid addressId);
 }
 
 public class UserRepository : IUserRepository {
@@ -380,6 +381,7 @@ public class UserRepository : IUserRepository {
 		entity.UpdatedAt = DateTime.Now;
 		entity.IsLoggedIn = dto.IsLoggedIn ?? entity.IsLoggedIn;
 		entity.IsOnline = dto.IsOnline ?? entity.IsOnline;
+		entity.IsPrivate = dto.IsPrivate ?? entity.IsPrivate;
 
 		if (dto.Categories.IsNotNullOrEmpty()) {
 			List<CategoryEntity> list = new();
@@ -490,7 +492,16 @@ public class UserRepository : IUserRepository {
 
     public async Task<GenericResponse<IEnumerable<UserAddresses>>> GetMyAddresses()
     {
-		var addresses = _dbContext.Set<UserAddresses>().Where(w => w.UserId == _userId);
+		var addresses = _dbContext.Set<UserAddresses>().Where(w => w.UserId == _userId && !w.IsDeleted);
         return new GenericResponse<IEnumerable<UserAddresses>>(addresses);
     }
+
+	public async Task<GenericResponse> DeleteAddress(Guid addressId)
+	{
+		var address = await _dbContext.Set<UserAddresses>().FirstOrDefaultAsync(f=>f.Id == addressId);
+		if (address is null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
+		address.IsDeleted = true;
+		_dbContext.Update(address);
+		return new GenericResponse(UtilitiesStatusCodes.Success);
+	}
 }

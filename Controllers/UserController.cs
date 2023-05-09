@@ -65,4 +65,9 @@ public class UserController : BaseApiController {
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [OutputCache(PolicyName = "10s")]
     public async Task<ActionResult<GenericResponse<IEnumerable<UserAddresses>>>> GetUserAddresses() => Result(await _repository.GetMyAddresses());
+
+	[HttpPut("DeleteAddresses")]
+	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+	[OutputCache(PolicyName = "10s")]
+	public async Task<ActionResult<GenericResponse>> DeleteAddress(Guid addressId) => Result(await _repository.DeleteAddress(addressId));
 }
