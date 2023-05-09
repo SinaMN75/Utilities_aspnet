@@ -13,6 +13,7 @@ public interface IUserRepository {
 	Task<GenericResponse> ToggleBlock(string userId);
 	Task<GenericResponse> TransferWalletToWallet(TransferFromWalletToWalletDto dto);
 	Task<UserEntity?> ReadByIdMinimal(string? idOrUserName, string? token = null);
+	Task<GenericResponse<UserAddresses>> AddUserAddress(UserAddressDto UserAddressDto);
 }
 
 public class UserRepository : IUserRepository {
@@ -450,4 +451,35 @@ public class UserRepository : IUserRepository {
 		e.Token = token;
 		return e;
 	}
+
+    public async Task<GenericResponse<UserAddresses>> AddUserAddress(UserAddressDto userAddressDto)
+    {
+		var userAddresses = _dbContext.Set<UserAddresses>().Where(w => w.UserId == _userId).ToList();
+		if (userAddresses.Any(a => a.PostalCode.Contains(userAddressDto.PostalCode))) return new GenericResponse<UserAddresses>(new UserAddresses(), UtilitiesStatusCodes.BadRequest);
+		UserAddresses? e = await _dbContext.Set<UserAddresses>().FirstOrDefaultAsync(f=>f.Id == userAddressDto.Id);
+		if(e is null)		
+			userAddresses.Add(new UserAddresses
+			{
+				Address = userAddressDto.Address,
+				CreatedAt = DateTime.UtcNow,
+				Pelak = userAddressDto.Pelak,
+				PostalCode = userAddressDto.PostalCode,
+				RecieverFullName = userAddressDto.RecieverFullName,
+				RecieverPhoneNumber = userAddressDto.RecieverPhoneNumber,
+				Unit = userAddressDto.Unit,
+				UserId = _userId,
+			});
+		else
+		{
+			e.PostalCode = userAddressDto.PostalCode ?? e.PostalCode;
+			e.Pelak = userAddressDto.Pelak ?? e.Pelak;
+			e.Unit = userAddressDto.Unit ?? e.Unit;
+			e.Address = userAddressDto.Address ?? e.Address;
+			e.UpdatedAt = DateTime.UtcNow;
+			e.RecieverFullName = userAddressDto.RecieverFullName ?? e.RecieverFullName;
+			e.RecieverPhoneNumber = userAddressDto.RecieverPhoneNumber ?? e.RecieverPhoneNumber;
+		}
+		_dbContext.SaveChanges();
+		return new GenericResponse<UserAddresses>(e, UtilitiesStatusCodes.Success);
+    }
 }
