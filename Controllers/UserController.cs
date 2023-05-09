@@ -57,5 +57,12 @@ public class UserController : BaseApiController {
 		=> Result(await _repository.TransferWalletToWallet(dto));
 
 	[HttpPost("AddUserAddresses")]
-	public async Task<ActionResult<GenericResponse<UserAddresses>>> AddUserAddress(UserAddressDto UserAddressDto) => Result(await _repository.AddUserAddress(UserAddressDto));
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [OutputCache(PolicyName = "10s")]
+    public async Task<ActionResult<GenericResponse<UserAddresses>>> AddUserAddress(UserAddressDto UserAddressDto) => Result(await _repository.AddUserAddress(UserAddressDto));
+
+    [HttpGet("ReadMyAddresses")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [OutputCache(PolicyName = "10s")]
+    public async Task<ActionResult<GenericResponse<IEnumerable<UserAddresses>>>> GetUserAddresses() => Result(await _repository.GetMyAddresses());
 }

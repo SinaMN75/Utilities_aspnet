@@ -14,6 +14,7 @@ public interface IUserRepository {
 	Task<GenericResponse> TransferWalletToWallet(TransferFromWalletToWalletDto dto);
 	Task<UserEntity?> ReadByIdMinimal(string? idOrUserName, string? token = null);
 	Task<GenericResponse<UserAddresses>> AddUserAddress(UserAddressDto UserAddressDto);
+	Task<GenericResponse<IEnumerable<UserAddresses>>> GetMyAddresses();
 }
 
 public class UserRepository : IUserRepository {
@@ -37,7 +38,7 @@ public class UserRepository : IUserRepository {
 		bool isUserId = Guid.TryParse(idOrUserName, out _);
 		UserEntity? entity = await _dbContext.Set<UserEntity>()
 			.Include(u => u.Media)
-			.Include(u => u.Categories)!.ThenInclude(u => u.Media)
+			.Include(u => u.Categories)!.ThenInclude(u => u.Media)			
 			.FirstOrDefaultAsync(u => isUserId ? u.Id == idOrUserName : u.UserName == idOrUserName);
 
 		if (entity == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
@@ -481,5 +482,11 @@ public class UserRepository : IUserRepository {
 		}
 		_dbContext.SaveChanges();
 		return new GenericResponse<UserAddresses>(e, UtilitiesStatusCodes.Success);
+    }
+
+    public async Task<GenericResponse<IEnumerable<UserAddresses>>> GetMyAddresses()
+    {
+		var addresses = _dbContext.Set<UserAddresses>().Where(w => w.UserId == _userId);
+        return new GenericResponse<IEnumerable<UserAddresses>>(addresses);
     }
 }
