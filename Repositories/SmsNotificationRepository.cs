@@ -29,7 +29,7 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 				break;
 			}
 			case "faraz": {
-				RestClient client = new("http://188.0.240.110/api/select");
+				RestClient client = new("http://ippanel.com/api/select");
 				RestRequest request = new(Method.POST);
 				request.AddHeader("cache-control", "no-cache");
 				request.AddHeader("Content-Type", "application/json");
