@@ -113,7 +113,7 @@ public class UserEntity : IdentityUser
 
     [JsonIgnore]
     public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
-    public IEnumerable<UserAddresses>? Addresses { get; set; }
+    public IEnumerable<AddressEntity>? Addresses { get; set; }
 
     [JsonIgnore]
     public string VisitedProducts { get; set; } = "";
@@ -160,38 +160,6 @@ public class UserEntity : IdentityUser
 
     [NotMapped]
     public GrowthRateReadDto? GrowthRate { get; set; }
-}
-
-[Table("UserAddresses")]
-public class UserAddresses : BaseEntity
-{
-    public string? RecieverFullName { get; set; }
-    public string? RecieverPhoneNumber { get; set; }
-    public string? Address { get; set; }
-    public string? Pelak { get; set; }
-    /// <summary>
-    /// vahed
-    /// </summary>
-    public string? Unit { get; set; }
-    public string? PostalCode { get; set; }
-    public UserEntity? User { get; set; }
-    public string? UserId { get; set; }
-    public bool IsDefault { get; set; }
-    public bool IsDeleted { get; set; }
-
-}
-public class UserAddressDto
-{
-    public Guid? Id { get; set; }
-    public string? RecieverFullName { get; set; }
-    public string? RecieverPhoneNumber { get; set; }
-    public string? Address { get; set; }
-    public string? Pelak { get; set; }
-    /// <summary>
-    /// vahed
-    /// </summary>
-    public string? Unit { get; set; }
-    public string? PostalCode { get; set; }
 }
 
 [Table("Otps")]

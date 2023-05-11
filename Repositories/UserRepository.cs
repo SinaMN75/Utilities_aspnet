@@ -13,9 +13,6 @@ public interface IUserRepository {
 	Task<GenericResponse> ToggleBlock(string userId);
 	Task<GenericResponse> TransferWalletToWallet(TransferFromWalletToWalletDto dto);
 	Task<UserEntity?> ReadByIdMinimal(string? idOrUserName, string? token = null);
-	Task<GenericResponse<UserAddresses>> AddUserAddress(UserAddressDto UserAddressDto);
-	Task<GenericResponse<IEnumerable<UserAddresses>>> GetMyAddresses();
-    Task<GenericResponse> DeleteAddress(Guid addressId);
 }
 
 public class UserRepository : IUserRepository {
@@ -453,55 +450,5 @@ public class UserRepository : IUserRepository {
 		UserEntity? e = await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(u => u.Id == idOrUserName || u.UserName == idOrUserName);
 		e.Token = token;
 		return e;
-	}
-
-    public async Task<GenericResponse<UserAddresses>> AddUserAddress(UserAddressDto userAddressDto)
-    {
-		var userAddresses = _dbContext.Set<UserAddresses>().Where(w => w.UserId == _userId).ToList();
-		if (userAddresses.Any(a => a.PostalCode.Contains(userAddressDto.PostalCode) && a.Id != userAddressDto.Id)) return new GenericResponse<UserAddresses>(null, UtilitiesStatusCodes.BadRequest);
-		UserAddresses? e = await _dbContext.Set<UserAddresses>().FirstOrDefaultAsync(f=>f.Id == userAddressDto.Id);
-		if(e is null)
-		{
-            e = new UserAddresses
-            {
-                Address = userAddressDto.Address,
-                CreatedAt = DateTime.UtcNow,
-                Pelak = userAddressDto.Pelak,
-                PostalCode = userAddressDto.PostalCode,
-                RecieverFullName = userAddressDto.RecieverFullName,
-                RecieverPhoneNumber = userAddressDto.RecieverPhoneNumber,
-                Unit = userAddressDto.Unit,
-                UserId = _userId,
-            };
-			await _dbContext.Set<UserAddresses>().AddAsync(e);
-        }
-		else
-		{
-			e.PostalCode = userAddressDto.PostalCode ?? e.PostalCode;
-			e.Pelak = userAddressDto.Pelak ?? e.Pelak;
-			e.Unit = userAddressDto.Unit ?? e.Unit;
-			e.Address = userAddressDto.Address ?? e.Address;
-			e.UpdatedAt = DateTime.UtcNow;
-			e.RecieverFullName = userAddressDto.RecieverFullName ?? e.RecieverFullName;
-			e.RecieverPhoneNumber = userAddressDto.RecieverPhoneNumber ?? e.RecieverPhoneNumber;
-			_dbContext.Update(e);
-		}
-		_dbContext.SaveChanges();
-		return new GenericResponse<UserAddresses>(e, UtilitiesStatusCodes.Success);
-    }
-
-    public async Task<GenericResponse<IEnumerable<UserAddresses>>> GetMyAddresses()
-    {
-		var addresses = _dbContext.Set<UserAddresses>().Where(w => w.UserId == _userId && !w.IsDeleted);
-        return new GenericResponse<IEnumerable<UserAddresses>>(addresses);
-    }
-
-	public async Task<GenericResponse> DeleteAddress(Guid addressId)
-	{
-		var address = await _dbContext.Set<UserAddresses>().FirstOrDefaultAsync(f=>f.Id == addressId);
-		if (address is null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
-		address.IsDeleted = true;
-		_dbContext.Update(address);
-		return new GenericResponse(UtilitiesStatusCodes.Success);
 	}
 }

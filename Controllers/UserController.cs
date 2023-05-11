@@ -55,19 +55,4 @@ public class UserController : BaseApiController {
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	public async Task<ActionResult<GenericResponse>> TransferWalletToWallet(TransferFromWalletToWalletDto dto)
 		=> Result(await _repository.TransferWalletToWallet(dto));
-
-	[HttpPost("AddUserAddresses")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    [OutputCache(PolicyName = "10s")]
-    public async Task<ActionResult<GenericResponse<UserAddresses>>> AddUserAddress(UserAddressDto UserAddressDto) => Result(await _repository.AddUserAddress(UserAddressDto));
-
-    [HttpGet("ReadMyAddresses")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    [OutputCache(PolicyName = "10s")]
-    public async Task<ActionResult<GenericResponse<IEnumerable<UserAddresses>>>> GetUserAddresses() => Result(await _repository.GetMyAddresses());
-
-	[HttpPut("DeleteAddresses")]
-	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	[OutputCache(PolicyName = "10s")]
-	public async Task<ActionResult<GenericResponse>> DeleteAddress(Guid addressId) => Result(await _repository.DeleteAddress(addressId));
 }
