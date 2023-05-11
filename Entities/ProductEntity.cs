@@ -255,6 +255,7 @@ public class ProductFilterDto
     public bool? OrderByCreaedDateDecending { get; set; } = false;
     public bool? OrderByMostUsedHashtag { get; set; }
     public bool? OrderByAgeCategory { get; set; }
+    public bool? OrderByCategory { get; set; }
     public bool? HasComment { get; set; } = false;
     public bool? HasOrder { get; set; } = false;
     public int? VisitsCount { get; set; }

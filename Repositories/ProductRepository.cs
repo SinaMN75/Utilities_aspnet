@@ -160,6 +160,10 @@ public class ProductRepository : IProductRepository
         //        }
         //    }
         //}
+        if (dto.OrderByCategory.IsTrue()) q = q.AsEnumerable().OrderBy(o => o.Categories != null && o.Categories.Any()
+                                               ? o.Categories.OrderBy(op => op.Title)
+                                               .Select(s=>s.Title)
+                                               .FirstOrDefault() ?? string.Empty : string.Empty).AsQueryable();
         if (dto.ShowCreator.IsTrue())
         {
             q = q.Include(i => i.User).ThenInclude(x => x!.Media);
