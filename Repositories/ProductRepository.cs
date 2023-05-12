@@ -11,7 +11,7 @@ public interface IProductRepository
     Task<GenericResponse<ProductEntity>> Update(ProductCreateUpdateDto dto, CancellationToken ct);
     Task<GenericResponse> Delete(Guid id, CancellationToken ct);
     Task<GenericResponse> SimpleSell(SimpleSellDto dto);
-    Task<GenericResponse> Reaction(ReactionCreateUpdateDto dto);
+    Task<GenericResponse> CreateReaction(ReactionCreateUpdateDto dto);
     GenericResponse<IQueryable<ReactionEntity>> ReadReactionsById(Guid id);
 
 }
@@ -314,7 +314,7 @@ public class ProductRepository : IProductRepository
         return new GenericResponse();
     }
 
-    public async Task<GenericResponse> Reaction(ReactionCreateUpdateDto dto)
+    public async Task<GenericResponse> CreateReaction(ReactionCreateUpdateDto dto)
     {
         var reaction = await _dbContext.Set<ReactionEntity>().FirstOrDefaultAsync(f => f.UserId == _userId && f.ProductId == dto.ProductId);
         if (reaction is not null && reaction.Reaction != dto.Reaction)

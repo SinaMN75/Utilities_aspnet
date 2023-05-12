@@ -46,9 +46,9 @@ public class ProductV2Controller : BaseApiController {
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	public async Task<ActionResult<GenericResponse<ProductEntity>>> SimpleSell(SimpleSellDto dto) => Result(await _repository.SimpleSell(dto));
 
-    [HttpPost("Reaction")]
+    [HttpPost("CreateReaction")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<ActionResult<GenericResponse>> Reaction(ReactionCreateUpdateDto dto) => Result(await _repository.Reaction(dto));
+    public async Task<ActionResult<GenericResponse>> CreateReaction(ReactionCreateUpdateDto dto) => Result(await _repository.CreateReaction(dto));
 
 	[HttpGet("ReadReactions/{id:guid}")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
