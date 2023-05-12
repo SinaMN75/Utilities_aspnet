@@ -8,18 +8,15 @@ public class AddressController : BaseApiController {
 
 	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse<AddressEntity>>> Create(AddressCreateUpdateDto UserAddressDto)
-		=> Result(await _repository.Create(UserAddressDto));
+	public async Task<ActionResult<GenericResponse<AddressEntity>>> Create(AddressCreateUpdateDto dto) => Result(await _repository.Create(dto));
 
 	[HttpPut]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse<AddressEntity>>> Update(AddressCreateUpdateDto UserAddressDto)
-		=> Result(await _repository.Update(UserAddressDto));
+	public async Task<ActionResult<GenericResponse<AddressEntity>>> Update(AddressCreateUpdateDto dto) => Result(await _repository.Update(dto));
 
 	[HttpGet("ReadMyAddresses")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	[OutputCache(PolicyName = "10s")]
-	public async Task<ActionResult<GenericResponse<IEnumerable<AddressEntity>>>> ReadUserAddresses() => Result(await _repository.GetMyAddresses());
+	public ActionResult<GenericResponse<IQueryable<AddressEntity>>> ReadUserAddresses() => Result(_repository.ReadMyAddresses());
 
 	[HttpPut("Delete")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
