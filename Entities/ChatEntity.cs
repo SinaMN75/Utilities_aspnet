@@ -20,23 +20,11 @@ public class ChatEntity : BaseEntity {
 	public Guid? ParentId { get; set; }
 	public ChatEntity? Parent { get; set; }
 
-	public IEnumerable<ChatReacts>? ChatReacts { get; set; }
+	public IEnumerable<ReactionEntity>? ChatReacts { get; set; }
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<ProductEntity?>? Products { get; set; }
 }
 
-[Table("ChatReacts")]
-public class ChatReacts : BaseEntity {
-	public Reaction? Reaction { get; set; }
-	public string? UserId { get; set; }
-	public ChatEntity? Chats { get; set; }
-	public Guid? ChatsId { get; set; }
-}
-
-public class ChatReaction : BaseEntity {
-	public Reaction? Reaction { get; set; }
-	public Guid? UserId { get; set; }
-}
 
 [Table("GroupChat")]
 public class GroupChatEntity : BaseEntity {

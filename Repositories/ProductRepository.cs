@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace Utilities_aspnet.Repositories;
 
 public interface IProductRepository
@@ -9,6 +11,9 @@ public interface IProductRepository
     Task<GenericResponse<ProductEntity>> Update(ProductCreateUpdateDto dto, CancellationToken ct);
     Task<GenericResponse> Delete(Guid id, CancellationToken ct);
     Task<GenericResponse> SimpleSell(SimpleSellDto dto);
+    Task<GenericResponse> Reaction(ReactionCreateUpdateDto dto);
+    GenericResponse<IQueryable<ReactionEntity>> ReadReactionsById(Guid id);
+
 }
 
 public class ProductRepository : IProductRepository
@@ -248,10 +253,10 @@ public class ProductRepository : IProductRepository
 
         if (i.ProductInsights?.Any() != null)
         {
-            List<IGrouping<ChatReaction?, ProductInsight>> psGrouping = i.ProductInsights.GroupBy(g => g.Reaction).ToList();
+            List<IGrouping<ReactionEntity?, ProductInsight>> psGrouping = i.ProductInsights.GroupBy(g => g.Reaction).ToList();
             i.ProductInsights = null;
             List<ProductInsight> productInsights = new();
-            foreach (IGrouping<ChatReaction?, ProductInsight> item in psGrouping)
+            foreach (IGrouping<ReactionEntity?, ProductInsight> item in psGrouping)
             {
                 item.FirstOrDefault().Count = item.Count();
                 productInsights.Add(item.FirstOrDefault());
@@ -307,6 +312,40 @@ public class ProductRepository : IProductRepository
             });
         }
         return new GenericResponse();
+    }
+
+    public async Task<GenericResponse> Reaction(ReactionCreateUpdateDto dto)
+    {
+        var reaction = await _dbContext.Set<ReactionEntity>().FirstOrDefaultAsync(f => f.UserId == _userId && f.ProductId == dto.ProductId);
+        if (reaction is not null && reaction.Reaction != dto.Reaction)
+        {
+            reaction.Reaction = dto.Reaction;
+            reaction.UpdatedAt = DateTime.UtcNow;
+            _dbContext.Update(reaction);
+        }
+        else
+        {
+            reaction = new()
+            {
+                CreatedAt = DateTime.UtcNow,
+                ProductId = dto.ProductId,
+                Reaction = dto.Reaction,
+                UserId = _userId,
+            };
+            await _dbContext.Set<ReactionEntity>().AddAsync(reaction);
+        }
+        await _dbContext.SaveChangesAsync();
+        return new GenericResponse();
+    }
+
+    public GenericResponse<IQueryable<ReactionEntity>> ReadReactionsById(Guid id)
+    {
+        IQueryable<ReactionEntity> reactions = _dbContext.Set<ReactionEntity>()
+            .Include(i => i.User)
+            .Where(w => w.ProductId == id)
+            .OrderBy(o => o.Reaction);
+
+        return new GenericResponse<IQueryable<ReactionEntity>>(reactions);
     }
 }
 

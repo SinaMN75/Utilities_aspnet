@@ -582,26 +582,26 @@ public class ChatRepository : IChatRepository
         ChatEntity? chat = await _dbContext.Set<ChatEntity>().Where(w => w.Id == messageId).FirstOrDefaultAsync();
         if (chat is null) return new GenericResponse(UtilitiesStatusCodes.NotFound, "Chat Not Found");
 
-        ChatReacts? oldReaction = await _dbContext.Set<ChatReacts>().Where(w => w.UserId == userId && w.ChatsId == chat.Id).FirstOrDefaultAsync();
+        ReactionEntity? oldReaction = await _dbContext.Set<ReactionEntity>().Where(w => w.UserId == userId && w.ChatsId == chat.Id).FirstOrDefaultAsync();
         if (oldReaction is null)
         {
-            ChatReacts react = new ChatReacts
+            ReactionEntity react = new ReactionEntity
             {
                 ChatsId = chat.Id,
                 Reaction = reaction,
                 CreatedAt = DateTime.UtcNow,
                 UserId = user.Id
             };
-            await _dbContext.Set<ChatReacts>().AddAsync(react);
+            await _dbContext.Set<ReactionEntity>().AddAsync(react);
         }
         else if (oldReaction.Reaction != reaction)
         {
             oldReaction.Reaction = reaction;
-            _dbContext.Set<ChatReacts>().Update(oldReaction);
+            _dbContext.Set<ReactionEntity>().Update(oldReaction);
         }
         else
         {
-            _dbContext.Set<ChatReacts>().Remove(oldReaction);
+            _dbContext.Set<ReactionEntity>().Remove(oldReaction);
         }
         await _dbContext.SaveChangesAsync();
         return new GenericResponse(UtilitiesStatusCodes.Success, "Ok");

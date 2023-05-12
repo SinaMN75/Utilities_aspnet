@@ -124,7 +124,7 @@ public class ProductEntity : BaseEntity
 [Table("ProductsInsight")]
 public class ProductInsight : BaseEntity
 {
-    public ChatReaction? Reaction { get; set; }
+    public ReactionEntity? Reaction { get; set; }
     public UserEntity? User { get; set; }
     public string? UserId { get; set; }
     public ProductEntity? Product { get; set; }
@@ -273,7 +273,7 @@ public class ProductFilterDto
 
 public class ProductInsightDto
 {
-    public ChatReaction? Reaction { get; set; }
+    public ReactionEntity? Reaction { get; set; }
     public string? UserId { get; set; }
 }
 
