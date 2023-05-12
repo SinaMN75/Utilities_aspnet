@@ -75,4 +75,7 @@ public class ChatController : BaseApiController {
 
 	[HttpPost("ExitFromGroup/{id:guid}")]
 	public async Task<ActionResult<GenericResponse>> ExitFromGroup(Guid id) => Result(await _repository.ExitFromGroup(id));
+
+	[HttpPost("Mute/{id:guid}")]
+	public async Task<ActionResult<GenericResponse>> Mute(Guid id) => Result(await _repository.Mute(id));
 }

@@ -95,6 +95,7 @@ public class UserEntity : IdentityUser
     public string? AccessLevel { get; set; }
     public string? Badge { get; set; }
     public bool IsOnline { get; set; } = false;
+    public string? MutedChats { get; set; }
 
     public IEnumerable<MediaEntity>? Media { get; set; }
     public IEnumerable<CategoryEntity>? Categories { get; set; }

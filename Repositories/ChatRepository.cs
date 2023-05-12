@@ -22,6 +22,7 @@ public interface IChatRepository
     Task<GenericResponse> AddReactionToMessage(Reaction reaction, Guid messageId);
     Task<GenericResponse> SeenGroupChatMessage(Guid messageId);
     Task<GenericResponse> ExitFromGroup(Guid id);
+    Task<GenericResponse> Mute(Guid id);
 }
 
 public class ChatRepository : IChatRepository
@@ -661,5 +662,19 @@ public class ChatRepository : IChatRepository
             return new GenericResponse(UtilitiesStatusCodes.Success, groupChat.Users.ToString());
         }
         else return new GenericResponse(UtilitiesStatusCodes.BadRequest);
+    }
+
+    public async Task<GenericResponse> Mute(Guid id)
+    {
+        var user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
+        if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound);
+
+        if (user.MutedChats.IsNullOrEmpty()) user.MutedChats += id.ToString();
+        else user.MutedChats = user.MutedChats + "," + id.ToString();
+
+        _dbContext.Update(user);
+        await _dbContext.SaveChangesAsync();
+
+        return new GenericResponse();
     }
 }
