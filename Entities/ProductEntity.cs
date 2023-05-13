@@ -95,6 +95,8 @@ public class ProductEntity : BaseEntity
 
     [StringLength(100000)]
     public string? SeenUsers { get; set; }
+    public ProductEntity? Product { get; set; }
+    public Guid? ParentId { get; set; }
 
     public IEnumerable<MediaEntity>? Media { get; set; }
     public IEnumerable<FormEntity>? Forms { get; set; }
@@ -194,6 +196,7 @@ public class ProductCreateUpdateDto
     public ProductStatus? Status { get; set; }
     public Currency? Currency { get; set; }
     public AgeCategory? AgeCategory { get; set; }
+    public Guid? ParentId { get; set; }
     public ProductInsightDto? ProductInsight { get; set; }
     public IEnumerable<Guid>? Categories { get; set; }
     public IEnumerable<string>? Teams { get; set; }

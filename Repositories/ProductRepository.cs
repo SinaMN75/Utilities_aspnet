@@ -468,6 +468,12 @@ public static class ProductEntityExtension
             entity.ProductInsights = productInsights;
         }
 
+        if(dto.ParentId is not null)
+        {
+            entity.ParentId = dto.ParentId ?? entity.ParentId;
+            entity.Product = context.Set<ProductEntity>().FirstOrDefault(f => f.Id == dto.ParentId);
+        }
+
         return entity;
     }
 }
