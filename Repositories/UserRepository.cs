@@ -36,7 +36,7 @@ public class UserRepository : IUserRepository {
 		bool isUserId = Guid.TryParse(idOrUserName, out _);
 		UserEntity? entity = await _dbContext.Set<UserEntity>()
 			.Include(u => u.Media)
-			.Include(u => u.Categories)!.ThenInclude(u => u.Media)			
+			.Include(u => u.Categories)!.ThenInclude(u => u.Media)
 			.FirstOrDefaultAsync(u => isUserId ? u.Id == idOrUserName : u.UserName == idOrUserName);
 
 		if (entity == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
@@ -70,7 +70,7 @@ public class UserRepository : IUserRepository {
 
 	public async Task<GenericResponse<IQueryable<UserEntity>>> Filter(UserFilterDto dto) {
 		IQueryable<UserEntity> q = _dbContext.Set<UserEntity>().Where(x => x.DeletedAt == null);
-		
+
 		if (dto.UserNameExact != null) q = q.Where(x => x.AppUserName == dto.UserNameExact || x.UserName == dto.UserNameExact);
 		if (dto.UserId != null) q = q.Where(x => x.Id == dto.UserId);
 		if (dto.Activity != null) q = q.Where(x => x.Activity.Contains(dto.Activity));
@@ -113,40 +113,39 @@ public class UserRepository : IUserRepository {
 			                 x.AppUserName.Contains(dto.Query) ||
 			                 x.AppEmail.Contains(dto.Query)
 			);
-		
-		if (dto.Categories.IsNotNullOrEmpty()) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
 
+		if (dto.Categories.IsNotNullOrEmpty()) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
 
 		if (dto.UserIds != null) q = q.Where(x => dto.UserIds.Contains(x.Id));
 		if (dto.UserName != null) q = q.Where(x => (x.AppUserName ?? "").ToLower().Contains(dto.UserName.ToLower()));
 		if (dto.ShowSuspend.IsTrue()) q = q.Where(x => x.Suspend == true);
-		
+
 		if (dto.OrderByUserName.IsTrue()) q = q.OrderBy(x => x.UserName);
-		
+
 		if (dto.ShowMedia.IsTrue()) q = q.Include(u => u.Media);
 		if (dto.ShowCategories.IsTrue()) q = q.Include(u => u.Categories);
 
 		//ToCheck WithSina : in query am kheili sangine
-    //    if (!dto.ShowBlockedUser.IsTrue())
-    //    {
-    //        var senderUser = _dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == _userId);
-    //        var list = q.ToList();
-    //        if (senderUser is not null || list.IsNotNullOrEmpty())
-    //        {
-    //            var listOfBlockedUser = list.Where(a => a.BlockedUsers.Contains(senderUser.Id)).Select(s => s.Id).ToList();
+		//    if (!dto.ShowBlockedUser.IsTrue())
+		//    {
+		//        var senderUser = _dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == _userId);
+		//        var list = q.ToList();
+		//        if (senderUser is not null || list.IsNotNullOrEmpty())
+		//        {
+		//            var listOfBlockedUser = list.Where(a => a.BlockedUsers.Contains(senderUser.Id)).Select(s => s.Id).ToList();
 
-    //            if (senderUser.BlockedUsers.IsNotNullOrEmpty())
-    //            {
-    //                var usersThatBlockedBySenderUser = senderUser.BlockedUsers.Split(",");
-    //                var filterdList =  usersThatBlockedBySenderUser.Where(w => w.IsNotNullOrEmpty());
-    //                listOfBlockedUser.AddRange(filterdList);
-    //            }
-				//var tempQ = list.Where(w => listOfBlockedUser.Any(a => a != w.Id));
-				//q = tempQ.AsQueryable();
-    //        }
-    //    }
+		//            if (senderUser.BlockedUsers.IsNotNullOrEmpty())
+		//            {
+		//                var usersThatBlockedBySenderUser = senderUser.BlockedUsers.Split(",");
+		//                var filterdList =  usersThatBlockedBySenderUser.Where(w => w.IsNotNullOrEmpty());
+		//                listOfBlockedUser.AddRange(filterdList);
+		//            }
+		//var tempQ = list.Where(w => listOfBlockedUser.Any(a => a != w.Id));
+		//q = tempQ.AsQueryable();
+		//        }
+		//    }
 
-        int totalCount = q.Count();
+		int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
 		return new GenericResponse<IQueryable<UserEntity>>(q.AsSingleQuery()) {
@@ -349,6 +348,8 @@ public class UserRepository : IUserRepository {
 		entity.Activity = dto.Activity ?? entity.Activity;
 		entity.Suspend = dto.Suspend ?? entity.Suspend;
 		entity.Headline = dto.Headline ?? entity.Headline;
+		entity.Detail1 = dto.Detail1 ?? entity.Detail1;
+		entity.Detail2 = dto.Detail2 ?? entity.Detail2;
 		entity.AppPhoneNumber = dto.AppPhoneNumber ?? entity.AppPhoneNumber;
 		entity.Birthdate = dto.BirthDate ?? entity.Birthdate;
 		entity.Wallet = dto.Wallet ?? entity.Wallet;
