@@ -246,11 +246,6 @@ public class ChatRepository : IChatRepository
         List<GroupChatEntity> e = await _dbContext.Set<GroupChatEntity>().AsNoTracking().Where(x => x.DeletedAt == null)
             .Where(x => x.DeletedAt == null && x.Users!.Any(y => y.Id == _userId))
             .Include(x => x.Users)!.ThenInclude(x => x.Media)
-            .Include(x => x.Media)
-            .Include(x => x.Products)!.ThenInclude(x => x.Media)
-            .Include(x => x.Products)!.ThenInclude(x => x.Categories)
-            .Include(x => x.Products)!.ThenInclude(x => x.Comments)
-            .Include(x => x.Products)!.ThenInclude(x => x.User)
             .Include(x => x.GroupChatMessage!.OrderByDescending(y => y.CreatedAt).Take(1)).ThenInclude(x => x.Media)
             .ToListAsync();
 
@@ -279,8 +274,8 @@ public class ChatRepository : IChatRepository
                 countOfMessage = groupchatMessages.Count();
             else
             {
-                var LastSeenMessage = groupchatMessages.Where(w => w.Id == seenUsers.Fk_GroupChatMessage).FirstOrDefault();
-                countOfMessage = groupchatMessages.Where(w => w.CreatedAt > LastSeenMessage.CreatedAt).Count();
+                var LastSeenMessage = await groupchatMessages.Where(w => w.Id == seenUsers.Fk_GroupChatMessage).FirstOrDefaultAsync();
+                countOfMessage = await groupchatMessages.Where(w => w.CreatedAt > LastSeenMessage.CreatedAt).CountAsync();
             }
             item.CountOfUnreadMessages = countOfMessage;
             myGroupChats.Add(item);
@@ -525,8 +520,9 @@ public class ChatRepository : IChatRepository
         return new GenericResponse<IEnumerable<ChatReadDto>?>(conversations.OrderByDescending(x => x.DateTime));
     }
 
-    private async Task<GenericResponse<GroupChatEntity?>> CreateGroupChatLogic(GroupChatCreateUpdateDto dto)
-    {
+    private async Task<GenericResponse<GroupChatEntity?>> CreateGroupChatLogic(GroupChatCreateUpdateDto dto) {
+        if (dto.UserIds.Count() > 2 && dto.Type == ChatType.Private)
+            return new GenericResponse<GroupChatEntity?>(null, UtilitiesStatusCodes.MoreThan2UserIsInPrivateChat);
         List<UserEntity> users = new();
         if (dto.UserIds.IsNotNull())
             foreach (string id in dto.UserIds!)

@@ -27,7 +27,8 @@ public enum UtilitiesStatusCodes {
 	OutOfStock = 610,
 	NotEnoughMoney  = 611,
 	UserRecieverBlocked = 612,
-	UserSenderBlocked = 613
+	UserSenderBlocked = 613,
+	MoreThan2UserIsInPrivateChat = 614
 }
 
 public enum NotoficationType {

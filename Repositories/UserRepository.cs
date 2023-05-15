@@ -343,7 +343,6 @@ public class UserRepository : IUserRepository {
 		entity.Dribble = dto.Dribble ?? entity.Dribble;
 		entity.SoundCloud = dto.SoundCloud ?? entity.SoundCloud;
 		entity.Pinterest = dto.Pinterest ?? entity.Pinterest;
-		entity.AppEmail = dto.AppEmail ?? entity.AppEmail;
 		entity.Region = dto.Region ?? entity.Region;
 		entity.Activity = dto.Activity ?? entity.Activity;
 		entity.Suspend = dto.Suspend ?? entity.Suspend;
