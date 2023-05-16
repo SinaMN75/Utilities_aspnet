@@ -106,45 +106,45 @@ public class UserEntity : IdentityUser {
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public IEnumerable<FormEntity>? FormBuilders { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public IEnumerable<ProductEntity>? Products { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public IEnumerable<TransactionEntity>? Transactions { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public IEnumerable<LikeCommentEntity>? LikeComments { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
 
 	public IEnumerable<AddressEntity>? Addresses { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public string VisitedProducts { get; set; } = "";
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public string BookmarkedProducts { get; set; } = "";
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public string FollowingUsers { get; set; } = "";
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public string FollowedUsers { get; set; } = "";
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public string BlockedUsers { get; set; } = "";
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public string BoughtProduts { get; set; } = "";
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public bool IsLoggedIn { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public DateTime? DeletedAt { get; set; }
 
 	public bool IsPrivate { get; set; }

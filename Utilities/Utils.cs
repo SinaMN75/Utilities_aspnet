@@ -1,6 +1,4 @@
-﻿using System.Net.Http;
-
-namespace Utilities_aspnet.Utilities;
+﻿namespace Utilities_aspnet.Utilities;
 
 public static class StartupExtension {
 	public static void SetupUtilities<T>(
@@ -194,6 +192,19 @@ internal class DefaultOutputCachePolicy : IOutputCachePolicy {
 		context.CacheVaryByRules.VaryByHost = true;
 		context.CacheVaryByRules.HeaderNames = "*";
 		return ValueTask.CompletedTask;
+	}
+}
+
+internal class SwaggerIgnoreAttribute : Attribute { }
+
+internal class SwaggerSkipPropertyFilter : ISchemaFilter {
+	public void Apply(OpenApiSchema schema, SchemaFilterContext context) {
+		if (schema?.Properties == null) return;
+		IEnumerable<PropertyInfo> skipProperties = context.Type.GetProperties().Where(t => t.GetCustomAttribute<SwaggerIgnoreAttribute>() != null);
+		foreach (PropertyInfo skipProperty in skipProperties) {
+			string? propertyToSkip = schema.Properties.Keys.SingleOrDefault(x => string.Equals(x, skipProperty.Name, StringComparison.OrdinalIgnoreCase));
+			if (propertyToSkip != null) schema.Properties.Remove(propertyToSkip);
+		}
 	}
 }
 

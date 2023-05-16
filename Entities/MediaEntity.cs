@@ -31,64 +31,64 @@ public class MediaEntity : BaseEntity {
 	[NotMapped]
 	public string Url => $"{Server.ServerAddress}/Medias/{FileName}";
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public ContentEntity? Content { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public Guid? ContentId { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public UserEntity? User { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public string? UserId { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public ProductEntity? Product { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public Guid? ProductId { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public CommentEntity? Comment { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public Guid? CommentId { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public ChatEntity? Chat { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public Guid? ChatId { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public NotificationEntity? Notification { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public Guid? NotificationId { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public CategoryEntity? Category { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public Guid? CategoryId { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public GroupChatEntity? GroupChat { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public Guid? GroupChatId { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public GroupChatMessageEntity? GroupChatMessage { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public Guid? GroupChatMessageId { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public Guid? BookmarkId { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public BookmarkEntity? Bookmark { get; set; }
 }
 

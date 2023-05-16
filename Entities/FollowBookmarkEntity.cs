@@ -2,10 +2,10 @@
 
 [Table("Bookmarks")]
 public class BookmarkEntity : BaseEntity {
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public UserEntity? User { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public string? UserId { get; set; }
 
 	[StringLength(500)]
@@ -13,12 +13,12 @@ public class BookmarkEntity : BaseEntity {
 
 	public ProductEntity? Product { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public Guid? ProductId { get; set; }
 
 	public CategoryEntity? Category { get; set; }
 
-	[JsonIgnore]
+	[SwaggerIgnore]
 	public Guid? CategoryId { get; set; }
 
 	public Guid? ParentId { get; set; }

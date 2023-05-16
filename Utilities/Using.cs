@@ -44,3 +44,5 @@ global using Utilities_aspnet.Hubs;
 global using Microsoft.AspNetCore.SignalR;
 global using System.Threading.RateLimiting;
 global using Microsoft.AspNetCore.RateLimiting;
+global using System.Reflection;
+global using Swashbuckle.AspNetCore.SwaggerGen;
