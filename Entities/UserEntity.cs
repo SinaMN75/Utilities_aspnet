@@ -101,6 +101,7 @@ public class UserEntity : IdentityUser {
 	public string? Badge { get; set; }
 	public bool IsOnline { get; set; } = false;
 	public string? MutedChats { get; set; }
+	public DateTime? ExpireUpgradeAccount { get; set; }
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
@@ -275,6 +276,7 @@ public class UserCreateUpdateDto {
 	public bool? IsLoggedIn { get; set; }
 	public bool? IsPrivate { get; set; }
 	public DateTime? BirthDate { get; set; }
+	public DateTime? ExpireUpgradeAccount { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 }
 

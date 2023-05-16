@@ -379,6 +379,7 @@ public class UserRepository : IUserRepository {
 		entity.IsLoggedIn = dto.IsLoggedIn ?? entity.IsLoggedIn;
 		entity.IsOnline = dto.IsOnline ?? entity.IsOnline;
 		entity.IsPrivate = dto.IsPrivate ?? entity.IsPrivate;
+		entity.ExpireUpgradeAccount = dto.ExpireUpgradeAccount ?? entity.ExpireUpgradeAccount;
 
 		if (dto.Categories.IsNotNullOrEmpty()) {
 			List<CategoryEntity> list = new();
