@@ -103,6 +103,8 @@ public class UserEntity : IdentityUser {
 	public string? MutedChats { get; set; }
 	public DateTime? ExpireUpgradeAccount { get; set; }
 
+	public bool IsPrivate { get; set; }
+
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
 
@@ -121,6 +123,7 @@ public class UserEntity : IdentityUser {
 	[System.Text.Json.Serialization.JsonIgnore]
 	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
 
+	[System.Text.Json.Serialization.JsonIgnore]
 	public IEnumerable<AddressEntity>? Addresses { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
@@ -147,8 +150,6 @@ public class UserEntity : IdentityUser {
 	[System.Text.Json.Serialization.JsonIgnore]
 	public DateTime? DeletedAt { get; set; }
 
-	public bool IsPrivate { get; set; }
-
 	[NotMapped]
 	public bool IsFollowing { get; set; } = false;
 
@@ -169,6 +170,39 @@ public class UserEntity : IdentityUser {
 
 	[NotMapped]
 	public GrowthRateReadDto? GrowthRate { get; set; }
+	
+	[System.Text.Json.Serialization.JsonIgnore]
+	public override string? PasswordHash { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	public override string? NormalizedUserName { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	public override string? NormalizedEmail { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	public override bool EmailConfirmed { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	public override string? SecurityStamp { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	public override string? ConcurrencyStamp { get; set; }
+	
+	[System.Text.Json.Serialization.JsonIgnore]
+	public override bool PhoneNumberConfirmed { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	public override bool TwoFactorEnabled { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	public override DateTimeOffset? LockoutEnd { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	public override bool LockoutEnabled { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	public override int AccessFailedCount { get; set; }
 }
 
 [Table("Otps")]
