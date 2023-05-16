@@ -43,19 +43,19 @@ public class CategoryEntity : BaseEntity {
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public IEnumerable<UserEntity>? Users { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public IEnumerable<ProductEntity>? Products { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public IEnumerable<FormEntity>? FormFields { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public IEnumerable<OrderDetailEntity>? OrderDetails { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
 }
 

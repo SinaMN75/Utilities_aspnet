@@ -31,64 +31,64 @@ public class MediaEntity : BaseEntity {
 	[NotMapped]
 	public string Url => $"{Server.ServerAddress}/Medias/{FileName}";
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public ContentEntity? Content { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public Guid? ContentId { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public UserEntity? User { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public string? UserId { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public ProductEntity? Product { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public Guid? ProductId { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public CommentEntity? Comment { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public Guid? CommentId { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public ChatEntity? Chat { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public Guid? ChatId { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public NotificationEntity? Notification { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public Guid? NotificationId { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public CategoryEntity? Category { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public Guid? CategoryId { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public GroupChatEntity? GroupChat { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public Guid? GroupChatId { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public GroupChatMessageEntity? GroupChatMessage { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public Guid? GroupChatMessageId { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public Guid? BookmarkId { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public BookmarkEntity? Bookmark { get; set; }
 }
 

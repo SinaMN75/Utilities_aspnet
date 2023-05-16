@@ -102,24 +102,24 @@ public class ProductEntity : BaseEntity
     public IEnumerable<FormEntity>? Forms { get; set; }
     public IEnumerable<CategoryEntity>? Categories { get; set; }
 
-    [SwaggerIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
     public IEnumerable<ReportEntity>? Reports { get; set; }
 
-    [SwaggerIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
     public IEnumerable<BookmarkEntity>? Bookmarks { get; set; }
 
     public IEnumerable<CommentEntity>? Comments { get; set; }
 
-    [SwaggerIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
     public IEnumerable<OrderDetailEntity>? OrderDetails { get; set; }
 
-    [SwaggerIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
     public IEnumerable<GroupChatEntity>? GroupChat { get; set; }
 
     public IEnumerable<ProductInsight>? ProductInsights { get; set; }
     public IEnumerable<VisitProducts>? VisitProducts { get; set; }
 
-    [SwaggerIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
     public IEnumerable<ChatEntity>? Chats { get; set; }
 }
 

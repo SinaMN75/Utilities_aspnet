@@ -14,22 +14,22 @@ public class FormEntity : BaseEntity {
 
 	public Guid? FormFieldId { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public UserEntity? User { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public string? UserId { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public ProductEntity? Product { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public Guid? ProductId { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public OrderDetailEntity? OrderDetail { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public Guid? OrderDetailId { get; set; }
 }
 
@@ -57,7 +57,7 @@ public class FormFieldEntity : BaseEntity {
 
 	public Guid? CategoryId { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public CategoryEntity? Category { get; set; }
 
 	[InverseProperty(nameof(FormEntity.FormField))]

@@ -106,45 +106,45 @@ public class UserEntity : IdentityUser {
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public IEnumerable<FormEntity>? FormBuilders { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public IEnumerable<ProductEntity>? Products { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public IEnumerable<TransactionEntity>? Transactions { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public IEnumerable<LikeCommentEntity>? LikeComments { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
 
 	public IEnumerable<AddressEntity>? Addresses { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public string VisitedProducts { get; set; } = "";
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public string BookmarkedProducts { get; set; } = "";
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public string FollowingUsers { get; set; } = "";
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public string FollowedUsers { get; set; } = "";
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public string BlockedUsers { get; set; } = "";
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public string BoughtProduts { get; set; } = "";
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public bool IsLoggedIn { get; set; }
 
-	[SwaggerIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public DateTime? DeletedAt { get; set; }
 
 	public bool IsPrivate { get; set; }

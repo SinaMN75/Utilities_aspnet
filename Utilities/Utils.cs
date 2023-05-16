@@ -195,19 +195,6 @@ internal class DefaultOutputCachePolicy : IOutputCachePolicy {
 	}
 }
 
-internal class SwaggerIgnoreAttribute : Attribute { }
-
-internal class SwaggerSkipPropertyFilter : ISchemaFilter {
-	public void Apply(OpenApiSchema schema, SchemaFilterContext context) {
-		if (schema?.Properties == null) return;
-		IEnumerable<PropertyInfo> skipProperties = context.Type.GetProperties().Where(t => t.GetCustomAttribute<SwaggerIgnoreAttribute>() != null);
-		foreach (PropertyInfo skipProperty in skipProperties) {
-			string? propertyToSkip = schema.Properties.Keys.SingleOrDefault(x => string.Equals(x, skipProperty.Name, StringComparison.OrdinalIgnoreCase));
-			if (propertyToSkip != null) schema.Properties.Remove(propertyToSkip);
-		}
-	}
-}
-
 internal class ShortOutputCachePolicy : IOutputCachePolicy {
 	public ValueTask ServeFromCacheAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
 	public ValueTask ServeResponseAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
