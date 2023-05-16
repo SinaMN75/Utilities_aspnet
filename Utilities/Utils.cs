@@ -1,4 +1,6 @@
-﻿namespace Utilities_aspnet.Utilities;
+﻿using System.Net.Http;
+
+namespace Utilities_aspnet.Utilities;
 
 public static class StartupExtension {
 	public static void SetupUtilities<T>(
@@ -66,8 +68,11 @@ public static class StartupExtension {
 
 		builder.Services.AddHttpContextAccessor();
 		builder.Services.AddSignalR();
+        builder.Services.AddScoped<CustomInterceptor>();
 
-		builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+        builder.Services.AddHttpClient("my-client").AddHttpMessageHandler<CustomInterceptor>();
+
+        builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 		builder.Services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")));
 		builder.Services.AddControllersWithViews(option => option.EnableEndpointRouting = false).AddNewtonsoftJson(options => {
 			options.SerializerSettings.ContractResolver = new DefaultContractResolver();
