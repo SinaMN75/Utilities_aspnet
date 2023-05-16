@@ -85,4 +85,58 @@ public class Utils
         }
         return new Tuple<bool, UtilitiesStatusCodes>(isBlocked, utilCode);
     }
+
+    public static Tuple<bool, UtilitiesStatusCodes> IsUserOverused(DbContext context, string? userId , string? type , ChatType? chatType , string? useCaseProduct)
+    {
+        var user = context.Set<UserEntity>().FirstOrDefault(f=>f.Id == userId);
+        if (user == null) return new Tuple<bool, UtilitiesStatusCodes>(true, UtilitiesStatusCodes.UserNotFound);
+        bool overUsed;
+        try
+        {
+            switch (type ?? string.Empty)
+            {
+                case "CreateGroupChat":
+                    if(chatType == ChatType.Private)
+                    {
+                        if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
+                            overUsed = context.Set<GroupChatEntity>().Count(w => w.CreatorUserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) > 20;
+                        else
+                            overUsed = context.Set<GroupChatEntity>().Count(w => w.CreatorUserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) > 50;
+                    }
+                    else
+                    {
+                        if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
+                            overUsed = context.Set<GroupChatEntity>().Count(w => w.CreatorUserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) > 10;
+                        else
+                            overUsed = false;
+                    }
+                    break;
+                case "CreateComment":
+                    if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
+                        overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) > 50;
+                    else
+                        overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) > 100;
+                    break;
+                case "CreateProduct":
+                    if (useCaseProduct == "product")
+                    {
+                        if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
+                            overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.CreatedAt.Value.Date == DateTime.Today) > 5;
+                        else
+                            overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt.Value.Date == DateTime.Today) > 50;
+                    }
+                    else overUsed = false; //todo
+                    break;
+                default:
+                    overUsed = false;
+                    break;
+            }
+            if (overUsed) return new Tuple<bool, UtilitiesStatusCodes>(overUsed, UtilitiesStatusCodes.Overused);
+            return new Tuple<bool, UtilitiesStatusCodes>(false, UtilitiesStatusCodes.Success);
+        }
+        catch (Exception)
+        {
+            return new Tuple<bool, UtilitiesStatusCodes>(true, UtilitiesStatusCodes.BadRequest);            
+        }
+    }
 }

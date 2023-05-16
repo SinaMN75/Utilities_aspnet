@@ -84,6 +84,9 @@ public class CommentRepository : ICommentRepository
 
     public async Task<GenericResponse<CommentEntity?>> Create(CommentCreateUpdateDto dto)
     {
+        var overUsedCheck = Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, "CreateComment", null, null);
+        if (overUsedCheck.Item1)
+            return new GenericResponse<CommentEntity?>(null, overUsedCheck.Item2);
 
         var prdct = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == dto.ProductId);
         if (prdct is not null)
