@@ -390,7 +390,7 @@ public class ChatRepository : IChatRepository
             .Include(x => x.ForwardedMessage).ThenInclude(x => x.Products)!.ThenInclude(x => x.Media)
             .Include(x => x.ForwardedMessage)!.ThenInclude(x => x.Parent)!.ThenInclude(x => x.Media)
             .Include(x => x.ForwardedMessage).ThenInclude(x => x.User).ThenInclude(x => x.Media)
-            .OrderByDescending(o => o.CreatedAt)
+            .OrderBy(o => o.CreatedAt)
             .AsNoTracking();
         
         int totalCount = q.Count();
