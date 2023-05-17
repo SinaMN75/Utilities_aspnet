@@ -191,3 +191,11 @@ public enum ReferenceIdType {
 	Category = 101,
 	User = 102
 }
+
+public enum CallerType
+{
+    CreateGroupChat = 100,
+    CreateComment = 101,
+    CreateProduct = 102,
+    None = 99999
+}

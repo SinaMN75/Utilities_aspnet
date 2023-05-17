@@ -137,7 +137,7 @@ public class ChatRepository : IChatRepository
 
     public async Task<GenericResponse<GroupChatEntity?>> CreateGroupChat(GroupChatCreateUpdateDto dto)
     {
-        var overUsedCheck = Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, nameof(CreateGroupChat) , dto.Type , null);
+        var overUsedCheck = Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, CallerType.CreateGroupChat , dto.Type , null);
         if (overUsedCheck.Item1)
             return new GenericResponse<GroupChatEntity?>(null, overUsedCheck.Item2);
 

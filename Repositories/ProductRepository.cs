@@ -37,7 +37,7 @@ public class ProductRepository : IProductRepository
 
     public async Task<GenericResponse<ProductEntity>> Create(ProductCreateUpdateDto dto, CancellationToken ct)
     {
-        var overUsedCheck = Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, "CreateProduct", null , dto.UseCase);
+        var overUsedCheck = Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, CallerType.CreateProduct , null , dto.UseCase);
         if (overUsedCheck.Item1)
             return new GenericResponse<ProductEntity>(null,overUsedCheck.Item2);
 
@@ -58,7 +58,7 @@ public class ProductRepository : IProductRepository
 
     public async Task<GenericResponse<ProductEntity>> CreateWithFiles(ProductCreateUpdateDto dto, CancellationToken ct)
     {
-        var overUsedCheck = Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, "CreateProduct", null, dto.UseCase);
+        var overUsedCheck = Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, CallerType.CreateProduct, null, dto.UseCase);
         if (overUsedCheck.Item1)
             return new GenericResponse<ProductEntity>(null, overUsedCheck.Item2);
 

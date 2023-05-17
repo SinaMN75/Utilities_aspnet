@@ -86,16 +86,16 @@ public class Utils
         return new Tuple<bool, UtilitiesStatusCodes>(isBlocked, utilCode);
     }
 
-    public static Tuple<bool, UtilitiesStatusCodes> IsUserOverused(DbContext context, string? userId , string? type , ChatType? chatType , string? useCaseProduct)
+    public static Tuple<bool, UtilitiesStatusCodes> IsUserOverused(DbContext context, string? userId , CallerType? type , ChatType? chatType , string? useCaseProduct)
     {
         var user = context.Set<UserEntity>().FirstOrDefault(f=>f.Id == userId);
         if (user == null) return new Tuple<bool, UtilitiesStatusCodes>(true, UtilitiesStatusCodes.UserNotFound);
         bool overUsed;
         try
         {
-            switch (type ?? string.Empty)
+            switch (type ?? CallerType.None)
             {
-                case "CreateGroupChat":
+                case CallerType.CreateGroupChat:
                     if(chatType == ChatType.Private)
                     {
                         if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
@@ -111,13 +111,13 @@ public class Utils
                             overUsed = false;
                     }
                     break;
-                case "CreateComment":
+                case CallerType.CreateComment:
                     if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
                         overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) > 50;
                     else
                         overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) > 100;
                     break;
-                case "CreateProduct":
+                case CallerType.CreateProduct:
                     if (useCaseProduct == "product")
                     {
                         if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
@@ -125,7 +125,7 @@ public class Utils
                         else
                             overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt.Value.Date == DateTime.Today) > 50;
                     }
-                    else overUsed = false; //todo
+                    else overUsed = false; //todo for other side of product like twitter and ...
                     break;
                 default:
                     overUsed = false;
