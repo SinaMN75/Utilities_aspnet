@@ -2,8 +2,8 @@
 
 [Table("Address")]
 public class AddressEntity : BaseEntity {
-	public string? RecieverFullName { get; set; }
-	public string? RecieverPhoneNumber { get; set; }
+	public string? ReceiverFullName { get; set; }
+	public string? ReceiverPhoneNumber { get; set; }
 	public string? Address { get; set; }
 	public string? Pelak { get; set; }
 	public string? Unit { get; set; }
@@ -15,8 +15,8 @@ public class AddressEntity : BaseEntity {
 
 public class AddressCreateUpdateDto {
 	public Guid? Id { get; set; }
-	public string? RecieverFullName { get; set; }
-	public string? RecieverPhoneNumber { get; set; }
+	public string? ReceiverFullName { get; set; }
+	public string? ReceiverPhoneNumber { get; set; }
 	public string? Address { get; set; }
 	public string? Pelak { get; set; }
 	public string? Unit { get; set; }
