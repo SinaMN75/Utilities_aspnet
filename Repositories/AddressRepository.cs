@@ -26,8 +26,8 @@ public class AddressRepository : IAddressRepository {
 			CreatedAt = DateTime.UtcNow,
 			Pelak = addressDto.Pelak,
 			PostalCode = addressDto.PostalCode,
-			RecieverFullName = addressDto.RecieverFullName,
-			RecieverPhoneNumber = addressDto.RecieverPhoneNumber,
+			ReceiverFullName = addressDto.ReceiverFullName,
+			ReceiverPhoneNumber = addressDto.ReceiverPhoneNumber,
 			Unit = addressDto.Unit,
 			UserId = _userId,
 		};
@@ -50,8 +50,8 @@ public class AddressRepository : IAddressRepository {
 		entity.Unit = addressDto.Unit ?? entity.Unit;
 		entity.Address = addressDto.Address ?? entity.Address;
 		entity.UpdatedAt = DateTime.UtcNow;
-		entity.RecieverFullName = addressDto.RecieverFullName ?? entity.RecieverFullName;
-		entity.RecieverPhoneNumber = addressDto.RecieverPhoneNumber ?? entity.RecieverPhoneNumber;
+		entity.ReceiverFullName = addressDto.ReceiverFullName ?? entity.ReceiverFullName;
+		entity.ReceiverPhoneNumber = addressDto.ReceiverPhoneNumber ?? entity.ReceiverPhoneNumber;
 
 		_dbContext.Update(entity);
 		await _dbContext.SaveChangesAsync();

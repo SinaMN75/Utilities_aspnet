@@ -1,11 +1,4 @@
-﻿using Azure.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
-using Utilities_aspnet.Utilities;
+﻿using System.Net.Http.Headers;
 
 namespace Utilities_aspnet.Controllers
 {
@@ -52,10 +45,14 @@ namespace Utilities_aspnet.Controllers
             return await client.SendRequest(null, "https://api.sinamn75.com/api/ProductV2/14F3561A-F0EC-42B2-41C9-08DA86C505D6", HttpMethod.Get, null);
         }
 
-        //[HttpDelete]
-        //public async Task<ActionResult<GenericResponse>> Delete()
-        //{
+        [HttpDelete]
+        public async Task<ActionResult<GenericResponse>> Delete()
+        {
+            var client = new CustomHttpClient<object, GenericResponse>();
 
-        //}
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            return await client.SendRequest(null, "https://localhost:7125/api/address?addressId=3fa85f64-5717-4562-b3fc-2c963f66afa6", HttpMethod.Delete, null);
+        }
     }
 }
