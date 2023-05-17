@@ -1,44 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
+using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Utilities_aspnet.Utilities
 {
-    public class CustomHttpClient : HttpClient
+    public class CustomHttpClient<TIn, TOut> : HttpClient where TIn : class where TOut : class
     {
         public CustomHttpClient() : base(new CustomInterceptor())
         {
-            DefaultRequestHeaders.Add("header-name", "header-value");
+            DefaultRequestHeaders.Accept.Clear();
+            DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public async Task<string> SendRequest(string url, string body, HttpMethod method)
+        public async Task<TOut> SendRequest(TIn data, string url, HttpMethod httpMethod, HttpRequestHeaders? headers)
         {
-            var content = new StringContent(body);
-
-            var request = new HttpRequestMessage(method, url)
-            {
-                Content = content
-            };
-
+            var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+            var request = new HttpRequestMessage(httpMethod, url) { Content = content };
+            if (headers != null)
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
             var response = await SendAsync(request);
-
-            return await response.Content.ReadAsStringAsync();
-        }
+            var responseString = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<TOut>(responseString);
+        }       
     }
+
 
     public class CustomInterceptor : DelegatingHandler
     {
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            // Modify the request here
-
-            var response = await base.SendAsync(request, cancellationToken);
-
-            // Modify the response here
-
-            return response;
+            try
+            {
+                var response = await base.SendAsync(request, cancellationToken);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception();
+            }                        
+        }
+        public CustomInterceptor()
+        {
+            InnerHandler = new HttpClientHandler();
         }
     }
 }
