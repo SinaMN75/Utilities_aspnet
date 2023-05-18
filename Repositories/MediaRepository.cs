@@ -23,7 +23,7 @@ public class MediaRepository : IMediaRepository {
 
 				string name = Guid.NewGuid() + Path.GetExtension(file.FileName);
 
-				List<string> allowedExtensions = new() {".png", ".gif", ".jpg", ".jpeg", ".mp4", ".mp3", ".pdf", ".aac"};
+				List<string> allowedExtensions = new() {".png", ".gif", ".jpg", ".jpeg", ".mp4", ".mp3", ".pdf", ".aac", ".apk"};
 				if (!allowedExtensions.Contains(Path.GetExtension(file.FileName.ToLower())))
 					return new GenericResponse<IEnumerable<MediaEntity>?>(null, UtilitiesStatusCodes.BadRequest);
 
