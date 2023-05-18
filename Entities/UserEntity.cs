@@ -102,10 +102,9 @@ public class UserEntity : IdentityUser {
 	public bool IsOnline { get; set; } = false;
 	public string? MutedChats { get; set; }
 	public DateTime? ExpireUpgradeAccount { get; set; }
-
 	public bool IsPrivate { get; set; }
 
-	public IEnumerable<MediaEntity>? Media { get; set; }
+    public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
@@ -367,4 +366,10 @@ public class TransferFromWalletToWalletDto {
 	public string FromUserId { get; set; } = null!;
 	public string ToUserId { get; set; } = null!;
 	public double Amount { get; set; }
+}
+
+public class WalletWithdrawalDto
+{
+    public string ShebaNumber { get; set; }
+    public double Amount { get; set; }
 }

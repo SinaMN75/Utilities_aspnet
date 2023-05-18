@@ -49,6 +49,14 @@ public static class StringExtension
     public static bool IsEmail(this string email) => Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.(com|net|org|gov)$", RegexOptions.IgnoreCase);
     public static bool IsNotNullOrEmpty(this string? s) => s is { Length: > 0 };
     public static bool IsNullOrEmpty(this string? s) => string.IsNullOrEmpty(s);
+    public static string? GetShebaNumber(this string s)
+    {
+        s = s.Replace(" ", "");
+        s = s.Replace("IR", "");
+        s = s.Replace("ir", "");
+        if (s.Length == 24) return s;
+        return null;
+    }
 }
 
 public class Utils

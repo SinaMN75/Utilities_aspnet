@@ -12,6 +12,7 @@ public interface IUserRepository {
 	Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList();
 	Task<GenericResponse> ToggleBlock(string userId);
 	Task<GenericResponse> TransferWalletToWallet(TransferFromWalletToWalletDto dto);
+	Task<GenericResponse> WalletWithdrawal(WalletWithdrawalDto dto);
 	Task<UserEntity?> ReadByIdMinimal(string? idOrUserName, string? token = null);
 }
 
@@ -19,20 +20,24 @@ public class UserRepository : IUserRepository {
 	private readonly DbContext _dbContext;
 	private readonly UserManager<UserEntity> _userManager;
 	private readonly ISmsNotificationRepository _sms;
-	private readonly string? _userId;
+	private readonly ITransactionRepository _transactionRepository;
+    private readonly string? _userId;
 
 	public UserRepository(
-		DbContext dbContext,
-		UserManager<UserEntity> userManager,
-		ISmsNotificationRepository sms,
-		IHttpContextAccessor httpContextAccessor) {
-		_dbContext = dbContext;
-		_userManager = userManager;
-		_sms = sms;
-		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
-	}
+        DbContext dbContext,
+        UserManager<UserEntity> userManager,
+        ISmsNotificationRepository sms,
+        IHttpContextAccessor httpContextAccessor,
+        ITransactionRepository transactionRepository)
+    {
+        _dbContext = dbContext;
+        _userManager = userManager;
+        _sms = sms;
+        _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
+        _transactionRepository = transactionRepository;
+    }
 
-	public async Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null) {
+    public async Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null) {
 		bool isUserId = Guid.TryParse(idOrUserName, out _);
 		UserEntity? entity = await _dbContext.Set<UserEntity>()
 			.Include(u => u.Media)
@@ -323,13 +328,30 @@ public class UserRepository : IUserRepository {
 
 		if (fromUser.Wallet <= dto.Amount) return new GenericResponse(UtilitiesStatusCodes.NotEnoughMoney);
 		await Update(new UserCreateUpdateDto {Id = fromUser.Id, Wallet = fromUser.Wallet - dto.Amount});
+		await _transactionRepository.Create(MakeTransactionEntity(fromUser.Id , dto.Amount,"کسر",null));
 		await Update(new UserCreateUpdateDto {Id = toUser.Id, Wallet = toUser.Wallet + dto.Amount});
-		return new GenericResponse();
+        await _transactionRepository.Create(MakeTransactionEntity(toUser.Id, dto.Amount, "واریز",null));
+        return new GenericResponse();
 	}
 
-	#endregion
+    public async Task<GenericResponse> WalletWithdrawal(WalletWithdrawalDto dto)
+    {
+        var user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f=>f.Id == _userId && f.Suspend != true);
+		if(user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound);
+		var sheba = dto.ShebaNumber.GetShebaNumber();
 
-	private void FillUserData(UserCreateUpdateDto dto, UserEntity entity) {
+        if (dto.Amount < 100000) return new GenericResponse(UtilitiesStatusCodes.NotEnoughMoney);
+        if (dto.Amount > 5000000) return new GenericResponse(UtilitiesStatusCodes.MoreThanAllowedMoney);
+		if (sheba is null) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
+
+        await _transactionRepository.Create(MakeTransactionEntity(user.Id, dto.Amount, "درخواست برداشت", sheba));
+		await Update(new UserCreateUpdateDto { Id = user.Id, Wallet = user.Wallet - dto.Amount});
+		return new GenericResponse();
+    }
+
+    #endregion
+
+    private void FillUserData(UserCreateUpdateDto dto, UserEntity entity) {
 		entity.FirstName = dto.FirstName ?? entity.FirstName;
 		entity.LastName = dto.LastName ?? entity.LastName;
 		entity.FullName = dto.FullName ?? entity.FullName;
@@ -392,7 +414,17 @@ public class UserRepository : IUserRepository {
 		}
 	}
 
-	private async Task<GrowthRateReadDto?> GetGrowthRate(string? id) {
+	private TransactionEntity MakeTransactionEntity(string userId , double amount, string description, string? ShebaNumber)
+	{
+		return new TransactionEntity
+		{
+			UserId = userId,
+			Amount = amount,
+			Descriptions = description
+		};
+	}
+
+    private async Task<GrowthRateReadDto?> GetGrowthRate(string? id) {
 		IEnumerable<CommentEntity> myComments = await _dbContext.Set<CommentEntity>().Where(x => x.UserId == id).ToListAsync();
 		IEnumerable<Guid> productIds = await _dbContext.Set<ProductEntity>().Where(x => x.UserId == id).Select(x => x.Id).ToListAsync();
 		IEnumerable<CommentEntity> comments = await _dbContext.Set<CommentEntity>().Where(x => productIds.Contains(x.ProductId ?? Guid.Empty)).ToListAsync();

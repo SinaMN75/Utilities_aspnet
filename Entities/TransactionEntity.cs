@@ -15,8 +15,9 @@ public class TransactionEntity : BaseEntity {
 
 	[StringLength(500)]
 	public string? PaymentId { get; set; }
+    public string? ShebaNumber { get; set; }
 
-	public long? RefId { get; set; }
+    public long? RefId { get; set; }
 
 	public TransactionStatus? StatusId { get; set; } = TransactionStatus.Pending;
 
