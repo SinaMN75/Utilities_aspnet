@@ -133,7 +133,13 @@ public class Utils
                         else
                             overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt.Value.Date == DateTime.Today) > 50;
                     }
-                    else overUsed = false; //todo for other side of product like twitter and ...
+                    else
+                    {
+                        if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
+                            overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.CreatedAt.Value.Date == DateTime.Today) > 5;
+                        else
+                            overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt.Value.Date == DateTime.Today) > 50;
+                    }
                     break;
                 default:
                     overUsed = false;
