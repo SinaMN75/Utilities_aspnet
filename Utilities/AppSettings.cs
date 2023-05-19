@@ -1,10 +1,10 @@
 ﻿namespace Utilities_aspnet.Utilities;
 
 public class AppSettings {
-	public SmsPanelSettings? SmsPanelSettings { get; set; }
-	public PaymentSettings? PaymentSettings { get; set; }
-	public PushNotificationSetting? PushNotificationSetting { get; set; }
-	public UsageRules? UsageRules { get; set; }
+	public SmsPanelSettings SmsPanelSettings { get; set; } = null!;
+	public PaymentSettings PaymentSettings { get; set; } = null!;
+	public PushNotificationSetting PushNotificationSetting { get; set; } = null!;
+	public UsageRules UsageRules { get; set; } = null!;
 	public string? AndroidMinimumVersion { get; set; }
 	public string? AndroidLatestVersion { get; set; }
 	public string? IosMinimumVersion { get; set; }

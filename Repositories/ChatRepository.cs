@@ -29,10 +29,12 @@ public class ChatRepository : IChatRepository
 {
     private readonly DbContext _dbContext;
     private readonly string? _userId;
+    private readonly IConfiguration _config;
 
-    public ChatRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor)
+    public ChatRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IConfiguration config)
     {
         _dbContext = dbContext;
+        _config = config;
         _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
     }
 
@@ -137,7 +139,9 @@ public class ChatRepository : IChatRepository
 
     public async Task<GenericResponse<GroupChatEntity?>> CreateGroupChat(GroupChatCreateUpdateDto dto)
     {
-        var overUsedCheck = Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, CallerType.CreateGroupChat , dto.Type , null);
+        AppSettings appSettings = new();
+        _config.GetSection("AppSettings").Bind(appSettings);
+        var overUsedCheck = Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, CallerType.CreateGroupChat , dto.Type , null, appSettings.UsageRules);
         if (overUsedCheck.Item1)
             return new GenericResponse<GroupChatEntity?>(null, overUsedCheck.Item2);
 
