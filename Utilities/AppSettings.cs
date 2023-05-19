@@ -3,7 +3,8 @@
 public class AppSettings {
 	public SmsPanelSettings? SmsPanelSettings { get; set; }
 	public PaymentSettings? PaymentSettings { get; set; }
-	public PushNotificationSetting PushNotificationSetting { get; set; } = null!;
+	public PushNotificationSetting? PushNotificationSetting { get; set; }
+	public UsageRules? UsageRules { get; set; }
 	public string? AndroidMinimumVersion { get; set; }
 	public string? AndroidLatestVersion { get; set; }
 	public string? IosMinimumVersion { get; set; }
@@ -22,6 +23,12 @@ public class SmsPanelSettings {
 	public string? SmsSecret { get; set; }
 	public int? OtpId { get; set; }
 	public string? PatternCode { get; set; }
+}
+
+public class UsageRules {
+	public string? MaxProductPerDay { get; set; }
+	public string? MaxCommentPerDay { get; set; }
+	public string? MaxChatPerDay { get; set; }
 }
 
 public class PaymentSettings {

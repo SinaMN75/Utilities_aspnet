@@ -17,14 +17,18 @@ public class CommentRepository : ICommentRepository
     private readonly DbContext _dbContext;
     private readonly INotificationRepository _notificationRepository;
     private readonly string? _userId;
+    private readonly IConfiguration _config;
+
 
     public CommentRepository(
         DbContext dbContext,
         IHttpContextAccessor httpContextAccessor,
-        INotificationRepository notificationRepository)
+        INotificationRepository notificationRepository,
+        IConfiguration config)
     {
         _dbContext = dbContext;
         _notificationRepository = notificationRepository;
+        _config = config;
         _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
     }
 
@@ -84,7 +88,9 @@ public class CommentRepository : ICommentRepository
 
     public async Task<GenericResponse<CommentEntity?>> Create(CommentCreateUpdateDto dto)
     {
-        var overUsedCheck = Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, CallerType.CreateComment, null, null);
+        AppSettings appSettings = new();
+        _config.GetSection("AppSettings").Bind(appSettings);
+        var overUsedCheck = Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, CallerType.CreateComment, null, null, appSettings.UsageRules!);
         if (overUsedCheck.Item1)
             return new GenericResponse<CommentEntity?>(null, overUsedCheck.Item2);
 

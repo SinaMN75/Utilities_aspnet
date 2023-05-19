@@ -18,6 +18,7 @@ public interface IProductRepository
 
 public class ProductRepository : IProductRepository
 {
+    private readonly IConfiguration _config;
     private readonly DbContext _dbContext;
     private readonly IMediaRepository _mediaRepository;
     private readonly IUserRepository _userRepository;
@@ -27,17 +28,21 @@ public class ProductRepository : IProductRepository
         DbContext dbContext,
         IHttpContextAccessor httpContextAccessor,
         IMediaRepository mediaRepository,
-        IUserRepository userRepository)
+        IUserRepository userRepository,
+        IConfiguration config)
     {
         _dbContext = dbContext;
         _mediaRepository = mediaRepository;
         _userRepository = userRepository;
+        _config = config;
         _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
     }
 
     public async Task<GenericResponse<ProductEntity>> Create(ProductCreateUpdateDto dto, CancellationToken ct)
     {
-        var overUsedCheck = Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, CallerType.CreateProduct , null , dto.UseCase);
+        AppSettings appSettings = new();
+        _config.GetSection("AppSettings").Bind(appSettings);
+        var overUsedCheck = Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, CallerType.CreateProduct , null , dto.UseCase, appSettings.UsageRules!);
         if (overUsedCheck.Item1)
             return new GenericResponse<ProductEntity>(null,overUsedCheck.Item2);
 
@@ -58,7 +63,9 @@ public class ProductRepository : IProductRepository
 
     public async Task<GenericResponse<ProductEntity>> CreateWithFiles(ProductCreateUpdateDto dto, CancellationToken ct)
     {
-        var overUsedCheck = Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, CallerType.CreateProduct, null, dto.UseCase);
+        AppSettings appSettings = new();
+        _config.GetSection("AppSettings").Bind(appSettings);
+        var overUsedCheck = Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, CallerType.CreateProduct, null, dto.UseCase, appSettings.UsageRules!);
         if (overUsedCheck.Item1)
             return new GenericResponse<ProductEntity>(null, overUsedCheck.Item2);
 
