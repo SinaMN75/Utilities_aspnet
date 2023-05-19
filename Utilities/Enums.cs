@@ -171,6 +171,14 @@ public enum AgeCategory {
 	Adult = 104
 }
 
+public enum ProductState
+{
+	None = 100,
+	New = 101, //kalaye no va jadid
+	KindOfNew = 102, // dar hade no
+	UsedGoods = 103, //daste dovom
+}
+
 public enum OrderReportType {
 	OrderDate = 100,
 	OrderDateProductUseCase = 101,

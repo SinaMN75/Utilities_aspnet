@@ -85,9 +85,10 @@ public class ProductEntity : BaseEntity
     public ProductStatus? Status { get; set; }
     public Currency? Currency { get; set; }
     public AgeCategory? AgeCategory { get; set; }
-
+    public ProductState? ProductState { get; set; }
     public double? Stock { get; set; }
-
+    public DateTime? ShippingTime { get; set; }
+    public double? ShippingCost { get; set; }
     public string? UserId { get; set; }
     public UserEntity? User { get; set; }
 

@@ -103,6 +103,9 @@ public class UserEntity : IdentityUser {
 	public string? MutedChats { get; set; }
 	public DateTime? ExpireUpgradeAccount { get; set; }
 	public bool IsPrivate { get; set; }
+    public string? MeliCode { get; set; }
+    public string? ShebaNumber { get; set; }
+
 
     public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
