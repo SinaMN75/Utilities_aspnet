@@ -370,9 +370,3 @@ public class TransferFromWalletToWalletDto {
 	public string ToUserId { get; set; } = null!;
 	public double Amount { get; set; }
 }
-
-public class WalletWithdrawalDto
-{
-    public string ShebaNumber { get; set; }
-    public double Amount { get; set; }
-}

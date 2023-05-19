@@ -208,3 +208,10 @@ public enum CallerType
     CreateProduct = 102,
     None = 99999
 }
+
+public enum WithdrawState
+{
+	None = 100,
+	Requested = 101,
+	Accepted = 102
+}

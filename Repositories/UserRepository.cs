@@ -12,7 +12,6 @@ public interface IUserRepository {
 	Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList();
 	Task<GenericResponse> ToggleBlock(string userId);
 	Task<GenericResponse> TransferWalletToWallet(TransferFromWalletToWalletDto dto);
-	Task<GenericResponse> WalletWithdrawal(WalletWithdrawalDto dto);
 	Task<UserEntity?> ReadByIdMinimal(string? idOrUserName, string? token = null);
 }
 
@@ -333,21 +332,6 @@ public class UserRepository : IUserRepository {
         await _transactionRepository.Create(MakeTransactionEntity(toUser.Id, dto.Amount, "واریز",null));
         return new GenericResponse();
 	}
-
-    public async Task<GenericResponse> WalletWithdrawal(WalletWithdrawalDto dto)
-    {
-        var user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f=>f.Id == _userId && f.Suspend != true);
-		if(user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound);
-		var sheba = dto.ShebaNumber.GetShebaNumber();
-
-        if (dto.Amount < 100000) return new GenericResponse(UtilitiesStatusCodes.NotEnoughMoney);
-        if (dto.Amount > 5000000) return new GenericResponse(UtilitiesStatusCodes.MoreThanAllowedMoney);
-		if (sheba is null) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
-
-        await _transactionRepository.Create(MakeTransactionEntity(user.Id, dto.Amount, "درخواست برداشت", sheba));
-		await Update(new UserCreateUpdateDto { Id = user.Id, Wallet = user.Wallet - dto.Amount});
-		return new GenericResponse();
-    }
 
     #endregion
 
