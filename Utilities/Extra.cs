@@ -94,35 +94,44 @@ public class Utils {
 				case CallerType.CreateGroupChat:
 					if (chatType == ChatType.Private) {
 						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
-							overUsed = context.Set<GroupChatEntity>().Count(w => w.CreatorUserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) > 20;
+							overUsed = context.Set<GroupChatEntity>().Count(w => w.CreatorUserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) >
+							           usageRules.MaxChatPerDay;
 						else
-							overUsed = context.Set<GroupChatEntity>().Count(w => w.CreatorUserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) > 50;
+							overUsed = context.Set<GroupChatEntity>().Count(w => w.CreatorUserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) >
+							           usageRules.MaxChatPerDay;
 					}
 					else {
 						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
-							overUsed = context.Set<GroupChatEntity>().Count(w => w.CreatorUserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) > 10;
+							overUsed = context.Set<GroupChatEntity>().Count(w => w.CreatorUserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) >
+							           usageRules.MaxChatPerDay;
 						else
 							overUsed = false;
 					}
 					break;
 				case CallerType.CreateComment:
 					if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
-						overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) > 50;
+						overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) >
+						           usageRules.MaxCommentPerDay;
 					else
-						overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) > 100;
+						overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) >
+						           usageRules.MaxCommentPerDay;
 					break;
 				case CallerType.CreateProduct:
 					if (useCaseProduct == "product") {
 						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
-							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.CreatedAt.Value.Date == DateTime.Today) > 5;
+							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.CreatedAt.Value.Date == DateTime.Today) >
+							           usageRules.MaxProductPerDay;
 						else
-							overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt.Value.Date == DateTime.Today) > 50;
+							overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt.Value.Date == DateTime.Today) >
+							           usageRules.MaxProductPerDay;
 					}
 					else {
 						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
-							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.CreatedAt.Value.Date == DateTime.Today) > 5;
+							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.CreatedAt.Value.Date == DateTime.Today) >
+							           usageRules.MaxProductPerDay;
 						else
-							overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt.Value.Date == DateTime.Today) > 50;
+							overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt.Value.Date == DateTime.Today) >
+							           usageRules.MaxProductPerDay;
 					}
 					break;
 				default:

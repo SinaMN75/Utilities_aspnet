@@ -26,9 +26,9 @@ public class SmsPanelSettings {
 }
 
 public class UsageRules {
-	public string? MaxProductPerDay { get; set; }
-	public string? MaxCommentPerDay { get; set; }
-	public string? MaxChatPerDay { get; set; }
+	public int MaxProductPerDay { get; set; }
+	public int MaxCommentPerDay { get; set; }
+	public int MaxChatPerDay { get; set; }
 }
 
 public class PaymentSettings {
