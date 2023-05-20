@@ -55,4 +55,8 @@ public class UserController : BaseApiController {
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	public async Task<ActionResult<GenericResponse>> TransferWalletToWallet(TransferFromWalletToWalletDto dto)
 		=> Result(await _repository.TransferWalletToWallet(dto));
+
+	[HttpPost("Authorize")]
+	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+	public async Task<ActionResult<GenericResponse>> Authorize(AuthorizeUserDto dto) => Result(await _repository.Authorize(dto));
 }

@@ -1,4 +1,7 @@
-﻿namespace Utilities_aspnet.Repositories;
+﻿using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+using System.Reflection.Metadata.Ecma335;
+
+namespace Utilities_aspnet.Repositories;
 
 public interface IUserRepository {
 	Task<GenericResponse<IQueryable<UserEntity>>> Filter(UserFilterDto dto);
@@ -13,6 +16,7 @@ public interface IUserRepository {
 	Task<GenericResponse> ToggleBlock(string userId);
 	Task<GenericResponse> TransferWalletToWallet(TransferFromWalletToWalletDto dto);
 	Task<UserEntity?> ReadByIdMinimal(string? idOrUserName, string? token = null);
+	Task<GenericResponse> Authorize(AuthorizeUserDto dto);
 }
 
 public class UserRepository : IUserRepository {
@@ -333,6 +337,37 @@ public class UserRepository : IUserRepository {
         return new GenericResponse();
 	}
 
+
+    public async Task<GenericResponse> Authorize(AuthorizeUserDto dto)
+    {
+		var user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
+		if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound);
+
+        var sheba = dto.ShebaNumber.GetShebaNumber();
+        //Todo : Sina MohamadZade Shahkar
+
+        if (user.IsAuthorize)
+		{
+			if (sheba is null) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
+			user.ShebaNumber = user.ShebaNumber == dto.ShebaNumber ? user.ShebaNumber : dto.ShebaNumber;
+        }
+		else
+		{
+            string? meliCode = dto.MeliCode.Length == 10 ? dto.MeliCode : null;
+            if (meliCode is null || sheba is null) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
+
+            user.MeliCode = meliCode;
+            user.ShebaNumber = sheba;
+            user.IsForeigner = dto.IsForeigner;
+            user.IsAuthorize = true;
+        }
+
+        _dbContext.Set<UserEntity>().Update(user);
+		await _dbContext.SaveChangesAsync();
+
+		return new GenericResponse(UtilitiesStatusCodes.Success);
+    }
+
     #endregion
 
     private void FillUserData(UserCreateUpdateDto dto, UserEntity entity) {
@@ -468,4 +503,5 @@ public class UserRepository : IUserRepository {
 		e.Token = token;
 		return e;
 	}
+
 }

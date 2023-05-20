@@ -105,7 +105,8 @@ public class UserEntity : IdentityUser {
 	public bool IsPrivate { get; set; }
     public string? MeliCode { get; set; }
     public string? ShebaNumber { get; set; }
-
+    public bool IsAuthorize { get; set; }
+    public bool IsForeigner { get; set; }
 
     public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
@@ -369,4 +370,11 @@ public class TransferFromWalletToWalletDto {
 	public string FromUserId { get; set; } = null!;
 	public string ToUserId { get; set; } = null!;
 	public double Amount { get; set; }
+}
+
+public class AuthorizeUserDto
+{
+    public bool IsForeigner { get; set; }
+	public string MeliCode { get; set; } = null!;
+	public string ShebaNumber { get; set; } = null!;
 }
