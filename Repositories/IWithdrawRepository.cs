@@ -10,6 +10,7 @@ namespace Utilities_aspnet.Repositories
     public interface IWithdrawRepository
     {
         Task<GenericResponse> WalletWithdrawal(WalletWithdrawalDto dto);
+        GenericResponse<IQueryable<WithdrawEntity>> Filter(WithdrawalFilterDto dto);
     }
 
     public class WithdrawRepository : IWithdrawRepository
@@ -21,6 +22,7 @@ namespace Utilities_aspnet.Repositories
             _dbContext = dbContext;
             _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
         }
+
         public async Task<GenericResponse> WalletWithdrawal(WalletWithdrawalDto dto)
         {
             var user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId && f.Suspend != true);
@@ -44,6 +46,18 @@ namespace Utilities_aspnet.Repositories
             await _dbContext.SaveChangesAsync();
 
             return new GenericResponse();
+        }
+
+        public GenericResponse<IQueryable<WithdrawEntity>> Filter(WithdrawalFilterDto dto)
+        {
+            IQueryable<WithdrawEntity> q = _dbContext.Set<WithdrawEntity>()
+                .Include(i => i.ApplicantUserEntity)
+                .Include(i => i.AdminUserEntity)
+                .OrderByDescending(o => o.CreatedAt);
+
+            if(dto.WithdrawState.HasValue) q = q.Where(w=>w.WithdrawState == dto.WithdrawState);
+
+            return new GenericResponse<IQueryable<WithdrawEntity>>(q);
         }
     }
 }
