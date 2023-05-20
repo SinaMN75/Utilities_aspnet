@@ -40,6 +40,7 @@ public class OrderRepository : IOrderRepository {
 			PayType = dto.PayType,
 			SendPrice = dto.SendPrice,
 			SendType = dto.SendType,
+			AddressId = dto.AddressId,
 			Status = dto.Status,
 			CreatedAt = DateTime.Now,
 			UpdatedAt = DateTime.Now,

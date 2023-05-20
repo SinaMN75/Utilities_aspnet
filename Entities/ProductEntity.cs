@@ -87,8 +87,9 @@ public class ProductEntity : BaseEntity
     public AgeCategory? AgeCategory { get; set; }
     public ProductState? ProductState { get; set; }
     public double? Stock { get; set; }
-    public DateTime? ShippingTime { get; set; }
+    public int? ShippingTime { get; set; }
     public double? ShippingCost { get; set; }
+    public bool IsPhysical { get; set; }
     public string? UserId { get; set; }
     public UserEntity? User { get; set; }
 
@@ -122,6 +123,8 @@ public class ProductEntity : BaseEntity
 
     [System.Text.Json.Serialization.JsonIgnore]
     public IEnumerable<ChatEntity>? Chats { get; set; }
+    [NotMapped]
+    public string? SuccessfulPurchase { get; set; }
 }
 
 [Table("ProductsInsight")]
@@ -197,6 +200,10 @@ public class ProductCreateUpdateDto
     public ProductStatus? Status { get; set; }
     public Currency? Currency { get; set; }
     public AgeCategory? AgeCategory { get; set; }
+    public ProductState? ProductState { get; set; }
+    public int? ShippingTime { get; set; }
+    public double? ShippingCost { get; set; }
+    public bool IsPhysical { get; set; }
     public Guid? ParentId { get; set; }
     public ProductInsightDto? ProductInsight { get; set; }
     public IEnumerable<Guid>? Categories { get; set; }

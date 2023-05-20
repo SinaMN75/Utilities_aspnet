@@ -113,7 +113,7 @@ public class PaymentRepository : IPaymentRepository {
 		Guid orderId,
 		string authority,
 		string status) {
-		OrderEntity order = (await _dbContext.Set<OrderEntity>().FirstOrDefaultAsync(x => x.Id == orderId))!;
+		OrderEntity order = (await _dbContext.Set<OrderEntity>().Include(i=> i.OrderDetails).FirstOrDefaultAsync(x => x.Id == orderId))!;
 		Payment payment = new(_appSettings.PaymentSettings!.Id, order.TotalPrice.ToInt());
 		if (!status.Equals("OK")) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 		PaymentVerificationResponse? verify = payment.Verification(authority).Result;
@@ -125,6 +125,27 @@ public class PaymentRepository : IPaymentRepository {
 			_dbContext.Set<TransactionEntity>().Update(pay);
 		}
 		order.Status = OrderStatuses.Paid;
+
+		if(order.OrderDetails is not null)
+			foreach (var item in order.OrderDetails)
+            {
+				var prdct = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == item.ProductId);
+				if (prdct is not null)
+				{
+					prdct.Stock = prdct.IsPhysical && prdct.Stock >= 1 ? prdct.Stock -= 1 : prdct.Stock;
+					_dbContext.Update(prdct);
+				}
+			}
+
+		if(order.AddressId is not null)
+		{
+			var address = await _dbContext.Set<AddressEntity>().FirstOrDefaultAsync(f => f.Id == order.AddressId);
+			if (address is not null)
+			{
+				address.IsDefault = true;
+				_dbContext.Update(address);
+			}
+        }
 
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();

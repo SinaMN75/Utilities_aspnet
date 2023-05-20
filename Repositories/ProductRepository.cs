@@ -281,6 +281,12 @@ public class ProductRepository : IProductRepository
 
         i.Comments = _dbContext.Set<CommentEntity>().Where(w => w.ProductId == i.Id && w.DeletedAt == null);
 
+        //var countOfCompleteOrder = _dbContext.Set<OrderEntity>().Where(c => c.OrderDetails != null && c.OrderDetails.Any(w => w.ProductId.HasValue && w.ProductId.Value == i.Id) && c.Status == OrderStatuses.Complete).Count();        
+        //switch (countOfCompleteOrder)
+        //{
+        //    case countOfCompleteOrder < 50: i.SuccessfulPurchase = countOfCompleteOrder.ToString(); break;
+        //}
+
         return new GenericResponse<ProductEntity?>(i);
     }
 
@@ -413,6 +419,10 @@ public static class ProductEntityExtension
         entity.UpdatedAt = DateTime.Now;
         entity.ExpireDate = dto.ExpireDate ?? entity.ExpireDate;
         entity.AgeCategory = dto.AgeCategory ?? entity.AgeCategory;
+        entity.ProductState = dto.ProductState ?? entity.ProductState;
+        entity.ShippingCost = dto.ShippingCost ?? entity.ShippingCost;
+        entity.ShippingTime = dto.ShippingTime ?? entity.ShippingTime;
+        entity.IsPhysical = dto.IsPhysical;
 
         if (dto.VisitsCountPlus.HasValue)
         {
