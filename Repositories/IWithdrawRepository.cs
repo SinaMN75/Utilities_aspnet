@@ -27,6 +27,9 @@ namespace Utilities_aspnet.Repositories
         {
             var user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId && f.Suspend != true);
             if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound);
+
+            if (user.Wallet <= dto.Amount) return new GenericResponse(UtilitiesStatusCodes.NotEnoughMoney);
+
             var sheba = dto.ShebaNumber.GetShebaNumber();
 
             if (dto.Amount < 100000) return new GenericResponse(UtilitiesStatusCodes.NotEnoughMoney);
@@ -51,8 +54,7 @@ namespace Utilities_aspnet.Repositories
         public GenericResponse<IQueryable<WithdrawEntity>> Filter(WithdrawalFilterDto dto)
         {
             IQueryable<WithdrawEntity> q = _dbContext.Set<WithdrawEntity>()
-                .Include(i => i.ApplicantUserEntity)
-                .Include(i => i.AdminUserEntity)
+                .Where(x => x.DeletedAt == null)
                 .OrderByDescending(o => o.CreatedAt);
 
             if(dto.WithdrawState.HasValue) q = q.Where(w=>w.WithdrawState == dto.WithdrawState);
