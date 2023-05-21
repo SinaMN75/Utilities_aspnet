@@ -211,6 +211,8 @@ public class ProductRepository : IProductRepository
             if (dto.IsMyBoughtList.IsTrue()) q = q.Where(i => user.BoughtProduts.Contains(i.Id.ToString()));
         }
 
+        if (dto.IsBoosted) q = q.OrderBy(o => o.IsBoosted);
+
         int totalCount = q.Count();
         q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
@@ -295,7 +297,7 @@ public class ProductRepository : IProductRepository
         ProductEntity? entity = await _dbContext.Set<ProductEntity>()
             .Include(x => x.Categories)
             .Where(x => x.Id == dto.Id)
-            .FirstOrDefaultAsync(ct);
+            .FirstOrDefaultAsync(ct);        
 
         if (entity == null) return new GenericResponse<ProductEntity>(new ProductEntity());
 
@@ -423,6 +425,7 @@ public static class ProductEntityExtension
         entity.ShippingCost = dto.ShippingCost ?? entity.ShippingCost;
         entity.ShippingTime = dto.ShippingTime ?? entity.ShippingTime;
         entity.IsPhysical = dto.IsPhysical;
+        entity.IsBoosted = dto.IsBoosted;
 
         if (dto.VisitsCountPlus.HasValue)
         {

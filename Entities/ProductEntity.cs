@@ -90,6 +90,7 @@ public class ProductEntity : BaseEntity
     public int? ShippingTime { get; set; }
     public double? ShippingCost { get; set; }
     public bool IsPhysical { get; set; }
+    public bool IsBoosted { get; set; }
     public string? UserId { get; set; }
     public UserEntity? User { get; set; }
 
@@ -204,6 +205,7 @@ public class ProductCreateUpdateDto
     public int? ShippingTime { get; set; }
     public double? ShippingCost { get; set; }
     public bool IsPhysical { get; set; }
+    public bool IsBoosted { get; set; }
     public Guid? ParentId { get; set; }
     public ProductInsightDto? ProductInsight { get; set; }
     public IEnumerable<Guid>? Categories { get; set; }
@@ -280,6 +282,7 @@ public class ProductFilterDto
     public IEnumerable<string>? UserIds { get; set; }
     public string? Query { get; set; }
     public bool ShowExpired { get; set; } = false;
+    public bool IsBoosted { get; set; }
 }
 
 public class ProductInsightDto

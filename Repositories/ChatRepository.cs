@@ -341,6 +341,8 @@ public class ChatRepository : IChatRepository
         if (dto.OrderByCreatedDate.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
         if (dto.OrderByCreaedDateDecending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 
+        if (dto.IsBoosted) q = q.OrderBy(o => o.IsBoosted);
+
         int totalCount = q.Count();
         q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
@@ -572,6 +574,8 @@ public class ChatRepository : IChatRepository
             }
             entity.Categories = listCategory;
         }
+
+        if (entity.Type == ChatType.PublicChannel) entity.IsBoosted = true;
 
         EntityEntry<GroupChatEntity> e = await _dbContext.Set<GroupChatEntity>().AddAsync(entity);
         await _dbContext.SaveChangesAsync();
