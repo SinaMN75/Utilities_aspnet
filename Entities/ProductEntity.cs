@@ -59,6 +59,9 @@ public class ProductEntity : BaseEntity
 
     [StringLength(500)]
     public string? RelatedIds { get; set; }
+    
+    [StringLength(2000)]
+    public string? JsonDetail { get; set; }
 
     public string Teams { get; set; } = "";
 
@@ -172,6 +175,7 @@ public class ProductCreateUpdateDto
     public string? KeyValues1 { get; set; }
     public string? KeyValues2 { get; set; }
     public string? RelatedIds { get; set; }
+    public string? JsonDetail { get; set; }
     public double? Latitude { get; set; }
     public double? Longitude { get; set; }
     public double? Price { get; set; }

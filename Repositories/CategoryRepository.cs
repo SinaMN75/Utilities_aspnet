@@ -97,6 +97,7 @@ public static class CategoryEntityExtension {
 		entity.Value = dto.Value ?? entity.Value;
 		entity.Order = dto.Order ?? entity.Order;
 		entity.Stock = dto.Stock ?? entity.Stock;
+		entity.JsonDetail = dto.JsonDetail ?? entity.JsonDetail;
 		entity.ParentId = dto.ParentId ?? entity.ParentId;
 		return entity;
 	}

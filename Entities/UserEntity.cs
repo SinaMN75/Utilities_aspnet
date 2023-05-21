@@ -89,6 +89,9 @@ public class UserEntity : IdentityUser {
 
 	[StringLength(500)]
 	public string? Detail2 { get; set; }
+	
+	[StringLength(2000)]
+	public string? JsonDetail { get; set; }
 
 	public double? Wallet { get; set; } = 0;
 	public double? Point { get; set; } = 0;
@@ -298,6 +301,7 @@ public class UserCreateUpdateDto {
 	public string? StateTr2 { get; set; }
 	public string? AccessLevel { get; set; }
 	public string? Badge { get; set; }
+	public string? JsonDetail { get; set; }
 	public string? VisitedProducts { get; set; }
 	public string? BookmarkedProducts { get; set; }
 	public string? BoughtProduts { get; set; }

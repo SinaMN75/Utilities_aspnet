@@ -408,6 +408,7 @@ public static class ProductEntityExtension
         entity.Length = dto.Length ?? entity.Length;
         entity.Width = dto.Width ?? entity.Width;
         entity.Height = dto.Height ?? entity.Height;
+        entity.JsonDetail = dto.JsonDetail ?? entity.JsonDetail;
         entity.Weight = dto.Weight ?? entity.Weight;
         entity.MinOrder = dto.MinOrder ?? entity.MinOrder;
         entity.MaxOrder = dto.MaxOrder ?? entity.MaxOrder;

@@ -397,6 +397,7 @@ public class UserRepository : IUserRepository {
 		entity.GenderTr2 = dto.GenderTr2 ?? entity.GenderTr2;
 		entity.UseCase = dto.UseCase ?? entity.UseCase;
 		entity.UserName = dto.UserName ?? entity.UserName;
+		entity.JsonDetail = dto.JsonDetail ?? entity.JsonDetail;
 		entity.Email = dto.Email ?? entity.Email;
 		entity.PhoneNumber = dto.PhoneNumber ?? entity.PhoneNumber;
 		entity.Color = dto.Color ?? entity.Color;

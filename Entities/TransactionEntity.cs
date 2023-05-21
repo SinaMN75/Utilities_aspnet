@@ -15,7 +15,12 @@ public class TransactionEntity : BaseEntity {
 
 	[StringLength(500)]
 	public string? PaymentId { get; set; }
+	
+	[StringLength(500)]
     public string? ShebaNumber { get; set; }
+    
+    [StringLength(2000)]
+    public string? JsonDetail { get; set; }
 
     public long? RefId { get; set; }
 
