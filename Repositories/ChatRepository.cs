@@ -319,7 +319,7 @@ public class ChatRepository : IChatRepository
         return new GenericResponse();
     }
 
-    public async GenericResponse<IQueryable<GroupChatEntity>> FilterGroupChats(GroupChatFilterDto dto)
+    public GenericResponse<IQueryable<GroupChatEntity>> FilterGroupChats(GroupChatFilterDto dto)
     {
         IQueryable<GroupChatEntity> q = _dbContext.Set<GroupChatEntity>()
             .Where(x => x.Users.Any(y => y.Id == _userId));
