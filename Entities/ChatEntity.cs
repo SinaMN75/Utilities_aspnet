@@ -136,7 +136,9 @@ public class GroupChatFilterDto {
 	public bool? ShowUsers { get; set; }
 	public bool? ShowProducts { get; set; }
 	public bool? ShowCategories { get; set; }
-	public bool? OrderByAtoZ { get; set; } = false;
+    public bool ShowAhtorized { get; set; }
+
+    public bool? OrderByAtoZ { get; set; } = false;
 	public bool? OrderByZtoA { get; set; } = false;
 	public bool? OrderByCreatedDate { get; set; } = false;
 	public bool? OrderByCreaedDateDecending { get; set; } = false;

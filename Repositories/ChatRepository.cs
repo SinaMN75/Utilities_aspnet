@@ -319,7 +319,7 @@ public class ChatRepository : IChatRepository
         return new GenericResponse();
     }
 
-    public GenericResponse<IQueryable<GroupChatEntity>> FilterGroupChats(GroupChatFilterDto dto)
+    public async GenericResponse<IQueryable<GroupChatEntity>> FilterGroupChats(GroupChatFilterDto dto)
     {
         IQueryable<GroupChatEntity> q = _dbContext.Set<GroupChatEntity>()
             .Where(x => x.Users.Any(y => y.Id == _userId));
@@ -344,6 +344,11 @@ public class ChatRepository : IChatRepository
         if (dto.OrderByCreaedDateDecending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 
         if (dto.IsBoosted) q = q.OrderBy(o => o.IsBoosted);
+        if (dto.ShowAhtorized)
+        {
+            var orders = _dbContext.Set<OrderEntity>().Where(w => w.ProductOwnerId == _userId).ToList();
+            q = q.Where(w => orders.Any(a => a.UserId == w.Users.FirstOrDefault().Id));
+        }
 
         int totalCount = q.Count();
         q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
