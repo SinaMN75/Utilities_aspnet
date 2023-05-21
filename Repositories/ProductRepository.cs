@@ -281,15 +281,12 @@ public class ProductRepository : IProductRepository
 
         i.Comments = _dbContext.Set<CommentEntity>().Where(w => w.ProductId == i.Id && w.DeletedAt == null);
 
-        //var countOfCompleteOrder = _dbContext.Set<OrderEntity>().Where(c => c.OrderDetails != null && c.OrderDetails.Any(w => w.ProductId.HasValue && w.ProductId.Value == i.Id) && c.Status == OrderStatuses.Complete).Count();        
-        //switch (countOfCompleteOrder)
-        //{
-        //    case countOfCompleteOrder < 50: i.SuccessfulPurchase = countOfCompleteOrder.ToString(); break;
-        //}
+        var countOfCompleteOrder = _dbContext.Set<OrderEntity>().Where(c => c.OrderDetails != null && c.OrderDetails.Any(w => w.ProductId.HasValue && w.ProductId.Value == i.Id) && c.Status == OrderStatuses.Complete).Count();
+        var displayOrderComplete = Utils.DisplayCountOfCompleteOrder(countOfCompleteOrder);
+        i.SuccessfulPurchase = displayOrderComplete;
 
         return new GenericResponse<ProductEntity?>(i);
     }
-
     public async Task<GenericResponse<ProductEntity>> Update(ProductCreateUpdateDto dto, CancellationToken ct)
     {
         ProductEntity? entity = await _dbContext.Set<ProductEntity>()
