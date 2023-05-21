@@ -281,9 +281,12 @@ public class ProductRepository : IProductRepository
 
         i.Comments = _dbContext.Set<CommentEntity>().Where(w => w.ProductId == i.Id && w.DeletedAt == null);
 
-        var countOfCompleteOrder = _dbContext.Set<OrderEntity>().Where(c => c.OrderDetails != null && c.OrderDetails.Any(w => w.ProductId.HasValue && w.ProductId.Value == i.Id) && c.Status == OrderStatuses.Complete).Count();
-        var displayOrderComplete = Utils.DisplayCountOfCompleteOrder(countOfCompleteOrder);
+        var completeOrder = _dbContext.Set<OrderEntity>().Where(c => c.OrderDetails != null && c.OrderDetails.Any(w => w.ProductId.HasValue && w.ProductId.Value == i.Id) && c.Status == OrderStatuses.Complete);
+        var displayOrderComplete = Utils.DisplayCountOfCompleteOrder(completeOrder.Count());
         i.SuccessfulPurchase = displayOrderComplete;
+
+        var isUserBuyIt = completeOrder.Any(a => a.UserId == _userId);
+        if (isUserBuyIt) i.Media?.Select(s => s.Link == "");
 
         return new GenericResponse<ProductEntity?>(i);
     }
