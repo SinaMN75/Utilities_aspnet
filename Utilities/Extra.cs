@@ -49,6 +49,13 @@ public static class StringExtension {
 		if (s.Length == 24) return s;
 		return null;
 	}
+
+    public static string? AddCommaSeperatorUsers(this string? baseString, string? userId)
+    {
+		if (string.IsNullOrEmpty(baseString)) return userId;
+		else if (baseString.Contains(userId ?? "")) return baseString;
+		else return baseString + "," + userId;
+    }
 }
 
 public class Utils {
@@ -172,4 +179,5 @@ public class Utils {
             case > 10000: return "+10000";
         }
     }
+
 }

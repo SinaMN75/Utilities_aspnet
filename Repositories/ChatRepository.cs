@@ -30,12 +30,14 @@ public class ChatRepository : IChatRepository
     private readonly DbContext _dbContext;
     private readonly string? _userId;
     private readonly IConfiguration _config;
+    private readonly IPromotionRepository _promotionRepository;
 
-    public ChatRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IConfiguration config)
+    public ChatRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IConfiguration config, IPromotionRepository promotionRepository)
     {
         _dbContext = dbContext;
         _config = config;
         _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
+        _promotionRepository = promotionRepository;
     }
 
     public async Task<GenericResponse<ChatReadDto?>> Create(ChatCreateUpdateDto model)
@@ -376,6 +378,7 @@ public class ChatRepository : IChatRepository
                 countOfMessage = groupchatMessages.Where(w => w.CreatedAt > LastSeenMessage.CreatedAt).Count();
             }
             e.CountOfUnreadMessages = countOfMessage;
+            await _promotionRepository.UserSeened(e.Id);
         }
 
         return new GenericResponse<GroupChatEntity>(e);

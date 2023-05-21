@@ -107,6 +107,7 @@ public class UserEntity : IdentityUser {
     public string? ShebaNumber { get; set; }
     public bool IsAuthorize { get; set; }
     public bool IsForeigner { get; set; }
+    public AgeCategory AgeCategory { get; set; } = AgeCategory.None;
 
     public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
@@ -312,7 +313,8 @@ public class UserCreateUpdateDto {
 	public bool? IsOnline { get; set; }
 	public bool? IsLoggedIn { get; set; }
 	public bool? IsPrivate { get; set; }
-	public DateTime? BirthDate { get; set; }
+    public AgeCategory? AgeCategory { get; set; }
+    public DateTime? BirthDate { get; set; }
 	public DateTime? ExpireUpgradeAccount { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 }
@@ -362,7 +364,7 @@ public class UserFilterDto {
 	public bool? ShowSuspend { get; set; }
 	public bool? ShowBlockedUser { get; set; }
 	public bool? OrderByUserName { get; set; }
-	public IEnumerable<string>? UserIds { get; set; }
+    public IEnumerable<string>? UserIds { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 }
 
