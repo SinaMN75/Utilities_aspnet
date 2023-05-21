@@ -26,6 +26,9 @@ public class MediaEntity : BaseEntity {
 	[StringLength(500)]
 	public string? Album { get; set; }
 	
+	[StringLength(2000)]
+	public string? JsonDetail { get; set; }
+	
 	public bool? IsPrivate { get; set; }
 
 	[NotMapped]
@@ -100,6 +103,7 @@ public class UploadDto {
 	public string? Time { get; set; }
 	public string? Artist { get; set; }
 	public string? Album { get; set; }
+	public string? JsonDetail { get; set; }
 	public bool? IsPrivate { get; set; }
 	public Guid? ProductId { get; set; }
 	public Guid? ContentId { get; set; }

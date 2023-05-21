@@ -44,6 +44,7 @@ public class MediaRepository : IMediaRepository {
 					Time = model.Time,
 					Artist = model.Artist,
 					Album = model.Album,
+					JsonDetail = model.JsonDetail,
 					NotificationId = model.NotificationId,
 					GroupChatId = model.GroupChatId,
 					GroupChatMessageId = model.GroupChatMessageId
@@ -65,6 +66,7 @@ public class MediaRepository : IMediaRepository {
 				         CommentId = model.CommentId,
 				         CreatedAt = DateTime.Now,
 				         UseCase = model.UseCase,
+				         JsonDetail = model.JsonDetail,
 				         Title = model.Title,
 				         Size = model.Size,
 				         NotificationId = model.NotificationId

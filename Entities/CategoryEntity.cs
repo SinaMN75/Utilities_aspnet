@@ -26,6 +26,9 @@ public class CategoryEntity : BaseEntity {
 	[StringLength(500)]
 	public string? Type { get; set; }
 
+	[StringLength(2000)]
+	public string? JsonDetail { get; set; }
+	
 	public double? Latitude { get; set; }
 	public double? Longitude { get; set; }
 	public double? Price { get; set; }
@@ -69,6 +72,7 @@ public class CategoryCreateUpdateDto {
 	public string? Link { get; set; }
 	public string? UseCase { get; set; }
 	public string? Type { get; set; }
+	public string? JsonDetail { get; set; }
 	public double? Latitude { get; set; }
 	public double? Longitude { get; set; }
 	public double? Price { get; set; }
