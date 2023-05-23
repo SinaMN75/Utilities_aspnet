@@ -215,3 +215,10 @@ public enum WithdrawState
 	Requested = 101,
 	Accepted = 102
 }
+
+public enum DisplayType
+{
+	None = 100,
+	Exploer = 101,
+	Channels = 102
+}

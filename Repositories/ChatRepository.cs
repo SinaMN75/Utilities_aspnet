@@ -30,12 +30,14 @@ public class ChatRepository : IChatRepository
     private readonly DbContext _dbContext;
     private readonly string? _userId;
     private readonly IConfiguration _config;
+    private readonly IPromotionRepository _promotionRepository;
 
-    public ChatRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IConfiguration config)
+    public ChatRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IConfiguration config, IPromotionRepository promotionRepository)
     {
         _dbContext = dbContext;
         _config = config;
         _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
+        _promotionRepository = promotionRepository;
     }
 
     public async Task<GenericResponse<ChatReadDto?>> Create(ChatCreateUpdateDto model)
@@ -341,6 +343,13 @@ public class ChatRepository : IChatRepository
         if (dto.OrderByCreatedDate.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
         if (dto.OrderByCreaedDateDecending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 
+        if (dto.IsBoosted) q = q.OrderBy(o => o.IsBoosted);
+        if (dto.ShowAhtorized)
+        {
+            var orders = _dbContext.Set<OrderEntity>().Where(w => w.ProductOwnerId == _userId).ToList();
+            q = q.Where(w => orders.Any(a => a.UserId == w.Users.FirstOrDefault().Id));
+        }
+
         int totalCount = q.Count();
         q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
@@ -374,6 +383,7 @@ public class ChatRepository : IChatRepository
                 countOfMessage = groupchatMessages.Where(w => w.CreatedAt > LastSeenMessage.CreatedAt).Count();
             }
             e.CountOfUnreadMessages = countOfMessage;
+            await _promotionRepository.UserSeened(e.Id);
         }
 
         return new GenericResponse<GroupChatEntity>(e);
@@ -572,6 +582,8 @@ public class ChatRepository : IChatRepository
             }
             entity.Categories = listCategory;
         }
+
+        if (entity.Type == ChatType.PublicChannel) entity.IsBoosted = true;
 
         EntityEntry<GroupChatEntity> e = await _dbContext.Set<GroupChatEntity>().AddAsync(entity);
         await _dbContext.SaveChangesAsync();

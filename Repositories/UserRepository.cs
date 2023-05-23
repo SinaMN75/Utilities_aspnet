@@ -132,7 +132,6 @@ public class UserRepository : IUserRepository {
 
 		if (dto.ShowMedia.IsTrue()) q = q.Include(u => u.Media);
 		if (dto.ShowCategories.IsTrue()) q = q.Include(u => u.Categories);
-
 		//ToCheck WithSina : in query am kheili sangine
 		//    if (!dto.ShowBlockedUser.IsTrue())
 		//    {
@@ -422,6 +421,7 @@ public class UserRepository : IUserRepository {
 		entity.IsOnline = dto.IsOnline ?? entity.IsOnline;
 		entity.IsPrivate = dto.IsPrivate ?? entity.IsPrivate;
 		entity.ExpireUpgradeAccount = dto.ExpireUpgradeAccount ?? entity.ExpireUpgradeAccount;
+		entity.AgeCategory = dto.AgeCategory ?? entity.AgeCategory;
 
 		if (dto.Categories.IsNotNullOrEmpty()) {
 			List<CategoryEntity> list = new();

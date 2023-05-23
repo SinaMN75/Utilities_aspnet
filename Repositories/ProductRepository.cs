@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Utilities_aspnet.Utilities;
 
 namespace Utilities_aspnet.Repositories;
 
@@ -13,7 +14,6 @@ public interface IProductRepository
     Task<GenericResponse> SimpleSell(SimpleSellDto dto);
     Task<GenericResponse> CreateReaction(ReactionCreateUpdateDto dto);
     GenericResponse<IQueryable<ReactionEntity>> ReadReactionsById(Guid id);
-
 }
 
 public class ProductRepository : IProductRepository
@@ -22,6 +22,7 @@ public class ProductRepository : IProductRepository
     private readonly DbContext _dbContext;
     private readonly IMediaRepository _mediaRepository;
     private readonly IUserRepository _userRepository;
+    private readonly IPromotionRepository _promotionRepository;
     private readonly string? _userId;
 
     public ProductRepository(
@@ -29,13 +30,15 @@ public class ProductRepository : IProductRepository
         IHttpContextAccessor httpContextAccessor,
         IMediaRepository mediaRepository,
         IUserRepository userRepository,
-        IConfiguration config)
+        IConfiguration config,
+        IPromotionRepository promotionRepository)
     {
         _dbContext = dbContext;
         _mediaRepository = mediaRepository;
         _userRepository = userRepository;
         _config = config;
         _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
+        _promotionRepository = promotionRepository;
     }
 
     public async Task<GenericResponse<ProductEntity>> Create(ProductCreateUpdateDto dto, CancellationToken ct)
@@ -211,6 +214,8 @@ public class ProductRepository : IProductRepository
             if (dto.IsMyBoughtList.IsTrue()) q = q.Where(i => user.BoughtProduts.Contains(i.Id.ToString()));
         }
 
+        if (dto.IsBoosted) q = q.OrderBy(o => o.IsBoosted);
+
         int totalCount = q.Count();
         q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
@@ -288,6 +293,8 @@ public class ProductRepository : IProductRepository
         var isUserBuyIt = completeOrder.Any(a => a.UserId == _userId);
         if (isUserBuyIt) i.Media?.Select(s => s.Link == "");
 
+        await _promotionRepository.UserSeened(i.Id);
+
         return new GenericResponse<ProductEntity?>(i);
     }
     public async Task<GenericResponse<ProductEntity>> Update(ProductCreateUpdateDto dto, CancellationToken ct)
@@ -295,7 +302,7 @@ public class ProductRepository : IProductRepository
         ProductEntity? entity = await _dbContext.Set<ProductEntity>()
             .Include(x => x.Categories)
             .Where(x => x.Id == dto.Id)
-            .FirstOrDefaultAsync(ct);
+            .FirstOrDefaultAsync(ct);        
 
         if (entity == null) return new GenericResponse<ProductEntity>(new ProductEntity());
 
@@ -424,6 +431,7 @@ public static class ProductEntityExtension
         entity.ShippingCost = dto.ShippingCost ?? entity.ShippingCost;
         entity.ShippingTime = dto.ShippingTime ?? entity.ShippingTime;
         entity.IsPhysical = dto.IsPhysical;
+        entity.IsBoosted = dto.IsBoosted;
 
         if (dto.VisitsCountPlus.HasValue)
         {
