@@ -378,7 +378,7 @@ public class TransferFromWalletToWalletDto {
 
 public class AuthorizeUserDto
 {
-    public bool IsForeigner { get; set; }
-	public string MeliCode { get; set; } = null!;
+	public bool IsForeigner { get; set; }
+	public string Code { get; set; } = null!;
 	public string ShebaNumber { get; set; } = null!;
 }

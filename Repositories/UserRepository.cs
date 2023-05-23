@@ -353,7 +353,7 @@ public class UserRepository : IUserRepository {
         }
 		else
 		{
-            string? meliCode = dto.MeliCode.Length == 10 ? dto.MeliCode : null;
+            string? meliCode = dto.Code.Length == 10 ? dto.Code : null;
             if (meliCode is null || sheba is null) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 
             user.MeliCode = meliCode;
