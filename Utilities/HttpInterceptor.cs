@@ -20,10 +20,10 @@ namespace Utilities_aspnet.Utilities {
 			return JsonConvert.DeserializeObject<TOut>(responseString);
 		}
 
-		public async Task<TOut> Post(string url, TIn body, HttpRequestHeaders? headers) => await SendRequest(HttpMethod.Post, url, body, headers);
-		public async Task<TOut> Get(string url, HttpRequestHeaders? headers) => await SendRequest(HttpMethod.Get, url, null, headers);
-		public async Task<TOut> Put(string url, TIn body, HttpRequestHeaders? headers) => await SendRequest(HttpMethod.Put, url, body, headers);
-		public async Task<TOut> Delete(string url, HttpRequestHeaders? headers) => await SendRequest(HttpMethod.Get, url, null, headers);
+		public async Task<TOut> Post(string url, TIn body, HttpRequestHeaders? headers = null) => await SendRequest(HttpMethod.Post, url, body, headers);
+		public async Task<TOut> Get(string url, HttpRequestHeaders? headers = null) => await SendRequest(HttpMethod.Get, url, null, headers);
+		public async Task<TOut> Put(string url, TIn body, HttpRequestHeaders? headers = null) => await SendRequest(HttpMethod.Put, url, body, headers);
+		public async Task<TOut> Delete(string url, HttpRequestHeaders? headers = null) => await SendRequest(HttpMethod.Get, url, null, headers);
 	}
 
 	public class CustomInterceptor : DelegatingHandler {

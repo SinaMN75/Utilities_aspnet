@@ -69,20 +69,11 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 			.Where(x => x.UserId == uId)
 			.Include(x => x.Product).ThenInclude(x => x.Media)
 			.Include(x => x.Product).ThenInclude(i => i.User).ThenInclude(x => x.Media)
-			.Include(x => x.Product).ThenInclude(i => i.Bookmarks)
-			.Include(x => x.Product).ThenInclude(i => i.Forms)!.ThenInclude(x => x.FormField)
 			.Include(x => x.Product).ThenInclude(i => i.Categories)
-			.Include(x => x.Product).ThenInclude(i => i.Comments.Where(x => x.ParentId == null)).ThenInclude(x => x.Children)
-			.Include(x => x.Product).ThenInclude(i => i.Reports)
 			.Include(x => x.Children).ThenInclude(x => x.Product)
 			.Include(x => x.Children).Include(x => x.Product).ThenInclude(x => x.Media)
 			.Include(x => x.Children).Include(x => x.Product).ThenInclude(i => i.User).ThenInclude(x => x.Media)
-			.Include(x => x.Children).Include(x => x.Product).ThenInclude(i => i.Bookmarks)
-			.Include(x => x.Children).Include(x => x.Product).ThenInclude(i => i.Forms)!.ThenInclude(x => x.FormField)
-			.Include(x => x.Children).Include(x => x.Product).ThenInclude(i => i.Categories)
-			.Include(x => x.Children).Include(x => x.Product).ThenInclude(i => i.Comments.Where(x => x.ParentId == null)).ThenInclude(x => x.Children)
-			.Include(x => x.Children).Include(x => x.Product).ThenInclude(i => i.Reports);
-
+			.Include(x => x.Children).Include(x => x.Product).ThenInclude(i => i.Categories);
 		return new GenericResponse<IQueryable<BookmarkEntity>?>(bookmark);
 	}
 
