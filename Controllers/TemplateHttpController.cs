@@ -18,7 +18,7 @@ namespace Utilities_aspnet.Controllers
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            return await client.SendRequest(dto, "https://api.sinamn75.com/api/address", HttpMethod.Post, null);
+            return await client.Post("https://api.sinamn75.com/api/address", dto, null);
 
             //var url = "https://api.sinamn75.com/api/address";
             //var method = HttpMethod.Post;
@@ -32,7 +32,7 @@ namespace Utilities_aspnet.Controllers
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            return await client.SendRequest(dto, "https://api.sinamn75.com/api/address", HttpMethod.Put, null);
+            return await client.Put("https://api.sinamn75.com/api/address", dto, null);
         }
 
         [HttpGet]
@@ -42,7 +42,7 @@ namespace Utilities_aspnet.Controllers
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             
-            return await client.SendRequest(null, "https://api.sinamn75.com/api/ProductV2/14F3561A-F0EC-42B2-41C9-08DA86C505D6", HttpMethod.Get, null);
+            return await client.Get("https://api.sinamn75.com/api/ProductV2/14F3561A-F0EC-42B2-41C9-08DA86C505D6", null);
         }
 
         [HttpDelete]
@@ -52,7 +52,7 @@ namespace Utilities_aspnet.Controllers
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            return await client.SendRequest(null, "https://localhost:7125/api/address?addressId=3fa85f64-5717-4562-b3fc-2c963f66afa6", HttpMethod.Delete, null);
+            return await client.Delete("https://localhost:7125/api/address?addressId=3fa85f64-5717-4562-b3fc-2c963f66afa6", null);
         }
     }
 }
