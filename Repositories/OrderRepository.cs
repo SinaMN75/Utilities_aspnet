@@ -61,14 +61,14 @@ public class OrderRepository : IOrderRepository {
 					return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.OutOfStock);
 			}
 			else {
-				if (productEntity != null && productEntity.Stock < item.Count)
+				if (productEntity != null && productEntity.ProductJsonDetail.Stock < item.Count)
 					return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.OutOfStock);
 			}
 
 			OrderDetailEntity orderDetailEntity = new() {
 				OrderId = entityOrder.Id,
 				ProductId = item.ProductId,
-				Price = item.Price ?? productEntity?.Price + categoryEntity?.Price,
+				Price = item.Price ?? productEntity?.ProductJsonDetail.Price + categoryEntity?.Price,
 				Count = item.Count,
 				CategoryId = item.Category
 			};
@@ -76,7 +76,7 @@ public class OrderRepository : IOrderRepository {
 			await _dbContext.Set<OrderDetailEntity>().AddAsync(orderDetailEntity);
 			await _dbContext.SaveChangesAsync();
 
-			totalPrice += Convert.ToDouble(productEntity?.Price + categoryEntity?.Price ?? 0);
+			totalPrice += Convert.ToDouble(productEntity?.ProductJsonDetail.Price + categoryEntity?.Price ?? 0);
 		}
 		entityOrder.TotalPrice = totalPrice = entityOrder.OrderDetails.Where(o => o.DeletedAt == null).Sum(x => x.Price ?? 0);
 		entityOrder.DiscountPrice = totalPrice * dto.DiscountPercent / 100;

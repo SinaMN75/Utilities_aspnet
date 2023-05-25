@@ -132,7 +132,7 @@ public class PaymentRepository : IPaymentRepository {
 				var prdct = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == item.ProductId);
 				if (prdct is not null)
 				{
-					prdct.Stock = prdct.IsPhysical && prdct.Stock >= 1 ? prdct.Stock -= 1 : prdct.Stock;
+					prdct.ProductJsonDetail.Stock = prdct.ProductJsonDetail.IsPhysical && prdct.ProductJsonDetail.Stock >= 1 ? prdct.ProductJsonDetail.Stock -= 1 : prdct.ProductJsonDetail.Stock;
 					_dbContext.Update(prdct);
 				}
 			}

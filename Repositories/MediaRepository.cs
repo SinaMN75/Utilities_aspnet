@@ -20,7 +20,6 @@ public class MediaRepository : IMediaRepository {
 
 		if (model.Files != null) {
 			foreach (IFormFile file in model.Files) {
-
 				string name = Guid.NewGuid() + Path.GetExtension(file.FileName);
 
 				List<string> allowedExtensions = new() {".png", ".gif", ".jpg", ".jpeg", ".mp4", ".mp3", ".pdf", ".aac", ".apk", ".zip"};
@@ -38,16 +37,17 @@ public class MediaRepository : IMediaRepository {
 					BookmarkId = model.BookmarkId,
 					CreatedAt = DateTime.Now,
 					UseCase = model.UseCase,
-					Title = model.Title,
-					IsPrivate = model.IsPrivate,
-					Size = model.Size,
-					Time = model.Time,
-					Artist = model.Artist,
-					Album = model.Album,
-					JsonDetail = model.JsonDetail,
 					NotificationId = model.NotificationId,
 					GroupChatId = model.GroupChatId,
-					GroupChatMessageId = model.GroupChatMessageId
+					GroupChatMessageId = model.GroupChatMessageId,
+					MediaJsonDetail = {
+						Title = model.Title,
+						IsPrivate = model.IsPrivate,
+						Size = model.Size,
+						Time = model.Time,
+						Artist = model.Artist,
+						Album = model.Album,
+					}
 				};
 				await _dbContext.Set<MediaEntity>().AddAsync(media);
 				await _dbContext.SaveChangesAsync();
@@ -57,7 +57,6 @@ public class MediaRepository : IMediaRepository {
 		}
 		if (model.Links != null) {
 			foreach (MediaEntity media in model.Links.Select(link => new MediaEntity {
-				         Link = link,
 				         UserId = model.UserId,
 				         ProductId = model.ProductId,
 				         ContentId = model.ContentId,
@@ -66,10 +65,15 @@ public class MediaRepository : IMediaRepository {
 				         CommentId = model.CommentId,
 				         CreatedAt = DateTime.Now,
 				         UseCase = model.UseCase,
-				         JsonDetail = model.JsonDetail,
-				         Title = model.Title,
-				         Size = model.Size,
-				         NotificationId = model.NotificationId
+				         NotificationId = model.NotificationId,
+				         MediaJsonDetail = {
+					         Title = model.Title,
+					         IsPrivate = model.IsPrivate,
+					         Size = model.Size,
+					         Time = model.Time,
+					         Artist = model.Artist,
+					         Album = model.Album,
+				         }
 			         })) {
 				await _dbContext.Set<MediaEntity>().AddAsync(media);
 				await _dbContext.SaveChangesAsync();
@@ -97,8 +101,11 @@ public class MediaRepository : IMediaRepository {
 		if (media is null)
 			throw new Exception("media is not found");
 
-		media.Title = model.Title ?? media.Title;
-		media.Size = model.Size ?? media.Size;
+		media.MediaJsonDetail.Title = model.Title ?? media.MediaJsonDetail.Title;
+		media.MediaJsonDetail.Size = model.Size ?? media.MediaJsonDetail.Size;
+		media.MediaJsonDetail.Time = model.Time ?? media.MediaJsonDetail.Time;
+		media.MediaJsonDetail.Artist = model.Artist ?? media.MediaJsonDetail.Artist;
+		media.MediaJsonDetail.Album = model.Album ?? media.MediaJsonDetail.Album;
 		media.UpdatedAt = DateTime.Now;
 		media.UseCase = model.UseCase ?? media.UseCase;
 

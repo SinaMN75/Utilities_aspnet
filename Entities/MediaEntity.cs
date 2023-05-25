@@ -8,28 +8,7 @@ public class MediaEntity : BaseEntity {
 	[StringLength(500)]
 	public string? UseCase { get; set; }
 
-	[StringLength(500)]
-	public string? Link { get; set; }
-
-	[StringLength(500)]
-	public string? Title { get; set; }
-
-	[StringLength(500)]
-	public string? Size { get; set; }
-
-	[StringLength(500)]
-	public string? Time { get; set; }
-
-	[StringLength(500)]
-	public string? Artist { get; set; }
-
-	[StringLength(500)]
-	public string? Album { get; set; }
-	
-	[StringLength(2000)]
-	public string? JsonDetail { get; set; }
-	
-	public bool? IsPrivate { get; set; }
+	public MediaJsonDetail MediaJsonDetail { get; set; } = new();
 
 	[NotMapped]
 	public string Url => $"{Server.ServerAddress}/Medias/{FileName}";
@@ -93,6 +72,16 @@ public class MediaEntity : BaseEntity {
 
 	[System.Text.Json.Serialization.JsonIgnore]
 	public BookmarkEntity? Bookmark { get; set; }
+}
+
+public class MediaJsonDetail {
+	public string? Link { get; set; }
+	public string? Title { get; set; }
+	public string? Size { get; set; }
+	public string? Time { get; set; }
+	public string? Artist { get; set; }
+	public string? Album { get; set; }
+	public bool? IsPrivate { get; set; }
 }
 
 public class UploadDto {
