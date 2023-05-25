@@ -79,7 +79,7 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 
 	public async Task<GenericResponse<IQueryable<UserEntity>>> GetFollowers(string id) {
 		UserEntity myUser = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!;
-		GenericResponse<IQueryable<UserEntity>> q = await _userRepository.Filter(new UserFilterDto {
+		GenericResponse<IQueryable<UserEntity>> q = _userRepository.Filter(new UserFilterDto {
 				UserIds = myUser.FollowedUsers.Split(","),
 				ShowCategories = true,
 				ShowMedia = true
@@ -90,7 +90,7 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 
 	public async Task<GenericResponse<IQueryable<UserEntity>>> GetFollowing(string id) {
 		UserEntity myUser = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!;
-		GenericResponse<IQueryable<UserEntity>> q = await _userRepository.Filter(new UserFilterDto {
+		GenericResponse<IQueryable<UserEntity>> q = _userRepository.Filter(new UserFilterDto {
 				UserIds = myUser.FollowingUsers.Split(","),
 				ShowCategories = true,
 				ShowMedia = true

@@ -48,7 +48,7 @@ namespace Utilities_aspnet.Repositories
             var product = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == dto.ProductId);
             if (product is not null)
             {
-                product.ProductJsonDetail.IsBoosted = true;
+                product.IsBoosted = true;
                 _dbContext.Update(product);
             }
 

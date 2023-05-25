@@ -26,11 +26,11 @@ public class UserController : BaseApiController {
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	[AllowAnonymous]
 	[HttpPost("Filter")]
-	public async Task<ActionResult<GenericResponse<IEnumerable<UserEntity>>>> Filter(UserFilterDto dto) => Result(await _repository.Filter(dto));
+	public ActionResult<GenericResponse<IEnumerable<UserEntity>>> Filter(UserFilterDto dto) => Result(_repository.Filter(dto));
 	
 	[HttpGet]
 	[OutputCache(PolicyName = "default")]
-	public async Task<ActionResult<GenericResponse<IEnumerable<UserEntity>>>> Read([FromQuery] UserFilterDto dto) => Result(await _repository.Filter(dto));
+	public ActionResult<GenericResponse<IEnumerable<UserEntity>>> Read([FromQuery] UserFilterDto dto) => Result(_repository.Filter(dto));
 
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	[AllowAnonymous]

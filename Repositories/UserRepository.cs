@@ -1,7 +1,7 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
 public interface IUserRepository {
-	Task<GenericResponse<IQueryable<UserEntity>>> Filter(UserFilterDto dto);
+	GenericResponse<IQueryable<UserEntity>> Filter(UserFilterDto dto);
 	Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null);
 	Task<GenericResponse<UserEntity?>> Update(UserCreateUpdateDto dto);
 	Task<GenericResponse<UserEntity?>> GetTokenForTest(string? mobile);
@@ -69,7 +69,7 @@ public class UserRepository : IUserRepository {
 		return new GenericResponse<UserEntity?>(entity);
 	}
 
-	public async Task<GenericResponse<IQueryable<UserEntity>>> Filter(UserFilterDto dto) {
+	public GenericResponse<IQueryable<UserEntity>> Filter(UserFilterDto dto) {
 		IQueryable<UserEntity> q = _dbContext.Set<UserEntity>().Where(x => x.DeletedAt == null);
 
 		if (dto.UserNameExact != null) q = q.Where(x => x.AppUserName == dto.UserNameExact || x.UserName == dto.UserNameExact);
@@ -277,7 +277,7 @@ public class UserRepository : IUserRepository {
 
 	public async Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList() {
 		UserEntity? user = await ReadByIdMinimal(_userId);
-		GenericResponse<IQueryable<UserEntity>> blockedUsers = await Filter(new UserFilterDto {
+		GenericResponse<IQueryable<UserEntity>> blockedUsers = Filter(new UserFilterDto {
 			ShowMedia = true,
 			UserIds = user?.BlockedUsers.Split(",")
 		});

@@ -96,11 +96,11 @@ public class ProductRepository : IProductRepository
     {
         IQueryable<ProductEntity> q = _dbContext.Set<ProductEntity>();
         q = q.Where(x => x.DeletedAt == null);
-        if (!dto.ShowExpired) q = q.Where(w => w.ProductJsonDetail.ExpireDate == null || w.ProductJsonDetail.ExpireDate >= DateTime.Now);
+        if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.Now);
 
         if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
         if (dto.Subtitle.IsNotNullOrEmpty()) q = q.Where(x => (x.Subtitle ?? "").Contains(dto.Subtitle!));
-        if (dto.Type.IsNotNullOrEmpty()) q = q.Where(x => (x.ProductJsonDetail.Type ?? "").Contains(dto.Type!));
+        if (dto.Type.IsNotNullOrEmpty()) q = q.Where(x => (x.Type ?? "").Contains(dto.Type!));
         if (dto.Details.IsNotNullOrEmpty()) q = q.Where(x => (x.ProductJsonDetail.Details ?? "").Contains(dto.Details!));
         if (dto.Description.IsNotNullOrEmpty()) q = q.Where(x => (x.Description ?? "").Contains(dto.Description!));
         if (dto.Author.IsNotNullOrEmpty()) q = q.Where(x => (x.ProductJsonDetail.Author ?? "").Contains(dto.Author!));
@@ -110,19 +110,19 @@ public class ProductRepository : IProductRepository
         if (dto.Unit.IsNotNullOrEmpty()) q = q.Where(x => x.ProductJsonDetail.Unit == dto.Unit);
         if (dto.UseCase.IsNotNullOrEmpty()) q = q.Where(x => x.UseCase.Contains(dto.UseCase));
         if (dto.State.IsNotNullOrEmpty()) q = q.Where(x => x.ProductJsonDetail.State == dto.State);
-        if (dto.StartPriceRange.HasValue) q = q.Where(x => x.ProductJsonDetail.Price >= dto.StartPriceRange);
-        if (dto.Currency.HasValue) q = q.Where(x => x.ProductJsonDetail.Currency == dto.Currency);
+        if (dto.StartPriceRange.HasValue) q = q.Where(x => x.Price >= dto.StartPriceRange);
+        if (dto.Currency.HasValue) q = q.Where(x => x.Currency == dto.Currency);
         if (dto.HasComment.IsTrue()) q = q.Where(x => x.Comments.Any());
         if (dto.HasOrder.IsTrue()) q = q.Where(x => x.OrderDetails.Any());
-        if (dto.HasDiscount.IsTrue()) q = q.Where(x => x.DiscountPercent != null || x.ProductJsonDetail.DiscountPrice != null);
-        if (dto.EndPriceRange.HasValue) q = q.Where(x => x.ProductJsonDetail.Price <= dto.EndPriceRange);
+        if (dto.HasDiscount.IsTrue()) q = q.Where(x => x.DiscountPercent != null || x.DiscountPrice != null);
+        if (dto.EndPriceRange.HasValue) q = q.Where(x => x.Price <= dto.EndPriceRange);
         if (dto.Enabled.HasValue) q = q.Where(x => x.Enabled == dto.Enabled);
         if (dto.VisitsCount.HasValue) q = q.Where(x => x.VisitsCount == dto.VisitsCount);
         if (dto.Length.HasValue) q = q.Where(x => x.ProductJsonDetail.Length.ToInt() == dto.Length.ToInt());
         if (dto.ResponseTime.HasValue) q = q.Where(x => x.ProductJsonDetail.ResponseTime.ToInt() == dto.ResponseTime.ToInt());
         if (dto.OnTimeDelivery.HasValue) q = q.Where(x => x.ProductJsonDetail.OnTimeDelivery.ToInt() == dto.OnTimeDelivery.ToInt());
         if (dto.Length.HasValue) q = q.Where(x => x.ProductJsonDetail.Length.ToInt() == dto.Length.ToInt());
-        if (dto.Status.HasValue) q = q.Where(x => x.ProductJsonDetail.Status == dto.Status);
+        if (dto.Status.HasValue) q = q.Where(x => x.Status == dto.Status);
         if (dto.Width.HasValue) q = q.Where(x => x.ProductJsonDetail.Width.ToInt() == dto.Width.ToInt());
         if (dto.Height.HasValue) q = q.Where(x => x.ProductJsonDetail.Height.ToInt() == dto.Height.ToInt());
         if (dto.Weight.HasValue) q = q.Where(x => x.ProductJsonDetail.Weight.ToInt() == dto.Weight.ToInt());
@@ -155,11 +155,11 @@ public class ProductRepository : IProductRepository
         if (dto.OrderByVotesDecending.IsTrue()) q = q.OrderByDescending(x => x.VoteCount);
         if (dto.OrderByAtoZ.IsTrue()) q = q.OrderBy(x => x.Title);
         if (dto.OrderByZtoA.IsTrue()) q = q.OrderByDescending(x => x.Title);
-        if (dto.OrderByPriceAccending.IsTrue()) q = q.OrderBy(x => x.ProductJsonDetail.Price);
-        if (dto.OrderByPriceDecending.IsTrue()) q = q.OrderByDescending(x => x.ProductJsonDetail.Price);
+        if (dto.OrderByPriceAccending.IsTrue()) q = q.OrderBy(x => x.Price);
+        if (dto.OrderByPriceDecending.IsTrue()) q = q.OrderByDescending(x => x.Price);
         if (dto.OrderByCreatedDate.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
         if (dto.OrderByCreaedDateDecending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
-        if (dto.OrderByAgeCategory.IsTrue()) q = q.OrderBy(o => o.ProductJsonDetail.AgeCategory);
+        if (dto.OrderByAgeCategory.IsTrue()) q = q.OrderBy(o => o.AgeCategory);
         if (dto.OrderByMostUsedHashtag.IsTrue()) q = q.OrderBy(o => o.Categories.Count(c => c.UseCase.ToLower() == "tag"));
         //if (dto.OrderByFavorites.IsTrue())
         //{
@@ -210,7 +210,7 @@ public class ProductRepository : IProductRepository
             if (dto.IsMyBoughtList.IsTrue()) q = q.Where(i => user.BoughtProduts.Contains(i.Id.ToString()));
         }
 
-        if (dto.IsBoosted) q = q.OrderBy(o => o.ProductJsonDetail.IsBoosted);
+        if (dto.IsBoosted) q = q.OrderBy(o => o.IsBoosted);
 
         int totalCount = q.Count();
         q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
@@ -385,17 +385,17 @@ public static class ProductEntityExtension
         entity.ProductJsonDetail.Link = dto.Link ?? entity.ProductJsonDetail.Link;
         entity.ProductJsonDetail.Website = dto.Website ?? entity.ProductJsonDetail.Website;
         entity.ProductJsonDetail.Email = dto.Email ?? entity.ProductJsonDetail.Email;
-        entity.ProductJsonDetail.Type = dto.Type ?? entity.ProductJsonDetail.Type;
+        entity.Type = dto.Type ?? entity.Type;
         entity.ProductJsonDetail.State = dto.State ?? entity.ProductJsonDetail.State;
         entity.ProductJsonDetail.Latitude = dto.Latitude ?? entity.ProductJsonDetail.Latitude;
         entity.ProductJsonDetail.ResponseTime = dto.ResponseTime ?? entity.ProductJsonDetail.ResponseTime;
         entity.ProductJsonDetail.OnTimeDelivery = dto.OnTimeDelivery ?? entity.ProductJsonDetail.OnTimeDelivery;
-        entity.ProductJsonDetail.DiscountPrice = dto.DiscountPrice ?? entity.ProductJsonDetail.DiscountPrice;
+        entity.DiscountPrice = dto.DiscountPrice ?? entity.DiscountPrice;
         entity.DiscountPercent = dto.DiscountPercent ?? entity.DiscountPercent;
         entity.ProductJsonDetail.Longitude = dto.Longitude ?? entity.ProductJsonDetail.Longitude;
         entity.Description = dto.Description ?? entity.Description;
         entity.UseCase = dto.UseCase ?? entity.UseCase;
-        entity.ProductJsonDetail.Price = dto.Price ?? entity.ProductJsonDetail.Price;
+        entity.Price = dto.Price ?? entity.Price;
         entity.Enabled = dto.Enabled ?? entity.Enabled;
         entity.VisitsCount = dto.VisitsCount ?? entity.VisitsCount;
         entity.ProductJsonDetail.Length = dto.Length ?? entity.ProductJsonDetail.Length;
@@ -407,19 +407,19 @@ public static class ProductEntityExtension
         entity.ProductJsonDetail.MinPrice = dto.MinPrice ?? entity.ProductJsonDetail.MinPrice;
         entity.ProductJsonDetail.MaxPrice = dto.MaxPrice ?? entity.ProductJsonDetail.MaxPrice;
         entity.ProductJsonDetail.Unit = dto.Unit ?? entity.ProductJsonDetail.Unit;
-        entity.ProductJsonDetail.Stock = dto.Stock ?? entity.ProductJsonDetail.Stock;
+        entity.Stock = dto.Stock ?? entity.Stock;
         entity.ProductJsonDetail.Address = dto.Address ?? entity.ProductJsonDetail.Address;
         entity.ProductJsonDetail.StartDate = dto.StartDate ?? entity.ProductJsonDetail.StartDate;
         entity.ProductJsonDetail.EndDate = dto.EndDate ?? entity.ProductJsonDetail.EndDate;
-        entity.ProductJsonDetail.Status = dto.Status ?? entity.ProductJsonDetail.Status;
-        entity.ProductJsonDetail.Currency = dto.Currency ?? entity.ProductJsonDetail.Currency;
-        entity.ProductJsonDetail.ExpireDate = dto.ExpireDate ?? entity.ProductJsonDetail.ExpireDate;
-        entity.ProductJsonDetail.AgeCategory = dto.AgeCategory ?? entity.ProductJsonDetail.AgeCategory;
-        entity.ProductJsonDetail.ProductState = dto.ProductState ?? entity.ProductJsonDetail.ProductState;
+        entity.Status = dto.Status ?? entity.Status;
+        entity.Currency = dto.Currency ?? entity.Currency;
+        entity.ExpireDate = dto.ExpireDate ?? entity.ExpireDate;
+        entity.AgeCategory = dto.AgeCategory ?? entity.AgeCategory;
+        entity.ProductState = dto.ProductState ?? entity.ProductState;
         entity.ProductJsonDetail.ShippingCost = dto.ShippingCost ?? entity.ProductJsonDetail.ShippingCost;
         entity.ProductJsonDetail.ShippingTime = dto.ShippingTime ?? entity.ProductJsonDetail.ShippingTime;
         entity.ProductJsonDetail.IsPhysical = dto.IsPhysical;
-        entity.ProductJsonDetail.IsBoosted = dto.IsBoosted;
+        entity.IsBoosted = dto.IsBoosted;
         entity.DeletedAt = dto.DeletedAt ?? entity.DeletedAt;
         entity.UpdatedAt = DateTime.Now;
 

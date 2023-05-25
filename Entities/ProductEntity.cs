@@ -13,11 +13,24 @@ public class ProductEntity : BaseEntity {
 
 	[StringLength(500)]
 	public string? UseCase { get; set; }
-
+	
+	[StringLength(500)]
+	public string? Type { get; set; }
+	
+	public bool IsBoosted { get; set; }
+	public double? Stock { get; set; }
 	public double? VoteCount { get; set; }
 	public int? DiscountPercent { get; set; }
 	public int? VisitsCount { get; set; }
 	public bool? Enabled { get; set; }
+	public double? DiscountPrice { get; set; }
+	public double? Price { get; set; }
+	
+	public Currency? Currency { get; set; }
+	public ProductStatus? Status { get; set; }
+	public AgeCategory? AgeCategory { get; set; }
+	public ProductState? ProductState { get; set; }
+	public DateTime? ExpireDate { get; set; }
 
 	public string? SeenUsers { get; set; } = "";
 	public string Teams { get; set; } = "";
@@ -66,7 +79,6 @@ public class ProductJsonDetail {
 	public string? Link { get; set; }
 	public string? Website { get; set; }
 	public string? Email { get; set; }
-	public string? Type { get; set; }
 	public string? Unit { get; set; }
 	public string? State { get; set; }
 	public double? Latitude { get; set; }
@@ -82,19 +94,10 @@ public class ProductJsonDetail {
 	public double? MaxPrice { get; set; }
 	public double? MinPrice { get; set; }
 	public double? ShippingCost { get; set; }
-	public double? Stock { get; set; }
 	public bool IsPhysical { get; set; }
-	public bool IsBoosted { get; set; }
 	public int? ShippingTime { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
-	public Currency? Currency { get; set; }
-	public ProductStatus? Status { get; set; }
-	public AgeCategory? AgeCategory { get; set; }
-	public ProductState? ProductState { get; set; }
-	public DateTime? ExpireDate { get; set; }
-	public double? DiscountPrice { get; set; }
-	public double? Price { get; set; }
 }
 
 [Table("ProductsInsight")]
