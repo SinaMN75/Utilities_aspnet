@@ -163,6 +163,14 @@ public enum Reaction {
 	Awful = 104
 }
 
+public enum GenderType {
+	Male = 100,
+	Female = 101,
+	Unknown = 102,
+	All = 103,
+	None = 104
+}
+
 public enum AgeCategory {
 	None = 100,
 	Kids = 101,

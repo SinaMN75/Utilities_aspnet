@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
-using System.Reflection.Metadata.Ecma335;
-
-namespace Utilities_aspnet.Repositories;
+﻿namespace Utilities_aspnet.Repositories;
 
 public interface IUserRepository {
 	Task<GenericResponse<IQueryable<UserEntity>>> Filter(UserFilterDto dto);
@@ -24,23 +21,22 @@ public class UserRepository : IUserRepository {
 	private readonly UserManager<UserEntity> _userManager;
 	private readonly ISmsNotificationRepository _sms;
 	private readonly ITransactionRepository _transactionRepository;
-    private readonly string? _userId;
+	private readonly string? _userId;
 
 	public UserRepository(
-        DbContext dbContext,
-        UserManager<UserEntity> userManager,
-        ISmsNotificationRepository sms,
-        IHttpContextAccessor httpContextAccessor,
-        ITransactionRepository transactionRepository)
-    {
-        _dbContext = dbContext;
-        _userManager = userManager;
-        _sms = sms;
-        _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
-        _transactionRepository = transactionRepository;
-    }
+		DbContext dbContext,
+		UserManager<UserEntity> userManager,
+		ISmsNotificationRepository sms,
+		IHttpContextAccessor httpContextAccessor,
+		ITransactionRepository transactionRepository) {
+		_dbContext = dbContext;
+		_userManager = userManager;
+		_sms = sms;
+		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
+		_transactionRepository = transactionRepository;
+	}
 
-    public async Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null) {
+	public async Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null) {
 		bool isUserId = Guid.TryParse(idOrUserName, out _);
 		UserEntity? entity = await _dbContext.Set<UserEntity>()
 			.Include(u => u.Media)
@@ -48,10 +44,7 @@ public class UserRepository : IUserRepository {
 			.FirstOrDefaultAsync(u => isUserId ? u.Id == idOrUserName : u.UserName == idOrUserName);
 
 		if (entity == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
-
-		entity.IsAdmin = await _userManager.IsInRoleAsync(entity, "Admin");
 		entity.Token = token;
-		entity.GrowthRate = GetGrowthRate(entity.Id).Result;
 
 		if (_userId.IsNotNullOrEmpty()) {
 			UserEntity myUser = (await ReadByIdMinimal(_userId))!;
@@ -81,37 +74,33 @@ public class UserRepository : IUserRepository {
 
 		if (dto.UserNameExact != null) q = q.Where(x => x.AppUserName == dto.UserNameExact || x.UserName == dto.UserNameExact);
 		if (dto.UserId != null) q = q.Where(x => x.Id == dto.UserId);
-		if (dto.Activity != null) q = q.Where(x => x.Activity.Contains(dto.Activity));
+		if (dto.Activity != null) q = q.Where(x => x.UserJsonDetail.Activity.Contains(dto.Activity));
 		if (dto.Badge != null) q = q.Where(x => x.Badge.Contains(dto.Badge));
 		if (dto.Bio != null) q = q.Where(x => x.Bio.Contains(dto.Bio));
-		if (dto.Color != null) q = q.Where(x => x.Color.Contains(dto.Color));
-		if (dto.Dribble != null) q = q.Where(x => x.Dribble.Contains(dto.Dribble));
+		if (dto.Color != null) q = q.Where(x => x.UserJsonDetail.Color.Contains(dto.Color));
+		if (dto.Dribble != null) q = q.Where(x => x.UserJsonDetail.Dribble.Contains(dto.Dribble));
 		if (dto.Email != null) q = q.Where(x => x.Email.Contains(dto.Email));
-		if (dto.Gender != null) q = q.Where(x => x.Gender.Contains(dto.Gender));
+		if (dto.Gender != null) q = q.Where(x => x.UserJsonDetail.Gender == dto.Gender);
 		if (dto.Headline != null) q = q.Where(x => x.Headline.Contains(dto.Headline));
-		if (dto.Instagram != null) q = q.Where(x => x.Instagram.Contains(dto.Instagram));
-		if (dto.Pinterest != null) q = q.Where(x => x.Pinterest.Contains(dto.Pinterest));
-		if (dto.Region != null) q = q.Where(x => x.Region.Contains(dto.Region));
-		if (dto.State != null) q = q.Where(x => x.State.Contains(dto.State));
-		if (dto.Telegram != null) q = q.Where(x => x.Telegram.Contains(dto.Telegram));
+		if (dto.Instagram != null) q = q.Where(x => x.UserJsonDetail.Instagram.Contains(dto.Instagram));
+		if (dto.Pinterest != null) q = q.Where(x => x.UserJsonDetail.Pinterest.Contains(dto.Pinterest));
+		if (dto.Region != null) q = q.Where(x => x.UserJsonDetail.Region.Contains(dto.Region));
+		if (dto.State != null) q = q.Where(x => x.UserJsonDetail.State.Contains(dto.State));
+		if (dto.Telegram != null) q = q.Where(x => x.UserJsonDetail.Telegram.Contains(dto.Telegram));
 		if (dto.Type != null) q = q.Where(x => x.Type.Contains(dto.Type));
-		if (dto.Website != null) q = q.Where(x => x.Website.Contains(dto.Website));
-		if (dto.AccessLevel != null) q = q.Where(x => x.AccessLevel.Contains(dto.AccessLevel));
+		if (dto.Website != null) q = q.Where(x => x.UserJsonDetail.Website.Contains(dto.Website));
+		if (dto.AccessLevel != null) q = q.Where(x => x.UserJsonDetail.AccessLevel.Contains(dto.AccessLevel));
 		if (dto.AppEmail != null) q = q.Where(x => x.AppEmail.Contains(dto.AppEmail));
 		if (dto.FirstName != null) q = q.Where(x => x.FirstName.Contains(dto.FirstName));
 		if (dto.LastName != null) q = q.Where(x => x.LastName.Contains(dto.LastName));
 		if (dto.FullName != null) q = q.Where(x => x.FullName.Contains(dto.FullName));
-		if (dto.GenderTr1 != null) q = q.Where(x => x.GenderTr1.Contains(dto.GenderTr1));
 		if (dto.UseCase != null) q = q.Where(x => x.UseCase.Contains(dto.UseCase));
-		if (dto.GenderTr2 != null) q = q.Where(x => x.GenderTr2.Contains(dto.GenderTr2));
 		if (dto.PhoneNumber != null) q = q.Where(x => x.PhoneNumber.Contains(dto.PhoneNumber));
 		if (dto.AppUserName != null) q = q.Where(x => x.AppUserName.Contains(dto.AppUserName));
 		if (dto.AppPhoneNumber != null) q = q.Where(x => x.AppPhoneNumber.Contains(dto.AppPhoneNumber));
-		if (dto.WhatsApp != null) q = q.Where(x => x.WhatsApp.Contains(dto.WhatsApp));
-		if (dto.LinkedIn != null) q = q.Where(x => x.LinkedIn.Contains(dto.LinkedIn));
-		if (dto.SoundCloud != null) q = q.Where(x => x.SoundCloud.Contains(dto.SoundCloud));
-		if (dto.StateTr1 != null) q = q.Where(x => x.StateTr1.Contains(dto.StateTr1));
-		if (dto.StateTr2 != null) q = q.Where(x => x.StateTr2.Contains(dto.StateTr2));
+		if (dto.WhatsApp != null) q = q.Where(x => x.UserJsonDetail.WhatsApp.Contains(dto.WhatsApp));
+		if (dto.LinkedIn != null) q = q.Where(x => x.UserJsonDetail.LinkedIn.Contains(dto.LinkedIn));
+		if (dto.SoundCloud != null) q = q.Where(x => x.UserJsonDetail.SoundCloud.Contains(dto.SoundCloud));
 
 		if (dto.Query != null)
 			q = q.Where(x => x.FirstName.Contains(dto.Query) ||
@@ -226,11 +215,11 @@ public class UserRepository : IUserRepository {
 			PhoneNumberConfirmed = false,
 			FullName = "",
 			Wallet = 0,
-			AccessLevel = dto.AccessLevel,
 			Suspend = false,
 			FirstName = dto.FirstName,
 			LastName = dto.LastName,
 			IsLoggedIn = true,
+			UserJsonDetail = dto.UserJsonDetail,
 		};
 
 		IdentityResult? result = await _userManager.CreateAsync(user, dto.Password);
@@ -330,85 +319,73 @@ public class UserRepository : IUserRepository {
 
 		if (fromUser.Wallet <= dto.Amount) return new GenericResponse(UtilitiesStatusCodes.NotEnoughMoney);
 		await Update(new UserCreateUpdateDto {Id = fromUser.Id, Wallet = fromUser.Wallet - dto.Amount});
-		await _transactionRepository.Create(MakeTransactionEntity(fromUser.Id , dto.Amount,"کسر",null));
+		await _transactionRepository.Create(MakeTransactionEntity(fromUser.Id, dto.Amount, "کسر", null));
 		await Update(new UserCreateUpdateDto {Id = toUser.Id, Wallet = toUser.Wallet + dto.Amount});
-        await _transactionRepository.Create(MakeTransactionEntity(toUser.Id, dto.Amount, "واریز",null));
-        return new GenericResponse();
+		await _transactionRepository.Create(MakeTransactionEntity(toUser.Id, dto.Amount, "واریز", null));
+		return new GenericResponse();
 	}
 
-
-    public async Task<GenericResponse> Authorize(AuthorizeUserDto dto)
-    {
+	public async Task<GenericResponse> Authorize(AuthorizeUserDto dto) {
 		var user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
 		if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound);
 
-        var sheba = dto.ShebaNumber.GetShebaNumber();
-        //Todo : Sina MohamadZade Shahkar
+		var sheba = dto.ShebaNumber.GetShebaNumber();
 
-        if (user.IsAuthorize)
-		{
+		if (user.UserJsonDetail.IsAuthorize) {
 			if (sheba is null) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
-			user.ShebaNumber = user.ShebaNumber == dto.ShebaNumber ? user.ShebaNumber : dto.ShebaNumber;
-        }
-		else
-		{
-            string? meliCode = dto.Code.Length == 10 ? dto.Code : null;
-            if (meliCode is null || sheba is null) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
+			user.UserJsonDetail.ShebaNumber = user.UserJsonDetail.ShebaNumber == dto.ShebaNumber ? user.UserJsonDetail.ShebaNumber : dto.ShebaNumber;
+		}
+		else {
+			string? meliCode = dto.Code.Length == 10 ? dto.Code : null;
+			if (meliCode is null || sheba is null) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 
-            user.MeliCode = meliCode;
-            user.ShebaNumber = sheba;
-            user.IsForeigner = dto.IsForeigner;
-            user.IsAuthorize = true;
-        }
+			user.UserJsonDetail.MeliCode = meliCode;
+			user.UserJsonDetail.ShebaNumber = sheba;
+			user.UserJsonDetail.IsForeigner = dto.IsForeigner;
+			user.UserJsonDetail.IsAuthorize = true;
+		}
 
-        _dbContext.Set<UserEntity>().Update(user);
+		_dbContext.Set<UserEntity>().Update(user);
 		await _dbContext.SaveChangesAsync();
 
 		return new GenericResponse(UtilitiesStatusCodes.Success);
-    }
+	}
 
-    #endregion
+	#endregion
 
-    private void FillUserData(UserCreateUpdateDto dto, UserEntity entity) {
+	private void FillUserData(UserCreateUpdateDto dto, UserEntity entity) {
 		entity.FirstName = dto.FirstName ?? entity.FirstName;
 		entity.LastName = dto.LastName ?? entity.LastName;
 		entity.FullName = dto.FullName ?? entity.FullName;
 		entity.Bio = dto.Bio ?? entity.Bio;
 		entity.AppUserName = dto.AppUserName ?? entity.AppUserName;
 		entity.AppEmail = dto.AppEmail ?? entity.AppEmail;
-		entity.Instagram = dto.Instagram ?? entity.Instagram;
-		entity.Telegram = dto.Telegram ?? entity.Telegram;
-		entity.WhatsApp = dto.WhatsApp ?? entity.WhatsApp;
-		entity.LinkedIn = dto.LinkedIn ?? entity.LinkedIn;
-		entity.Dribble = dto.Dribble ?? entity.Dribble;
-		entity.SoundCloud = dto.SoundCloud ?? entity.SoundCloud;
-		entity.Pinterest = dto.Pinterest ?? entity.Pinterest;
-		entity.Region = dto.Region ?? entity.Region;
-		entity.Activity = dto.Activity ?? entity.Activity;
+		entity.UserJsonDetail.Instagram = dto.Instagram ?? entity.UserJsonDetail.Instagram;
+		entity.UserJsonDetail.Telegram = dto.Telegram ?? entity.UserJsonDetail.Telegram;
+		entity.UserJsonDetail.WhatsApp = dto.WhatsApp ?? entity.UserJsonDetail.WhatsApp;
+		entity.UserJsonDetail.LinkedIn = dto.LinkedIn ?? entity.UserJsonDetail.LinkedIn;
+		entity.UserJsonDetail.Dribble = dto.Dribble ?? entity.UserJsonDetail.Dribble;
+		entity.UserJsonDetail.SoundCloud = dto.SoundCloud ?? entity.UserJsonDetail.SoundCloud;
+		entity.UserJsonDetail.Pinterest = dto.Pinterest ?? entity.UserJsonDetail.Pinterest;
+		entity.UserJsonDetail.Region = dto.Region ?? entity.UserJsonDetail.Region;
+		entity.UserJsonDetail.Activity = dto.Activity ?? entity.UserJsonDetail.Activity;
 		entity.Suspend = dto.Suspend ?? entity.Suspend;
 		entity.Headline = dto.Headline ?? entity.Headline;
-		entity.Detail1 = dto.Detail1 ?? entity.Detail1;
-		entity.Detail2 = dto.Detail2 ?? entity.Detail2;
 		entity.AppPhoneNumber = dto.AppPhoneNumber ?? entity.AppPhoneNumber;
 		entity.Birthdate = dto.BirthDate ?? entity.Birthdate;
 		entity.Wallet = dto.Wallet ?? entity.Wallet;
-		entity.Gender = dto.Gender ?? entity.Gender;
-		entity.GenderTr1 = dto.GenderTr1 ?? entity.GenderTr1;
-		entity.GenderTr2 = dto.GenderTr2 ?? entity.GenderTr2;
+		entity.UserJsonDetail.Gender = dto.Gender ?? entity.UserJsonDetail.Gender;
 		entity.UseCase = dto.UseCase ?? entity.UseCase;
 		entity.UserName = dto.UserName ?? entity.UserName;
-		entity.JsonDetail = dto.JsonDetail ?? entity.JsonDetail;
 		entity.Email = dto.Email ?? entity.Email;
 		entity.PhoneNumber = dto.PhoneNumber ?? entity.PhoneNumber;
-		entity.Color = dto.Color ?? entity.Color;
-		entity.Website = dto.Website ?? entity.Website;
-		entity.ShowContactInfo = dto.ShowContactInfo ?? entity.ShowContactInfo;
-		entity.State = dto.State ?? entity.State;
+		entity.UserJsonDetail.Color = dto.Color ?? entity.UserJsonDetail.Color;
+		entity.UserJsonDetail.Website = dto.Website ?? entity.UserJsonDetail.Website;
+		entity.UserJsonDetail.ShowContactInfo = dto.ShowContactInfo ?? entity.UserJsonDetail.ShowContactInfo;
+		entity.UserJsonDetail.State = dto.State ?? entity.UserJsonDetail.State;
 		entity.Type = dto.Type ?? entity.Type;
-		entity.StateTr1 = dto.StateTr1 ?? entity.StateTr1;
-		entity.StateTr2 = dto.StateTr2 ?? entity.StateTr2;
 		entity.Point = dto.Point ?? entity.Point;
-		entity.AccessLevel = dto.AccessLevel ?? entity.AccessLevel;
+		entity.UserJsonDetail.AccessLevel = dto.AccessLevel ?? entity.UserJsonDetail.AccessLevel;
 		entity.VisitedProducts = dto.VisitedProducts ?? entity.VisitedProducts;
 		entity.BookmarkedProducts = dto.BookmarkedProducts ?? entity.BookmarkedProducts;
 		entity.FollowingUsers = dto.FollowingUsers ?? entity.FollowingUsers;
@@ -419,7 +396,7 @@ public class UserRepository : IUserRepository {
 		entity.UpdatedAt = DateTime.Now;
 		entity.IsLoggedIn = dto.IsLoggedIn ?? entity.IsLoggedIn;
 		entity.IsOnline = dto.IsOnline ?? entity.IsOnline;
-		entity.IsPrivate = dto.IsPrivate ?? entity.IsPrivate;
+		entity.UserJsonDetail.IsPrivate = dto.IsPrivate ?? entity.UserJsonDetail.IsPrivate;
 		entity.ExpireUpgradeAccount = dto.ExpireUpgradeAccount ?? entity.ExpireUpgradeAccount;
 		entity.AgeCategory = dto.AgeCategory ?? entity.AgeCategory;
 
@@ -434,17 +411,15 @@ public class UserRepository : IUserRepository {
 		}
 	}
 
-	private TransactionEntity MakeTransactionEntity(string userId , double amount, string description, string? ShebaNumber)
-	{
-		return new TransactionEntity
-		{
+	private TransactionEntity MakeTransactionEntity(string userId, double amount, string description, string? ShebaNumber) {
+		return new TransactionEntity {
 			UserId = userId,
 			Amount = amount,
 			Descriptions = description
 		};
 	}
 
-    private async Task<GrowthRateReadDto?> GetGrowthRate(string? id) {
+	private async Task<GrowthRateReadDto?> GetGrowthRate(string? id) {
 		IEnumerable<CommentEntity> myComments = await _dbContext.Set<CommentEntity>().Where(x => x.UserId == id).ToListAsync();
 		IEnumerable<Guid> productIds = await _dbContext.Set<ProductEntity>().Where(x => x.UserId == id).Select(x => x.Id).ToListAsync();
 		IEnumerable<CommentEntity> comments = await _dbContext.Set<CommentEntity>().Where(x => productIds.Contains(x.ProductId ?? Guid.Empty)).ToListAsync();
@@ -504,5 +479,4 @@ public class UserRepository : IUserRepository {
 		e.Token = token;
 		return e;
 	}
-
 }
