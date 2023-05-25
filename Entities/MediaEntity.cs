@@ -8,6 +8,7 @@ public class MediaEntity : BaseEntity {
 	[StringLength(500)]
 	public string? UseCase { get; set; }
 
+	public string ComputedJson { get; set; } = null!;
 	public MediaJsonDetail MediaJsonDetail { get; set; } = new();
 
 	[NotMapped]
