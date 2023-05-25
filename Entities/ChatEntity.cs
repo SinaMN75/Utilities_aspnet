@@ -35,8 +35,7 @@ public class GroupChatEntity : BaseEntity {
 	public string? CreatorUserId { get; set; }
 	
 	public ChatType? Type { get; set; }
-
-	public string ComputedJson { get; set; } = null!;
+	
 	public GroupChatJsonDetail? GroupChatJsonDetail { get; set; }
 
     public IEnumerable<MediaEntity>? Media { get; set; }

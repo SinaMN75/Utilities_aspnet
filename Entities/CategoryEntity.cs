@@ -24,7 +24,6 @@ public class CategoryEntity : BaseEntity {
 	public int? Stock { get; set; }
 	public int? Order { get; set; }
 
-	public string ComputedJson { get; set; } = null!;
 	public CategoryJsonDetail? CategoryJsonDetail { get; set; }
 
 	public Guid? ParentId { get; set; }

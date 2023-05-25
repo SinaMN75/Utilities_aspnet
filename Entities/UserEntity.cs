@@ -45,7 +45,6 @@ public class UserEntity : IdentityUser {
 	public DateTime? ExpireUpgradeAccount { get; set; }
 	public AgeCategory AgeCategory { get; set; } = AgeCategory.None;
 
-	public string ComputedJson { get; set; } = null!;
 	public UserJsonDetail UserJsonDetail { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }

@@ -28,7 +28,6 @@ public class ProductEntity : BaseEntity {
 	public string? UserId { get; set; }
 	public UserEntity? User { get; set; }
 
-	public string ComputedJson { get; set; } = null!;
 	public ProductJsonDetail ProductJsonDetail { get; set; } = new();
 	
 	public IEnumerable<MediaEntity>? Media { get; set; }
