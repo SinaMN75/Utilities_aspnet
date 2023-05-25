@@ -345,7 +345,7 @@ public class UserRepository : IUserRepository {
         var sheba = dto.ShebaNumber.GetShebaNumber();
         //Todo : Sina MohamadZade Shahkar
 
-        if (user.IsAuthorize)
+        if (user.IsAuthenticated)
 		{
 			if (sheba is null) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 			user.ShebaNumber = user.ShebaNumber == dto.ShebaNumber ? user.ShebaNumber : dto.ShebaNumber;
@@ -358,7 +358,7 @@ public class UserRepository : IUserRepository {
             user.MeliCode = meliCode;
             user.ShebaNumber = sheba;
             user.IsForeigner = dto.IsForeigner;
-            user.IsAuthorize = true;
+            user.IsAuthenticated = true;
         }
 
         _dbContext.Set<UserEntity>().Update(user);

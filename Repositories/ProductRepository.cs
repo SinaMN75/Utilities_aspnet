@@ -214,7 +214,7 @@ public class ProductRepository : IProductRepository
             if (dto.IsMyBoughtList.IsTrue()) q = q.Where(i => user.BoughtProduts.Contains(i.Id.ToString()));
         }
 
-        if (dto.IsBoosted) q = q.OrderBy(o => o.IsBoosted);
+        if (dto.Boosted) q = q.OrderByDescending(o => o.Boosted);
 
         int totalCount = q.Count();
         q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
@@ -431,7 +431,7 @@ public static class ProductEntityExtension
         entity.ShippingCost = dto.ShippingCost ?? entity.ShippingCost;
         entity.ShippingTime = dto.ShippingTime ?? entity.ShippingTime;
         entity.IsPhysical = dto.IsPhysical;
-        entity.IsBoosted = dto.IsBoosted;
+        entity.Boosted = dto.Boosted ?? entity.Boosted;
 
         if (dto.VisitsCountPlus.HasValue)
         {

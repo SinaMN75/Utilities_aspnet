@@ -343,7 +343,7 @@ public class ChatRepository : IChatRepository
         if (dto.OrderByCreatedDate.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
         if (dto.OrderByCreaedDateDecending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 
-        if (dto.IsBoosted) q = q.OrderBy(o => o.IsBoosted);
+        if (dto.Boosted) q = q.OrderByDescending(o => o.Boosted);
         if (dto.ShowAhtorized)
         {
             var orders = _dbContext.Set<OrderEntity>().Where(w => w.ProductOwnerId == _userId).ToList();
@@ -583,7 +583,7 @@ public class ChatRepository : IChatRepository
             entity.Categories = listCategory;
         }
 
-        if (entity.Type == ChatType.PublicChannel) entity.IsBoosted = true;
+        if (entity.Type == ChatType.PublicChannel) entity.Boosted = DateTime.UtcNow;
 
         EntityEntry<GroupChatEntity> e = await _dbContext.Set<GroupChatEntity>().AddAsync(entity);
         await _dbContext.SaveChangesAsync();

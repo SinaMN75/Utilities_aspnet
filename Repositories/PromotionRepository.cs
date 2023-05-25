@@ -48,14 +48,14 @@ namespace Utilities_aspnet.Repositories
             var product = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == dto.ProductId);
             if (product is not null)
             {
-                product.IsBoosted = true;
+                product.Boosted = DateTime.UtcNow;
                 _dbContext.Update(product);
             }
 
             var groupChat = await _dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(f => f.Id == dto.GroupChatId);
             if (groupChat is not null)
             {
-                groupChat.IsBoosted = true;
+                groupChat.Boosted = DateTime.UtcNow;
                 _dbContext.Update(groupChat);
             }
             await _dbContext.SaveChangesAsync();

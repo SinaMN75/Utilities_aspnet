@@ -48,7 +48,7 @@ public class GroupChatEntity : BaseEntity {
 	public ChatType? Type { get; set; }
 
 	public Priority? Priority { get; set; }
-    public bool IsBoosted { get; set; }
+    public DateTime? Boosted { get; set; }
     public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<UserEntity>? Users { get; set; }
 	public IEnumerable<ProductEntity>? Products { get; set; }
@@ -142,7 +142,7 @@ public class GroupChatFilterDto {
 	public bool? OrderByZtoA { get; set; } = false;
 	public bool? OrderByCreatedDate { get; set; } = false;
 	public bool? OrderByCreaedDateDecending { get; set; } = false;
-    public bool IsBoosted { get; set; }
+    public bool Boosted { get; set; }
     public int PageSize { get; set; } = 100;
 	public int PageNumber { get; set; } = 1;
 }

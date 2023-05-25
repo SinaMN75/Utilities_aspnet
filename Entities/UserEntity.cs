@@ -11,8 +11,11 @@ public class UserEntity : IdentityUser {
 
 	[StringLength(500)]
 	public string? FullName { get; set; }
+    public bool IsPrivate { get; set; } = true;
+    public string? MeliCode { get; set; }
+    public string? ShebaNumber { get; set; }
 
-	[StringLength(500)]
+    [StringLength(500)]
 	public string? Headline { get; set; }
 
 	[StringLength(2000)]
@@ -105,10 +108,7 @@ public class UserEntity : IdentityUser {
 	public bool IsOnline { get; set; } = false;
 	public string? MutedChats { get; set; }
 	public DateTime? ExpireUpgradeAccount { get; set; }
-	public bool IsPrivate { get; set; }
-    public string? MeliCode { get; set; }
-    public string? ShebaNumber { get; set; }
-    public bool IsAuthorize { get; set; }
+    public bool IsAuthenticated { get; set; }
     public bool IsForeigner { get; set; }
     public AgeCategory AgeCategory { get; set; } = AgeCategory.None;
 
