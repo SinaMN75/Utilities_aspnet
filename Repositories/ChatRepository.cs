@@ -204,14 +204,14 @@ public class ChatRepository : IChatRepository
             e.Categories = list;
         }
 
-        e.Department = dto.Department ?? e.Department;
-        e.Priority = dto.Priority ?? e.Priority;
+        e.GroupChatJsonDetail.Department = dto.Department ?? e.GroupChatJsonDetail.Department;
+        e.GroupChatJsonDetail.Priority = dto.Priority ?? e.GroupChatJsonDetail.Priority;
         e.Title = dto.Title ?? e.Title;
         e.Type = dto.Type ?? e.Type;
-        e.Value = dto.Value ?? e.Value;
+        e.GroupChatJsonDetail.Value = dto.Value ?? e.GroupChatJsonDetail.Value;
         e.UpdatedAt = DateTime.Now;
-        e.Description = dto.Description ?? e.Description;
-        e.ChatStatus = dto.ChatStatus ?? e.ChatStatus;
+        e.GroupChatJsonDetail.Description = dto.Description ?? e.GroupChatJsonDetail.Description;
+        e.GroupChatJsonDetail.ChatStatus = dto.ChatStatus ?? e.GroupChatJsonDetail.ChatStatus;
 
         EntityEntry<GroupChatEntity> entity = _dbContext.Set<GroupChatEntity>().Update(e);
         await _dbContext.SaveChangesAsync();
@@ -327,12 +327,12 @@ public class ChatRepository : IChatRepository
         if (dto.UsersIds.IsNotNullOrEmpty()) q = q.Where(x => x.Users.Any(x => x.Id == dto.UsersIds.FirstOrDefault()));
         if (dto.ProductsIds.IsNotNullOrEmpty()) q = q.Where(x => x.Products.Any(x => x.Id == dto.ProductsIds.FirstOrDefault()));
         if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => x.Title == dto.Title);
-        if (dto.Description.IsNotNullOrEmpty()) q = q.Where(x => x.Description == dto.Description);
+        if (dto.Description.IsNotNullOrEmpty()) q = q.Where(x => x.GroupChatJsonDetail.Description == dto.Description);
         if (dto.Type.HasValue) q = q.Where(x => x.Type == dto.Type);
-        if (dto.Value.IsNotNullOrEmpty()) q = q.Where(x => x.Value == dto.Value);
-        if (dto.Department.IsNotNullOrEmpty()) q = q.Where(x => x.Department == dto.Department);
-        if (dto.ChatStatus.HasValue) q = q.Where(x => x.ChatStatus == dto.ChatStatus);
-        if (dto.Priority.HasValue) q = q.Where(x => x.Priority == dto.Priority);
+        if (dto.Value.IsNotNullOrEmpty()) q = q.Where(x => x.GroupChatJsonDetail.Value == dto.Value);
+        if (dto.Department.IsNotNullOrEmpty()) q = q.Where(x => x.GroupChatJsonDetail.Department == dto.Department);
+        if (dto.ChatStatus.HasValue) q = q.Where(x => x.GroupChatJsonDetail.ChatStatus == dto.ChatStatus);
+        if (dto.Priority.HasValue) q = q.Where(x => x.GroupChatJsonDetail.Priority == dto.Priority);
 
         if (dto.ShowProducts.IsTrue()) q = q.Include(x => x.Products)!.ThenInclude(x => x.Media);
         if (dto.ShowUsers.IsTrue()) q = q.Include(x => x.Users)!.ThenInclude(x => x.Media);
@@ -343,7 +343,7 @@ public class ChatRepository : IChatRepository
         if (dto.OrderByCreatedDate.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
         if (dto.OrderByCreaedDateDecending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 
-        if (dto.IsBoosted) q = q.OrderBy(o => o.IsBoosted);
+        if (dto.IsBoosted) q = q.OrderBy(o => o.GroupChatJsonDetail.IsBoosted);
         if (dto.ShowAhtorized)
         {
             var orders = _dbContext.Set<OrderEntity>().Where(w => w.ProductOwnerId == _userId).ToList();
@@ -557,18 +557,20 @@ public class ChatRepository : IChatRepository
 
         GroupChatEntity entity = new()
         {
-            Department = dto.Department,
-            Priority = dto.Priority,
             Title = dto.Title,
             Type = dto.Type,
-            Value = dto.Value,
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now,
-            ChatStatus = dto.ChatStatus,
-            Description = dto.Description,
             CreatorUserId = _userId!,
             Users = users,
-            Products = products
+            Products = products,
+            GroupChatJsonDetail = new GroupChatJsonDetail {
+                ChatStatus = dto.ChatStatus,
+                Description = dto.Description,
+                Value = dto.Value,
+                Department = dto.Department,
+                Priority = dto.Priority,
+            }
         };
         if (dto.Id != null) entity.Id = (Guid)dto.Id;
 
@@ -583,7 +585,7 @@ public class ChatRepository : IChatRepository
             entity.Categories = listCategory;
         }
 
-        if (entity.Type == ChatType.PublicChannel) entity.IsBoosted = true;
+        if (entity.Type == ChatType.PublicChannel) entity.GroupChatJsonDetail.IsBoosted = true;
 
         EntityEntry<GroupChatEntity> e = await _dbContext.Set<GroupChatEntity>().AddAsync(entity);
         await _dbContext.SaveChangesAsync();

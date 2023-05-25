@@ -55,7 +55,7 @@ namespace Utilities_aspnet.Repositories
             var groupChat = await _dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(f => f.Id == dto.GroupChatId);
             if (groupChat is not null)
             {
-                groupChat.IsBoosted = true;
+                groupChat.GroupChatJsonDetail.IsBoosted = true;
                 _dbContext.Update(groupChat);
             }
             await _dbContext.SaveChangesAsync();

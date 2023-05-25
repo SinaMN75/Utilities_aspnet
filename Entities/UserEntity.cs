@@ -182,11 +182,11 @@ public class UserJsonDetail {
 	public bool? ShowContactInfo { get; set; }
 	public string? Region { get; set; }
 	public string? State { get; set; }
-	public bool IsPrivate { get; set; }
+	public bool? IsPrivate { get; set; }
 	public string? MeliCode { get; set; }
 	public string? ShebaNumber { get; set; }
-	public bool IsAuthorize { get; set; }
-	public bool IsForeigner { get; set; }
+	public bool? IsAuthorize { get; set; }
+	public bool? IsForeigner { get; set; }
 }
 
 [Table("Otps")]

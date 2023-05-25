@@ -32,23 +32,12 @@ public class GroupChatEntity : BaseEntity {
 	public string? Title { get; set; }
 
 	[StringLength(500)]
-	public string? Description { get; set; }
-
-	[StringLength(500)]
-	public string? Value { get; set; }
-
-	[StringLength(500)]
-	public string? Department { get; set; }
-
-	[StringLength(500)]
 	public string? CreatorUserId { get; set; }
-
-	public ChatStatus? ChatStatus { get; set; }
-
+	
 	public ChatType? Type { get; set; }
 
-	public Priority? Priority { get; set; }
-    public bool IsBoosted { get; set; }
+	public GroupChatJsonDetail? GroupChatJsonDetail { get; set; }
+
     public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<UserEntity>? Users { get; set; }
 	public IEnumerable<ProductEntity>? Products { get; set; }
@@ -57,6 +46,15 @@ public class GroupChatEntity : BaseEntity {
 
 	[NotMapped]
 	public int CountOfUnreadMessages { get; set; }
+}
+
+public class GroupChatJsonDetail {
+	public string? Description { get; set; }
+	public string? Value { get; set; }
+	public string? Department { get; set; }
+	public ChatStatus? ChatStatus { get; set; }
+	public Priority? Priority { get; set; }
+	public bool? IsBoosted { get; set; }
 }
 
 [Table("GroupChatMessage")]
