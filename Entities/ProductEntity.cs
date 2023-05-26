@@ -19,8 +19,8 @@ public class ProductEntity : BaseEntity {
 
 	[StringLength(500)]
 	public string? State { get; set; }
-
-	public bool IsBoosted { get; set; }
+	
+	public DateTime Boosted { get; set; }
 	public double? Stock { get; set; }
 	public double? VoteCount { get; set; }
 	public int? DiscountPercent { get; set; }
@@ -150,7 +150,7 @@ public class ProductCreateUpdateDto {
 	public ProductState? ProductState { get; set; }
 	public int? ShippingTime { get; set; }
 	public double? ShippingCost { get; set; }
-	public bool IsBoosted { get; set; }
+	public DateTime Boosted { get; set; }
 	public Guid? ParentId { get; set; }
 
 	[JsonIgnore]
@@ -174,7 +174,6 @@ public class ProductFilterDto {
 	public bool? Enabled { get; set; }
 	public bool? IsFollowing { get; set; }
 	public bool? IsBookmarked { get; set; }
-	public bool? IsMyBoughtList { get; set; }
 	public bool? HasDiscount { get; set; }
 	public bool? ShowMedia { get; set; } = false;
 	public bool? ShowForms { get; set; } = false;
@@ -203,7 +202,7 @@ public class ProductFilterDto {
 	public IEnumerable<string>? UserIds { get; set; }
 	public string? Query { get; set; }
 	public bool ShowExpired { get; set; } = false;
-	public bool IsBoosted { get; set; }
+	public bool Boosted { get; set; }
 }
 
 public class ProductInsightDto {
