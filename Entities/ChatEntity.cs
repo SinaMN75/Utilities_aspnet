@@ -95,14 +95,14 @@ public class GroupChatMessageEntity : BaseEntity {
 
 [Table("SeenUsers")]
 public class SeenUsers : BaseEntity {
-	public Guid? Fk_GroupChat { get; set; }
-	public string? Fk_UserId { get; set; }
-	public Guid? Fk_GroupChatMessage { get; set; }
+	public Guid? FkGroupChat { get; set; }
+	public string? FkUserId { get; set; }
+	public Guid? FkGroupChatMessage { get; set; }
 }
 
 public class ChatReadDto {
 	public Guid? Id { get; set; }
-	public string? UserId { get; set; } = null!;
+	public string? UserId { get; set; }
 	public string? MessageText { get; set; }
 	public DateTime? DateTime { get; set; }
 	public bool? Send { get; set; }
@@ -134,7 +134,6 @@ public class GroupChatFilterDto {
 	public bool? ShowProducts { get; set; }
 	public bool? ShowCategories { get; set; }
 	public bool ShowAhtorized { get; set; }
-
 	public bool? OrderByAtoZ { get; set; } = false;
 	public bool? OrderByZtoA { get; set; } = false;
 	public bool? OrderByCreatedDate { get; set; } = false;

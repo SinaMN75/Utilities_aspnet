@@ -278,13 +278,13 @@ public class ChatRepository : IChatRepository
         foreach (var item in e)
         {
             int countOfMessage = 0;
-            var seenUsers = _dbContext.Set<SeenUsers>().FirstOrDefault(w => w.Fk_GroupChat == item.Id && w.Fk_UserId == _userId);
+            var seenUsers = _dbContext.Set<SeenUsers>().FirstOrDefault(w => w.FkGroupChat == item.Id && w.FkUserId == _userId);
             var groupchatMessages = _dbContext.Set<GroupChatMessageEntity>().Where(w => w.GroupChatId == item.Id);
             if (seenUsers is null)
                 countOfMessage = groupchatMessages.Count();
             else
             {
-                var LastSeenMessage = await groupchatMessages.Where(w => w.Id == seenUsers.Fk_GroupChatMessage).FirstOrDefaultAsync();
+                var LastSeenMessage = await groupchatMessages.Where(w => w.Id == seenUsers.FkGroupChatMessage).FirstOrDefaultAsync();
                 countOfMessage = await groupchatMessages.Where(w => w.CreatedAt > LastSeenMessage.CreatedAt).CountAsync();
             }
             item.CountOfUnreadMessages = countOfMessage;
@@ -373,13 +373,13 @@ public class ChatRepository : IChatRepository
         if (e != null)
         {
             int countOfMessage = 0;
-            var seenUsers = _dbContext.Set<SeenUsers>().FirstOrDefault(w => w.Fk_GroupChat == e.Id && w.Fk_UserId == _userId);
+            var seenUsers = _dbContext.Set<SeenUsers>().FirstOrDefault(w => w.FkGroupChat == e.Id && w.FkUserId == _userId);
             var groupchatMessages = _dbContext.Set<GroupChatMessageEntity>().Where(w => w.GroupChatId == e.Id);
             if (seenUsers is null)
                 countOfMessage = groupchatMessages.Count();
             else
             {
-                var LastSeenMessage = groupchatMessages.Where(w => w.Id == seenUsers.Fk_GroupChatMessage).FirstOrDefault();
+                var LastSeenMessage = groupchatMessages.Where(w => w.Id == seenUsers.FkGroupChatMessage).FirstOrDefault();
                 countOfMessage = groupchatMessages.Where(w => w.CreatedAt > LastSeenMessage.CreatedAt).Count();
             }
             e.CountOfUnreadMessages = countOfMessage;
@@ -412,14 +412,14 @@ public class ChatRepository : IChatRepository
         q = q.Skip((pageNumber - 1) * pageSize).Take(pageSize);
 
         var tempGroupChatsMessage = q.ToList();
-        var messageSeen = _dbContext.Set<SeenUsers>().Where(w => w.Fk_GroupChat == id);
+        var messageSeen = _dbContext.Set<SeenUsers>().Where(w => w.FkGroupChat == id);
         foreach (var item in tempGroupChatsMessage)
         {
             var usersMessage = new List<UserEntity>();
             foreach (var seenTbl in messageSeen)
             {
-                var lastMessageThatUserSeened = q.FirstOrDefault(f => f.Id == seenTbl.Fk_GroupChatMessage);
-                var user = _dbContext.Set<UserEntity>().Where(w => w.Id == seenTbl.Fk_UserId).Include(x => x.Media).FirstOrDefault();
+                var lastMessageThatUserSeened = q.FirstOrDefault(f => f.Id == seenTbl.FkGroupChatMessage);
+                var user = _dbContext.Set<UserEntity>().Where(w => w.Id == seenTbl.FkUserId).Include(x => x.Media).FirstOrDefault();
                 if (user is not null && (lastMessageThatUserSeened?.CreatedAt > item.CreatedAt || lastMessageThatUserSeened?.Id == item.Id))
                     usersMessage.Add(user);
             }
@@ -636,22 +636,22 @@ public class ChatRepository : IChatRepository
         if (groupChat is null)
             return new GenericResponse(UtilitiesStatusCodes.NotFound, "GroupChate Not Found!");
 
-        var seenUsers = await _dbContext.Set<SeenUsers>().Where(w => w.Fk_GroupChat == groupChat.Id && w.Fk_UserId == _userId).FirstOrDefaultAsync();
+        var seenUsers = await _dbContext.Set<SeenUsers>().Where(w => w.FkGroupChat == groupChat.Id && w.FkUserId == _userId).FirstOrDefaultAsync();
 
         if (seenUsers is null)
             await _dbContext.Set<SeenUsers>().AddAsync(new SeenUsers
             {
                 CreatedAt = DateTime.Now,
-                Fk_GroupChat = groupChat.Id,
-                Fk_UserId = _userId,
-                Fk_GroupChatMessage = messageId
+                FkGroupChat = groupChat.Id,
+                FkUserId = _userId,
+                FkGroupChatMessage = messageId
             });
         else
         {
-            var lastMessageSeen = await _dbContext.Set<GroupChatMessageEntity>().FirstOrDefaultAsync(f => f.Id == seenUsers.Fk_GroupChatMessage);
-            if (lastMessageSeen?.CreatedAt > groupMessageChat.CreatedAt || seenUsers.Fk_GroupChatMessage == messageId) return new GenericResponse();
+            var lastMessageSeen = await _dbContext.Set<GroupChatMessageEntity>().FirstOrDefaultAsync(f => f.Id == seenUsers.FkGroupChatMessage);
+            if (lastMessageSeen?.CreatedAt > groupMessageChat.CreatedAt || seenUsers.FkGroupChatMessage == messageId) return new GenericResponse();
 
-            seenUsers.Fk_GroupChatMessage = messageId;
+            seenUsers.FkGroupChatMessage = messageId;
             _dbContext.Update(seenUsers);
         }
 

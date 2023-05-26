@@ -12,8 +12,8 @@ public class WithdrawEntity : BaseEntity {
 }
 
 public class WalletWithdrawalDto {
-	public string ShebaNumber { get; set; }
-	public double Amount { get; set; }
+	public required string ShebaNumber { get; set; }
+	public required double Amount { get; set; }
 }
 
 public class WithdrawalFilterDto {
