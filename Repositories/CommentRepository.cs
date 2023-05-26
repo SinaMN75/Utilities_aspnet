@@ -35,8 +35,8 @@ public class CommentRepository : ICommentRepository {
 			.Include(x => x.Media)
 			.Where(x => x.ProductId == id && x.ParentId == null && x.DeletedAt == null)
 			.Include(x => x.User).ThenInclude(x => x!.Media)
-			.Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Media.Where(x => x.DeletedAt == null)).Where(x => x.DeletedAt == null)
-			.Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.User).ThenInclude(x => x.Media.Where(x => x.DeletedAt == null))
+			.Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Media).Where(x => x.DeletedAt == null)
+			.Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.User).ThenInclude(x => x.Media)
 			.Where(x => x.DeletedAt == null)
 			.OrderByDescending(x => x.CreatedAt).AsNoTracking();
 		return new GenericResponse<IQueryable<CommentEntity>?>(comment);
