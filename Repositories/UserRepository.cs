@@ -74,22 +74,15 @@ public class UserRepository : IUserRepository {
 
 		if (dto.UserNameExact != null) q = q.Where(x => x.AppUserName == dto.UserNameExact || x.UserName == dto.UserNameExact);
 		if (dto.UserId != null) q = q.Where(x => x.Id == dto.UserId);
-		if (dto.Activity != null) q = q.Where(x => x.UserJsonDetail.Activity.Contains(dto.Activity));
 		if (dto.Badge != null) q = q.Where(x => x.Badge.Contains(dto.Badge));
 		if (dto.Bio != null) q = q.Where(x => x.Bio.Contains(dto.Bio));
-		if (dto.Color != null) q = q.Where(x => x.UserJsonDetail.Color.Contains(dto.Color));
-		if (dto.Dribble != null) q = q.Where(x => x.UserJsonDetail.Dribble.Contains(dto.Dribble));
 		if (dto.Email != null) q = q.Where(x => x.Email.Contains(dto.Email));
-		if (dto.Gender != null) q = q.Where(x => x.UserJsonDetail.Gender == dto.Gender);
+		if (dto.Gender != null) q = q.Where(x => x.Gender == dto.Gender);
 		if (dto.Headline != null) q = q.Where(x => x.Headline.Contains(dto.Headline));
-		if (dto.Instagram != null) q = q.Where(x => x.UserJsonDetail.Instagram.Contains(dto.Instagram));
-		if (dto.Pinterest != null) q = q.Where(x => x.UserJsonDetail.Pinterest.Contains(dto.Pinterest));
-		if (dto.Region != null) q = q.Where(x => x.UserJsonDetail.Region.Contains(dto.Region));
-		if (dto.State != null) q = q.Where(x => x.UserJsonDetail.State.Contains(dto.State));
-		if (dto.Telegram != null) q = q.Where(x => x.UserJsonDetail.Telegram.Contains(dto.Telegram));
+		if (dto.Region != null) q = q.Where(x => x.Region.Contains(dto.Region));
+		if (dto.State != null) q = q.Where(x => x.State.Contains(dto.State));
 		if (dto.Type != null) q = q.Where(x => x.Type.Contains(dto.Type));
-		if (dto.Website != null) q = q.Where(x => x.UserJsonDetail.Website.Contains(dto.Website));
-		if (dto.AccessLevel != null) q = q.Where(x => x.UserJsonDetail.AccessLevel.Contains(dto.AccessLevel));
+		if (dto.AccessLevel != null) q = q.Where(x => x.AccessLevel.Contains(dto.AccessLevel));
 		if (dto.AppEmail != null) q = q.Where(x => x.AppEmail.Contains(dto.AppEmail));
 		if (dto.FirstName != null) q = q.Where(x => x.FirstName.Contains(dto.FirstName));
 		if (dto.LastName != null) q = q.Where(x => x.LastName.Contains(dto.LastName));
@@ -98,9 +91,6 @@ public class UserRepository : IUserRepository {
 		if (dto.PhoneNumber != null) q = q.Where(x => x.PhoneNumber.Contains(dto.PhoneNumber));
 		if (dto.AppUserName != null) q = q.Where(x => x.AppUserName.Contains(dto.AppUserName));
 		if (dto.AppPhoneNumber != null) q = q.Where(x => x.AppPhoneNumber.Contains(dto.AppPhoneNumber));
-		if (dto.WhatsApp != null) q = q.Where(x => x.UserJsonDetail.WhatsApp.Contains(dto.WhatsApp));
-		if (dto.LinkedIn != null) q = q.Where(x => x.UserJsonDetail.LinkedIn.Contains(dto.LinkedIn));
-		if (dto.SoundCloud != null) q = q.Where(x => x.UserJsonDetail.SoundCloud.Contains(dto.SoundCloud));
 
 		if (dto.Query != null)
 			q = q.Where(x => x.FirstName.Contains(dto.Query) ||
@@ -348,14 +338,14 @@ public class UserRepository : IUserRepository {
 		entity.UserJsonDetail.Dribble = dto.Dribble ?? entity.UserJsonDetail.Dribble;
 		entity.UserJsonDetail.SoundCloud = dto.SoundCloud ?? entity.UserJsonDetail.SoundCloud;
 		entity.UserJsonDetail.Pinterest = dto.Pinterest ?? entity.UserJsonDetail.Pinterest;
-		entity.UserJsonDetail.Region = dto.Region ?? entity.UserJsonDetail.Region;
+		entity.Region = dto.Region ?? entity.Region;
 		entity.UserJsonDetail.Activity = dto.Activity ?? entity.UserJsonDetail.Activity;
 		entity.Suspend = dto.Suspend ?? entity.Suspend;
 		entity.Headline = dto.Headline ?? entity.Headline;
 		entity.AppPhoneNumber = dto.AppPhoneNumber ?? entity.AppPhoneNumber;
 		entity.Birthdate = dto.BirthDate ?? entity.Birthdate;
 		entity.Wallet = dto.Wallet ?? entity.Wallet;
-		entity.UserJsonDetail.Gender = dto.Gender ?? entity.UserJsonDetail.Gender;
+		entity.Gender = dto.Gender ?? entity.Gender;
 		entity.UseCase = dto.UseCase ?? entity.UseCase;
 		entity.UserName = dto.UserName ?? entity.UserName;
 		entity.Email = dto.Email ?? entity.Email;
@@ -363,10 +353,10 @@ public class UserRepository : IUserRepository {
 		entity.UserJsonDetail.Color = dto.Color ?? entity.UserJsonDetail.Color;
 		entity.UserJsonDetail.Website = dto.Website ?? entity.UserJsonDetail.Website;
 		entity.UserJsonDetail.ShowContactInfo = dto.ShowContactInfo ?? entity.UserJsonDetail.ShowContactInfo;
-		entity.UserJsonDetail.State = dto.State ?? entity.UserJsonDetail.State;
+		entity.State = dto.State ?? entity.State;
 		entity.Type = dto.Type ?? entity.Type;
 		entity.Point = dto.Point ?? entity.Point;
-		entity.UserJsonDetail.AccessLevel = dto.AccessLevel ?? entity.UserJsonDetail.AccessLevel;
+		entity.AccessLevel = dto.AccessLevel ?? entity.AccessLevel;
 		entity.VisitedProducts = dto.VisitedProducts ?? entity.VisitedProducts;
 		entity.BookmarkedProducts = dto.BookmarkedProducts ?? entity.BookmarkedProducts;
 		entity.FollowingUsers = dto.FollowingUsers ?? entity.FollowingUsers;

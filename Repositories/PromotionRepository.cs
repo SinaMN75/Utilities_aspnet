@@ -83,7 +83,7 @@ namespace Utilities_aspnet.Repositories
             double userPerHour = (users.Count() / hoursPassed) * 100;
             
             List<StatePerUser> statePerUsers = users
-                .GroupBy(u => u.UserJsonDetail.State)
+                .GroupBy(u => u.State)
                 .Select(g => new StatePerUser { State = g.Key, UserCount = g.Count() })
                 .ToList();
 

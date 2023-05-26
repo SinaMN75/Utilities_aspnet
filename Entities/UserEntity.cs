@@ -32,6 +32,18 @@ public class UserEntity : IdentityUser {
 
 	[StringLength(500)]
 	public string? Type { get; set; }
+	
+	[StringLength(500)]
+	public string? AccessLevel { get; set; }
+	
+	[StringLength(500)]
+	
+	public string? Region { get; set; }
+	
+	[StringLength(500)]
+	public string? State { get; set; }
+	
+	public GenderType? Gender { get; set; }
 
 	public double? Wallet { get; set; } = 0;
 	public double? Point { get; set; } = 0;
@@ -177,11 +189,7 @@ public class UserJsonDetail {
 	public string? Website { get; set; }
 	public string? Activity { get; set; }
 	public string? Color { get; set; }
-	public string? AccessLevel { get; set; }
-	public GenderType? Gender { get; set; }
 	public bool? ShowContactInfo { get; set; }
-	public string? Region { get; set; }
-	public string? State { get; set; }
 	public bool? IsPrivate { get; set; }
 	public string? MeliCode { get; set; }
 	public string? ShebaNumber { get; set; }
@@ -296,7 +304,6 @@ public class UserCreateUpdateDto {
 public class UserFilterDto {
 	public string? UserId { get; set; }
 	public string? UserName { get; set; }
-
 	public string? UserNameExact { get; set; }
 	public string? Query { get; set; }
 	public string? PhoneNumber { get; set; }
@@ -306,29 +313,18 @@ public class UserFilterDto {
 	public string? FullName { get; set; }
 	public string? Bio { get; set; }
 	public string? Headline { get; set; }
-	public string? Website { get; set; }
 	public string? AppUserName { get; set; }
 	public string? AppPhoneNumber { get; set; }
 	public string? AppEmail { get; set; }
-	public string? Instagram { get; set; }
-	public string? Telegram { get; set; }
-	public string? WhatsApp { get; set; }
-	public string? LinkedIn { get; set; }
-	public string? Dribble { get; set; }
-	public string? SoundCloud { get; set; }
-	public string? Pinterest { get; set; }
 	public GenderType? Gender { get; set; } = null!;
 	public string? UseCase { get; set; }
 	public string? Type { get; set; }
 	public string? Region { get; set; }
-	public string? Activity { get; set; }
-	public string? Color { get; set; }
 	public string? State { get; set; }
 	public string? AccessLevel { get; set; }
 	public string? Badge { get; set; }
 	public int PageSize { get; set; } = 100;
 	public int PageNumber { get; set; } = 1;
-
 	public bool? ShowMedia { get; set; }
 	public bool? ShowCategories { get; set; }
 	public bool? ShowSuspend { get; set; }

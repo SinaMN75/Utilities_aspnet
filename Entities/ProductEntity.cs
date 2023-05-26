@@ -17,6 +17,9 @@ public class ProductEntity : BaseEntity {
 	[StringLength(500)]
 	public string? Type { get; set; }
 	
+	[StringLength(500)]
+	public string? State { get; set; }
+
 	public bool IsBoosted { get; set; }
 	public double? Stock { get; set; }
 	public double? VoteCount { get; set; }
@@ -80,7 +83,6 @@ public class ProductJsonDetail {
 	public string? Website { get; set; }
 	public string? Email { get; set; }
 	public string? Unit { get; set; }
-	public string? State { get; set; }
 	public double? Latitude { get; set; }
 	public double? ResponseTime { get; set; }
 	public double? OnTimeDelivery { get; set; }
@@ -94,7 +96,6 @@ public class ProductJsonDetail {
 	public double? MaxPrice { get; set; }
 	public double? MinPrice { get; set; }
 	public double? ShippingCost { get; set; }
-	public bool IsPhysical { get; set; }
 	public int? ShippingTime { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
@@ -136,12 +137,6 @@ public class ProductCreateUpdateDto {
 	public string? Unit { get; set; }
 	public string? UseCase { get; set; }
 	public string? State { get; set; }
-	public string? StateTr1 { get; set; }
-	public string? StateTr2 { get; set; }
-	public string? KeyValues1 { get; set; }
-	public string? KeyValues2 { get; set; }
-	public string? RelatedIds { get; set; }
-	public string? JsonDetail { get; set; }
 	public double? Latitude { get; set; }
 	public double? Longitude { get; set; }
 	public double? Price { get; set; }
@@ -163,7 +158,6 @@ public class ProductCreateUpdateDto {
 	public int? VisitsCount { get; set; }
 	public int? VisitsCountPlus { get; set; }
 	public bool? Enabled { get; set; }
-	public bool? IsForSale { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
 	public DateTime? DeletedAt { get; set; }
@@ -187,31 +181,11 @@ public class ProductFilterDto {
 	public string? Title { get; set; }
 	public string? Subtitle { get; set; }
 	public string? Description { get; set; }
-	public string? Details { get; set; }
-	public string? Address { get; set; }
-	public string? Author { get; set; }
-	public string? PhoneNumber { get; set; }
-	public string? Email { get; set; }
 	public string? Type { get; set; }
-	public string? Unit { get; set; }
 	public string? UseCase { get; set; }
 	public string? State { get; set; }
-	public string? StateTr1 { get; set; }
-	public string? StateTr2 { get; set; }
-	public string? KeyValues1 { get; set; }
-	public string? KeyValues2 { get; set; }
-	public double? Length { get; set; }
-	public double? Width { get; set; }
-	public double? Height { get; set; }
-	public double? Weight { get; set; }
-	public double? MinOrder { get; set; }
-	public double? MaxOrder { get; set; }
-	public double? MaxPrice { get; set; }
-	public double? MinPrice { get; set; }
 	public double? StartPriceRange { get; set; }
 	public double? EndPriceRange { get; set; }
-	public double? ResponseTime { get; set; }
-	public double? OnTimeDelivery { get; set; }
 	public bool? Enabled { get; set; }
 	public bool? IsFollowing { get; set; }
 	public bool? IsBookmarked { get; set; }
@@ -240,11 +214,8 @@ public class ProductFilterDto {
 	public bool? OrderByCategory { get; set; }
 	public bool? HasComment { get; set; } = false;
 	public bool? HasOrder { get; set; } = false;
-	public int? VisitsCount { get; set; }
 	public int PageSize { get; set; } = 100;
 	public int PageNumber { get; set; } = 1;
-	public DateTime? StartDate { get; set; }
-	public DateTime? EndDate { get; set; }
 	public ProductStatus? Status { get; set; }
 	public Currency? Currency { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
@@ -260,6 +231,6 @@ public class ProductInsightDto {
 }
 
 public class SimpleSellDto {
-	public string BuyerUserId { get; set; }
+	public string? BuyerUserId { get; set; }
 	public Guid ProductId { get; set; }
 }
