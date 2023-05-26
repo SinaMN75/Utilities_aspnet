@@ -82,14 +82,20 @@ public static class CategoryEntityExtension {
 		entity.Title = dto.Title ?? entity.Title;
 		entity.TitleTr1 = dto.TitleTr1 ?? entity.TitleTr1;
 		entity.TitleTr2 = dto.TitleTr2 ?? entity.TitleTr2;
+		entity.CategoryJsonDetail.Subtitle = dto.Subtitle ?? entity.CategoryJsonDetail.Subtitle;
+		entity.CategoryJsonDetail.Link = dto.Link ?? entity.CategoryJsonDetail.Link;
 		entity.Type = dto.Type ?? entity.Type;
+		entity.CategoryJsonDetail.Latitude = dto.Latitude ?? entity.CategoryJsonDetail.Latitude;
+		entity.CategoryJsonDetail.Longitude = dto.Longitude ?? entity.CategoryJsonDetail.Longitude;
 		entity.UseCase = dto.UseCase ?? entity.UseCase;
 		entity.Price = dto.Price ?? entity.Price;
 		entity.UpdatedAt = DateTime.Now;
+		entity.CategoryJsonDetail.Date1 = dto.Date1 ?? entity.CategoryJsonDetail.Date1;
+		entity.CategoryJsonDetail.Date2 = dto.Date2 ?? entity.CategoryJsonDetail.Date2;
 		entity.Color = dto.Color ?? entity.Color;
+		entity.CategoryJsonDetail.Value = dto.Value ?? entity.CategoryJsonDetail.Value;
 		entity.Order = dto.Order ?? entity.Order;
 		entity.Stock = dto.Stock ?? entity.Stock;
-		entity.CategoryJsonDetail = dto.CategoryJsonDetail ?? entity.CategoryJsonDetail;
 		entity.ParentId = dto.ParentId ?? entity.ParentId;
 		return entity;
 	}

@@ -24,7 +24,7 @@ public class CategoryEntity : BaseEntity {
 	public int? Stock { get; set; }
 	public int? Order { get; set; }
 
-	public CategoryJsonDetail? CategoryJsonDetail { get; set; }
+	public CategoryJsonDetail CategoryJsonDetail { get; set; } = new();
 
 	public Guid? ParentId { get; set; }
 	public CategoryEntity? Parent { get; set; }
@@ -52,7 +52,6 @@ public class CategoryEntity : BaseEntity {
 
 public class CategoryJsonDetail {
 	public string? Subtitle { get; set; }
-	public string? Color { get; set; }
 	public string? Link { get; set; }
 	public double? Latitude { get; set; }
 	public double? Longitude { get; set; }
@@ -66,15 +65,21 @@ public class CategoryCreateUpdateDto {
 	public string? Title { get; set; }
 	public string? TitleTr1 { get; set; }
 	public string? TitleTr2 { get; set; }
+	public string? Subtitle { get; set; }
 	public string? Color { get; set; }
+	public string? Link { get; set; }
 	public string? UseCase { get; set; }
 	public string? Type { get; set; }
+	public double? Latitude { get; set; }
+	public double? Longitude { get; set; }
 	public double? Price { get; set; }
+	public double? Value { get; set; }
 	public int? Stock { get; set; }
-	public int? Order { get; set; }
+	public int? Order{ get; set; }
+	public DateTime? Date1 { get; set; }
+	public DateTime? Date2 { get; set; }
 	public Guid? ParentId { get; set; }
 	public bool IsUnique { get; set; } = true;
-	public CategoryJsonDetail? CategoryJsonDetail { get; set; }
 }
 
 public class CategoryFilterDto {
