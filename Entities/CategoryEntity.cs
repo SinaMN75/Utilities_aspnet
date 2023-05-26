@@ -94,6 +94,7 @@ public class CategoryFilterDto {
 	public string? UseCase { get; set; }
 	public string? Type { get; set; }
 	public Guid? ParentId { get; set; }
+	public bool? ShowMedia { get; set; }
 	public bool? OrderByOrder { get; set; }
 	public bool? OrderByOrderDecending { get; set; }
 	public bool? OrderByCreatedAt { get; set; }
