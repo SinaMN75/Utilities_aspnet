@@ -23,9 +23,9 @@ public class OrderEntity : BaseEntity {
 	public PayType? PayType { get; set; }
 	public DateTime? PayDateTime { get; set; }
 	public DateTime? ReceivedDate { get; set; }
-    public AddressEntity? Address { get; set; }
-    public Guid? AddressId { get; set; }
-    public UserEntity? User { get; set; }
+	public AddressEntity? Address { get; set; }
+	public Guid? AddressId { get; set; }
+	public UserEntity? User { get; set; }
 
 	[ForeignKey(nameof(User))]
 	public string? UserId { get; set; }
@@ -67,8 +67,8 @@ public class OrderCreateUpdateDto {
 	public double? DiscountPrice { get; set; }
 	public double? SendPrice { get; set; }
 	public DateTime? ReceivedDate { get; set; }
-    public Guid? AddressId { get; set; }
-    public OrderStatuses? Status { get; set; } = OrderStatuses.Pending;
+	public Guid? AddressId { get; set; }
+	public OrderStatuses? Status { get; set; } = OrderStatuses.Pending;
 	public PayType? PayType { get; set; } = Utilities.PayType.Online;
 	public SendType? SendType { get; set; } = Utilities.SendType.Custom;
 	public IEnumerable<OrderDetailCreateUpdateDto>? OrderDetails { get; set; }

@@ -7,7 +7,8 @@ public class BaseEntity {
 
 	public DateTime? CreatedAt { get; set; }
 	public DateTime? UpdatedAt { get; set; }
-	
+
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public DateTime? DeletedAt { get; set; }
 }

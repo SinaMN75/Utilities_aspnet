@@ -32,17 +32,17 @@ public class UserEntity : IdentityUser {
 
 	[StringLength(500)]
 	public string? Type { get; set; }
-	
+
 	[StringLength(500)]
 	public string? AccessLevel { get; set; }
-	
+
 	[StringLength(500)]
-	
+
 	public string? Region { get; set; }
-	
+
 	[StringLength(500)]
 	public string? State { get; set; }
-	
+
 	public GenderType? Gender { get; set; }
 
 	public double? Wallet { get; set; } = 0;

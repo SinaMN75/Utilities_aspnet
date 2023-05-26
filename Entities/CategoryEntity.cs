@@ -35,18 +35,23 @@ public class CategoryEntity : BaseEntity {
 	public IEnumerable<MediaEntity>? Media { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public IEnumerable<UserEntity>? Users { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public IEnumerable<ProductEntity>? Products { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public IEnumerable<FormEntity>? FormFields { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public IEnumerable<OrderDetailEntity>? OrderDetails { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
 }
 
@@ -75,7 +80,7 @@ public class CategoryCreateUpdateDto {
 	public double? Price { get; set; }
 	public double? Value { get; set; }
 	public int? Stock { get; set; }
-	public int? Order{ get; set; }
+	public int? Order { get; set; }
 	public DateTime? Date1 { get; set; }
 	public DateTime? Date2 { get; set; }
 	public Guid? ParentId { get; set; }

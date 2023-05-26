@@ -13,10 +13,10 @@ public class ProductEntity : BaseEntity {
 
 	[StringLength(500)]
 	public string? UseCase { get; set; }
-	
+
 	[StringLength(500)]
 	public string? Type { get; set; }
-	
+
 	[StringLength(500)]
 	public string? State { get; set; }
 
@@ -28,7 +28,7 @@ public class ProductEntity : BaseEntity {
 	public bool? Enabled { get; set; }
 	public double? DiscountPrice { get; set; }
 	public double? Price { get; set; }
-	
+
 	public Currency? Currency { get; set; }
 	public ProductStatus? Status { get; set; }
 	public AgeCategory? AgeCategory { get; set; }
@@ -45,29 +45,35 @@ public class ProductEntity : BaseEntity {
 	public UserEntity? User { get; set; }
 
 	public ProductJsonDetail ProductJsonDetail { get; set; } = new();
-	
+
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<FormEntity>? Forms { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
 	public IEnumerable<ProductInsight>? ProductInsights { get; set; }
 	public IEnumerable<VisitProducts>? VisitProducts { get; set; }
-	
+
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public IEnumerable<CommentEntity>? Comments { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public IEnumerable<ReportEntity>? Reports { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public IEnumerable<BookmarkEntity>? Bookmarks { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public IEnumerable<OrderDetailEntity>? OrderDetails { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public IEnumerable<GroupChatEntity>? GroupChat { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public IEnumerable<ChatEntity>? Chats { get; set; }
 
 	[NotMapped]
@@ -168,7 +174,6 @@ public class ProductCreateUpdateDto {
 	public ProductState? ProductState { get; set; }
 	public int? ShippingTime { get; set; }
 	public double? ShippingCost { get; set; }
-	public bool IsPhysical { get; set; }
 	public bool IsBoosted { get; set; }
 	public Guid? ParentId { get; set; }
 	public ProductInsightDto? ProductInsight { get; set; }
