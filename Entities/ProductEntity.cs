@@ -52,26 +52,6 @@ public class ProductEntity : BaseEntity {
 	public IEnumerable<ProductInsight>? ProductInsights { get; set; }
 	public IEnumerable<VisitProducts>? VisitProducts { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public IEnumerable<ReportEntity>? Reports { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public IEnumerable<BookmarkEntity>? Bookmarks { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public IEnumerable<OrderDetailEntity>? OrderDetails { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public IEnumerable<GroupChatEntity>? GroupChat { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public IEnumerable<ChatEntity>? Chats { get; set; }
-
 	[NotMapped]
 	public string? SuccessfulPurchase { get; set; }
 }
@@ -202,8 +182,6 @@ public class ProductFilterDto {
 	public bool? ShowCategories { get; set; } = false;
 	public bool? ShowCategoriesFormFields { get; set; } = false;
 	public bool? ShowVisitProducts { get; set; } = false;
-	public bool? ShowComments { get; set; } = false;
-	public bool? ShowOrders { get; set; } = false;
 	public bool? ShowCreator { get; set; } = false;
 	public bool? ShowCategoryMedia { get; set; } = false;
 	public bool? OrderByVotes { get; set; } = false;
@@ -217,8 +195,6 @@ public class ProductFilterDto {
 	public bool? OrderByMostUsedHashtag { get; set; }
 	public bool? OrderByAgeCategory { get; set; }
 	public bool? OrderByCategory { get; set; }
-	public bool? HasComment { get; set; } = false;
-	public bool? HasOrder { get; set; } = false;
 	public int PageSize { get; set; } = 100;
 	public int PageNumber { get; set; } = 1;
 	public ProductStatus? Status { get; set; }

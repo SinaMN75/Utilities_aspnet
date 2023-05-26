@@ -70,7 +70,7 @@ public class UserRepository : IUserRepository {
 	}
 
 	public GenericResponse<IQueryable<UserEntity>> Filter(UserFilterDto dto) {
-		IQueryable<UserEntity> q = _dbContext.Set<UserEntity>().Where(x => x.DeletedAt == null);
+		IQueryable<UserEntity> q = _dbContext.Set<UserEntity>();
 
 		if (dto.UserNameExact != null) q = q.Where(x => x.AppUserName == dto.UserNameExact || x.UserName == dto.UserNameExact);
 		if (dto.UserId != null) q = q.Where(x => x.Id == dto.UserId);
@@ -163,7 +163,6 @@ public class UserRepository : IUserRepository {
 		if (!result)
 			return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.BadRequest, "The password is incorrect!");
 
-		user.IsLoggedIn = true;
 		await _dbContext.SaveChangesAsync();
 		JwtSecurityToken token = await CreateToken(user);
 
@@ -189,7 +188,6 @@ public class UserRepository : IUserRepository {
 			Suspend = false,
 			FirstName = dto.FirstName,
 			LastName = dto.LastName,
-			IsLoggedIn = true,
 			UserJsonDetail = dto.UserJsonDetail,
 		};
 
@@ -255,7 +253,6 @@ public class UserRepository : IUserRepository {
 		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.UserNotFound);
 		if (user.Suspend) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.UserSuspended);
 
-		user.IsLoggedIn = true;
 		await _dbContext.SaveChangesAsync();
 		JwtSecurityToken token = await CreateToken(user);
 
@@ -361,11 +358,9 @@ public class UserRepository : IUserRepository {
 		entity.BookmarkedProducts = dto.BookmarkedProducts ?? entity.BookmarkedProducts;
 		entity.FollowingUsers = dto.FollowingUsers ?? entity.FollowingUsers;
 		entity.FollowedUsers = dto.FollowedUsers ?? entity.FollowedUsers;
-		entity.BoughtProduts = dto.BoughtProduts ?? entity.BoughtProduts;
 		entity.BlockedUsers = dto.BlockedUsers ?? entity.BlockedUsers;
 		entity.Badge = dto.Badge ?? entity.Badge;
 		entity.UpdatedAt = DateTime.Now;
-		entity.IsLoggedIn = dto.IsLoggedIn ?? entity.IsLoggedIn;
 		entity.IsOnline = dto.IsOnline ?? entity.IsOnline;
 		entity.UserJsonDetail.IsPrivate = dto.IsPrivate ?? entity.UserJsonDetail.IsPrivate;
 		entity.ExpireUpgradeAccount = dto.ExpireUpgradeAccount ?? entity.ExpireUpgradeAccount;

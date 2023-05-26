@@ -11,7 +11,6 @@ public interface IProductRepository
     Task<GenericResponse<ProductEntity?>> ReadById(Guid id, CancellationToken ct);
     Task<GenericResponse<ProductEntity>> Update(ProductCreateUpdateDto dto, CancellationToken ct);
     Task<GenericResponse> Delete(Guid id, CancellationToken ct);
-    Task<GenericResponse> SimpleSell(SimpleSellDto dto);
     Task<GenericResponse> CreateReaction(ReactionCreateUpdateDto dto);
     GenericResponse<IQueryable<ReactionEntity>> ReadReactionsById(Guid id);
 }
@@ -106,7 +105,6 @@ public class ProductRepository : IProductRepository
         if (dto.State.IsNotNullOrEmpty()) q = q.Where(x => x.State == dto.State);
         if (dto.StartPriceRange.HasValue) q = q.Where(x => x.Price >= dto.StartPriceRange);
         if (dto.Currency.HasValue) q = q.Where(x => x.Currency == dto.Currency);
-        if (dto.HasOrder.IsTrue()) q = q.Where(x => x.OrderDetails.Any());
         if (dto.HasDiscount.IsTrue()) q = q.Where(x => x.DiscountPercent != null || x.DiscountPrice != null);
         if (dto.EndPriceRange.HasValue) q = q.Where(x => x.Price <= dto.EndPriceRange);
         if (dto.Enabled.HasValue) q = q.Where(x => x.Enabled == dto.Enabled);
@@ -120,7 +118,6 @@ public class ProductRepository : IProductRepository
         if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories);
         if (dto.ShowCategoriesFormFields.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.FormFields);
         if (dto.ShowCategoryMedia.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.Media);
-        if (dto.ShowOrders.IsTrue()) q = q.Include(i => i.OrderDetails);
         if (dto.ShowForms.IsTrue()) q = q.Include(i => i.Forms);
         if (dto.ShowFormFields.IsTrue()) q = q.Include(i => i.Forms)!.ThenInclude(i => i.FormField);
         if (dto.ShowMedia.IsTrue()) q = q.Include(i => i.Media);
@@ -151,7 +148,6 @@ public class ProductRepository : IProductRepository
             UserEntity user = (await _userRepository.ReadByIdMinimal(_userId))!;
             if (dto.IsFollowing.IsTrue()) q = q.Where(i => user.FollowingUsers.Contains(i.UserId!));
             if (dto.IsBookmarked.IsTrue()) q = q.Where(i => user.BookmarkedProducts.Contains(i.Id.ToString()));
-            if (dto.IsMyBoughtList.IsTrue()) q = q.Where(i => user.BoughtProduts.Contains(i.Id.ToString()));
         }
 
         if (dto.IsBoosted) q = q.OrderBy(o => o.IsBoosted);
@@ -172,7 +168,6 @@ public class ProductRepository : IProductRepository
         ProductEntity? i = await _dbContext.Set<ProductEntity>()
             .Include(i => i.Media)
             .Include(i => i.Categories)!.ThenInclude(x => x.Media)
-            .Include(i => i.Reports)
             .Include(i => i.User).ThenInclude(x => x.Media)
             .Include(i => i.User).ThenInclude(x => x.Categories)
             .Include(i => i.Forms)!.ThenInclude(x => x.FormField)
@@ -263,20 +258,6 @@ public class ProductRepository : IProductRepository
             return new GenericResponse(message: "Deleted");
         }
         return new GenericResponse(UtilitiesStatusCodes.NotFound, "Notfound");
-    }
-
-    public async Task<GenericResponse> SimpleSell(SimpleSellDto dto)
-    {
-        UserEntity buyer = (await _userRepository.ReadByIdMinimal(dto.BuyerUserId))!;
-        if (!buyer.BoughtProduts.Contains(dto.ProductId.ToString()))
-        {
-            await _userRepository.Update(new UserCreateUpdateDto
-            {
-                Id = dto.BuyerUserId,
-                BoughtProduts = buyer.BoughtProduts + "," + dto.ProductId
-            });
-        }
-        return new GenericResponse();
     }
 
     public async Task<GenericResponse> CreateReaction(ReactionCreateUpdateDto dto)

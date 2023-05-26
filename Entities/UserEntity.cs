@@ -68,22 +68,6 @@ public class UserEntity : IdentityUser {
 
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
-	public IEnumerable<ProductEntity>? Products { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public IEnumerable<TransactionEntity>? Transactions { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public IEnumerable<AddressEntity>? Addresses { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
 	public string VisitedProducts { get; set; } = "";
 
 	[System.Text.Json.Serialization.JsonIgnore]
@@ -101,18 +85,6 @@ public class UserEntity : IdentityUser {
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
 	public string BlockedUsers { get; set; } = "";
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public string BoughtProduts { get; set; } = "";
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public bool IsLoggedIn { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public DateTime? DeletedAt { get; set; }
 
 	[NotMapped]
 	public bool IsFollowing { get; set; }
