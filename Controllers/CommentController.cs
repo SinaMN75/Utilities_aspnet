@@ -21,12 +21,7 @@ public class CommentController : BaseApiController {
 
 	[HttpPost("Filter")]
 	public ActionResult<GenericResponse<CommentEntity>> Filter(CommentFilterDto dto) => Result(_repository.Filter(dto));
-
-	[HttpPost("ToggleLikeComment/{commentId:guid}")]
-	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse<CommentEntity?>>> ToggleLikeComment(Guid commentId)
-		=> Result(await _repository.ToggleLikeComment(commentId));
-
+	
 	[HttpPost("AddReactionToComment/{commentId:guid}/{reaction}")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	public async Task<ActionResult<GenericResponse>> AddReactionToComment(Guid commentId, Reaction reaction)

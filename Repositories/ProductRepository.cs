@@ -106,7 +106,6 @@ public class ProductRepository : IProductRepository
         if (dto.State.IsNotNullOrEmpty()) q = q.Where(x => x.State == dto.State);
         if (dto.StartPriceRange.HasValue) q = q.Where(x => x.Price >= dto.StartPriceRange);
         if (dto.Currency.HasValue) q = q.Where(x => x.Currency == dto.Currency);
-        if (dto.HasComment.IsTrue()) q = q.Where(x => x.Comments.Any());
         if (dto.HasOrder.IsTrue()) q = q.Where(x => x.OrderDetails.Any());
         if (dto.HasDiscount.IsTrue()) q = q.Where(x => x.DiscountPercent != null || x.DiscountPrice != null);
         if (dto.EndPriceRange.HasValue) q = q.Where(x => x.Price <= dto.EndPriceRange);
@@ -121,7 +120,6 @@ public class ProductRepository : IProductRepository
         if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories);
         if (dto.ShowCategoriesFormFields.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.FormFields);
         if (dto.ShowCategoryMedia.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.Media);
-        if (dto.ShowComments.IsTrue()) q = q.Include(i => i.Comments)!.ThenInclude(i => i.LikeComments);
         if (dto.ShowOrders.IsTrue()) q = q.Include(i => i.OrderDetails);
         if (dto.ShowForms.IsTrue()) q = q.Include(i => i.Forms);
         if (dto.ShowFormFields.IsTrue()) q = q.Include(i => i.Forms)!.ThenInclude(i => i.FormField);
@@ -147,19 +145,6 @@ public class ProductRepository : IProductRepository
             q = q.Include(i => i.User).ThenInclude(x => x!.Media);
             q = q.Include(i => i.User).ThenInclude(x => x!.Categories);
         }
-
-        //ToCheck : in query besyar query sanginiye va momkene moshkel saz beshe ba in structure i ke darim
-        //     if (!dto.ShowBlockedUsers.IsTrue())
-        //     {
-        //		   var list = q.ToList();
-        //		   var tempList = q.ToList();
-        //         foreach (var product in list)
-        //         {
-        //             var blockedState = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == product.UserId), _dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == _userId));
-        //             if (blockedState.Item1) tempList.Remove(product);
-        //         }
-        //         q = tempList.AsQueryable();
-        //     }
 
         if (_userId.IsNotNullOrEmpty())
         {
@@ -188,7 +173,6 @@ public class ProductRepository : IProductRepository
             .Include(i => i.Media)
             .Include(i => i.Categories)!.ThenInclude(x => x.Media)
             .Include(i => i.Reports)
-            .Include(i => i.Comments)!.ThenInclude(x => x.LikeComments)
             .Include(i => i.User).ThenInclude(x => x.Media)
             .Include(i => i.User).ThenInclude(x => x.Categories)
             .Include(i => i.Forms)!.ThenInclude(x => x.FormField)
@@ -238,9 +222,7 @@ public class ProductRepository : IProductRepository
             }
             i.ProductInsights = productInsights;
         }
-
-        i.Comments = _dbContext.Set<CommentEntity>().Where(w => w.ProductId == i.Id && w.DeletedAt == null);
-
+        
         var completeOrder = _dbContext.Set<OrderEntity>().Where(c => c.OrderDetails != null && c.OrderDetails.Any(w => w.ProductId.HasValue && w.ProductId.Value == i.Id) && c.Status == OrderStatuses.Complete);
         var displayOrderComplete = Utils.DisplayCountOfCompleteOrder(completeOrder.Count());
         i.SuccessfulPurchase = displayOrderComplete;

@@ -76,10 +76,6 @@ public class UserEntity : IdentityUser {
 
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
-	public IEnumerable<LikeCommentEntity>? LikeComments { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
 	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]

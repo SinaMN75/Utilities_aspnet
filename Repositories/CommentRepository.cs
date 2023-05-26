@@ -3,7 +3,6 @@
 public interface ICommentRepository
 {
     Task<GenericResponse<CommentEntity?>> Create(CommentCreateUpdateDto dto);
-    Task<GenericResponse<CommentEntity?>> ToggleLikeComment(Guid commentId);
     Task<GenericResponse> AddReactionToComment(Guid commentId, Reaction reaction);
     Task<GenericResponse<CommentEntity?>> Read(Guid id);
     GenericResponse<IQueryable<CommentEntity>?> ReadByProductId(Guid id);
@@ -16,6 +15,7 @@ public class CommentRepository : ICommentRepository
 {
     private readonly DbContext _dbContext;
     private readonly INotificationRepository _notificationRepository;
+    private readonly IMediaRepository _mediaRepository;
     private readonly string? _userId;
     private readonly IConfiguration _config;
 
@@ -24,26 +24,24 @@ public class CommentRepository : ICommentRepository
         DbContext dbContext,
         IHttpContextAccessor httpContextAccessor,
         INotificationRepository notificationRepository,
-        IConfiguration config)
+        IConfiguration config,
+        IMediaRepository mediaRepository)
     {
         _dbContext = dbContext;
         _notificationRepository = notificationRepository;
         _config = config;
+        _mediaRepository = mediaRepository;
         _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
     }
 
     public GenericResponse<IQueryable<CommentEntity>?> ReadByProductId(Guid id)
     {
         IQueryable<CommentEntity> comment = _dbContext.Set<CommentEntity>()
-            .Include(x => x.User).ThenInclude(x => x!.Media)
             .Include(x => x.Media)
-            .Include(x => x.LikeComments)
-            .Include(x => x.CommentReacts)
-            .Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Children.Where(x => x.DeletedAt == null))
-            .Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Media).Where(x => x.DeletedAt == null)
-            .Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.LikeComments).Where(x => x.DeletedAt == null)
-            .Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.User).ThenInclude(x => x.Media).Where(x => x.DeletedAt == null)
             .Where(x => x.ProductId == id && x.ParentId == null && x.DeletedAt == null)
+            .Include(x => x.User).ThenInclude(x => x!.Media)
+            .Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Media.Where(x => x.DeletedAt == null)).Where(x => x.DeletedAt == null)
+            .Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.User).ThenInclude(x => x.Media.Where(x => x.DeletedAt == null)).Where(x => x.DeletedAt == null)
             .OrderByDescending(x => x.CreatedAt).AsNoTracking();
         return new GenericResponse<IQueryable<CommentEntity>?>(comment);
     }
@@ -60,7 +58,6 @@ public class CommentRepository : ICommentRepository
         q = q.Include(x => x.User).ThenInclude(x => x!.Media)
             .Include(x => x.Media)
             .Include(x => x.Product).ThenInclude(x => x.Media)
-            .Include(x => x.LikeComments.Where(x => x.DeletedAt == null))
             .Include(x => x.Children.Where(x => x.DeletedAt == null))!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
             .OrderByDescending(x => x.CreatedAt)
             .AsNoTracking();
@@ -75,7 +72,6 @@ public class CommentRepository : ICommentRepository
         CommentEntity? comment = await _dbContext.Set<CommentEntity>()
             .Include(x => x.User).ThenInclude(x => x!.Media)
             .Include(x => x.Media)
-            .Include(x => x.LikeComments)
             .Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.User).ThenInclude(x => x.Media)
             .Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Media)
             .Where(x => x.Id == id && x.DeletedAt == null)
@@ -143,28 +139,6 @@ public class CommentRepository : ICommentRepository
         return await Read(comment.Id);
     }
 
-    public async Task<GenericResponse<CommentEntity?>> ToggleLikeComment(Guid commentId)
-    {
-        CommentEntity? comment = await _dbContext.Set<CommentEntity>().FirstOrDefaultAsync(x => x.Id == commentId);
-        LikeCommentEntity? oldLikeComment = await _dbContext.Set<LikeCommentEntity>()
-            .FirstOrDefaultAsync(x => x.CommentId == commentId && x.UserId == _userId);
-        comment.Score ??= 0;
-        if (oldLikeComment != null)
-        {
-            comment.Score -= 1;
-            _dbContext.Set<LikeCommentEntity>().Remove(oldLikeComment);
-            await _dbContext.SaveChangesAsync();
-        }
-        else
-        {
-            comment.Score += 1;
-            await _dbContext.AddAsync(new LikeCommentEntity { UserId = _userId, CommentId = commentId });
-            await _dbContext.SaveChangesAsync();
-        }
-
-        return await Read(comment.Id);
-    }
-
     public async Task<GenericResponse<CommentEntity?>> Update(Guid id, CommentCreateUpdateDto dto)
     {
         CommentEntity? comment = await _dbContext.Set<CommentEntity>().FirstOrDefaultAsync(x => x.Id == id);
@@ -184,9 +158,15 @@ public class CommentRepository : ICommentRepository
 
     public async Task<GenericResponse> Delete(Guid id)
     {
-        CommentEntity? comment = await _dbContext.Set<CommentEntity>().FirstOrDefaultAsync(x => x.Id == id);
+        CommentEntity? comment = await _dbContext.Set<CommentEntity>()
+            .Include(i => i.Media)
+            .Include(i => i.Parent)
+            .Include(i => i.Children)
+            .FirstOrDefaultAsync(x => x.Id == id);
         if (comment == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
-        comment.DeletedAt = DateTime.Now;
+        foreach (MediaEntity i in comment.Media) await _mediaRepository.Delete(i.Id);
+        
+           comment.DeletedAt = DateTime.Now;
         _dbContext.Update(comment);
         await _dbContext.SaveChangesAsync();
         return new GenericResponse();
@@ -200,26 +180,21 @@ public class CommentRepository : ICommentRepository
         CommentEntity? comment = await _dbContext.Set<CommentEntity>().Where(w => w.Id == commentId).FirstOrDefaultAsync();
         if (comment is null) return new GenericResponse(UtilitiesStatusCodes.NotFound, "Comment Not Found");
 
-        CommentReacts? oldReaction = await _dbContext.Set<CommentReacts>().Where(w => w.UserId == _userId && w.CommentId == comment.Id).FirstOrDefaultAsync();
+        CommentReacts? oldReaction = comment.CommentJsonDetail.Reacts.FirstOrDefault(w => w.UserId == _userId);
         if (oldReaction is null)
         {
-            CommentReacts? react = new CommentReacts
-            {
-                CommentId = comment.Id,
+            CommentReacts? react = new() {
                 Reaction = reaction,
-                CreatedAt = DateTime.UtcNow,
                 UserId = user.Id
             };
-            await _dbContext.Set<CommentReacts>().AddAsync(react);
+            comment.CommentJsonDetail.Reacts.Add(react);
         }
         else if (oldReaction.Reaction != reaction)
         {
             oldReaction.Reaction = reaction;
-            _dbContext.Set<CommentReacts>().Update(oldReaction);
         }
-        else
-        {
-            _dbContext.Set<CommentReacts>().Remove(oldReaction);
+        else {
+            comment.CommentJsonDetail.Reacts.Remove(oldReaction);
         }
         await _dbContext.SaveChangesAsync();
         return new GenericResponse(UtilitiesStatusCodes.Success, "Ok");

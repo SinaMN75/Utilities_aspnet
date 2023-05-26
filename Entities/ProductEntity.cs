@@ -54,10 +54,6 @@ public class ProductEntity : BaseEntity {
 
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
-	public IEnumerable<CommentEntity>? Comments { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
 	public IEnumerable<ReportEntity>? Reports { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
@@ -176,7 +172,11 @@ public class ProductCreateUpdateDto {
 	public double? ShippingCost { get; set; }
 	public bool IsBoosted { get; set; }
 	public Guid? ParentId { get; set; }
+
+	[JsonIgnore]
+	[System.Text.Json.Serialization.JsonIgnore]
 	public ProductInsightDto? ProductInsight { get; set; }
+
 	public IEnumerable<Guid>? Categories { get; set; }
 	public IEnumerable<string>? Teams { get; set; }
 	public IEnumerable<UploadDto>? Upload { get; set; }

@@ -15,37 +15,33 @@ public class CommentEntity : BaseEntity {
 	public UserEntity? User { get; set; }
 	public string? UserId { get; set; }
 
-	public ProductEntity? Product { get; set; }
-	public Guid? ProductId { get; set; }
-
+	public CommentJsonDetail CommentJsonDetail { get; set; } = new();
+	
 	[InverseProperty("Parent")]
 	public IEnumerable<CommentEntity>? Children { get; set; }
-
+	
 	public IEnumerable<MediaEntity>? Media { get; set; }
-	public IEnumerable<LikeCommentEntity>? LikeComments { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public ProductEntity? Product { get; set; }
+	
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public Guid? ProductId { get; set; }
+	
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public IEnumerable<ReportEntity>? Reports { get; set; }
-	public IEnumerable<CommentReacts>? CommentReacts { get; set; }
-
-	[NotMapped]
-	public bool IsLiked { get; set; }
 }
 
-[Table("CommentReacts")]
-public class CommentReacts : BaseEntity {
-	public Reaction? Reaction { get; set; }
-	public string? UserId { get; set; }
-	public CommentEntity? Comment { get; set; }
-	public Guid? CommentId { get; set; }
+public class CommentJsonDetail {
+	public List<CommentReacts> Reacts { get; set; } = new();
 }
 
-[Table("LikeComment")]
-public class LikeCommentEntity : BaseEntity {
-	public double? Score { get; set; } = 0;
-	public UserEntity? User { get; set; }
-	public string? UserId { get; set; }
-
-	public CommentEntity? Comment { get; set; }
-	public Guid? CommentId { get; set; }
+public class CommentReacts {
+	public Reaction Reaction { get; set; }
+	public string UserId { get; set; } = null!;
 }
 
 public class CommentCreateUpdateDto {
@@ -59,7 +55,6 @@ public class CommentCreateUpdateDto {
 public class CommentFilterDto {
 	public string? UserId { get; set; }
 	public Guid? ProductId { get; set; }
-	public Guid? CategoryId { get; set; }
 	public bool? ShowProducts { get; set; }
 	public ChatStatus? Status { get; set; }
 	public bool ShowDeleted { get; set; } = false;
