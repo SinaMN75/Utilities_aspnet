@@ -85,7 +85,7 @@ namespace Utilities_aspnet.Hubs
                 sw.WriteLine($"reciever id : {user.Id}");
                 if (user != null)
                 {
-                    if (user.IsOnline)
+                    if (user.IsOnline.IsTrue())
                     {
                         await Clients.User(user.Id).SendAsync("MessageReceived", sender, message);
                         sw.WriteLine("sended to client");
@@ -119,7 +119,7 @@ namespace Utilities_aspnet.Hubs
                 sw.WriteLine($"reciever id : {user.Id}");
                 if (user != null)
                 {
-                    if (user.IsOnline)
+                    if (user.IsOnline.IsTrue())
                     {
                         await Clients.User(user.Id).SendAsync("MessageState", sender, type);
                         sw.WriteLine("sended to client");

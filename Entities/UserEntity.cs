@@ -55,7 +55,7 @@ public class UserEntity : IdentityUser {
 	public DateTime? UpdatedAt { get; set; }
 
 	public string? Badge { get; set; }
-	public bool IsOnline { get; set; } = false;
+	public bool? IsOnline { get; set; }
 	public string? MutedChats { get; set; }
 	public DateTime? ExpireUpgradeAccount { get; set; }
 	public AgeCategory AgeCategory { get; set; } = AgeCategory.None;
@@ -170,21 +170,21 @@ public class UserJsonDetail {
 
 [Table("Otps")]
 public class OtpEntity : BaseEntity {
-	public string OtpCode { get; set; }
+	public required string OtpCode { get; set; }
 
-	public UserEntity User { get; set; }
-	public string UserId { get; set; }
+	public UserEntity? User { get; set; }
+	public string? UserId { get; set; }
 }
 
 public class GetMobileVerificationCodeForLoginDto {
-	public string Mobile { get; set; }
-	public bool SendSMS { get; set; }
-	public string? token { get; set; }
+	public required string Mobile { get; set; }
+	public required bool SendSMS { get; set; }
+	public string? Token { get; set; }
 }
 
 public class VerifyMobileForLoginDto {
-	public string Mobile { get; set; }
-	public string VerificationCode { get; set; }
+	public required string Mobile { get; set; }
+	public required string VerificationCode { get; set; }
 }
 
 public class RegisterDto {
@@ -194,7 +194,7 @@ public class RegisterDto {
 	public string? Email { get; set; }
 	public string? PhoneNumber { get; set; }
 	public string? Password { get; set; }
-	public bool? SendSMS { get; set; }
+	public bool SendSms { get; set; } = false;
 	public UserJsonDetail? UserJsonDetail { get; set; }
 }
 

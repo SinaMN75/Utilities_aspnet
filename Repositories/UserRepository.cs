@@ -197,7 +197,7 @@ public class UserRepository : IUserRepository {
 
 		JwtSecurityToken token = await CreateToken(user);
 
-		if (dto.SendSMS ?? false) {
+		if (dto.SendSms) {
 			if (dto.Email != null && dto.Email.IsEmail()) { }
 			else await SendOtp(user.Id, 4);
 		}
