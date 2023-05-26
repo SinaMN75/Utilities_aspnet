@@ -26,8 +26,8 @@ public static class StartupExtension {
 	private static void AddUtilitiesServices<T>(this WebApplicationBuilder builder, string connectionStrings, DatabaseType databaseType) where T : DbContext {
 		builder.Services.AddOptions();
 		builder.Services.AddOutputCache(x => {
-			x.AddPolicy("default", new DefaultOutputCachePolicy());
-			x.AddPolicy("10s", new ShortOutputCachePolicy());
+			x.AddPolicy("default", new OutputCachePolicy(60));
+			x.AddPolicy("short", new OutputCachePolicy(10));
 		});
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
@@ -66,11 +66,9 @@ public static class StartupExtension {
 
 		builder.Services.AddHttpContextAccessor();
 		builder.Services.AddSignalR();
-        builder.Services.AddScoped<CustomInterceptor>();
-
-        builder.Services.AddHttpClient("my-client").AddHttpMessageHandler<CustomInterceptor>();
-
-        builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+		builder.Services.AddScoped<CustomInterceptor>();
+		builder.Services.AddHttpClient("my-client").AddHttpMessageHandler<CustomInterceptor>();
+		builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 		builder.Services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")));
 		builder.Services.AddControllersWithViews(option => option.EnableEndpointRouting = false).AddNewtonsoftJson(options => {
 			options.SerializerSettings.ContractResolver = new DefaultContractResolver();
@@ -180,7 +178,9 @@ public static class StartupExtension {
 	}
 }
 
-internal class DefaultOutputCachePolicy : IOutputCachePolicy {
+internal class OutputCachePolicy : IOutputCachePolicy {
+	private readonly int _seconds;
+	public OutputCachePolicy(int seconds) => _seconds = seconds;
 	public ValueTask ServeFromCacheAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
 	public ValueTask ServeResponseAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
 
@@ -189,24 +189,7 @@ internal class DefaultOutputCachePolicy : IOutputCachePolicy {
 		context.AllowCacheStorage = true;
 		context.AllowLocking = true;
 		context.EnableOutputCaching = true;
-		context.ResponseExpirationTimeSpan = TimeSpan.FromSeconds(30);
-		context.CacheVaryByRules.QueryKeys = "*";
-		context.CacheVaryByRules.VaryByHost = true;
-		context.CacheVaryByRules.HeaderNames = "*";
-		return ValueTask.CompletedTask;
-	}
-}
-
-internal class ShortOutputCachePolicy : IOutputCachePolicy {
-	public ValueTask ServeFromCacheAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
-	public ValueTask ServeResponseAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
-
-	public ValueTask CacheRequestAsync(OutputCacheContext context, CancellationToken cancellation) {
-		context.AllowCacheLookup = true;
-		context.AllowCacheStorage = true;
-		context.AllowLocking = true;
-		context.EnableOutputCaching = true;
-		context.ResponseExpirationTimeSpan = TimeSpan.FromSeconds(10);
+		context.ResponseExpirationTimeSpan = TimeSpan.FromSeconds(_seconds);
 		context.CacheVaryByRules.QueryKeys = "*";
 		context.CacheVaryByRules.VaryByHost = true;
 		context.CacheVaryByRules.HeaderNames = "*";
