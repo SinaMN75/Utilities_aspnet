@@ -11,8 +11,11 @@ public class UserEntity : IdentityUser {
 
 	[StringLength(500)]
 	public string? FullName { get; set; }
+    public bool IsPrivate { get; set; } = true;
+    public string? MeliCode { get; set; }
+    public string? ShebaNumber { get; set; }
 
-	[StringLength(500)]
+    [StringLength(500)]
 	public string? Headline { get; set; }
 
 	[StringLength(2000)]

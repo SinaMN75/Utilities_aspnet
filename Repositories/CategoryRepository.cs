@@ -2,7 +2,7 @@
 
 public interface ICategoryRepository {
 	public Task<GenericResponse<CategoryEntity>> Create(CategoryCreateUpdateDto dto);
-	public Task<GenericResponse> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto);
+	public Task<GenericResponse<IEnumerable<CategoryEntity>>> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto);
 	public GenericResponse<IEnumerable<CategoryEntity>> Filter(CategoryFilterDto dto);
 	public Task<GenericResponse<CategoryEntity?>> Update(CategoryCreateUpdateDto dto);
 	public Task<GenericResponse> Delete(Guid id);
@@ -33,9 +33,13 @@ public class CategoryRepository : ICategoryRepository {
 		}
 	}
 
-	public async Task<GenericResponse> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto) {
-		foreach (CategoryCreateUpdateDto i in dto) await Create(i);
-		return new GenericResponse();
+	public async Task<GenericResponse<IEnumerable<CategoryEntity>>> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto) {
+		List<CategoryEntity> list = new();
+		foreach (CategoryCreateUpdateDto i in dto) {
+			GenericResponse<CategoryEntity> j = await Create(i);
+			list.Add(j.Result);
+		}
+		return new GenericResponse<IEnumerable<CategoryEntity>>(list);
 	}
 
 	public GenericResponse<IEnumerable<CategoryEntity>> Filter(CategoryFilterDto dto) {

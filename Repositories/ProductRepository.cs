@@ -150,7 +150,7 @@ public class ProductRepository : IProductRepository
             if (dto.IsBookmarked.IsTrue()) q = q.Where(i => user.BookmarkedProducts.Contains(i.Id.ToString()));
         }
 
-        if (dto.IsBoosted) q = q.OrderBy(o => o.IsBoosted);
+        if (dto.Boosted) q = q.OrderByDescending(o => o.Boosted);
 
         int totalCount = q.Count();
         q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
@@ -340,8 +340,7 @@ public static class ProductEntityExtension
         entity.ExpireDate = dto.ExpireDate ?? entity.ExpireDate;
         entity.AgeCategory = dto.AgeCategory ?? entity.AgeCategory;
         entity.ProductState = dto.ProductState ?? entity.ProductState;
-        entity.IsBoosted = dto.IsBoosted;
-        entity.DeletedAt = dto.DeletedAt ?? entity.DeletedAt;
+        entity.Boosted = dto.Boosted;
         entity.UpdatedAt = DateTime.Now;
 
         if (dto.VisitsCountPlus.HasValue)

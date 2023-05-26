@@ -18,7 +18,7 @@ public class AddressController : BaseApiController {
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	public ActionResult<GenericResponse<IQueryable<AddressEntity>>> ReadUserAddresses() => Result(_repository.ReadMyAddresses());
 
-	[HttpDelete("Delete/{addressId:guid}")]
+	[HttpDelete("{addressId:guid}")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	public async Task<ActionResult<GenericResponse>> Delete(Guid addressId) => Result(await _repository.DeleteAddress(addressId));
 }

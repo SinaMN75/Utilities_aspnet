@@ -13,7 +13,7 @@ public class CategoryController : BaseApiController {
 
 	[HttpPost("BulkCreate")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse<CategoryEntity>>> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto)
+	public async Task<ActionResult<GenericResponse<IEnumerable<CategoryEntity>>>> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto)
 		=> Result(await _repository.BulkCreate(dto));
 
 	[HttpGet]

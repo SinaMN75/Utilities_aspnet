@@ -48,14 +48,14 @@ namespace Utilities_aspnet.Repositories
             var product = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == dto.ProductId);
             if (product is not null)
             {
-                product.IsBoosted = true;
+                product.Boosted = DateTime.Now;
                 _dbContext.Update(product);
             }
 
             var groupChat = await _dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(f => f.Id == dto.GroupChatId);
             if (groupChat is not null)
             {
-                groupChat.GroupChatJsonDetail.IsBoosted = true;
+                groupChat.GroupChatJsonDetail.Boosted = DateTime.Now;
                 _dbContext.Update(groupChat);
             }
             await _dbContext.SaveChangesAsync();
@@ -67,7 +67,7 @@ namespace Utilities_aspnet.Repositories
             var promotion = await _dbContext.Set<PromotionEntity>().FirstOrDefaultAsync(f => f.ProductId == id || f.GroupChatId == id);
             if (promotion is null) return new GenericResponse<PromotionDetail?>(null, UtilitiesStatusCodes.NotFound);
 
-            TimeSpan timeDifference = DateTime.UtcNow - promotion.CreatedAt!.Value;
+            TimeSpan timeDifference = DateTime.Now - promotion.CreatedAt!.Value;
             double hoursPassed = timeDifference.TotalHours;
 
             var usersId = promotion?.Users.IsNotNullOrEmpty() ?? false ? promotion.Users.Split(",") : null;
