@@ -31,6 +31,17 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 				break;
 			}
 			case "faraz": {
+				var body = new
+				{
+					op = "pattern",
+					user = smsSetting.UserName,
+					pass = smsSetting.SmsSecret,
+					fromNum = "03000505".TrimStart(new[] {'0'}),
+					toNum = mobileNumber,
+					patternCode = smsSetting.PatternCode,
+					inputData = "[{\"verification-code\":" + message + "}]}"
+				};
+
 				RestClient client = new("http://ippanel.com/api/select");
 				RestRequest request = new(Method.POST);
 				request.AddHeader("cache-control", "no-cache");
@@ -69,6 +80,8 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
                     };
 
                     var client = new CustomHttpClient<object, object>();
+                    client.DefaultRequestHeaders.Add("Content-Type", "application/json");
+                    client.DefaultRequestHeaders.Add("Authorization", "Token " + setting.Token);
                     client.DefaultRequestHeaders.Add("Content-Type", "application/json");
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "Token " + setting.Token);
 

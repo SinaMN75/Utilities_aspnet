@@ -36,7 +36,7 @@ public class ProductEntity : BaseEntity {
 	public DateTime? ExpireDate { get; set; }
 
 	public string? SeenUsers { get; set; } = "";
-	public string Teams { get; set; } = "";
+	public string? Teams { get; set; } = "";
 
 	public ProductEntity? Product { get; set; }
 	public Guid? ParentId { get; set; }
@@ -151,7 +151,7 @@ public class ProductCreateUpdateDto {
 	public ProductState? ProductState { get; set; }
 	public int? ShippingTime { get; set; }
 	public double? ShippingCost { get; set; }
-	public DateTime Boosted { get; set; }
+	public DateTime? Boosted { get; set; }
 	public Guid? ParentId { get; set; }
 
 	[JsonIgnore]

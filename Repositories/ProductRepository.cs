@@ -321,7 +321,7 @@ public static class ProductEntityExtension {
 		entity.ExpireDate = dto.ExpireDate ?? entity.ExpireDate;
 		entity.AgeCategory = dto.AgeCategory ?? entity.AgeCategory;
 		entity.ProductState = dto.ProductState ?? entity.ProductState;
-		entity.Boosted = dto.Boosted;
+		entity.Boosted = dto.Boosted ?? entity.Boosted;
 		entity.UpdatedAt = DateTime.Now;
 
 		if (dto.VisitsCountPlus.HasValue) {
