@@ -1,4 +1,4 @@
-﻿namespace Utilities_aspnet.Utilities; 
+﻿namespace Utilities_aspnet.Utilities;
 
 public static class Extension {
 	public static string DeleteAdditionsInsteadNumber(this string str) {

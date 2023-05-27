@@ -21,7 +21,7 @@ public class CommentController : BaseApiController {
 
 	[HttpPost("Filter")]
 	public ActionResult<GenericResponse<CommentEntity>> Filter(CommentFilterDto dto) => Result(_repository.Filter(dto));
-	
+
 	[HttpPost("AddReactionToComment/{commentId:guid}/{reaction}")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	public async Task<ActionResult<GenericResponse>> AddReactionToComment(Guid commentId, Reaction reaction)

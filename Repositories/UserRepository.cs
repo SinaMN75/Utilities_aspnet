@@ -294,10 +294,10 @@ public class UserRepository : IUserRepository {
 	}
 
 	public async Task<GenericResponse> Authorize(AuthorizeUserDto dto) {
-		var user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
+		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
 		if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound);
 
-		var sheba = dto.ShebaNumber.GetShebaNumber();
+		string? sheba = dto.ShebaNumber.GetShebaNumber();
 
 		if (user.UserJsonDetail.IsAuthorize.IsTrue()) {
 			if (sheba is null) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
@@ -335,6 +335,7 @@ public class UserRepository : IUserRepository {
 		entity.UserJsonDetail.Dribble = dto.Dribble ?? entity.UserJsonDetail.Dribble;
 		entity.UserJsonDetail.SoundCloud = dto.SoundCloud ?? entity.UserJsonDetail.SoundCloud;
 		entity.UserJsonDetail.Pinterest = dto.Pinterest ?? entity.UserJsonDetail.Pinterest;
+		entity.UserJsonDetail.Code = dto.Code ?? entity.UserJsonDetail.Code;
 		entity.Region = dto.Region ?? entity.Region;
 		entity.UserJsonDetail.Activity = dto.Activity ?? entity.UserJsonDetail.Activity;
 		entity.Suspend = dto.Suspend ?? entity.Suspend;

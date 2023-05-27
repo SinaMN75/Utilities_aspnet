@@ -11,11 +11,10 @@ public class UserEntity : IdentityUser {
 
 	[StringLength(500)]
 	public string? FullName { get; set; }
-    public bool IsPrivate { get; set; } = true;
-    public string? MeliCode { get; set; }
-    public string? ShebaNumber { get; set; }
 
-    [StringLength(500)]
+	public bool IsPrivate { get; set; } = true;
+
+	[StringLength(500)]
 	public string? Headline { get; set; }
 
 	[StringLength(2000)]
@@ -166,6 +165,7 @@ public class UserJsonDetail {
 	public string? ShebaNumber { get; set; }
 	public bool? IsAuthorize { get; set; }
 	public bool? IsForeigner { get; set; }
+	public string? Code { get; set; }
 }
 
 [Table("Otps")]
@@ -243,7 +243,6 @@ public class UserCreateUpdateDto {
 	public string? Badge { get; set; }
 	public string? VisitedProducts { get; set; }
 	public string? BookmarkedProducts { get; set; }
-	public string? BoughtProduts { get; set; }
 	public string? FollowedUsers { get; set; }
 	public string? FollowingUsers { get; set; }
 	public string? BlockedUsers { get; set; }
@@ -264,12 +263,12 @@ public class UserCreateUpdateDto {
 	public string? AccessLevel { get; set; }
 	public GenderType? Gender { get; set; }
 	public bool? IsOnline { get; set; }
-	public bool? IsLoggedIn { get; set; }
 	public bool? IsPrivate { get; set; }
 	public AgeCategory? AgeCategory { get; set; }
 	public DateTime? BirthDate { get; set; }
 	public DateTime? ExpireUpgradeAccount { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
+	public string? Code { get; set; }
 }
 
 public class UserFilterDto {

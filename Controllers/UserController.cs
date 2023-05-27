@@ -27,7 +27,7 @@ public class UserController : BaseApiController {
 	[AllowAnonymous]
 	[HttpPost("Filter")]
 	public ActionResult<GenericResponse<IEnumerable<UserEntity>>> Filter(UserFilterDto dto) => Result(_repository.Filter(dto));
-	
+
 	[HttpGet]
 	[OutputCache(PolicyName = "default")]
 	public ActionResult<GenericResponse<IEnumerable<UserEntity>>> Read([FromQuery] UserFilterDto dto) => Result(_repository.Filter(dto));

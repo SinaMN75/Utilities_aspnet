@@ -12,3 +12,8 @@ public class BaseEntity {
 	[JsonIgnore]
 	public DateTime? DeletedAt { get; set; }
 }
+
+public class KeyValue {
+	public string? Key { get; set; }
+	public string? Value { get; set; }
+}

@@ -79,14 +79,15 @@ public class CommentRepository : ICommentRepository {
 	public async Task<GenericResponse<CommentEntity?>> Create(CommentCreateUpdateDto dto) {
 		AppSettings appSettings = new();
 		_config.GetSection("AppSettings").Bind(appSettings);
-		var overUsedCheck = Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, CallerType.CreateComment, null, null, appSettings.UsageRules!);
+		Tuple<bool, UtilitiesStatusCodes>? overUsedCheck =
+			Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, CallerType.CreateComment, null, null, appSettings.UsageRules!);
 		if (overUsedCheck.Item1)
 			return new GenericResponse<CommentEntity?>(null, overUsedCheck.Item2);
 
-		var prdct = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == dto.ProductId);
+		ProductEntity? prdct = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == dto.ProductId);
 		if (prdct is not null) {
-			var blockedState = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == prdct.UserId),
-			                                       _dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == _userId));
+			Tuple<bool, UtilitiesStatusCodes>? blockedState = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == prdct.UserId),
+			                                                                      _dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == _userId));
 			if (blockedState.Item1)
 				return new GenericResponse<CommentEntity?>(null, blockedState.Item2);
 		}

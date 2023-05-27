@@ -19,7 +19,7 @@ public class ProductEntity : BaseEntity {
 
 	[StringLength(500)]
 	public string? State { get; set; }
-	
+
 	public DateTime Boosted { get; set; }
 	public double? Stock { get; set; }
 	public double? VoteCount { get; set; }
@@ -65,6 +65,7 @@ public class ProductJsonDetail {
 	public string? Website { get; set; }
 	public string? Email { get; set; }
 	public string? Unit { get; set; }
+	public string? KeyValue { get; set; }
 	public double? Latitude { get; set; }
 	public double? ResponseTime { get; set; }
 	public double? OnTimeDelivery { get; set; }
@@ -81,6 +82,7 @@ public class ProductJsonDetail {
 	public int? ShippingTime { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
+	public IEnumerable<KeyValue>? KeyValues { get; set; }
 }
 
 [Table("ProductsInsight")]
@@ -118,6 +120,7 @@ public class ProductCreateUpdateDto {
 	public string? Type { get; set; }
 	public string? Unit { get; set; }
 	public string? UseCase { get; set; }
+	public string? KeyValue { get; set; }
 	public string? State { get; set; }
 	public double? Latitude { get; set; }
 	public double? Longitude { get; set; }

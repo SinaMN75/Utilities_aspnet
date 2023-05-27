@@ -48,10 +48,6 @@ public class CategoryEntity : BaseEntity {
 
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
-	public IEnumerable<OrderDetailEntity>? OrderDetails { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
 	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
 }
 

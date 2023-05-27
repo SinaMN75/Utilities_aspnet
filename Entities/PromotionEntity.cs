@@ -1,4 +1,4 @@
-﻿namespace Utilities_aspnet.Entities; 
+﻿namespace Utilities_aspnet.Entities;
 
 [Table("Promotion")]
 public class PromotionEntity : BaseEntity {

@@ -25,7 +25,7 @@ public enum UtilitiesStatusCodes {
 	MultipleSeller = 607,
 	OrderPayed = 608,
 	OutOfStock = 610,
-	NotEnoughMoney  = 611,
+	NotEnoughMoney = 611,
 	UserRecieverBlocked = 612,
 	UserSenderBlocked = 613,
 	MoreThan2UserIsInPrivateChat = 614,
@@ -182,8 +182,7 @@ public enum AgeCategory {
 	Adult = 104
 }
 
-public enum ProductState
-{
+public enum ProductState {
 	None = 100,
 	New = 101,
 	KindOfNew = 102,
@@ -212,23 +211,20 @@ public enum ReferenceIdType {
 	User = 102
 }
 
-public enum CallerType
-{
-    CreateGroupChat = 100,
-    CreateComment = 101,
-    CreateProduct = 102,
-    None = 99999
+public enum CallerType {
+	CreateGroupChat = 100,
+	CreateComment = 101,
+	CreateProduct = 102,
+	None = 99999
 }
 
-public enum WithdrawState
-{
+public enum WithdrawState {
 	None = 100,
 	Requested = 101,
 	Accepted = 102
 }
 
-public enum DisplayType
-{
+public enum DisplayType {
 	None = 100,
 	Exploer = 101,
 	Channels = 102

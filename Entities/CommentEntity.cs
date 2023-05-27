@@ -16,23 +16,19 @@ public class CommentEntity : BaseEntity {
 	public string? UserId { get; set; }
 
 	public CommentJsonDetail CommentJsonDetail { get; set; } = new();
-	
+
 	[InverseProperty("Parent")]
 	public IEnumerable<CommentEntity>? Children { get; set; }
-	
+
 	public IEnumerable<MediaEntity>? Media { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
 	public ProductEntity? Product { get; set; }
-	
+
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
 	public Guid? ProductId { get; set; }
-	
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public IEnumerable<ReportEntity>? Reports { get; set; }
 }
 
 public class CommentJsonDetail {
