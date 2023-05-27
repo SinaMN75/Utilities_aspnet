@@ -1,4 +1,6 @@
-﻿namespace Utilities_aspnet.Repositories;
+﻿using System.Net.Http.Headers;
+
+namespace Utilities_aspnet.Repositories;
 
 public interface ISmsNotificationRepository {
 	void SendSms(string mobileNumber, string message);
@@ -52,24 +54,45 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 
 		switch (setting.Provider) {
 			case "pushe": {
-				RestRequest request = new(Method.POST);
-				request.AddHeader("Content-Type", "application/json");
-				request.AddHeader("Authorization", "Token " + setting.Token);
-				var body = new {
-					app_ids = setting.AppId,
-					data = new {
-						title = dto.Title,
-						content = dto.Content,
-						bigContent = dto.BigContent,
-						action = new {action_type = dto.ActionType, url = dto.Url}
-					},
-					is_draft = false,
-					filter = new {custom_id = dto.UserIds}
-				};
-				request.AddJsonBody(body);
+                    var body = new
+                    {
+                        app_ids = setting.AppId,
+                        data = new
+                        {
+                            title = dto.Title,
+                            content = dto.Content,
+                            bigContent = dto.BigContent,
+                            action = new { action_type = dto.ActionType, url = dto.Url }
+                        },
+                        is_draft = false,
+                        filter = new { custom_id = dto.UserIds }
+                    };
 
-				IRestResponse i = await new RestClient("https://api.pushe.co/v2/messaging/notifications/").ExecuteAsync(request);
+                    var client = new CustomHttpClient<object, object>();
+                    client.DefaultRequestHeaders.Add("Content-Type", "application/json");
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "Token " + setting.Token);
+
+					var result = await client.Post("https://api.pushe.co/v2/messaging/notifications/", body);
 				break;
+
+
+				//RestRequest request = new(Method.POST);
+				//request.AddHeader("Content-Type", "application/json");
+				//request.AddHeader("Authorization", "Token " + setting.Token);
+				//var body = new {
+				//	app_ids = setting.AppId,
+				//	data = new {
+				//		title = dto.Title,
+				//		content = dto.Content,
+				//		bigContent = dto.BigContent,
+				//		action = new {action_type = dto.ActionType, url = dto.Url}
+				//	},
+				//	is_draft = false,
+				//	filter = new {custom_id = dto.UserIds}
+				//};
+				//request.AddJsonBody(body);
+
+				//IRestResponse i = await new RestClient("https://api.pushe.co/v2/messaging/notifications/").ExecuteAsync(request);
 			}
 		}
 		return new GenericResponse();
