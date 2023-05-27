@@ -167,8 +167,11 @@ public enum GenderType {
 	Male = 100,
 	Female = 101,
 	Unknown = 102,
-	All = 103,
-	None = 104
+	Company = 103,
+	Team = 104,
+	Both = 105,
+	All = 106,
+	None = 107
 }
 
 public enum AgeCategory {
@@ -182,9 +185,9 @@ public enum AgeCategory {
 public enum ProductState
 {
 	None = 100,
-	New = 101, //kalaye no va jadid
-	KindOfNew = 102, // dar hade no
-	UsedGoods = 103, //daste dovom
+	New = 101,
+	KindOfNew = 102,
+	UsedGoods = 103
 }
 
 public enum OrderReportType {

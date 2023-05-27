@@ -66,5 +66,6 @@ public class EnumDto {
 	public IEnumerable<IdTitleDto>? AgeCategory { get; set; }
 	public IEnumerable<IdTitleDto>? ReferenceIdType { get; set; }
 	public IEnumerable<IdTitleDto>? ChatTypes { get; set; }
+	public IEnumerable<IdTitleDto>? GenderType { get; set; }
 	public AppSettings? AppSettings { get; set; }
 }
