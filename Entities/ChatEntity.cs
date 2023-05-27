@@ -67,7 +67,10 @@ public class GroupChatMessageEntity : BaseEntity {
 	[StringLength(500)]
 	public string? UseCase { get; set; }
 
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public GroupChatEntity? GroupChat { get; set; }
+
 	public Guid? GroupChatId { get; set; }
 
 	public UserEntity? User { get; set; }

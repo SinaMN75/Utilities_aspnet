@@ -82,7 +82,6 @@ public class ProductJsonDetail {
 	public int? ShippingTime { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
-	public IEnumerable<KeyValue>? KeyValues { get; set; }
 }
 
 [Table("ProductsInsight")]
@@ -145,7 +144,6 @@ public class ProductCreateUpdateDto {
 	public bool? Enabled { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
-	public DateTime? DeletedAt { get; set; }
 	public DateTime? ExpireDate { get; set; }
 	public ProductStatus? Status { get; set; }
 	public Currency? Currency { get; set; }
