@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 
 namespace Utilities_aspnet.Utilities {
 	public class CustomHttpClient<TIn, TOut> : HttpClient where TIn : class where TOut : class {

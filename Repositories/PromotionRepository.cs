@@ -1,11 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Utilities_aspnet.Repositories {
+﻿namespace Utilities_aspnet.Repositories {
 	public interface IPromotionRepository {
 		Task<GenericResponse> CreatePromotion(CreateUpdatePromotionDto dto);
 		Task<GenericResponse> UserSeened(Guid id);

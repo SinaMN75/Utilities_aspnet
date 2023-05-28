@@ -14,6 +14,7 @@ public class CommentRepository : ICommentRepository {
 	private readonly DbContext _dbContext;
 	private readonly INotificationRepository _notificationRepository;
 	private readonly IMediaRepository _mediaRepository;
+	private readonly IProductRepository _productRepository;
 	private readonly string? _userId;
 	private readonly IConfiguration _config;
 
@@ -22,11 +23,13 @@ public class CommentRepository : ICommentRepository {
 		IHttpContextAccessor httpContextAccessor,
 		INotificationRepository notificationRepository,
 		IConfiguration config,
-		IMediaRepository mediaRepository) {
+		IMediaRepository mediaRepository,
+		IProductRepository productRepository) {
 		_dbContext = dbContext;
 		_notificationRepository = notificationRepository;
 		_config = config;
 		_mediaRepository = mediaRepository;
+		_productRepository = productRepository;
 		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 	}
 
@@ -103,15 +106,11 @@ public class CommentRepository : ICommentRepository {
 			Status = dto.Status
 		};
 		await _dbContext.AddAsync(comment);
-		await _dbContext.SaveChangesAsync();
-
 		try {
-			ProductEntity? product = _dbContext.Set<ProductEntity>()
-				.Include(x => x.Media)
-				.Include(x => x.User)
-				.FirstOrDefault(x => x.Id == comment.ProductId);
+			ProductEntity product = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == comment.ProductId))!;
+			product.CommentsCount += 1;
 
-			if (product != null && product.UserId != _userId) {
+			if (product.UserId != _userId) {
 				await _notificationRepository.Create(new NotificationCreateUpdateDto {
 					UserId = product.UserId,
 					Message = dto.Comment ?? "",
@@ -124,7 +123,7 @@ public class CommentRepository : ICommentRepository {
 			}
 		}
 		catch { }
-
+		await _dbContext.SaveChangesAsync();
 		return await Read(comment.Id);
 	}
 

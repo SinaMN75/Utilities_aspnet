@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Hosting.Internal;
-
-namespace Utilities_aspnet.Hubs {
+﻿namespace Utilities_aspnet.Hubs {
 	public class ChatHub : Hub {
 		private readonly DbContext _context;
 		private readonly string uploadsFolder;

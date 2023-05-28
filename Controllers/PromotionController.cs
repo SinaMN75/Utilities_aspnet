@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Utilities_aspnet.Controllers {
+﻿namespace Utilities_aspnet.Controllers {
 	public class PromotionController : BaseApiController {
 		private readonly IPromotionRepository _repository;
 		public PromotionController(IPromotionRepository repository) => _repository = repository;

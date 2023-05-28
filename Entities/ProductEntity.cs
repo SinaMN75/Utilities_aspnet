@@ -24,7 +24,7 @@ public class ProductEntity : BaseEntity {
 	public double? Stock { get; set; }
 	public double? VoteCount { get; set; }
 	public int? DiscountPercent { get; set; }
-	public int? VisitsCount { get; set; }
+	public int? CommentsCount { get; set; }
 	public bool? Enabled { get; set; }
 	public double? DiscountPrice { get; set; }
 	public double? Price { get; set; }
@@ -138,9 +138,8 @@ public class ProductCreateUpdateDto {
 	public double? ResponseTime { get; set; }
 	public double? OnTimeDelivery { get; set; }
 	public int? DiscountPercent { get; set; }
+	public int? CommentsCount { get; set; }
 	public int? Stock { get; set; }
-	public int? VisitsCount { get; set; }
-	public int? VisitsCountPlus { get; set; }
 	public bool? Enabled { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }

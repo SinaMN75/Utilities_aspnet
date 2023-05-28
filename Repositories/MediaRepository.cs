@@ -66,6 +66,7 @@ public class MediaRepository : IMediaRepository {
 				         CreatedAt = DateTime.Now,
 				         UseCase = model.UseCase,
 				         NotificationId = model.NotificationId,
+				         Order = model.Order,
 				         MediaJsonDetail = {
 					         Title = model.Title,
 					         IsPrivate = model.IsPrivate,
@@ -108,6 +109,7 @@ public class MediaRepository : IMediaRepository {
 		media.MediaJsonDetail.Album = model.Album ?? media.MediaJsonDetail.Album;
 		media.UpdatedAt = DateTime.Now;
 		media.UseCase = model.UseCase ?? media.UseCase;
+		media.Order = model.Order ?? media.Order;
 
 		_dbContext.Set<MediaEntity>().Update(media);
 		await _dbContext.SaveChangesAsync();

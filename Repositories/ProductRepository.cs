@@ -1,6 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using Utilities_aspnet.Utilities;
-
 namespace Utilities_aspnet.Repositories;
 
 public interface IProductRepository {
@@ -50,7 +47,6 @@ public class ProductRepository : IProductRepository {
 		if (dto.ProductInsight is not null) dto.ProductInsight.UserId = _userId;
 
 		ProductEntity e = await entity.FillData(dto, _dbContext);
-		e.VisitsCount = 1;
 		e.UserId = _userId;
 		e.CreatedAt = DateTime.Now;
 
@@ -77,7 +73,6 @@ public class ProductRepository : IProductRepository {
 			dto.ProductInsight.UserId = _userId;
 
 		ProductEntity e = await entity.FillData(dto, _dbContext);
-		e.VisitsCount = 1;
 		e.UserId = _userId;
 		e.CreatedAt = DateTime.Now;
 
@@ -188,8 +183,6 @@ public class ProductRepository : IProductRepository {
 				if (string.IsNullOrEmpty(i.SeenUsers)) i.SeenUsers = user.Id;
 				else i.SeenUsers = i.SeenUsers + "," + user.Id;
 			}
-			if (i.VisitProducts != null && !i.VisitProducts.Any()) i.VisitsCount = 1;
-			else if (i.VisitProducts != null) i.VisitsCount = i.VisitProducts.Count() + 1;
 			_dbContext.Update(i);
 			await _dbContext.SaveChangesAsync(ct);
 		}
@@ -289,7 +282,6 @@ public static class ProductEntityExtension {
 		entity.UseCase = dto.UseCase ?? entity.UseCase;
 		entity.Price = dto.Price ?? entity.Price;
 		entity.Enabled = dto.Enabled ?? entity.Enabled;
-		entity.VisitsCount = dto.VisitsCount ?? entity.VisitsCount;
 		entity.ProductJsonDetail.Details = dto.Details ?? entity.ProductJsonDetail.Details;
 		entity.ProductJsonDetail.Author = dto.Author ?? entity.ProductJsonDetail.Author;
 		entity.ProductJsonDetail.PhoneNumber = dto.PhoneNumber ?? entity.ProductJsonDetail.PhoneNumber;
@@ -317,17 +309,13 @@ public static class ProductEntityExtension {
 		entity.ProductJsonDetail.KeyValue = dto.KeyValue ?? entity.ProductJsonDetail.KeyValue;
 		entity.Stock = dto.Stock ?? entity.Stock;
 		entity.Status = dto.Status ?? entity.Status;
+		entity.CommentsCount = dto.CommentsCount ?? entity.CommentsCount;
 		entity.Currency = dto.Currency ?? entity.Currency;
 		entity.ExpireDate = dto.ExpireDate ?? entity.ExpireDate;
 		entity.AgeCategory = dto.AgeCategory ?? entity.AgeCategory;
 		entity.ProductState = dto.ProductState ?? entity.ProductState;
 		entity.Boosted = dto.Boosted ?? entity.Boosted;
 		entity.UpdatedAt = DateTime.Now;
-
-		if (dto.VisitsCountPlus.HasValue) {
-			if (entity.VisitsCount == null) entity.VisitsCount = 1;
-			else entity.VisitsCount += dto.VisitsCountPlus;
-		}
 
 		if (dto.ScorePlus.HasValue) {
 			if (entity.VoteCount == null) entity.VoteCount = 1;

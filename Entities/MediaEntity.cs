@@ -8,6 +8,8 @@ public class MediaEntity : BaseEntity {
 	[StringLength(500)]
 	public string? UseCase { get; set; }
 
+	public int? Order { get; set; }
+	
 	public MediaJsonDetail MediaJsonDetail { get; set; } = new();
 
 	[NotMapped]
@@ -105,6 +107,7 @@ public class MediaJsonDetail {
 }
 
 public class UploadDto {
+	public int? Order { get; set; }
 	public string? UseCase { get; set; }
 	public string? UserId { get; set; }
 	public string? Title { get; set; }
@@ -133,4 +136,5 @@ public class UpdateMediaDto {
 	public string? Time { get; set; }
 	public string? Artist { get; set; }
 	public string? Album { get; set; }
+	public int? Order { get; set; }
 }
