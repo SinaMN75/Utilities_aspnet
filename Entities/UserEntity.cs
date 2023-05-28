@@ -159,11 +159,10 @@ public class UserJsonDetail {
 	public string? Activity { get; set; }
 	public string? Color { get; set; }
 	public PrivacyType? PrivacyType { get; set; }
-	public string? MeliCode { get; set; }
+	public string? Code { get; set; }
 	public string? ShebaNumber { get; set; }
 	public LegalAuthenticationType? LegalAuthenticationType { get; set; }
 	public NationalityType? NationalityType { get; set; }
-	public string? Code { get; set; }
 }
 
 [Table("Otps")]
@@ -227,7 +226,6 @@ public class UserCreateUpdateDto {
 	public double? Wallet { get; set; }
 	public double? Point { get; set; } = 0;
 	public bool? Suspend { get; set; }
-	public bool? ShowContactInfo { get; set; }
 	public string? Instagram { get; set; }
 	public string? Telegram { get; set; }
 	public string? WhatsApp { get; set; }
@@ -244,12 +242,12 @@ public class UserCreateUpdateDto {
 	public NationalityType? NationalityType { get; set; }
 	public PrivacyType? PrivacyType { get; set; }
 	public bool? IsOnline { get; set; }
-	public bool? IsPrivate { get; set; }
 	public AgeCategory? AgeCategory { get; set; }
 	public DateTime? BirthDate { get; set; }
 	public DateTime? ExpireUpgradeAccount { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 	public string? Code { get; set; }
+	public string? ShebaNumber { get; set; }
 }
 
 public class UserFilterDto {

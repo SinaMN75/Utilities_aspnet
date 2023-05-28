@@ -307,7 +307,7 @@ public class UserRepository : IUserRepository {
 			string? meliCode = dto.Code.Length == 10 ? dto.Code : null;
 			if (meliCode is null || sheba is null) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 
-			user.UserJsonDetail.MeliCode = meliCode;
+			user.UserJsonDetail.Code = meliCode;
 			user.UserJsonDetail.ShebaNumber = sheba;
 			user.UserJsonDetail.NationalityType = dto.NationalityType;
 			user.UserJsonDetail.LegalAuthenticationType = LegalAuthenticationType.Authenticated;
@@ -328,20 +328,7 @@ public class UserRepository : IUserRepository {
 		entity.Bio = dto.Bio ?? entity.Bio;
 		entity.AppUserName = dto.AppUserName ?? entity.AppUserName;
 		entity.AppEmail = dto.AppEmail ?? entity.AppEmail;
-		entity.UserJsonDetail.Instagram = dto.Instagram ?? entity.UserJsonDetail.Instagram;
-		entity.UserJsonDetail.LegalAuthenticationType = dto.LegalAuthenticationType ?? entity.UserJsonDetail.LegalAuthenticationType;
-		entity.UserJsonDetail.NationalityType = dto.NationalityType ?? entity.UserJsonDetail.NationalityType;
-		entity.UserJsonDetail.Instagram = dto.Instagram ?? entity.UserJsonDetail.Instagram;
-		entity.UserJsonDetail.Instagram = dto.Instagram ?? entity.UserJsonDetail.Instagram;
-		entity.UserJsonDetail.PrivacyType = dto.PrivacyType ?? entity.UserJsonDetail.PrivacyType;
-		entity.UserJsonDetail.WhatsApp = dto.WhatsApp ?? entity.UserJsonDetail.WhatsApp;
-		entity.UserJsonDetail.LinkedIn = dto.LinkedIn ?? entity.UserJsonDetail.LinkedIn;
-		entity.UserJsonDetail.Dribble = dto.Dribble ?? entity.UserJsonDetail.Dribble;
-		entity.UserJsonDetail.SoundCloud = dto.SoundCloud ?? entity.UserJsonDetail.SoundCloud;
-		entity.UserJsonDetail.Pinterest = dto.Pinterest ?? entity.UserJsonDetail.Pinterest;
-		entity.UserJsonDetail.Code = dto.Code ?? entity.UserJsonDetail.Code;
 		entity.Region = dto.Region ?? entity.Region;
-		entity.UserJsonDetail.Activity = dto.Activity ?? entity.UserJsonDetail.Activity;
 		entity.Suspend = dto.Suspend ?? entity.Suspend;
 		entity.Headline = dto.Headline ?? entity.Headline;
 		entity.AppPhoneNumber = dto.AppPhoneNumber ?? entity.AppPhoneNumber;
@@ -352,8 +339,6 @@ public class UserRepository : IUserRepository {
 		entity.UserName = dto.UserName ?? entity.UserName;
 		entity.Email = dto.Email ?? entity.Email;
 		entity.PhoneNumber = dto.PhoneNumber ?? entity.PhoneNumber;
-		entity.UserJsonDetail.Color = dto.Color ?? entity.UserJsonDetail.Color;
-		entity.UserJsonDetail.Website = dto.Website ?? entity.UserJsonDetail.Website;
 		entity.State = dto.State ?? entity.State;
 		entity.Type = dto.Type ?? entity.Type;
 		entity.Point = dto.Point ?? entity.Point;
@@ -368,6 +353,23 @@ public class UserRepository : IUserRepository {
 		entity.IsOnline = dto.IsOnline ?? entity.IsOnline;
 		entity.ExpireUpgradeAccount = dto.ExpireUpgradeAccount ?? entity.ExpireUpgradeAccount;
 		entity.AgeCategory = dto.AgeCategory ?? entity.AgeCategory;
+		entity.UserJsonDetail = new UserJsonDetail {
+			Instagram = dto.Instagram ?? entity.UserJsonDetail.Instagram,
+			Telegram = dto.Telegram ?? entity.UserJsonDetail.Telegram,
+			WhatsApp = dto.WhatsApp ?? entity.UserJsonDetail.WhatsApp,
+			LinkedIn = dto.LinkedIn ?? entity.UserJsonDetail.LinkedIn,
+			Dribble = dto.Dribble ?? entity.UserJsonDetail.Dribble,
+			SoundCloud = dto.SoundCloud ?? entity.UserJsonDetail.SoundCloud,
+			Pinterest = dto.Pinterest ?? entity.UserJsonDetail.Pinterest,
+			Website = dto.Website ?? entity.UserJsonDetail.Website,
+			Activity = dto.Activity ?? entity.UserJsonDetail.Activity,
+			Color = dto.Color ?? entity.UserJsonDetail.Color,
+			PrivacyType = dto.PrivacyType ?? entity.UserJsonDetail.PrivacyType,
+			ShebaNumber = dto.ShebaNumber,
+			LegalAuthenticationType = dto.LegalAuthenticationType ?? entity.UserJsonDetail.LegalAuthenticationType,
+			NationalityType = dto.NationalityType ?? entity.UserJsonDetail.NationalityType,
+			Code = dto.Code ?? entity.UserJsonDetail.Code
+		};
 
 		if (dto.Categories.IsNotNullOrEmpty()) {
 			List<CategoryEntity> list = new();

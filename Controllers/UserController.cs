@@ -29,13 +29,11 @@ public class UserController : BaseApiController {
 	public ActionResult<GenericResponse<IEnumerable<UserEntity>>> Filter(UserFilterDto dto) => Result(_repository.Filter(dto));
 
 	[HttpGet]
-	[OutputCache(PolicyName = "default")]
 	public ActionResult<GenericResponse<IEnumerable<UserEntity>>> Read([FromQuery] UserFilterDto dto) => Result(_repository.Filter(dto));
 
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	[AllowAnonymous]
 	[HttpGet("{id}")]
-	[OutputCache(PolicyName = "default")]
 	public async Task<ActionResult<GenericResponse<UserEntity?>>> ReadById(string id) => Result(await _repository.ReadById(id));
 
 	[HttpPut]
@@ -44,7 +42,6 @@ public class UserController : BaseApiController {
 
 	[HttpGet("ReadMyBlockList")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	[OutputCache(PolicyName = "10s")]
 	public async Task<ActionResult<GenericResponse<IQueryable<UserEntity>>>> ReadMine() => Result(await _repository.ReadMyBlockList());
 
 	[HttpPost("ToggleBlock")]
