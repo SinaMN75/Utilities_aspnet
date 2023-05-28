@@ -44,7 +44,7 @@ public class ProductEntity : BaseEntity {
 	public string? UserId { get; set; }
 	public UserEntity? User { get; set; }
 
-	public ProductJsonDetail? ProductJsonDetail { get; set; } = new();
+	public ProductJsonDetail ProductJsonDetail { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<FormEntity>? Forms { get; set; }

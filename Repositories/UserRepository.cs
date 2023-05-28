@@ -299,7 +299,7 @@ public class UserRepository : IUserRepository {
 
 		string? sheba = dto.ShebaNumber.GetShebaNumber();
 
-		if (user.UserJsonDetail.IsAuthorize.IsTrue()) {
+		if (user.UserJsonDetail.LegalAuthenticationType == LegalAuthenticationType.Authenticated) {
 			if (sheba is null) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 			user.UserJsonDetail.ShebaNumber = user.UserJsonDetail.ShebaNumber == dto.ShebaNumber ? user.UserJsonDetail.ShebaNumber : dto.ShebaNumber;
 		}
@@ -309,8 +309,8 @@ public class UserRepository : IUserRepository {
 
 			user.UserJsonDetail.MeliCode = meliCode;
 			user.UserJsonDetail.ShebaNumber = sheba;
-			user.UserJsonDetail.IsForeigner = dto.IsForeigner;
-			user.UserJsonDetail.IsAuthorize = true;
+			user.UserJsonDetail.NationalityType = dto.NationalityType;
+			user.UserJsonDetail.LegalAuthenticationType = LegalAuthenticationType.Authenticated;
 		}
 
 		_dbContext.Set<UserEntity>().Update(user);
@@ -329,7 +329,11 @@ public class UserRepository : IUserRepository {
 		entity.AppUserName = dto.AppUserName ?? entity.AppUserName;
 		entity.AppEmail = dto.AppEmail ?? entity.AppEmail;
 		entity.UserJsonDetail.Instagram = dto.Instagram ?? entity.UserJsonDetail.Instagram;
-		entity.UserJsonDetail.Telegram = dto.Telegram ?? entity.UserJsonDetail.Telegram;
+		entity.UserJsonDetail.LegalAuthenticationType = dto.LegalAuthenticationType ?? entity.UserJsonDetail.LegalAuthenticationType;
+		entity.UserJsonDetail.NationalityType = dto.NationalityType ?? entity.UserJsonDetail.NationalityType;
+		entity.UserJsonDetail.Instagram = dto.Instagram ?? entity.UserJsonDetail.Instagram;
+		entity.UserJsonDetail.Instagram = dto.Instagram ?? entity.UserJsonDetail.Instagram;
+		entity.UserJsonDetail.PrivacyType = dto.PrivacyType ?? entity.UserJsonDetail.PrivacyType;
 		entity.UserJsonDetail.WhatsApp = dto.WhatsApp ?? entity.UserJsonDetail.WhatsApp;
 		entity.UserJsonDetail.LinkedIn = dto.LinkedIn ?? entity.UserJsonDetail.LinkedIn;
 		entity.UserJsonDetail.Dribble = dto.Dribble ?? entity.UserJsonDetail.Dribble;
@@ -350,7 +354,6 @@ public class UserRepository : IUserRepository {
 		entity.PhoneNumber = dto.PhoneNumber ?? entity.PhoneNumber;
 		entity.UserJsonDetail.Color = dto.Color ?? entity.UserJsonDetail.Color;
 		entity.UserJsonDetail.Website = dto.Website ?? entity.UserJsonDetail.Website;
-		entity.UserJsonDetail.ShowContactInfo = dto.ShowContactInfo ?? entity.UserJsonDetail.ShowContactInfo;
 		entity.State = dto.State ?? entity.State;
 		entity.Type = dto.Type ?? entity.Type;
 		entity.Point = dto.Point ?? entity.Point;
@@ -363,7 +366,6 @@ public class UserRepository : IUserRepository {
 		entity.Badge = dto.Badge ?? entity.Badge;
 		entity.UpdatedAt = DateTime.Now;
 		entity.IsOnline = dto.IsOnline ?? entity.IsOnline;
-		entity.UserJsonDetail.IsPrivate = dto.IsPrivate ?? entity.UserJsonDetail.IsPrivate;
 		entity.ExpireUpgradeAccount = dto.ExpireUpgradeAccount ?? entity.ExpireUpgradeAccount;
 		entity.AgeCategory = dto.AgeCategory ?? entity.AgeCategory;
 

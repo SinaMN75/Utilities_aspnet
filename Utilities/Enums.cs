@@ -174,6 +174,22 @@ public enum GenderType {
 	None = 107
 }
 
+public enum PrivacyType {
+	Private = 100,
+	Public = 101,
+	FollowersOnly = 102
+}
+
+public enum NationalityType {
+	Iranian = 100,
+	NonIranian = 101
+}
+
+public enum LegalAuthenticationType {
+	Authenticated = 100,
+	NotAutenticated = 101
+}
+
 public enum AgeCategory {
 	None = 100,
 	Kids = 101,

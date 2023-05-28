@@ -58,7 +58,7 @@ public class UserEntity : IdentityUser {
 	public DateTime? ExpireUpgradeAccount { get; set; }
 	public AgeCategory? AgeCategory { get; set; }
 
-	public UserJsonDetail? UserJsonDetail { get; set; } = new();
+	public UserJsonDetail UserJsonDetail { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
@@ -158,12 +158,11 @@ public class UserJsonDetail {
 	public string? Website { get; set; }
 	public string? Activity { get; set; }
 	public string? Color { get; set; }
-	public bool? ShowContactInfo { get; set; }
-	public bool? IsPrivate { get; set; }
+	public PrivacyType? PrivacyType { get; set; }
 	public string? MeliCode { get; set; }
 	public string? ShebaNumber { get; set; }
-	public bool? IsAuthorize { get; set; }
-	public bool? IsForeigner { get; set; }
+	public LegalAuthenticationType? LegalAuthenticationType { get; set; }
+	public NationalityType? NationalityType { get; set; }
 	public string? Code { get; set; }
 }
 
@@ -241,6 +240,9 @@ public class UserCreateUpdateDto {
 	public string? Color { get; set; }
 	public string? AccessLevel { get; set; }
 	public GenderType? Gender { get; set; }
+	public LegalAuthenticationType? LegalAuthenticationType { get; set; }
+	public NationalityType? NationalityType { get; set; }
+	public PrivacyType? PrivacyType { get; set; }
 	public bool? IsOnline { get; set; }
 	public bool? IsPrivate { get; set; }
 	public AgeCategory? AgeCategory { get; set; }
@@ -289,7 +291,7 @@ public class TransferFromWalletToWalletDto {
 }
 
 public class AuthorizeUserDto {
-	public bool IsForeigner { get; set; }
+	public NationalityType NationalityType { get; set; }
 	public string Code { get; set; } = null!;
 	public string ShebaNumber { get; set; } = null!;
 }

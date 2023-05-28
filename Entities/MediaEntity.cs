@@ -10,7 +10,7 @@ public class MediaEntity : BaseEntity {
 
 	public int? Order { get; set; }
 	
-	public MediaJsonDetail? MediaJsonDetail { get; set; } = new();
+	public MediaJsonDetail MediaJsonDetail { get; set; } = new();
 
 	[NotMapped]
 	public string Url => $"{Server.ServerAddress}/Medias/{FileName}";

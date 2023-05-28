@@ -35,7 +35,7 @@ public class GroupChatEntity : BaseEntity {
 
 	public ChatType? Type { get; set; }
 
-	public GroupChatJsonDetail? GroupChatJsonDetail { get; set; }
+	public GroupChatJsonDetail GroupChatJsonDetail { get; set; }
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<UserEntity>? Users { get; set; }

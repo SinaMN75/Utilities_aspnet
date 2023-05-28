@@ -35,6 +35,9 @@ public class AppSettingsController : BaseApiController {
 			AgeCategory = EnumExtension.GetValues<AgeCategory>(),
 			ReferenceIdType = EnumExtension.GetValues<ReferenceIdType>(),
 			ChatTypes = EnumExtension.GetValues<ChatType>(),
+			PrivacyType = EnumExtension.GetValues<PrivacyType>(),
+			Nationality = EnumExtension.GetValues<NationalityType>(),
+			LegalAuthenticationType = EnumExtension.GetValues<LegalAuthenticationType>(),
 			AppSettings = appSettings
 		}));
 	}

@@ -67,5 +67,8 @@ public class EnumDto {
 	public IEnumerable<IdTitleDto>? ReferenceIdType { get; set; }
 	public IEnumerable<IdTitleDto>? ChatTypes { get; set; }
 	public IEnumerable<IdTitleDto>? GenderType { get; set; }
+	public IEnumerable<IdTitleDto>? PrivacyType { get; set; }
+	public IEnumerable<IdTitleDto>? Nationality { get; set; }
+	public IEnumerable<IdTitleDto>? LegalAuthenticationType { get; set; }
 	public AppSettings? AppSettings { get; set; }
 }
