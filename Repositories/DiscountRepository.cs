@@ -60,12 +60,7 @@ public class DiscountRepository : IDiscountRepository {
 	}
 
 	public async Task<GenericResponse> Delete(Guid id) {
-		DiscountEntity? e = await _dbContext.Set<DiscountEntity>().FirstOrDefaultAsync(x => x.Id == id);
-
-		if (e == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
-		_dbContext.Remove(e);
-		await _dbContext.SaveChangesAsync();
-
+		await _dbContext.Set<DiscountEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
 	}
 
