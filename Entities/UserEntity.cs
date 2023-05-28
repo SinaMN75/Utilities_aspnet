@@ -1,7 +1,7 @@
 ﻿namespace Utilities_aspnet.Entities;
 
 public class UserEntity : IdentityUser {
-	public bool Suspend { get; set; }
+	public bool? Suspend { get; set; }
 
 	[StringLength(500)]
 	public string? FirstName { get; set; }
@@ -12,7 +12,7 @@ public class UserEntity : IdentityUser {
 	[StringLength(500)]
 	public string? FullName { get; set; }
 
-	public bool IsPrivate { get; set; } = true;
+	public bool? IsPrivate { get; set; } = true;
 
 	[StringLength(500)]
 	public string? Headline { get; set; }
@@ -39,7 +39,6 @@ public class UserEntity : IdentityUser {
 	public string? AccessLevel { get; set; }
 
 	[StringLength(500)]
-
 	public string? Region { get; set; }
 
 	[StringLength(500)]
@@ -57,9 +56,9 @@ public class UserEntity : IdentityUser {
 	public bool? IsOnline { get; set; }
 	public string? MutedChats { get; set; }
 	public DateTime? ExpireUpgradeAccount { get; set; }
-	public AgeCategory AgeCategory { get; set; } = AgeCategory.None;
+	public AgeCategory? AgeCategory { get; set; }
 
-	public UserJsonDetail UserJsonDetail { get; set; } = new();
+	public UserJsonDetail? UserJsonDetail { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
@@ -201,26 +200,6 @@ public class RegisterDto {
 public class LoginWithPasswordDto {
 	public string? Email { get; set; }
 	public string? Password { get; set; }
-}
-
-public class GrowthRateReadDto {
-	public string? Id { get; set; }
-	public double InterActive1 { get; set; }
-	public double InterActive2 { get; set; }
-	public double InterActive3 { get; set; }
-	public double InterActive4 { get; set; }
-	public double InterActive5 { get; set; }
-	public double InterActive6 { get; set; }
-	public double InterActive7 { get; set; }
-	public double Feedback1 { get; set; }
-	public double Feedback2 { get; set; }
-	public double Feedback3 { get; set; }
-	public double Feedback4 { get; set; }
-	public double Feedback5 { get; set; }
-	public double Feedback6 { get; set; }
-	public double Feedback7 { get; set; }
-	public double TotalInterActive { get; set; }
-	public double TotalFeedback { get; set; }
 }
 
 public class UserCreateUpdateDto {

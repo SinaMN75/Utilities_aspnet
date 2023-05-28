@@ -251,7 +251,7 @@ public class UserRepository : IUserRepository {
 		string mobile = dto.Mobile.Replace("+", "");
 		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == mobile || x.Email == mobile);
 		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.UserNotFound);
-		if (user.Suspend) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.UserSuspended);
+		if (user.Suspend ?? false) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.UserSuspended);
 
 		await _dbContext.SaveChangesAsync();
 		JwtSecurityToken token = await CreateToken(user);
@@ -384,35 +384,6 @@ public class UserRepository : IUserRepository {
 			Amount = amount,
 			Descriptions = description
 		};
-	}
-
-	private async Task<GrowthRateReadDto?> GetGrowthRate(string? id) {
-		IEnumerable<CommentEntity> myComments = await _dbContext.Set<CommentEntity>().Where(x => x.UserId == id).ToListAsync();
-		IEnumerable<Guid> productIds = await _dbContext.Set<ProductEntity>().Where(x => x.UserId == id).Select(x => x.Id).ToListAsync();
-		IEnumerable<CommentEntity> comments = await _dbContext.Set<CommentEntity>().Where(x => productIds.Contains(x.ProductId ?? Guid.Empty)).ToListAsync();
-		GrowthRateReadDto dto = new() {
-			Feedback7 = 0,
-			Id = id
-		};
-		double totalInteractive = dto.InterActive1 +
-		                          dto.InterActive2 +
-		                          dto.InterActive3 +
-		                          dto.InterActive4 +
-		                          dto.InterActive5 +
-		                          dto.InterActive6;
-		double totalFeedback = dto.Feedback1 +
-		                       dto.Feedback2 +
-		                       dto.Feedback3 +
-		                       dto.Feedback4 +
-		                       dto.Feedback5 +
-		                       dto.Feedback6;
-		double total = totalInteractive + totalFeedback;
-		if (total > 0) {
-			dto.TotalInterActive = totalInteractive / total * 100;
-			dto.TotalFeedback = totalFeedback / total * 100;
-		}
-
-		return dto;
 	}
 
 	private async Task<bool> SendOtp(string userId, int codeLength) {
