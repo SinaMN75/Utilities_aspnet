@@ -3,7 +3,7 @@
 [Table("Comment")]
 public class CommentEntity : BaseEntity {
 	public double? Score { get; set; } = 0;
-	public CommentJsonDetail CommentJsonDetail { get; set; } = new();
+	public CommentJsonDetail JsonDetail { get; set; } = new();
 
 	[StringLength(2000)]
 	public string? Comment { get; set; }

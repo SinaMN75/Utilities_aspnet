@@ -10,9 +10,6 @@ public class BookmarkEntity : BaseEntity {
 	public ProductEntity? Product { get; set; }
 	public Guid? ProductId { get; set; }
 
-	public CategoryEntity? Category { get; set; }
-	public Guid? CategoryId { get; set; }
-
 	public BookmarkEntity? Parent { get; set; }
 	public Guid? ParentId { get; set; }
 
@@ -25,7 +22,6 @@ public class BookmarkEntity : BaseEntity {
 public class BookmarkCreateDto {
 	public string? FolderName { get; set; }
 	public Guid? ProductId { get; set; }
-	public Guid? CategoryId { get; set; }
 	public Guid? ParentId { get; set; }
 }
 

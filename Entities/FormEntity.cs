@@ -26,14 +26,6 @@ public class FormEntity : BaseEntity {
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
 	public Guid? ProductId { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public OrderDetailEntity? OrderDetail { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public Guid? OrderDetailId { get; set; }
 }
 
 [Table("FormFields")]
@@ -46,12 +38,6 @@ public class FormFieldEntity : BaseEntity {
 	public string? OptionList { get; set; }
 
 	public FormFieldType? Type { get; set; }
-
-	public Guid? ParentId { get; set; }
-	public FormFieldEntity? Parent { get; set; }
-
-	[InverseProperty("Parent")]
-	public IEnumerable<FormFieldEntity>? Children { get; set; }
 
 	public Guid? CategoryId { get; set; }
 
@@ -66,7 +52,6 @@ public class FormFieldEntity : BaseEntity {
 public class FormCreateDto {
 	public string? UserId { get; set; }
 	public Guid? ProductId { get; set; }
-	public Guid? OrderDetailId { get; set; }
 	public IEnumerable<FormTitleDto>? Form { get; set; }
 }
 

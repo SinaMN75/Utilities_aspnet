@@ -189,22 +189,22 @@ public class UserRepository : IUserRepository {
 		entity.IsOnline = dto.IsOnline ?? entity.IsOnline;
 		entity.ExpireUpgradeAccount = dto.ExpireUpgradeAccount ?? entity.ExpireUpgradeAccount;
 		entity.AgeCategory = dto.AgeCategory ?? entity.AgeCategory;
-		entity.UserJsonDetail = new UserJsonDetail {
-			Instagram = dto.Instagram ?? entity.UserJsonDetail.Instagram,
-			Telegram = dto.Telegram ?? entity.UserJsonDetail.Telegram,
-			WhatsApp = dto.WhatsApp ?? entity.UserJsonDetail.WhatsApp,
-			LinkedIn = dto.LinkedIn ?? entity.UserJsonDetail.LinkedIn,
-			Dribble = dto.Dribble ?? entity.UserJsonDetail.Dribble,
-			SoundCloud = dto.SoundCloud ?? entity.UserJsonDetail.SoundCloud,
-			Pinterest = dto.Pinterest ?? entity.UserJsonDetail.Pinterest,
-			Website = dto.Website ?? entity.UserJsonDetail.Website,
-			Activity = dto.Activity ?? entity.UserJsonDetail.Activity,
-			Color = dto.Color ?? entity.UserJsonDetail.Color,
-			PrivacyType = dto.PrivacyType ?? entity.UserJsonDetail.PrivacyType,
+		entity.JsonDetail = new UserJsonDetail {
+			Instagram = dto.Instagram ?? entity.JsonDetail.Instagram,
+			Telegram = dto.Telegram ?? entity.JsonDetail.Telegram,
+			WhatsApp = dto.WhatsApp ?? entity.JsonDetail.WhatsApp,
+			LinkedIn = dto.LinkedIn ?? entity.JsonDetail.LinkedIn,
+			Dribble = dto.Dribble ?? entity.JsonDetail.Dribble,
+			SoundCloud = dto.SoundCloud ?? entity.JsonDetail.SoundCloud,
+			Pinterest = dto.Pinterest ?? entity.JsonDetail.Pinterest,
+			Website = dto.Website ?? entity.JsonDetail.Website,
+			Activity = dto.Activity ?? entity.JsonDetail.Activity,
+			Color = dto.Color ?? entity.JsonDetail.Color,
+			PrivacyType = dto.PrivacyType ?? entity.JsonDetail.PrivacyType,
 			ShebaNumber = dto.ShebaNumber,
-			LegalAuthenticationType = dto.LegalAuthenticationType ?? entity.UserJsonDetail.LegalAuthenticationType,
-			NationalityType = dto.NationalityType ?? entity.UserJsonDetail.NationalityType,
-			Code = dto.Code ?? entity.UserJsonDetail.Code
+			LegalAuthenticationType = dto.LegalAuthenticationType ?? entity.JsonDetail.LegalAuthenticationType,
+			NationalityType = dto.NationalityType ?? entity.JsonDetail.NationalityType,
+			Code = dto.Code ?? entity.JsonDetail.Code
 		};
 
 		if (dto.Categories.IsNotNullOrEmpty()) {
@@ -287,7 +287,7 @@ public class UserRepository : IUserRepository {
 			Suspend = false,
 			FirstName = dto.FirstName,
 			LastName = dto.LastName,
-			UserJsonDetail = dto.UserJsonDetail
+			JsonDetail = dto.JsonDetail
 		};
 
 		IdentityResult? result = await _userManager.CreateAsync(user, dto.Password);
@@ -397,18 +397,18 @@ public class UserRepository : IUserRepository {
 
 		string? sheba = dto.ShebaNumber.GetShebaNumber();
 
-		if (user.UserJsonDetail.LegalAuthenticationType == LegalAuthenticationType.Authenticated) {
+		if (user.JsonDetail.LegalAuthenticationType == LegalAuthenticationType.Authenticated) {
 			if (sheba is null) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
-			user.UserJsonDetail.ShebaNumber = user.UserJsonDetail.ShebaNumber == dto.ShebaNumber ? user.UserJsonDetail.ShebaNumber : dto.ShebaNumber;
+			user.JsonDetail.ShebaNumber = user.JsonDetail.ShebaNumber == dto.ShebaNumber ? user.JsonDetail.ShebaNumber : dto.ShebaNumber;
 		}
 		else {
 			string? meliCode = dto.Code.Length == 10 ? dto.Code : null;
 			if (meliCode is null || sheba is null) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 
-			user.UserJsonDetail.Code = meliCode;
-			user.UserJsonDetail.ShebaNumber = sheba;
-			user.UserJsonDetail.NationalityType = dto.NationalityType;
-			user.UserJsonDetail.LegalAuthenticationType = LegalAuthenticationType.Authenticated;
+			user.JsonDetail.Code = meliCode;
+			user.JsonDetail.ShebaNumber = sheba;
+			user.JsonDetail.NationalityType = dto.NationalityType;
+			user.JsonDetail.LegalAuthenticationType = LegalAuthenticationType.Authenticated;
 		}
 
 		_dbContext.Set<UserEntity>().Update(user);

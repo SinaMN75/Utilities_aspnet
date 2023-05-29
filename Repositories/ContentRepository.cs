@@ -28,10 +28,7 @@ public class ContentRepository : IContentRepository {
 	}
 
 	public GenericResponse<IQueryable<ContentEntity>> Read() {
-		IQueryable<ContentEntity> e = _dbContext.Set<ContentEntity>().AsNoTracking()
-			.Include(x => x.Media!.Where(y => y.DeletedAt == null))
-			.Where(x => x.DeletedAt == null);
-		return new GenericResponse<IQueryable<ContentEntity>>(e);
+		return new GenericResponse<IQueryable<ContentEntity>>(_dbContext.Set<ContentEntity>().AsNoTracking().Include(x => x.Media));
 	}
 
 	public async Task<GenericResponse<ContentEntity>> Update(ContentCreateUpdateDto dto) {
@@ -47,9 +44,7 @@ public class ContentRepository : IContentRepository {
 	}
 
 	public async Task<GenericResponse> Delete(Guid id) {
-		ContentEntity e = (await _dbContext.Set<ContentEntity>().FirstOrDefaultAsync(i => i.Id == id))!;
-		e.DeletedAt = DateTime.Now;
-		await _dbContext.SaveChangesAsync();
+		await _dbContext.Set<ContentEntity>().Where(i => i.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
 	}
 }

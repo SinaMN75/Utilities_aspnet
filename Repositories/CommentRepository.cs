@@ -159,16 +159,16 @@ public class CommentRepository : ICommentRepository {
 		CommentEntity? comment = await _dbContext.Set<CommentEntity>().Where(w => w.Id == commentId).FirstOrDefaultAsync();
 		if (comment is null) return new GenericResponse(UtilitiesStatusCodes.NotFound, "Comment Not Found");
 
-		CommentReacts? oldReaction = comment.CommentJsonDetail.Reacts.FirstOrDefault(w => w.UserId == _userId);
+		CommentReacts? oldReaction = comment.JsonDetail.Reacts.FirstOrDefault(w => w.UserId == _userId);
 		if (oldReaction is null) {
 			CommentReacts? react = new() {
 				Reaction = reaction,
 				UserId = user.Id
 			};
-			comment.CommentJsonDetail.Reacts.Add(react);
+			comment.JsonDetail.Reacts.Add(react);
 		}
 		else if (oldReaction.Reaction != reaction) { oldReaction.Reaction = reaction; }
-		else { comment.CommentJsonDetail.Reacts.Remove(oldReaction); }
+		else { comment.JsonDetail.Reacts.Remove(oldReaction); }
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse(UtilitiesStatusCodes.Success, "Ok");
 	}

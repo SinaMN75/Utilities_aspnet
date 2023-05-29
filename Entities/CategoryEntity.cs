@@ -11,7 +11,7 @@ public class CategoryEntity : BaseEntity {
 	public double? Price { get; set; }
 	public int? Stock { get; set; }
 	public int? Order { get; set; }
-	public CategoryJsonDetail CategoryJsonDetail { get; set; } = new();
+	public CategoryJsonDetail JsonDetail { get; set; } = new();
 
 	public Guid? ParentId { get; set; }
 	public CategoryEntity? Parent { get; set; }

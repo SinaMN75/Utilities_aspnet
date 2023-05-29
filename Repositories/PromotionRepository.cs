@@ -43,7 +43,7 @@ public class PromotionRepository : IPromotionRepository {
 
 		GroupChatEntity? groupChat = await _dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(f => f.Id == dto.GroupChatId);
 		if (groupChat is not null) {
-			groupChat.GroupChatJsonDetail.Boosted = DateTime.Now;
+			groupChat.JsonDetail.Boosted = DateTime.Now;
 			_dbContext.Update(groupChat);
 		}
 		await _dbContext.SaveChangesAsync();

@@ -174,7 +174,7 @@ public static class StartupExtension {
 		app.UseSwagger();
 		app.UseSwaggerUI(c => {
 			c.DocExpansion(DocExpansion.None);
-			c.DefaultModelsExpandDepth(-1);
+			c.DefaultModelsExpandDepth(2);
 		});
 	}
 }

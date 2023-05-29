@@ -29,9 +29,7 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 
 	public async Task<GenericResponse<BookmarkEntity?>> ToggleBookmark(BookmarkCreateDto dto) {
 		BookmarkEntity? oldBookmark = _dbContext.Set<BookmarkEntity>()
-			.FirstOrDefault(x => ((x.ProductId != null && x.ProductId == dto.ProductId) ||
-			                      (x.CategoryId != null && x.CategoryId == dto.CategoryId)) &&
-			                     x.UserId == _userId);
+			.FirstOrDefault(x => x.ProductId != null && x.ProductId == dto.ProductId && x.UserId == _userId);
 		if (oldBookmark == null) {
 			BookmarkEntity e = new() {UserId = _userId};
 			if (dto.ProductId.HasValue) e.ProductId = dto.ProductId;
@@ -66,12 +64,8 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 		IQueryable<BookmarkEntity> bookmark = _dbContext.Set<BookmarkEntity>().Include(x => x.Media)
 			.Where(x => x.UserId == uId)
 			.Include(x => x.Product).ThenInclude(x => x.Media)
-			.Include(x => x.Product).ThenInclude(i => i.User).ThenInclude(x => x.Media)
-			.Include(x => x.Product).ThenInclude(i => i.Categories)
 			.Include(x => x.Children).ThenInclude(x => x.Product)
-			.Include(x => x.Children).Include(x => x.Product).ThenInclude(x => x.Media)
-			.Include(x => x.Children).Include(x => x.Product).ThenInclude(i => i.User).ThenInclude(x => x.Media)
-			.Include(x => x.Children).Include(x => x.Product).ThenInclude(i => i.Categories);
+			.Include(x => x.Children).Include(x => x.Product).ThenInclude(x => x.Media);
 		return new GenericResponse<IQueryable<BookmarkEntity>?>(bookmark);
 	}
 

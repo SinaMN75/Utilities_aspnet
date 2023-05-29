@@ -30,7 +30,7 @@ public class UserEntity : IdentityUser {
 	public bool? IsPrivate { get; set; } = true;
 	public DateTime? ExpireUpgradeAccount { get; set; }
 	public AgeCategory? AgeCategory { get; set; }
-	public UserJsonDetail UserJsonDetail { get; set; } = new();
+	public UserJsonDetail JsonDetail { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
@@ -164,7 +164,7 @@ public class RegisterDto {
 	public string? PhoneNumber { get; set; }
 	public string? Password { get; set; }
 	public bool SendSms { get; set; } = false;
-	public UserJsonDetail? UserJsonDetail { get; set; }
+	public UserJsonDetail? JsonDetail { get; set; }
 }
 
 public class LoginWithPasswordDto {

@@ -19,9 +19,7 @@ public class FormRepository : IFormRepository {
 			try {
 				FormEntity? up = await _dbContext.Set<FormEntity>()
 					.FirstOrDefaultAsync(x => ((x.ProductId == model.ProductId &&
-					                            model.ProductId != null) || (x.UserId == model.UserId &&
-					                                                         model.UserId != null) || (x.OrderDetailId == model.OrderDetailId &&
-					                                                                                   model.OrderDetailId != null)) &&
+					                            model.ProductId != null) || (x.UserId == model.UserId && model.UserId != null)) &&
 					                          x.FormFieldId == item.Id);
 				if (up != null) {
 					up.Title = item.Title ?? "";
@@ -31,7 +29,6 @@ public class FormRepository : IFormRepository {
 					_dbContext.Set<FormEntity>().Add(new FormEntity {
 						ProductId = model.ProductId,
 						UserId = model.UserId,
-						OrderDetailId = model.OrderDetailId,
 						FormFieldId = item.Id,
 						Title = item.Title ?? ""
 					});
@@ -42,9 +39,7 @@ public class FormRepository : IFormRepository {
 			catch { }
 
 		IQueryable<FormEntity> entity = _dbContext.Set<FormEntity>()
-			.Where(x => (x.ProductId == model.ProductId && model.ProductId != null)
-			            || (x.UserId == model.UserId && model.UserId != null)
-			            || (x.OrderDetailId == model.OrderDetailId && model.OrderDetailId != null))
+			.Where(x => (x.ProductId == model.ProductId && model.ProductId != null) || (x.UserId == model.UserId && model.UserId != null))
 			.AsNoTracking();
 		return new GenericResponse<IQueryable<FormEntity>>(entity);
 	}
@@ -85,8 +80,6 @@ public class FormRepository : IFormRepository {
 		return new GenericResponse<IQueryable<FormFieldEntity>>(_dbContext.Set<FormFieldEntity>()
 			                                                        .Where(x => x.DeletedAt == null)
 			                                                        .Where(x => x.CategoryId == categoryId)
-			                                                        .Where(x => x.ParentId == null)
-			                                                        .Include(i => i.Children.Where(x => x.DeletedAt == null))
 			                                                        .AsNoTracking());
 	}
 

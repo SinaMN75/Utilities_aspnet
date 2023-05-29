@@ -2,24 +2,12 @@
 
 [Table("Address")]
 public class AddressEntity : BaseEntity {
-	[MaxLength(500)]
 	public string? ReceiverFullName { get; set; }
-
-	[MaxLength(500)]
 	public string? ReceiverPhoneNumber { get; set; }
-
-	[MaxLength(500)]
 	public string? Address { get; set; }
-
-	[MaxLength(500)]
 	public string? Pelak { get; set; }
-
-	[MaxLength(500)]
 	public string? Unit { get; set; }
-
-	[MaxLength(500)]
 	public string? PostalCode { get; set; }
-
 	public bool IsDefault { get; set; }
 	public UserEntity? User { get; set; }
 	public string? UserId { get; set; }

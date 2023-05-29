@@ -5,7 +5,7 @@ public class MediaEntity : BaseEntity {
 	public string? FileName { get; set; }
 	public string? UseCase { get; set; }
 	public int? Order { get; set; }
-	public MediaJsonDetail MediaJsonDetail { get; set; } = new();
+	public MediaJsonDetail JsonDetail { get; set; } = new();
 
 	[NotMapped]
 	public string Url => $"{Server.ServerAddress}/Medias/{FileName}";
@@ -98,7 +98,7 @@ public class MediaJsonDetail {
 	public string? Time { get; set; }
 	public string? Artist { get; set; }
 	public string? Album { get; set; }
-	public bool? IsPrivate { get; set; }
+	public PrivacyType? IsPrivate { get; set; }
 }
 
 public class UploadDto {
@@ -110,7 +110,7 @@ public class UploadDto {
 	public string? Time { get; set; }
 	public string? Artist { get; set; }
 	public string? Album { get; set; }
-	public bool? IsPrivate { get; set; }
+	public PrivacyType? PrivacyType { get; set; }
 	public Guid? ProductId { get; set; }
 	public Guid? ContentId { get; set; }
 	public Guid? CategoryId { get; set; }

@@ -205,7 +205,7 @@ public class ProductRepository : IProductRepository {
 		i.SuccessfulPurchase = displayOrderComplete;
 
 		bool isUserBuyIt = completeOrder.Any(a => a.UserId == _userId);
-		if (isUserBuyIt) i.Media?.Select(s => s.MediaJsonDetail.Link == "");
+		if (isUserBuyIt) i.Media?.Select(s => s.JsonDetail.Link == "");
 
 		await _promotionRepository.UserSeened(i.Id);
 
@@ -282,31 +282,6 @@ public static class ProductEntityExtension {
 		entity.UseCase = dto.UseCase ?? entity.UseCase;
 		entity.Price = dto.Price ?? entity.Price;
 		entity.Enabled = dto.Enabled ?? entity.Enabled;
-		entity.ProductJsonDetail.Details = dto.Details ?? entity.ProductJsonDetail.Details;
-		entity.ProductJsonDetail.Author = dto.Author ?? entity.ProductJsonDetail.Author;
-		entity.ProductJsonDetail.PhoneNumber = dto.PhoneNumber ?? entity.ProductJsonDetail.PhoneNumber;
-		entity.ProductJsonDetail.Link = dto.Link ?? entity.ProductJsonDetail.Link;
-		entity.ProductJsonDetail.Website = dto.Website ?? entity.ProductJsonDetail.Website;
-		entity.ProductJsonDetail.Email = dto.Email ?? entity.ProductJsonDetail.Email;
-		entity.ProductJsonDetail.Longitude = dto.Longitude ?? entity.ProductJsonDetail.Longitude;
-		entity.ProductJsonDetail.Latitude = dto.Latitude ?? entity.ProductJsonDetail.Latitude;
-		entity.ProductJsonDetail.ResponseTime = dto.ResponseTime ?? entity.ProductJsonDetail.ResponseTime;
-		entity.ProductJsonDetail.OnTimeDelivery = dto.OnTimeDelivery ?? entity.ProductJsonDetail.OnTimeDelivery;
-		entity.ProductJsonDetail.Length = dto.Length ?? entity.ProductJsonDetail.Length;
-		entity.ProductJsonDetail.Width = dto.Width ?? entity.ProductJsonDetail.Width;
-		entity.ProductJsonDetail.Height = dto.Height ?? entity.ProductJsonDetail.Height;
-		entity.ProductJsonDetail.Weight = dto.Weight ?? entity.ProductJsonDetail.Weight;
-		entity.ProductJsonDetail.MinOrder = dto.MinOrder ?? entity.ProductJsonDetail.MinOrder;
-		entity.ProductJsonDetail.MaxOrder = dto.MaxOrder ?? entity.ProductJsonDetail.MaxOrder;
-		entity.ProductJsonDetail.MinPrice = dto.MinPrice ?? entity.ProductJsonDetail.MinPrice;
-		entity.ProductJsonDetail.MaxPrice = dto.MaxPrice ?? entity.ProductJsonDetail.MaxPrice;
-		entity.ProductJsonDetail.Unit = dto.Unit ?? entity.ProductJsonDetail.Unit;
-		entity.ProductJsonDetail.Address = dto.Address ?? entity.ProductJsonDetail.Address;
-		entity.ProductJsonDetail.StartDate = dto.StartDate ?? entity.ProductJsonDetail.StartDate;
-		entity.ProductJsonDetail.EndDate = dto.EndDate ?? entity.ProductJsonDetail.EndDate;
-		entity.ProductJsonDetail.ShippingCost = dto.ShippingCost ?? entity.ProductJsonDetail.ShippingCost;
-		entity.ProductJsonDetail.ShippingTime = dto.ShippingTime ?? entity.ProductJsonDetail.ShippingTime;
-		entity.ProductJsonDetail.KeyValue = dto.KeyValue ?? entity.ProductJsonDetail.KeyValue;
 		entity.Stock = dto.Stock ?? entity.Stock;
 		entity.Status = dto.Status ?? entity.Status;
 		entity.CommentsCount = dto.CommentsCount ?? entity.CommentsCount;
@@ -316,6 +291,33 @@ public static class ProductEntityExtension {
 		entity.ProductState = dto.ProductState ?? entity.ProductState;
 		entity.Boosted = dto.Boosted ?? entity.Boosted;
 		entity.UpdatedAt = DateTime.Now;
+		entity.JsonDetail = new ProductJsonDetail {
+			Details = dto.Details ?? entity.JsonDetail.Details,
+			Author = dto.Author ?? entity.JsonDetail.Author,
+			PhoneNumber = dto.PhoneNumber ?? entity.JsonDetail.PhoneNumber,
+			Link = dto.Link ?? entity.JsonDetail.Link,
+			Website = dto.Website ?? entity.JsonDetail.Website,
+			Email = dto.Email ?? entity.JsonDetail.Email,
+			Longitude = dto.Longitude ?? entity.JsonDetail.Longitude,
+			Latitude = dto.Latitude ?? entity.JsonDetail.Latitude,
+			ResponseTime = dto.ResponseTime ?? entity.JsonDetail.ResponseTime,
+			OnTimeDelivery = dto.OnTimeDelivery ?? entity.JsonDetail.OnTimeDelivery,
+			Length = dto.Length ?? entity.JsonDetail.Length,
+			Width = dto.Width ?? entity.JsonDetail.Width,
+			Height = dto.Height ?? entity.JsonDetail.Height,
+			Weight = dto.Weight ?? entity.JsonDetail.Weight,
+			MinOrder = dto.MinOrder ?? entity.JsonDetail.MinOrder,
+			MaxOrder = dto.MaxOrder ?? entity.JsonDetail.MaxOrder,
+			MinPrice = dto.MinPrice ?? entity.JsonDetail.MinPrice,
+			MaxPrice = dto.MaxPrice ?? entity.JsonDetail.MaxPrice,
+			Unit = dto.Unit ?? entity.JsonDetail.Unit,
+			Address = dto.Address ?? entity.JsonDetail.Address,
+			StartDate = dto.StartDate ?? entity.JsonDetail.StartDate,
+			EndDate = dto.EndDate ?? entity.JsonDetail.EndDate,
+			ShippingCost = dto.ShippingCost ?? entity.JsonDetail.ShippingCost,
+			ShippingTime = dto.ShippingTime ?? entity.JsonDetail.ShippingTime,
+			KeyValue = dto.KeyValue ?? entity.JsonDetail.KeyValue,
+		};
 
 		if (dto.ScorePlus.HasValue) {
 			if (entity.VoteCount == null) entity.VoteCount = 1;

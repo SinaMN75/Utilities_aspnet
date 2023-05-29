@@ -40,9 +40,9 @@ public class MediaRepository : IMediaRepository {
 					NotificationId = model.NotificationId,
 					GroupChatId = model.GroupChatId,
 					GroupChatMessageId = model.GroupChatMessageId,
-					MediaJsonDetail = {
+					JsonDetail = {
 						Title = model.Title,
-						IsPrivate = model.IsPrivate,
+						IsPrivate = model.PrivacyType,
 						Size = model.Size,
 						Time = model.Time,
 						Artist = model.Artist,
@@ -66,9 +66,9 @@ public class MediaRepository : IMediaRepository {
 				         UseCase = model.UseCase,
 				         NotificationId = model.NotificationId,
 				         Order = model.Order,
-				         MediaJsonDetail = {
+				         JsonDetail = {
 					         Title = model.Title,
-					         IsPrivate = model.IsPrivate,
+					         IsPrivate = model.PrivacyType,
 					         Size = model.Size,
 					         Time = model.Time,
 					         Artist = model.Artist,
@@ -98,11 +98,11 @@ public class MediaRepository : IMediaRepository {
 		if (media is null)
 			throw new Exception("media is not found");
 
-		media.MediaJsonDetail.Title = model.Title ?? media.MediaJsonDetail.Title;
-		media.MediaJsonDetail.Size = model.Size ?? media.MediaJsonDetail.Size;
-		media.MediaJsonDetail.Time = model.Time ?? media.MediaJsonDetail.Time;
-		media.MediaJsonDetail.Artist = model.Artist ?? media.MediaJsonDetail.Artist;
-		media.MediaJsonDetail.Album = model.Album ?? media.MediaJsonDetail.Album;
+		media.JsonDetail.Title = model.Title ?? media.JsonDetail.Title;
+		media.JsonDetail.Size = model.Size ?? media.JsonDetail.Size;
+		media.JsonDetail.Time = model.Time ?? media.JsonDetail.Time;
+		media.JsonDetail.Artist = model.Artist ?? media.JsonDetail.Artist;
+		media.JsonDetail.Album = model.Album ?? media.JsonDetail.Album;
 		media.UpdatedAt = DateTime.Now;
 		media.UseCase = model.UseCase ?? media.UseCase;
 		media.Order = model.Order ?? media.Order;
