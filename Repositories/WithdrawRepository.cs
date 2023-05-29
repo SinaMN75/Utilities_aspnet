@@ -28,7 +28,7 @@ public class WithdrawRepository : IWithdrawRepository {
 
 		WithdrawEntity withdraw = new() {
 			Amount = dto.Amount,
-			ApplicantUserId = user.Id,
+			UserId = user.Id,
 			CreatedAt = DateTime.UtcNow,
 			ShebaNumber = dto.ShebaNumber,
 			WithdrawState = WithdrawState.Requested
