@@ -174,7 +174,6 @@ public class UserRepository : IUserRepository {
 		entity.UseCase = dto.UseCase ?? entity.UseCase;
 		entity.UserName = dto.UserName ?? entity.UserName;
 		entity.Email = dto.Email ?? entity.Email;
-		entity.PhoneNumber = dto.PhoneNumber ?? entity.PhoneNumber;
 		entity.State = dto.State ?? entity.State;
 		entity.Type = dto.Type ?? entity.Type;
 		entity.Point = dto.Point ?? entity.Point;
