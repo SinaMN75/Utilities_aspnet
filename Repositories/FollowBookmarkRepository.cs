@@ -12,9 +12,9 @@ public interface IFollowBookmarkRepository {
 
 public class FollowBookmarkRepository : IFollowBookmarkRepository {
 	private readonly DbContext _dbContext;
-	private readonly IUserRepository _userRepository;
 	private readonly INotificationRepository _notificationRepository;
 	private readonly string _userId;
+	private readonly IUserRepository _userRepository;
 
 	public FollowBookmarkRepository(
 		DbContext dbContext,
@@ -29,8 +29,8 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 
 	public async Task<GenericResponse<BookmarkEntity?>> ToggleBookmark(BookmarkCreateDto dto) {
 		BookmarkEntity? oldBookmark = _dbContext.Set<BookmarkEntity>()
-			.FirstOrDefault(x => (x.ProductId != null && x.ProductId == dto.ProductId ||
-			                      x.CategoryId != null && x.CategoryId == dto.CategoryId) &&
+			.FirstOrDefault(x => ((x.ProductId != null && x.ProductId == dto.ProductId) ||
+			                      (x.CategoryId != null && x.CategoryId == dto.CategoryId)) &&
 			                     x.UserId == _userId);
 		if (oldBookmark == null) {
 			BookmarkEntity e = new() {UserId = _userId};
@@ -48,19 +48,17 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 
 		GenericResponse<UserEntity?> userRespository = await _userRepository.ReadById(_userId);
 		UserEntity user = userRespository.Result!;
-		if (user.BookmarkedProducts.Contains(dto.ProductId.ToString())) {
+		if (user.BookmarkedProducts.Contains(dto.ProductId.ToString()))
 			await _userRepository.Update(new UserCreateUpdateDto {
 				Id = _userId,
 				BookmarkedProducts = user.BookmarkedProducts.Replace($",{dto.ProductId}", "")
 			});
-		}
-		else {
+		else
 			await _userRepository.Update(new UserCreateUpdateDto {
 				Id = _userId,
 				BookmarkedProducts = user.BookmarkedProducts + "," + dto.ProductId
 			});
-		}
-		return new GenericResponse<BookmarkEntity?>(oldBookmark, UtilitiesStatusCodes.Success);
+		return new GenericResponse<BookmarkEntity?>(oldBookmark);
 	}
 
 	public GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarks(string? userId) {

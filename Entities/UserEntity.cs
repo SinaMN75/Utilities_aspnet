@@ -1,63 +1,35 @@
 ﻿namespace Utilities_aspnet.Entities;
 
 public class UserEntity : IdentityUser {
-	public bool? Suspend { get; set; }
-
-	[StringLength(500)]
 	public string? FirstName { get; set; }
-
-	[StringLength(500)]
 	public string? LastName { get; set; }
-
-	[StringLength(500)]
 	public string? FullName { get; set; }
-
-	public bool? IsPrivate { get; set; } = true;
-
-	[StringLength(500)]
 	public string? Headline { get; set; }
 
 	[StringLength(2000)]
 	public string? Bio { get; set; }
 
-	[StringLength(500)]
 	public string? AppUserName { get; set; }
-
-	[StringLength(500)]
 	public string? AppPhoneNumber { get; set; }
-
-	[StringLength(500)]
 	public string? AppEmail { get; set; }
-
-	[StringLength(500)]
 	public string? UseCase { get; set; }
-
-	[StringLength(500)]
 	public string? Type { get; set; }
-
-	[StringLength(500)]
 	public string? AccessLevel { get; set; }
-
-	[StringLength(500)]
 	public string? Region { get; set; }
-
-	[StringLength(500)]
 	public string? State { get; set; }
-
+	public string? Badge { get; set; }
+	public string? MutedChats { get; set; }
 	public GenderType? Gender { get; set; }
-
 	public double? Wallet { get; set; } = 0;
 	public double? Point { get; set; } = 0;
 	public DateTime? Birthdate { get; set; }
 	public DateTime? CreatedAt { get; set; }
 	public DateTime? UpdatedAt { get; set; }
-
-	public string? Badge { get; set; }
 	public bool? IsOnline { get; set; }
-	public string? MutedChats { get; set; }
+	public bool? Suspend { get; set; }
+	public bool? IsPrivate { get; set; } = true;
 	public DateTime? ExpireUpgradeAccount { get; set; }
 	public AgeCategory? AgeCategory { get; set; }
-
 	public UserJsonDetail UserJsonDetail { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }

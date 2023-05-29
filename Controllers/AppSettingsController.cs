@@ -6,7 +6,7 @@
 public class AppSettingsController : BaseApiController {
 	private readonly IConfiguration _config;
 
-	public AppSettingsController(IConfiguration config) => _config = config;
+	public AppSettingsController(IConfiguration config) { _config = config; }
 
 	[HttpGet]
 	public ActionResult<GenericResponse<EnumDto>> Read() {

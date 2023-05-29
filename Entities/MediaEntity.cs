@@ -2,14 +2,9 @@
 
 [Table("Media")]
 public class MediaEntity : BaseEntity {
-	[StringLength(500)]
 	public string? FileName { get; set; }
-
-	[StringLength(500)]
 	public string? UseCase { get; set; }
-
 	public int? Order { get; set; }
-	
 	public MediaJsonDetail MediaJsonDetail { get; set; } = new();
 
 	[NotMapped]

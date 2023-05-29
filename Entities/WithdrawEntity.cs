@@ -2,12 +2,8 @@
 
 [Table("Withdraw")]
 public class WithdrawEntity : BaseEntity {
-	[StringLength(500)]
 	public string? ShebaNumber { get; set; }
-
-	[StringLength(500)]
 	public double? Amount { get; set; }
-
 	public WithdrawState? WithdrawState { get; set; }
 	public UserEntity? ApplicantUserEntity { get; set; }
 	public string? ApplicantUserId { get; set; }

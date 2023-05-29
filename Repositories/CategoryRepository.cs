@@ -11,7 +11,7 @@ public interface ICategoryRepository {
 public class CategoryRepository : ICategoryRepository {
 	private readonly DbContext _dbContext;
 
-	public CategoryRepository(DbContext context) => _dbContext = context;
+	public CategoryRepository(DbContext context) { _dbContext = context; }
 
 	public async Task<GenericResponse<CategoryEntity>> Create(CategoryCreateUpdateDto dto) {
 		CategoryEntity entity = new();

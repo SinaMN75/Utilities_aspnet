@@ -10,7 +10,7 @@ public interface IContentRepository {
 public class ContentRepository : IContentRepository {
 	private readonly DbContext _dbContext;
 
-	public ContentRepository(DbContext dbContext) => _dbContext = dbContext;
+	public ContentRepository(DbContext dbContext) { _dbContext = dbContext; }
 
 	public async Task<GenericResponse<ContentEntity>> Create(ContentCreateUpdateDto dto) {
 		ContentEntity entity = new() {

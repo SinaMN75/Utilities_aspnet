@@ -8,7 +8,7 @@ public static class EnumExtension {
 }
 
 public static class UtilitiesStatusCodesExtension {
-	public static int Value(this UtilitiesStatusCodes statusCode) => (int) statusCode;
+	public static int Value(this UtilitiesStatusCodes statusCode) { return (int) statusCode; }
 }
 
 public enum UtilitiesStatusCodes {
@@ -35,7 +35,7 @@ public enum UtilitiesStatusCodes {
 
 public enum NotoficationType {
 	WalletMoneyGain = 100,
-	WalletMoneyLost = 101,
+	WalletMoneyLost = 101
 }
 
 public enum OtpResult {
@@ -61,7 +61,7 @@ public enum OrderStatuses {
 	Refund = 108, //not used yet
 	RefundComplete = 109, //not used yet
 	Complete = 110,
-	PaidFail = 112,
+	PaidFail = 112
 }
 
 public enum PayType {

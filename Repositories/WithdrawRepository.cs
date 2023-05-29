@@ -1,4 +1,4 @@
-﻿namespace Utilities_aspnet.Repositories; 
+﻿namespace Utilities_aspnet.Repositories;
 
 public interface IWithdrawRepository {
 	Task<GenericResponse> WalletWithdrawal(WalletWithdrawalDto dto);
@@ -26,7 +26,7 @@ public class WithdrawRepository : IWithdrawRepository {
 		if (dto.Amount > 5000000) return new GenericResponse(UtilitiesStatusCodes.MoreThanAllowedMoney);
 		if (sheba is null) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 
-		WithdrawEntity withdraw = new WithdrawEntity {
+		WithdrawEntity withdraw = new() {
 			Amount = dto.Amount,
 			ApplicantUserId = user.Id,
 			CreatedAt = DateTime.UtcNow,

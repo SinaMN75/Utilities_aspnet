@@ -7,8 +7,8 @@ public interface IMediaRepository {
 }
 
 public class MediaRepository : IMediaRepository {
-	private readonly IWebHostEnvironment _env;
 	private readonly DbContext _dbContext;
+	private readonly IWebHostEnvironment _env;
 
 	public MediaRepository(IWebHostEnvironment env, DbContext dbContext) {
 		_env = env;
@@ -18,7 +18,7 @@ public class MediaRepository : IMediaRepository {
 	public async Task<GenericResponse<IEnumerable<MediaEntity>?>> Upload(UploadDto model) {
 		List<MediaEntity> medias = new();
 
-		if (model.Files != null) {
+		if (model.Files != null)
 			foreach (IFormFile file in model.Files) {
 				string name = Guid.NewGuid() + Path.GetExtension(file.FileName);
 
@@ -46,7 +46,7 @@ public class MediaRepository : IMediaRepository {
 						Size = model.Size,
 						Time = model.Time,
 						Artist = model.Artist,
-						Album = model.Album,
+						Album = model.Album
 					}
 				};
 				await _dbContext.Set<MediaEntity>().AddAsync(media);
@@ -54,8 +54,7 @@ public class MediaRepository : IMediaRepository {
 				medias.Add(media);
 				SaveMedia(file, name);
 			}
-		}
-		if (model.Links != null) {
+		if (model.Links != null)
 			foreach (MediaEntity media in model.Links.Select(link => new MediaEntity {
 				         UserId = model.UserId,
 				         ProductId = model.ProductId,
@@ -73,14 +72,13 @@ public class MediaRepository : IMediaRepository {
 					         Size = model.Size,
 					         Time = model.Time,
 					         Artist = model.Artist,
-					         Album = model.Album,
+					         Album = model.Album
 				         }
 			         })) {
 				await _dbContext.Set<MediaEntity>().AddAsync(media);
 				await _dbContext.SaveChangesAsync();
 				medias.Add(media);
 			}
-		}
 
 		return new GenericResponse<IEnumerable<MediaEntity>?>(medias);
 	}
@@ -88,9 +86,7 @@ public class MediaRepository : IMediaRepository {
 	public async Task<GenericResponse> Delete(Guid id) {
 		MediaEntity? media = await _dbContext.Set<MediaEntity>().FirstOrDefaultAsync(x => x.Id == id);
 		if (media == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
-		try {
-			File.Delete(Path.Combine(_env.WebRootPath, "Medias", media.FileName!));
-		}
+		try { File.Delete(Path.Combine(_env.WebRootPath, "Medias", media.FileName!)); }
 		catch (Exception) { }
 		_dbContext.Set<MediaEntity>().Remove(media);
 		await _dbContext.SaveChangesAsync();
@@ -125,12 +121,8 @@ public class MediaRepository : IMediaRepository {
 		if (!Directory.Exists(uploadDir))
 			Directory.CreateDirectory(uploadDir);
 		try {
-			try {
-				File.Delete(path);
-			}
-			catch (Exception ex) {
-				throw new ArgumentException("Exception in SaveMedia- Delete! " + ex.Message);
-			}
+			try { File.Delete(path); }
+			catch (Exception ex) { throw new ArgumentException("Exception in SaveMedia- Delete! " + ex.Message); }
 
 			using FileStream stream = new(path, FileMode.Create);
 			image.CopyTo(stream);

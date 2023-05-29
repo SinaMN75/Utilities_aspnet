@@ -2,28 +2,15 @@ namespace Utilities_aspnet.Entities;
 
 [Table("Categories")]
 public class CategoryEntity : BaseEntity {
-	[StringLength(500)]
 	public string? Title { get; set; }
-
-	[StringLength(500)]
 	public string? TitleTr1 { get; set; }
-
-	[StringLength(500)]
 	public string? TitleTr2 { get; set; }
-
-	[StringLength(500)]
 	public string? Color { get; set; }
-
-	[StringLength(500)]
 	public string? UseCase { get; set; }
-
-	[StringLength(500)]
 	public string? Type { get; set; }
-
 	public double? Price { get; set; }
 	public int? Stock { get; set; }
 	public int? Order { get; set; }
-
 	public CategoryJsonDetail CategoryJsonDetail { get; set; } = new();
 
 	public Guid? ParentId { get; set; }

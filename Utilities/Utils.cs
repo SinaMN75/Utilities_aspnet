@@ -32,7 +32,7 @@ public static class StartupExtension {
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
 		builder.Services.AddRateLimiter(x => {
-			x.AddFixedWindowLimiter(policyName: "fixed", y => {
+			x.AddFixedWindowLimiter("fixed", y => {
 				y.PermitLimit = 10;
 				y.Window = TimeSpan.FromSeconds(1);
 				y.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
@@ -124,8 +124,9 @@ public static class StartupExtension {
 		});
 	}
 
-	private static void AddRedis(this WebApplicationBuilder builder, string connectionString)
-		=> builder.Services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(connectionString));
+	private static void AddRedis(this WebApplicationBuilder builder, string connectionString) {
+		builder.Services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(connectionString));
+	}
 
 	public static void AddUtilitiesIdentity(this WebApplicationBuilder builder) {
 		builder.Services.AddIdentity<UserEntity, IdentityRole>(options => { options.SignIn.RequireConfirmedAccount = false; }).AddRoles<IdentityRole>()
@@ -180,9 +181,12 @@ public static class StartupExtension {
 
 internal class OutputCachePolicy : IOutputCachePolicy {
 	private readonly int _seconds;
-	public OutputCachePolicy(int seconds) => _seconds = seconds;
-	public ValueTask ServeFromCacheAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
-	public ValueTask ServeResponseAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
+
+	public OutputCachePolicy(int seconds) { _seconds = seconds; }
+
+	public ValueTask ServeFromCacheAsync(OutputCacheContext context, CancellationToken cancellation) { return ValueTask.CompletedTask; }
+
+	public ValueTask ServeResponseAsync(OutputCacheContext context, CancellationToken cancellation) { return ValueTask.CompletedTask; }
 
 	public ValueTask CacheRequestAsync(OutputCacheContext context, CancellationToken cancellation) {
 		context.AllowCacheLookup = true;

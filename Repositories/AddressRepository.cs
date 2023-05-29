@@ -29,7 +29,7 @@ public class AddressRepository : IAddressRepository {
 			ReceiverFullName = addressDto.ReceiverFullName,
 			ReceiverPhoneNumber = addressDto.ReceiverPhoneNumber,
 			Unit = addressDto.Unit,
-			UserId = _userId,
+			UserId = _userId
 		};
 		await _dbContext.Set<AddressEntity>().AddAsync(e);
 		await _dbContext.SaveChangesAsync();

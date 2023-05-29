@@ -2,18 +2,10 @@
 
 [Table("Order")]
 public class OrderEntity : BaseEntity {
-	[StringLength(2000)]
 	public string? Description { get; set; }
-
-	[StringLength(500)]
 	public string? DiscountCode { get; set; }
-
-	[StringLength(500)]
 	public string? ProductUseCase { get; set; }
-
-	[StringLength(500)]
 	public string? PayNumber { get; set; }
-
 	public OrderStatuses? Status { get; set; }
 	public double? TotalPrice { get; set; }
 	public double? DiscountPrice { get; set; }
@@ -23,8 +15,10 @@ public class OrderEntity : BaseEntity {
 	public PayType? PayType { get; set; }
 	public DateTime? PayDateTime { get; set; }
 	public DateTime? ReceivedDate { get; set; }
+
 	public AddressEntity? Address { get; set; }
 	public Guid? AddressId { get; set; }
+
 	public UserEntity? User { get; set; }
 
 	[ForeignKey(nameof(User))]

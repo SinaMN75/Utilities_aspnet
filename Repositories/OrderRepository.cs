@@ -45,7 +45,7 @@ public class OrderRepository : IOrderRepository {
 			CreatedAt = DateTime.Now,
 			UpdatedAt = DateTime.Now,
 			ProductUseCase = dto.ProductUseCase,
-			ProductOwnerId = listProducts.First().UserId,
+			ProductOwnerId = listProducts.First().UserId
 		};
 
 		await _dbContext.Set<OrderEntity>().AddAsync(entityOrder);
@@ -125,8 +125,9 @@ public class OrderRepository : IOrderRepository {
 		if (dto.PayNumber.IsNotNullOrEmpty()) q = q.Where(x => (x.PayNumber ?? "").Contains(dto.PayNumber!));
 		if (dto.ReceivedDate.HasValue) q = q.Where(x => x.ReceivedDate == dto.ReceivedDate);
 
-		if (dto.UserId.IsNotNullOrEmpty() && dto.ProductOwnerId.IsNotNullOrEmpty())
+		if (dto.UserId.IsNotNullOrEmpty() && dto.ProductOwnerId.IsNotNullOrEmpty()) {
 			q = q.Where(x => x.ProductOwnerId == dto.ProductOwnerId || x.UserId == dto.UserId);
+		}
 		else {
 			if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => x.UserId == dto.UserId);
 			if (dto.ProductOwnerId.IsNotNullOrEmpty()) q = q.Where(x => x.ProductOwnerId == dto.ProductOwnerId);

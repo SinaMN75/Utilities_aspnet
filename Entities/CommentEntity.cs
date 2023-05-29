@@ -3,6 +3,7 @@
 [Table("Comment")]
 public class CommentEntity : BaseEntity {
 	public double? Score { get; set; } = 0;
+	public CommentJsonDetail CommentJsonDetail { get; set; } = new();
 
 	[StringLength(2000)]
 	public string? Comment { get; set; }
@@ -14,8 +15,6 @@ public class CommentEntity : BaseEntity {
 
 	public UserEntity? User { get; set; }
 	public string? UserId { get; set; }
-
-	public CommentJsonDetail CommentJsonDetail { get; set; } = new();
 
 	[InverseProperty("Parent")]
 	public IEnumerable<CommentEntity>? Children { get; set; }

@@ -2,6 +2,11 @@
 
 [Table("Chats")]
 public class ChatEntity : BaseEntity {
+	public bool ReadMessage { get; set; }
+
+	[StringLength(2000)]
+	public string MessageText { get; set; } = null!;
+
 	[ForeignKey(nameof(FromUser))]
 	public string FromUserId { get; set; } = null!;
 
@@ -11,11 +16,6 @@ public class ChatEntity : BaseEntity {
 	public string ToUserId { get; set; } = null!;
 
 	public UserEntity ToUser { get; set; } = null!;
-
-	[StringLength(2000)]
-	public string MessageText { get; set; } = null!;
-
-	public bool ReadMessage { get; set; }
 
 	public Guid? ParentId { get; set; }
 	public ChatEntity? Parent { get; set; }
@@ -27,10 +27,8 @@ public class ChatEntity : BaseEntity {
 
 [Table("GroupChat")]
 public class GroupChatEntity : BaseEntity {
-	[StringLength(500)]
 	public string? Title { get; set; }
 
-	[StringLength(500)]
 	public string? CreatorUserId { get; set; }
 
 	public ChatType? Type { get; set; }
@@ -61,10 +59,8 @@ public class GroupChatMessageEntity : BaseEntity {
 	[StringLength(2000)]
 	public string? Message { get; set; }
 
-	[StringLength(500)]
 	public string? Type { get; set; }
 
-	[StringLength(500)]
 	public string? UseCase { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]

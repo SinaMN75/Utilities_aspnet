@@ -24,23 +24,27 @@ public class GenericResponse {
 }
 
 public static class BoolExtension {
-	public static bool IsTrue(this bool? value) => value != null && value != false;
+	public static bool IsTrue(this bool? value) { return value != null && value != false; }
 }
 
 public static class EnumerableExtension {
-	public static bool IsNotNullOrEmpty<T>(this IEnumerable<T>? list) => list != null && list.Any();
-	public static bool IsNotNull<T>(this IEnumerable<T>? list) => list != null;
+	public static bool IsNotNullOrEmpty<T>(this IEnumerable<T>? list) { return list != null && list.Any(); }
+
+	public static bool IsNotNull<T>(this IEnumerable<T>? list) { return list != null; }
 }
 
 public static class NumberExtension {
-	public static int ToInt(this double value) => (int) value;
-	public static int ToInt(this double? value) => (int) (value ?? 0.0);
+	public static int ToInt(this double value) { return (int) value; }
+
+	public static int ToInt(this double? value) { return (int) (value ?? 0.0); }
 }
 
 public static class StringExtension {
-	public static bool IsEmail(this string email) => Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.(com|net|org|gov)$", RegexOptions.IgnoreCase);
-	public static bool IsNotNullOrEmpty(this string? s) => s is {Length: > 0};
-	public static bool IsNullOrEmpty(this string? s) => string.IsNullOrEmpty(s);
+	public static bool IsEmail(this string email) { return Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.(com|net|org|gov)$", RegexOptions.IgnoreCase); }
+
+	public static bool IsNotNullOrEmpty(this string? s) { return s is {Length: > 0}; }
+
+	public static bool IsNullOrEmpty(this string? s) { return string.IsNullOrEmpty(s); }
 
 	public static string? GetShebaNumber(this string s) {
 		s = s.Replace(" ", "");
@@ -52,8 +56,8 @@ public static class StringExtension {
 
 	public static string? AddCommaSeperatorUsers(this string? baseString, string? userId) {
 		if (string.IsNullOrEmpty(baseString)) return userId;
-		else if (baseString.Contains(userId ?? "")) return baseString;
-		else return baseString + "," + userId;
+		if (baseString.Contains(userId ?? "")) return baseString;
+		return baseString + "," + userId;
 	}
 }
 
@@ -147,9 +151,7 @@ public class Utils {
 			if (overUsed) return new Tuple<bool, UtilitiesStatusCodes>(overUsed, UtilitiesStatusCodes.Overused);
 			return new Tuple<bool, UtilitiesStatusCodes>(false, UtilitiesStatusCodes.Success);
 		}
-		catch (Exception) {
-			return new Tuple<bool, UtilitiesStatusCodes>(true, UtilitiesStatusCodes.BadRequest);
-		}
+		catch (Exception) { return new Tuple<bool, UtilitiesStatusCodes>(true, UtilitiesStatusCodes.BadRequest); }
 	}
 
 	public static string DisplayCountOfCompleteOrder(int countOfCompleteOrder) {

@@ -2,10 +2,7 @@
 
 [Table("Forms")]
 public class FormEntity : BaseEntity {
-	[StringLength(2000)]
 	public string? Title { get; set; }
-
-	[StringLength(500)]
 	public string? UseCase { get; set; }
 
 	[ForeignKey(nameof(FormFieldId))]
@@ -41,21 +38,16 @@ public class FormEntity : BaseEntity {
 
 [Table("FormFields")]
 public class FormFieldEntity : BaseEntity {
-	[StringLength(500)]
 	public string? Label { get; set; }
+	public string? UseCase { get; set; }
+	public bool? IsRequired { get; set; } = false;
 
 	[StringLength(2000)]
 	public string? OptionList { get; set; }
 
-	[StringLength(500)]
-	public string? UseCase { get; set; }
-
-	public bool? IsRequired { get; set; } = false;
-
 	public FormFieldType? Type { get; set; }
 
 	public Guid? ParentId { get; set; }
-
 	public FormFieldEntity? Parent { get; set; }
 
 	[InverseProperty("Parent")]

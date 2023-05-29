@@ -15,9 +15,9 @@ public class ProductRepository : IProductRepository {
 	private readonly IConfiguration _config;
 	private readonly DbContext _dbContext;
 	private readonly IMediaRepository _mediaRepository;
-	private readonly IUserRepository _userRepository;
 	private readonly IPromotionRepository _promotionRepository;
 	private readonly string? _userId;
+	private readonly IUserRepository _userRepository;
 
 	public ProductRepository(
 		DbContext dbContext,
@@ -65,9 +65,9 @@ public class ProductRepository : IProductRepository {
 			return new GenericResponse<ProductEntity>(null, overUsedCheck.Item2);
 
 		ProductEntity entity = new();
-		if (dto.Upload is not null) {
-			foreach (UploadDto uploadDto in dto.Upload) await _mediaRepository.Upload(uploadDto);
-		}
+		if (dto.Upload is not null)
+			foreach (UploadDto uploadDto in dto.Upload)
+				await _mediaRepository.Upload(uploadDto);
 
 		if (dto.ProductInsight is not null)
 			dto.ProductInsight.UserId = _userId;
@@ -177,7 +177,7 @@ public class ProductRepository : IProductRepository {
 				VisitProducts visitProduct = new() {
 					CreatedAt = DateTime.Now,
 					ProductId = i.Id,
-					UserId = user.Id,
+					UserId = user.Id
 				};
 				await _dbContext.Set<VisitProducts>().AddAsync(visitProduct, ct);
 				if (string.IsNullOrEmpty(i.SeenUsers)) i.SeenUsers = user.Id;
@@ -248,11 +248,11 @@ public class ProductRepository : IProductRepository {
 			_dbContext.Update(reaction);
 		}
 		else {
-			reaction = new() {
+			reaction = new ReactionEntity {
 				CreatedAt = DateTime.UtcNow,
 				ProductId = dto.ProductId,
 				Reaction = dto.Reaction,
-				UserId = _userId,
+				UserId = _userId
 			};
 			await _dbContext.Set<ReactionEntity>().AddAsync(reaction);
 		}
@@ -349,20 +349,18 @@ public static class ProductEntityExtension {
 			if (e != null) {
 				ProductInsight pI;
 				ProductInsight? oldProductInsight = await context.Set<ProductInsight>().FirstOrDefaultAsync(f => f.UserId == e.Id && f.ProductId == entity.Id);
-				if (oldProductInsight is not null && oldProductInsight.Reaction != pInsight.Reaction) {
+				if (oldProductInsight is not null && oldProductInsight.Reaction != pInsight.Reaction)
 					pI = new ProductInsight {
 						UserId = e.Id,
 						Reaction = pInsight.Reaction,
 						UpdatedAt = DateTime.Now
 					};
-				}
-				else {
+				else
 					pI = new ProductInsight {
 						UserId = e.Id,
 						Reaction = pInsight.Reaction,
 						CreatedAt = DateTime.Now
 					};
-				}
 				await context.Set<ProductInsight>().AddAsync(pI);
 				productInsights.Add(pI);
 			}

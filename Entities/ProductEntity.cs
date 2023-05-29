@@ -2,24 +2,15 @@ namespace Utilities_aspnet.Entities;
 
 [Table("Products")]
 public class ProductEntity : BaseEntity {
-	[StringLength(500)]
 	public string? Title { get; set; }
-
-	[StringLength(500)]
 	public string? Subtitle { get; set; }
 
 	[StringLength(2000)]
 	public string? Description { get; set; }
 
-	[StringLength(500)]
 	public string? UseCase { get; set; }
-
-	[StringLength(500)]
 	public string? Type { get; set; }
-
-	[StringLength(500)]
 	public string? State { get; set; }
-
 	public DateTime Boosted { get; set; }
 	public double? Stock { get; set; }
 	public double? VoteCount { get; set; }
@@ -28,7 +19,6 @@ public class ProductEntity : BaseEntity {
 	public bool? Enabled { get; set; }
 	public double? DiscountPrice { get; set; }
 	public double? Price { get; set; }
-
 	public Currency? Currency { get; set; }
 	public ProductStatus? Status { get; set; }
 	public AgeCategory? AgeCategory { get; set; }

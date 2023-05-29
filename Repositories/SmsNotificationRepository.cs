@@ -1,6 +1,4 @@
-﻿using System.Net.Http.Headers;
-
-namespace Utilities_aspnet.Repositories;
+﻿namespace Utilities_aspnet.Repositories;
 
 public interface ISmsNotificationRepository {
 	void SendSms(string mobileNumber, string message);
@@ -10,7 +8,7 @@ public interface ISmsNotificationRepository {
 public class SmsNotificationRepository : ISmsNotificationRepository {
 	private readonly IConfiguration _config;
 
-	public SmsNotificationRepository(IConfiguration config) => _config = config;
+	public SmsNotificationRepository(IConfiguration config) { _config = config; }
 
 	public void SendSms(string mobileNumber, string message) {
 		AppSettings appSettings = new();
@@ -22,7 +20,7 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 			mobileNumber = mobileNumber.TrimStart(new[] {'9'});
 			mobileNumber = mobileNumber.TrimStart(new[] {'8'});
 		}
-		else mobileNumber = mobileNumber.TrimStart(new[] {'0'});
+		else { mobileNumber = mobileNumber.TrimStart(new[] {'0'}); }
 
 		switch (smsSetting.Provider) {
 			case "ghasedak": {
@@ -31,8 +29,7 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 				break;
 			}
 			case "faraz": {
-				var body = new
-				{
+				var body = new {
 					op = "pattern",
 					user = smsSetting.UserName,
 					pass = smsSetting.SmsSecret,
@@ -65,29 +62,26 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 
 		switch (setting.Provider) {
 			case "pushe": {
-                    var body = new
-                    {
-                        app_ids = setting.AppId,
-                        data = new
-                        {
-                            title = dto.Title,
-                            content = dto.Content,
-                            bigContent = dto.BigContent,
-                            action = new { action_type = dto.ActionType, url = dto.Url }
-                        },
-                        is_draft = false,
-                        filter = new { custom_id = dto.UserIds }
-                    };
+				var body = new {
+					app_ids = setting.AppId,
+					data = new {
+						title = dto.Title,
+						content = dto.Content,
+						bigContent = dto.BigContent,
+						action = new {action_type = dto.ActionType, url = dto.Url}
+					},
+					is_draft = false,
+					filter = new {custom_id = dto.UserIds}
+				};
 
-                    var client = new CustomHttpClient<object, object>();
-                    client.DefaultRequestHeaders.Add("Content-Type", "application/json");
-                    client.DefaultRequestHeaders.Add("Authorization", "Token " + setting.Token);
-                    client.DefaultRequestHeaders.Add("Content-Type", "application/json");
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "Token " + setting.Token);
+				CustomHttpClient<object, object> client = new();
+				client.DefaultRequestHeaders.Add("Content-Type", "application/json");
+				client.DefaultRequestHeaders.Add("Authorization", "Token " + setting.Token);
+				client.DefaultRequestHeaders.Add("Content-Type", "application/json");
+				client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "Token " + setting.Token);
 
-					var result = await client.Post("https://api.pushe.co/v2/messaging/notifications/", body);
+				object result = await client.Post("https://api.pushe.co/v2/messaging/notifications/", body);
 				break;
-
 
 				//RestRequest request = new(Method.POST);
 				//request.AddHeader("Content-Type", "application/json");

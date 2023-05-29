@@ -11,12 +11,12 @@ public interface ICommentRepository {
 }
 
 public class CommentRepository : ICommentRepository {
+	private readonly IConfiguration _config;
 	private readonly DbContext _dbContext;
-	private readonly INotificationRepository _notificationRepository;
 	private readonly IMediaRepository _mediaRepository;
+	private readonly INotificationRepository _notificationRepository;
 	private readonly IProductRepository _productRepository;
 	private readonly string? _userId;
-	private readonly IConfiguration _config;
 
 	public CommentRepository(
 		DbContext dbContext,
@@ -110,7 +110,7 @@ public class CommentRepository : ICommentRepository {
 			ProductEntity product = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == comment.ProductId))!;
 			product.CommentsCount += 1;
 
-			if (product.UserId != _userId) {
+			if (product.UserId != _userId)
 				await _notificationRepository.Create(new NotificationCreateUpdateDto {
 					UserId = product.UserId,
 					Message = dto.Comment ?? "",
@@ -120,7 +120,6 @@ public class CommentRepository : ICommentRepository {
 					Link = product.Id.ToString(),
 					ProductId = product.Id
 				});
-			}
 		}
 		catch { }
 		await _dbContext.SaveChangesAsync();
@@ -168,12 +167,8 @@ public class CommentRepository : ICommentRepository {
 			};
 			comment.CommentJsonDetail.Reacts.Add(react);
 		}
-		else if (oldReaction.Reaction != reaction) {
-			oldReaction.Reaction = reaction;
-		}
-		else {
-			comment.CommentJsonDetail.Reacts.Remove(oldReaction);
-		}
+		else if (oldReaction.Reaction != reaction) { oldReaction.Reaction = reaction; }
+		else { comment.CommentJsonDetail.Reacts.Remove(oldReaction); }
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse(UtilitiesStatusCodes.Success, "Ok");
 	}

@@ -46,3 +46,4 @@ global using System.Threading.RateLimiting;
 global using Microsoft.AspNetCore.RateLimiting;
 global using System.Reflection;
 global using Swashbuckle.AspNetCore.SwaggerGen;
+global using System.Net.Http.Headers;

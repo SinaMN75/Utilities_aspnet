@@ -8,9 +8,9 @@ public interface IPaymentRepository {
 }
 
 public class PaymentRepository : IPaymentRepository {
+	private readonly AppSettings _appSettings = new();
 	private readonly DbContext _dbContext;
 	private readonly string? _userId;
-	private readonly AppSettings _appSettings = new();
 
 	public PaymentRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IConfiguration config) {
 		_dbContext = dbContext;
@@ -43,9 +43,7 @@ public class PaymentRepository : IPaymentRepository {
 			}
 			return new GenericResponse<string?>("", UtilitiesStatusCodes.BadRequest);
 		}
-		catch (Exception ex) {
-			return new GenericResponse<string?>(ex.Message, UtilitiesStatusCodes.BadRequest);
-		}
+		catch (Exception ex) { return new GenericResponse<string?>(ex.Message, UtilitiesStatusCodes.BadRequest); }
 	}
 
 	public async Task<GenericResponse<string?>> PayOrderZarinPal(Guid orderId) {
@@ -74,9 +72,7 @@ public class PaymentRepository : IPaymentRepository {
 			}
 			return new GenericResponse<string?>("", UtilitiesStatusCodes.BadRequest);
 		}
-		catch (Exception ex) {
-			return new GenericResponse<string?>(ex.Message, UtilitiesStatusCodes.BadRequest);
-		}
+		catch (Exception ex) { return new GenericResponse<string?>(ex.Message, UtilitiesStatusCodes.BadRequest); }
 	}
 
 	public async Task<GenericResponse> WalletCallBack(
@@ -84,15 +80,11 @@ public class PaymentRepository : IPaymentRepository {
 		string authority,
 		string status,
 		string userId) {
-		if (userId.IsNullOrEmpty()) {
-			return new GenericResponse(UtilitiesStatusCodes.BadRequest);
-		}
+		if (userId.IsNullOrEmpty()) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 
 		UserEntity user = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == userId))!;
 		Payment payment = new(_appSettings.PaymentSettings!.Id, amount);
-		if (!status.Equals("OK")) {
-			return new GenericResponse(UtilitiesStatusCodes.BadRequest);
-		}
+		if (!status.Equals("OK")) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 		PaymentVerificationResponse? verify = payment.Verification(authority).Result;
 		TransactionEntity? pay = _dbContext.Set<TransactionEntity>().FirstOrDefault(x => x.Authority == authority);
 		if (pay != null) {
