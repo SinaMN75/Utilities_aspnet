@@ -4,7 +4,7 @@ public interface IAddressRepository {
 	Task<GenericResponse<AddressEntity?>> Create(AddressCreateUpdateDto dto);
 	Task<GenericResponse<AddressEntity?>> Update(AddressCreateUpdateDto dto);
 	GenericResponse<IQueryable<AddressEntity>> ReadMyAddresses();
-	Task<GenericResponse> DeleteAddress(Guid addressId);
+	Task<GenericResponse> Delete(Guid addressId);
 }
 
 public class AddressRepository : IAddressRepository {
@@ -57,15 +57,8 @@ public class AddressRepository : IAddressRepository {
 	public GenericResponse<IQueryable<AddressEntity>> ReadMyAddresses() =>
 		new(_dbContext.Set<AddressEntity>().Where(w => w.UserId == _userId && w.DeletedAt == null).AsNoTracking());
 
-	public async Task<GenericResponse> DeleteAddress(Guid addressId) {
-		AddressEntity? address = await _dbContext.Set<AddressEntity>().FirstOrDefaultAsync(f => f.Id == addressId);
-		if (address is null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
-
-		address.DeletedAt = DateTime.UtcNow;
-
-		_dbContext.Update(address);
-		await _dbContext.SaveChangesAsync();
-
+	public async Task<GenericResponse> Delete(Guid addressId) {
+		await _dbContext.Set<AddressEntity>().Where(f => f.Id == addressId).ExecuteUpdateAsync(x => x.SetProperty(y => y.DeletedAt, DateTime.Now));
 		return new GenericResponse();
 	}
 }

@@ -22,11 +22,7 @@ public class TransactionRepository : ITransactionRepository {
 		return new GenericResponse<TransactionEntity>(entity);
 	}
 
-	public GenericResponse<IQueryable<TransactionEntity>> Read() => new(_dbContext.Set<TransactionEntity>());
+	public GenericResponse<IQueryable<TransactionEntity>> Read() => new(_dbContext.Set<TransactionEntity>().AsNoTracking());
 
-	public GenericResponse<IQueryable<TransactionEntity>> ReadMine() {
-		IQueryable<TransactionEntity> i = _dbContext.Set<TransactionEntity>()
-			.Where(i => i.UserId == _userId);
-		return new GenericResponse<IQueryable<TransactionEntity>>(i);
-	}
+	public GenericResponse<IQueryable<TransactionEntity>> ReadMine() => new(_dbContext.Set<TransactionEntity>().Where(i => i.UserId == _userId).AsNoTracking());
 }

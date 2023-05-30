@@ -156,11 +156,7 @@ public class OrderRepository : IOrderRepository {
 	}
 
 	public async Task<GenericResponse> Delete(Guid id) {
-		OrderEntity? i = await _dbContext.Set<OrderEntity>().FirstOrDefaultAsync(i => i.Id == id);
-		if (i == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
-		if (i.PayDateTime != null) return new GenericResponse(UtilitiesStatusCodes.OrderPayed);
-		_dbContext.Remove(i);
-		await _dbContext.SaveChangesAsync();
+		await _dbContext.Set<OrderEntity>().Where(i => i.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
 	}
 

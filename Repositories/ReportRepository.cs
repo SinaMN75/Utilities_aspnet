@@ -44,10 +44,7 @@ public class ReportRepository : IReportRepository {
 	}
 
 	public async Task<GenericResponse> Delete(Guid id) {
-		ReportEntity? report = await _dbContext.Set<ReportEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
-		if (report == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
-		_dbContext.Set<ReportEntity>().Remove(report);
-		await _dbContext.SaveChangesAsync();
+		await _dbContext.Set<ReportEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
 	}
 
