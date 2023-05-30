@@ -317,6 +317,7 @@ public static class ProductEntityExtension {
 			ShippingCost = dto.ShippingCost ?? entity.JsonDetail.ShippingCost,
 			ShippingTime = dto.ShippingTime ?? entity.JsonDetail.ShippingTime,
 			KeyValue = dto.KeyValue ?? entity.JsonDetail.KeyValue,
+			KeyValues = dto.KeyValues ?? entity.JsonDetail.KeyValues,
 		};
 
 		if (dto.ScorePlus.HasValue) {

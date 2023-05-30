@@ -72,6 +72,7 @@ public class ProductJsonDetail {
 	public int? ShippingTime { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
+	public List<KeyValue>? KeyValues { get; set; }
 }
 
 [Table("ProductsInsight")]
@@ -142,6 +143,7 @@ public class ProductCreateUpdateDto {
 	public double? ShippingCost { get; set; }
 	public DateTime? Boosted { get; set; }
 	public Guid? ParentId { get; set; }
+	public List<KeyValue>? KeyValues { get; set; }
 
 	[JsonIgnore]
 	[System.Text.Json.Serialization.JsonIgnore]

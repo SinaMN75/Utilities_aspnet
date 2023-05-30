@@ -172,7 +172,6 @@ public class UserRepository : IUserRepository {
 		entity.Wallet = dto.Wallet ?? entity.Wallet;
 		entity.Gender = dto.Gender ?? entity.Gender;
 		entity.UseCase = dto.UseCase ?? entity.UseCase;
-		entity.UserName = dto.UserName ?? entity.UserName;
 		entity.Email = dto.Email ?? entity.Email;
 		entity.State = dto.State ?? entity.State;
 		entity.Type = dto.Type ?? entity.Type;
