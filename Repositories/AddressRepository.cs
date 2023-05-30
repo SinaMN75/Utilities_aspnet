@@ -17,10 +17,6 @@ public class AddressRepository : IAddressRepository {
 	}
 
 	public async Task<GenericResponse<AddressEntity?>> Create(AddressCreateUpdateDto addressDto) {
-		IQueryable<AddressEntity> userAddresses = _dbContext.Set<AddressEntity>().Where(w => w.UserId == _userId);
-		if (userAddresses.Any(a => a.PostalCode.Contains(addressDto.PostalCode) && a.Id != addressDto.Id))
-			return new GenericResponse<AddressEntity?>(null, UtilitiesStatusCodes.BadRequest);
-
 		AddressEntity e = new() {
 			Address = addressDto.Address,
 			CreatedAt = DateTime.UtcNow,
@@ -33,36 +29,33 @@ public class AddressRepository : IAddressRepository {
 		};
 		await _dbContext.Set<AddressEntity>().AddAsync(e);
 		await _dbContext.SaveChangesAsync();
-
 		return new GenericResponse<AddressEntity?>(e);
 	}
 
 	public async Task<GenericResponse<AddressEntity?>> Update(AddressCreateUpdateDto addressDto) {
 		IQueryable<AddressEntity> userAddresses = _dbContext.Set<AddressEntity>().Where(w => w.UserId == _userId);
-		if (userAddresses.Any(a => a.PostalCode.Contains(addressDto.PostalCode ?? string.Empty) && a.Id != addressDto.Id))
+		if (userAddresses.Any(a => a.PostalCode!.Contains(addressDto.PostalCode ?? string.Empty) && a.Id != addressDto.Id))
 			return new GenericResponse<AddressEntity?>(null, UtilitiesStatusCodes.BadRequest);
 
-		AddressEntity entity = await _dbContext.Set<AddressEntity>().FirstOrDefaultAsync(f => f.Id == addressDto.Id && f.DeletedAt == null);
-		if (entity is null) return new GenericResponse<AddressEntity?>(null, UtilitiesStatusCodes.NotFound);
+		AddressEntity? e = await _dbContext.Set<AddressEntity>().FirstOrDefaultAsync(f => f.Id == addressDto.Id && f.DeletedAt == null);
+		if (e is null) return new GenericResponse<AddressEntity?>(null, UtilitiesStatusCodes.NotFound);
 
-		entity.PostalCode = addressDto.PostalCode ?? entity.PostalCode;
-		entity.Pelak = addressDto.Pelak ?? entity.Pelak;
-		entity.Unit = addressDto.Unit ?? entity.Unit;
-		entity.Address = addressDto.Address ?? entity.Address;
-		entity.UpdatedAt = DateTime.UtcNow;
-		entity.ReceiverFullName = addressDto.ReceiverFullName ?? entity.ReceiverFullName;
-		entity.ReceiverPhoneNumber = addressDto.ReceiverPhoneNumber ?? entity.ReceiverPhoneNumber;
+		e.PostalCode = addressDto.PostalCode ?? e.PostalCode;
+		e.Pelak = addressDto.Pelak ?? e.Pelak;
+		e.Unit = addressDto.Unit ?? e.Unit;
+		e.Address = addressDto.Address ?? e.Address;
+		e.UpdatedAt = DateTime.UtcNow;
+		e.ReceiverFullName = addressDto.ReceiverFullName ?? e.ReceiverFullName;
+		e.ReceiverPhoneNumber = addressDto.ReceiverPhoneNumber ?? e.ReceiverPhoneNumber;
 
-		_dbContext.Update(entity);
+		_dbContext.Update(e);
 		await _dbContext.SaveChangesAsync();
 
-		return new GenericResponse<AddressEntity?>(entity);
+		return new GenericResponse<AddressEntity?>(e);
 	}
 
-	public GenericResponse<IQueryable<AddressEntity>> ReadMyAddresses() {
-		IQueryable<AddressEntity> addresses = _dbContext.Set<AddressEntity>().Where(w => w.UserId == _userId && w.DeletedAt == null);
-		return new GenericResponse<IQueryable<AddressEntity>>(addresses);
-	}
+	public GenericResponse<IQueryable<AddressEntity>> ReadMyAddresses() =>
+		new(_dbContext.Set<AddressEntity>().Where(w => w.UserId == _userId && w.DeletedAt == null).AsNoTracking());
 
 	public async Task<GenericResponse> DeleteAddress(Guid addressId) {
 		AddressEntity? address = await _dbContext.Set<AddressEntity>().FirstOrDefaultAsync(f => f.Id == addressId);

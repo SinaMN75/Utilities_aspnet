@@ -65,11 +65,7 @@ public class CategoryRepository : ICategoryRepository {
 	}
 
 	public async Task<GenericResponse> Delete(Guid id) {
-		CategoryEntity? e = await _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == id);
-		if (e == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
-		e.DeletedAt = DateTime.Now;
-		_dbContext.Update(e);
-		await _dbContext.SaveChangesAsync();
+		await _dbContext.Set<CategoryEntity>().Where(x => x.Id == id).ExecuteUpdateAsync(x => x.SetProperty(y => y.DeletedAt, DateTime.Now));
 		return new GenericResponse();
 	}
 

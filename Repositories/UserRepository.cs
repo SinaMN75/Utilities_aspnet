@@ -74,31 +74,31 @@ public class UserRepository : IUserRepository {
 
 		if (dto.UserNameExact != null) q = q.Where(x => x.AppUserName == dto.UserNameExact || x.UserName == dto.UserNameExact);
 		if (dto.UserId != null) q = q.Where(x => x.Id == dto.UserId);
-		if (dto.Badge != null) q = q.Where(x => x.Badge.Contains(dto.Badge));
-		if (dto.Bio != null) q = q.Where(x => x.Bio.Contains(dto.Bio));
-		if (dto.Email != null) q = q.Where(x => x.Email.Contains(dto.Email));
+		if (dto.Badge != null) q = q.Where(x => x.Badge!.Contains(dto.Badge));
+		if (dto.Bio != null) q = q.Where(x => x.Bio!.Contains(dto.Bio));
+		if (dto.Email != null) q = q.Where(x => x.Email!.Contains(dto.Email));
 		if (dto.Gender != null) q = q.Where(x => x.Gender == dto.Gender);
-		if (dto.Headline != null) q = q.Where(x => x.Headline.Contains(dto.Headline));
-		if (dto.Region != null) q = q.Where(x => x.Region.Contains(dto.Region));
-		if (dto.State != null) q = q.Where(x => x.State.Contains(dto.State));
-		if (dto.Type != null) q = q.Where(x => x.Type.Contains(dto.Type));
-		if (dto.AccessLevel != null) q = q.Where(x => x.AccessLevel.Contains(dto.AccessLevel));
-		if (dto.AppEmail != null) q = q.Where(x => x.AppEmail.Contains(dto.AppEmail));
-		if (dto.FirstName != null) q = q.Where(x => x.FirstName.Contains(dto.FirstName));
-		if (dto.LastName != null) q = q.Where(x => x.LastName.Contains(dto.LastName));
-		if (dto.FullName != null) q = q.Where(x => x.FullName.Contains(dto.FullName));
-		if (dto.UseCase != null) q = q.Where(x => x.UseCase.Contains(dto.UseCase));
-		if (dto.PhoneNumber != null) q = q.Where(x => x.PhoneNumber.Contains(dto.PhoneNumber));
-		if (dto.AppUserName != null) q = q.Where(x => x.AppUserName.Contains(dto.AppUserName));
-		if (dto.AppPhoneNumber != null) q = q.Where(x => x.AppPhoneNumber.Contains(dto.AppPhoneNumber));
+		if (dto.Headline != null) q = q.Where(x => x.Headline!.Contains(dto.Headline));
+		if (dto.Region != null) q = q.Where(x => x.Region!.Contains(dto.Region));
+		if (dto.State != null) q = q.Where(x => x.State!.Contains(dto.State));
+		if (dto.Type != null) q = q.Where(x => x.Type!.Contains(dto.Type));
+		if (dto.AccessLevel != null) q = q.Where(x => x.AccessLevel!.Contains(dto.AccessLevel));
+		if (dto.AppEmail != null) q = q.Where(x => x.AppEmail!.Contains(dto.AppEmail));
+		if (dto.FirstName != null) q = q.Where(x => x.FirstName!.Contains(dto.FirstName));
+		if (dto.LastName != null) q = q.Where(x => x.LastName!.Contains(dto.LastName));
+		if (dto.FullName != null) q = q.Where(x => x.FullName!.Contains(dto.FullName));
+		if (dto.UseCase != null) q = q.Where(x => x.UseCase!.Contains(dto.UseCase));
+		if (dto.PhoneNumber != null) q = q.Where(x => x.PhoneNumber!.Contains(dto.PhoneNumber));
+		if (dto.AppUserName != null) q = q.Where(x => x.AppUserName!.Contains(dto.AppUserName));
+		if (dto.AppPhoneNumber != null) q = q.Where(x => x.AppPhoneNumber!.Contains(dto.AppPhoneNumber));
 
 		if (dto.Query != null)
-			q = q.Where(x => x.FirstName.Contains(dto.Query) ||
-			                 x.LastName.Contains(dto.Query) ||
-			                 x.FullName.Contains(dto.Query) ||
-			                 x.UserName.Contains(dto.Query) ||
-			                 x.AppUserName.Contains(dto.Query) ||
-			                 x.AppEmail.Contains(dto.Query)
+			q = q.Where(x => x.FirstName!.Contains(dto.Query) ||
+			                 x.LastName!.Contains(dto.Query) ||
+			                 x.FullName!.Contains(dto.Query) ||
+			                 x.UserName!.Contains(dto.Query) ||
+			                 x.AppUserName!.Contains(dto.Query) ||
+			                 x.AppEmail!.Contains(dto.Query)
 			);
 
 		if (dto.Categories.IsNotNullOrEmpty()) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
@@ -131,13 +131,13 @@ public class UserRepository : IUserRepository {
 	}
 
 	public async Task<UserEntity?> ReadByIdMinimal(string? idOrUserName, string? token = null) {
-		UserEntity? e = await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(u => u.Id == idOrUserName || u.UserName == idOrUserName);
+		UserEntity e = (await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(u => u.Id == idOrUserName || u.UserName == idOrUserName))!;
 		e.Token = token;
 		return e;
 	}
 
 	private async Task<JwtSecurityToken> CreateToken(UserEntity user) {
-		IEnumerable<string>? roles = await _userManager.GetRolesAsync(user);
+		IEnumerable<string> roles = await _userManager.GetRolesAsync(user);
 		List<Claim> claims = new() {
 			new Claim(JwtRegisteredClaimNames.Sub, user.Id),
 			new Claim(ClaimTypes.NameIdentifier, user.Id),
@@ -148,8 +148,8 @@ public class UserRepository : IUserRepository {
 			new Claim("IsLoggedIn", true.ToString()),
 			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
 		};
-		if (roles != null) claims.AddRange(roles.Select(role => new Claim("role", role)));
-		SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes("https://SinaMN75.com"));
+		claims.AddRange(roles.Select(role => new Claim("role", role)));
+		SymmetricSecurityKey key = new("https://SinaMN75.com"u8.ToArray());
 		SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha256);
 		JwtSecurityToken token = new("https://SinaMN75.com", "https://SinaMN75.com", claims, expires: DateTime.Now.AddDays(365), signingCredentials: creds);
 
@@ -216,7 +216,7 @@ public class UserRepository : IUserRepository {
 		}
 	}
 
-	private TransactionEntity MakeTransactionEntity(string userId, double amount, string description, string? ShebaNumber) {
+	private TransactionEntity MakeTransactionEntity(string userId, double amount, string description, string? shebaNumber) {
 		return new TransactionEntity {
 			UserId = userId,
 			Amount = amount,
@@ -249,30 +249,26 @@ public class UserRepository : IUserRepository {
 		}
 		return OtpResult.Incorrect;
 	}
-	
+
 	public async Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model) {
-		UserEntity? user = (await _userManager.FindByEmailAsync(model.Email) ?? await _userManager.FindByNameAsync(model.Email))
+		UserEntity? user = (await _userManager.FindByEmailAsync(model.Email!) ?? await _userManager.FindByNameAsync(model.Email!))
 		                   ?? await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == model.Email);
 
-		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound, "User not found");
+		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
 
-		bool result = await _userManager.CheckPasswordAsync(user, model.Password);
-		if (!result)
-			return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.BadRequest, "The password is incorrect!");
+		bool result = await _userManager.CheckPasswordAsync(user, model.Password!);
+		if (!result) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.BadRequest);
 
 		await _dbContext.SaveChangesAsync();
 		JwtSecurityToken token = await CreateToken(user);
 
-		return new GenericResponse<UserEntity?>(
-			ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result, UtilitiesStatusCodes.Success, "Success"
-		);
+		return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result);
 	}
 
 	public async Task<GenericResponse<UserEntity?>> Register(RegisterDto dto) {
 		UserEntity? model = await _dbContext.Set<UserEntity>()
 			.FirstOrDefaultAsync(x => x.UserName == dto.UserName || x.Email == dto.Email || x.PhoneNumber == dto.PhoneNumber);
-		if (model != null)
-			return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.UserAlreadyExist, "This email or username already exists");
+		if (model != null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.UserAlreadyExist);
 
 		UserEntity user = new() {
 			Email = dto.Email ?? "",
@@ -288,9 +284,8 @@ public class UserRepository : IUserRepository {
 			JsonDetail = dto.JsonDetail
 		};
 
-		IdentityResult? result = await _userManager.CreateAsync(user, dto.Password);
-		if (!result.Succeeded)
-			return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.Unhandled, "The information was not entered correctly");
+		IdentityResult? result = await _userManager.CreateAsync(user, dto.Password!);
+		if (!result.Succeeded) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.Unhandled);
 
 		JwtSecurityToken token = await CreateToken(user);
 

@@ -164,7 +164,7 @@ public class RegisterDto {
 	public string? PhoneNumber { get; set; }
 	public string? Password { get; set; }
 	public bool SendSms { get; set; } = false;
-	public UserJsonDetail? JsonDetail { get; set; }
+	public UserJsonDetail? JsonDetail { get; set; } = new();
 }
 
 public class LoginWithPasswordDto {

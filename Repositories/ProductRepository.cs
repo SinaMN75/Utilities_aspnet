@@ -1,8 +1,8 @@
 namespace Utilities_aspnet.Repositories;
 
 public interface IProductRepository {
-	Task<GenericResponse<ProductEntity>> Create(ProductCreateUpdateDto dto, CancellationToken ct);
-	Task<GenericResponse<ProductEntity>> CreateWithFiles(ProductCreateUpdateDto dto, CancellationToken ct);
+	Task<GenericResponse<ProductEntity?>> Create(ProductCreateUpdateDto dto, CancellationToken ct);
+	Task<GenericResponse<ProductEntity?>> CreateWithFiles(ProductCreateUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse<IQueryable<ProductEntity>>> Filter(ProductFilterDto dto);
 	Task<GenericResponse<ProductEntity?>> ReadById(Guid id, CancellationToken ct);
 	Task<GenericResponse<ProductEntity>> Update(ProductCreateUpdateDto dto, CancellationToken ct);
@@ -34,52 +34,46 @@ public class ProductRepository : IProductRepository {
 		_promotionRepository = promotionRepository;
 	}
 
-	public async Task<GenericResponse<ProductEntity>> Create(ProductCreateUpdateDto dto, CancellationToken ct) {
+	public async Task<GenericResponse<ProductEntity?>> Create(ProductCreateUpdateDto dto, CancellationToken ct) {
 		AppSettings appSettings = new();
 		_config.GetSection("AppSettings").Bind(appSettings);
-		Tuple<bool, UtilitiesStatusCodes>? overUsedCheck =
-			Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, CallerType.CreateProduct, null, dto.UseCase, appSettings.UsageRules!);
-		if (overUsedCheck.Item1)
-			return new GenericResponse<ProductEntity>(null, overUsedCheck.Item2);
-
-		ProductEntity entity = new();
+		Tuple<bool, UtilitiesStatusCodes> overUsedCheck =
+			Utils.IsUserOverused(_dbContext, _userId, CallerType.CreateProduct, null, dto.UseCase, appSettings.UsageRules);
+		if (overUsedCheck.Item1) return new GenericResponse<ProductEntity?>(null, overUsedCheck.Item2);
 
 		if (dto.ProductInsight is not null) dto.ProductInsight.UserId = _userId;
 
-		ProductEntity e = await entity.FillData(dto, _dbContext);
+		ProductEntity e = await new ProductEntity().FillData(dto, _dbContext);
 		e.UserId = _userId;
 		e.CreatedAt = DateTime.Now;
 
 		EntityEntry<ProductEntity> i = await _dbContext.Set<ProductEntity>().AddAsync(e, ct);
 		await _dbContext.SaveChangesAsync(ct);
 
-		return new GenericResponse<ProductEntity>(i.Entity);
+		return new GenericResponse<ProductEntity?>(i.Entity);
 	}
 
-	public async Task<GenericResponse<ProductEntity>> CreateWithFiles(ProductCreateUpdateDto dto, CancellationToken ct) {
+	public async Task<GenericResponse<ProductEntity?>> CreateWithFiles(ProductCreateUpdateDto dto, CancellationToken ct) {
 		AppSettings appSettings = new();
 		_config.GetSection("AppSettings").Bind(appSettings);
-		Tuple<bool, UtilitiesStatusCodes>? overUsedCheck =
-			Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, CallerType.CreateProduct, null, dto.UseCase, appSettings.UsageRules!);
-		if (overUsedCheck.Item1)
-			return new GenericResponse<ProductEntity>(null, overUsedCheck.Item2);
+		Tuple<bool, UtilitiesStatusCodes> overUsedCheck =
+			Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, CallerType.CreateProduct, null, dto.UseCase, appSettings.UsageRules);
+		if (overUsedCheck.Item1) return new GenericResponse<ProductEntity?>(null, overUsedCheck.Item2);
 
-		ProductEntity entity = new();
 		if (dto.Upload is not null)
 			foreach (UploadDto uploadDto in dto.Upload)
 				await _mediaRepository.Upload(uploadDto);
 
-		if (dto.ProductInsight is not null)
-			dto.ProductInsight.UserId = _userId;
+		if (dto.ProductInsight is not null) dto.ProductInsight.UserId = _userId;
 
-		ProductEntity e = await entity.FillData(dto, _dbContext);
+		ProductEntity e = await new ProductEntity().FillData(dto, _dbContext);
 		e.UserId = _userId;
 		e.CreatedAt = DateTime.Now;
 
 		EntityEntry<ProductEntity> i = await _dbContext.Set<ProductEntity>().AddAsync(e, ct);
 		await _dbContext.SaveChangesAsync(ct);
 
-		return new GenericResponse<ProductEntity>(i.Entity);
+		return new GenericResponse<ProductEntity?>(i.Entity);
 	}
 
 	public async Task<GenericResponse<IQueryable<ProductEntity>>> Filter(ProductFilterDto dto) {
@@ -91,7 +85,7 @@ public class ProductRepository : IProductRepository {
 		if (dto.Subtitle.IsNotNullOrEmpty()) q = q.Where(x => (x.Subtitle ?? "").Contains(dto.Subtitle!));
 		if (dto.Type.IsNotNullOrEmpty()) q = q.Where(x => (x.Type ?? "").Contains(dto.Type!));
 		if (dto.Description.IsNotNullOrEmpty()) q = q.Where(x => (x.Description ?? "").Contains(dto.Description!));
-		if (dto.UseCase.IsNotNullOrEmpty()) q = q.Where(x => x.UseCase.Contains(dto.UseCase));
+		if (dto.UseCase.IsNotNullOrEmpty()) q = q.Where(x => x.UseCase!.Contains(dto.UseCase!));
 		if (dto.State.IsNotNullOrEmpty()) q = q.Where(x => x.State == dto.State);
 		if (dto.StartPriceRange.HasValue) q = q.Where(x => x.Price >= dto.StartPriceRange);
 		if (dto.Currency.HasValue) q = q.Where(x => x.Currency == dto.Currency);
@@ -121,7 +115,7 @@ public class ProductRepository : IProductRepository {
 		if (dto.OrderByCreatedDate.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 		if (dto.OrderByCreaedDateDecending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 		if (dto.OrderByAgeCategory.IsTrue()) q = q.OrderBy(o => o.AgeCategory);
-		if (dto.OrderByMostUsedHashtag.IsTrue()) q = q.OrderBy(o => o.Categories.Count(c => c.UseCase.ToLower() == "tag"));
+		if (dto.OrderByMostUsedHashtag.IsTrue()) q = q.OrderBy(o => o.Categories!.Count(c => c.UseCase!.ToLower() == "tag"));
 
 		if (dto.OrderByCategory.IsTrue())
 			q = q.AsEnumerable().OrderBy(o => o.Categories != null && o.Categories.Any()
@@ -156,8 +150,8 @@ public class ProductRepository : IProductRepository {
 		ProductEntity? i = await _dbContext.Set<ProductEntity>()
 			.Include(i => i.Media)
 			.Include(i => i.Categories)!.ThenInclude(x => x.Media)
-			.Include(i => i.User).ThenInclude(x => x.Media)
-			.Include(i => i.User).ThenInclude(x => x.Categories)
+			.Include(i => i.User).ThenInclude(x => x!.Media)
+			.Include(i => i.User).ThenInclude(x => x!.Categories)
 			.Include(i => i.Forms)!.ThenInclude(x => x.FormField)
 			.Include(i => i.VisitProducts)!.ThenInclude(i => i.User)
 			.Include(i => i.ProductInsights)
@@ -166,7 +160,7 @@ public class ProductRepository : IProductRepository {
 
 		if (_userId.IsNotNullOrEmpty()) {
 			UserEntity? user = await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == _userId, ct);
-			if (!user.VisitedProducts.Contains(i.Id.ToString()))
+			if (!user!.VisitedProducts.Contains(i.Id.ToString()))
 				await _userRepository.Update(new UserCreateUpdateDto {
 					Id = _userId,
 					VisitedProducts = user.VisitedProducts + "," + i.Id
@@ -230,14 +224,9 @@ public class ProductRepository : IProductRepository {
 	}
 
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
-		ProductEntity? i = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id, ct);
-		if (i != null) {
-			i.DeletedAt = DateTime.Now;
-			_dbContext.Update(i);
-			await _dbContext.SaveChangesAsync(ct);
-			return new GenericResponse(message: "Deleted");
-		}
-		return new GenericResponse(UtilitiesStatusCodes.NotFound, "Notfound");
+		await _dbContext.Set<ProductEntity>().Where(x => x.Id == id || x.ParentId == id)
+			.ExecuteUpdateAsync(x => x.SetProperty(y => y.DeletedAt, DateTime.Now), ct);
+		return new GenericResponse();
 	}
 
 	public async Task<GenericResponse> CreateReaction(ReactionCreateUpdateDto dto) {
@@ -265,7 +254,6 @@ public class ProductRepository : IProductRepository {
 			.Include(i => i.User)
 			.Where(w => w.ProductId == id)
 			.OrderBy(o => o.Reaction);
-
 		return new GenericResponse<IQueryable<ReactionEntity>>(reactions);
 	}
 }

@@ -187,11 +187,11 @@ public class ChatRepository : IChatRepository {
 			foreach (Guid id in dto.Categories!) list.Add((await _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
 			e.Categories = list;
 		}
-		
+
 		e.Title = dto.Title ?? e.Title;
 		e.Type = dto.Type ?? e.Type;
 		e.UpdatedAt = DateTime.Now;
-		
+
 		e.JsonDetail = new GroupChatJsonDetail {
 			Department = dto.Department ?? e.JsonDetail.Department,
 			Priority = dto.Priority ?? e.JsonDetail.Priority,
@@ -200,18 +200,13 @@ public class ChatRepository : IChatRepository {
 			ChatStatus = dto.ChatStatus ?? e.JsonDetail.ChatStatus,
 		};
 
-
 		EntityEntry<GroupChatEntity> entity = _dbContext.Set<GroupChatEntity>().Update(e);
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse<GroupChatEntity?>(entity.Entity);
 	}
 
 	public async Task<GenericResponse> DeleteGroupChat(Guid id) {
-		GroupChatEntity? e = await _dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(x => x.Id == id);
-		if (e == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
-		e.DeletedAt = DateTime.Now;
-		_dbContext.Update(e);
-		await _dbContext.SaveChangesAsync();
+		await _dbContext.Set<GroupChatEntity>().Where(x => x.Id == id).ExecuteUpdateAsync(x => x.SetProperty(y => y.DeletedAt, DateTime.Now));
 		return new GenericResponse();
 	}
 
@@ -286,11 +281,7 @@ public class ChatRepository : IChatRepository {
 	}
 
 	public async Task<GenericResponse> DeleteGroupChatMessage(Guid id) {
-		GroupChatMessageEntity? e = await _dbContext.Set<GroupChatMessageEntity>().FirstOrDefaultAsync(x => x.Id == id);
-		if (e == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
-		e.DeletedAt = DateTime.Now;
-		_dbContext.Update(e);
-		await _dbContext.SaveChangesAsync();
+		await _dbContext.Set<GroupChatMessageEntity>().Where(x => x.Id == id).ExecuteUpdateAsync(x => x.SetProperty(y => y.DeletedAt, DateTime.Now));
 		return new GenericResponse();
 	}
 
