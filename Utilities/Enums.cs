@@ -1,14 +1,12 @@
 namespace Utilities_aspnet.Utilities;
 
 public static class EnumExtension {
-	public static IEnumerable<IdTitleDto> GetValues<T>() {
-		return (from int itemType in Enum.GetValues(typeof(T))
-			select new IdTitleDto {Title = Enum.GetName(typeof(T), itemType), Id = itemType}).ToList();
-	}
+	public static IEnumerable<IdTitleDto> GetValues<T>() => (from int itemType in Enum.GetValues(typeof(T))
+		select new IdTitleDto { Title = Enum.GetName(typeof(T), itemType), Id = itemType }).ToList();
 }
 
 public static class UtilitiesStatusCodesExtension {
-	public static int Value(this UtilitiesStatusCodes statusCode) { return (int) statusCode; }
+	public static int Value(this UtilitiesStatusCodes statusCode) => (int) statusCode;
 }
 
 public enum UtilitiesStatusCodes {

@@ -17,7 +17,7 @@ public class ChatHub : Hub {
 	//                        sw.WriteLine($"{contentStreamFinal}");
 	//                    }
 	//
-	
+
 	public override async Task OnConnectedAsync() {
 		string fileName = Path.Combine(uploadsFolder, $"OnConnected - {DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss")}");
 		FileInfo log = new(fileName);
@@ -57,7 +57,7 @@ public class ChatHub : Hub {
 			sw.WriteLine("sended to client");
 		}
 	}
-	
+
 	public async Task SendMessageToReceiver(string sender, string receiver, string message) {
 		string fileName = Path.Combine(uploadsFolder, $"send message - {DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss")}");
 		FileInfo log = new(fileName);
@@ -127,7 +127,7 @@ public class ChatHub : Hub {
 	//		//Todo: else => push notification for receiver
 	//	}
 	//}
-	
+
 	//public async Task SendMessageToGroup(string roomId, List<string> receiverList, string message) {
 	//	await Clients.Users(receiverList).SendAsync("MessageReceivedFromGroup", roomId, message);
 	//}
@@ -147,7 +147,7 @@ public class ChatHub : Hub {
 	//	string messageId) {
 	//	await Clients.Users(receiverList).SendAsync("MessageDeletedFromGroup", roomId, message, messageId);
 	//}
-	
+
 	//public async Task NotifySeenMessage(string senderId, string receiverId, Guid messageId) {
 	//	UserEntity? user = await _context.Set<UserEntity>().FirstOrDefaultAsync(u => u.Id.ToLower() == senderId.ToLower());
 	//	string? userId = user?.Id;

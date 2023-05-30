@@ -12,7 +12,7 @@ public interface IFormRepository {
 public class FormRepository : IFormRepository {
 	private readonly DbContext _dbContext;
 
-	public FormRepository(DbContext dbContext) { _dbContext = dbContext; }
+	public FormRepository(DbContext dbContext) => _dbContext = dbContext;
 
 	public async Task<GenericResponse<IQueryable<FormEntity>>> UpdateForm(FormCreateDto model) {
 		foreach (FormTitleDto item in model.Form!)

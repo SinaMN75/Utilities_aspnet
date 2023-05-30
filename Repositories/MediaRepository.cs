@@ -22,7 +22,7 @@ public class MediaRepository : IMediaRepository {
 			foreach (IFormFile file in model.Files) {
 				string name = Guid.NewGuid() + Path.GetExtension(file.FileName);
 
-				List<string> allowedExtensions = new() {".png", ".gif", ".jpg", ".jpeg", ".mp4", ".mp3", ".pdf", ".aac", ".apk", ".zip"};
+				List<string> allowedExtensions = new() { ".png", ".gif", ".jpg", ".jpeg", ".mp4", ".mp3", ".pdf", ".aac", ".apk", ".zip" };
 				if (!allowedExtensions.Contains(Path.GetExtension(file.FileName.ToLower())))
 					return new GenericResponse<IEnumerable<MediaEntity>?>(null, UtilitiesStatusCodes.BadRequest);
 

@@ -1,4 +1,6 @@
-﻿global using System;
+﻿#region
+
+global using System;
 global using System.Collections.Generic;
 global using System.Linq;
 global using System.Text;
@@ -47,3 +49,5 @@ global using Microsoft.AspNetCore.RateLimiting;
 global using System.Reflection;
 global using Swashbuckle.AspNetCore.SwaggerGen;
 global using System.Net.Http.Headers;
+
+#endregion

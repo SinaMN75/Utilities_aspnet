@@ -8,7 +8,7 @@ public interface ISmsNotificationRepository {
 public class SmsNotificationRepository : ISmsNotificationRepository {
 	private readonly IConfiguration _config;
 
-	public SmsNotificationRepository(IConfiguration config) { _config = config; }
+	public SmsNotificationRepository(IConfiguration config) => _config = config;
 
 	public void SendSms(string mobileNumber, string message) {
 		AppSettings appSettings = new();
@@ -16,16 +16,16 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 		SmsPanelSettings smsSetting = appSettings.SmsPanelSettings;
 
 		if (mobileNumber.Contains("+98")) {
-			mobileNumber = mobileNumber.TrimStart(new[] {'+'});
-			mobileNumber = mobileNumber.TrimStart(new[] {'9'});
-			mobileNumber = mobileNumber.TrimStart(new[] {'8'});
+			mobileNumber = mobileNumber.TrimStart(new[] { '+' });
+			mobileNumber = mobileNumber.TrimStart(new[] { '9' });
+			mobileNumber = mobileNumber.TrimStart(new[] { '8' });
 		}
-		else { mobileNumber = mobileNumber.TrimStart(new[] {'0'}); }
+		else { mobileNumber = mobileNumber.TrimStart(new[] { '0' }); }
 
 		switch (smsSetting.Provider) {
 			case "ghasedak": {
 				Api sms = new(smsSetting.SmsApiKey);
-				sms.VerifyAsync(1, smsSetting.PatternCode, new[] {mobileNumber}, message);
+				sms.VerifyAsync(1, smsSetting.PatternCode, new[] { mobileNumber }, message);
 				break;
 			}
 			case "faraz": {
@@ -33,7 +33,7 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 					op = "pattern",
 					user = smsSetting.UserName,
 					pass = smsSetting.SmsSecret,
-					fromNum = "03000505".TrimStart(new[] {'0'}),
+					fromNum = "03000505".TrimStart(new[] { '0' }),
 					toNum = mobileNumber,
 					patternCode = smsSetting.PatternCode,
 					inputData = "[{\"verification-code\":" + message + "}]}"
@@ -46,7 +46,8 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 				request.AddHeader("Authorization", "AccessKey " + smsSetting.SmsApiKey);
 				request.AddParameter("undefined",
 				                     "{\"op\" : \"pattern\"" + ",\"user\" : \"" + smsSetting.UserName + "\"" + ",\"pass\": \"" + smsSetting.SmsSecret + "\"" +
-				                     ",\"fromNum\" : " + "03000505".TrimStart(new[] {'0'}) + "" + ",\"toNum\": " + mobileNumber + "" + ",\"patternCode\": \" " +
+				                     ",\"fromNum\" : " + "03000505".TrimStart(new[] { '0' }) + "" + ",\"toNum\": " + mobileNumber + "" +
+				                     ",\"patternCode\": \" " +
 				                     smsSetting.PatternCode + "\"" + ",\"inputData\" : [{\"verification-code\":" + message + "}]}", ParameterType.RequestBody);
 
 				client.Execute(request);
@@ -68,10 +69,10 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 						title = dto.Title,
 						content = dto.Content,
 						bigContent = dto.BigContent,
-						action = new {action_type = dto.ActionType, url = dto.Url}
+						action = new { action_type = dto.ActionType, url = dto.Url }
 					},
 					is_draft = false,
-					filter = new {custom_id = dto.UserIds}
+					filter = new { custom_id = dto.UserIds }
 				};
 
 				CustomHttpClient<object, object> client = new();

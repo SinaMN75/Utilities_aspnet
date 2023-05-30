@@ -136,120 +136,6 @@ public class UserRepository : IUserRepository {
 		return e;
 	}
 
-	private async Task<JwtSecurityToken> CreateToken(UserEntity user) {
-		IEnumerable<string> roles = await _userManager.GetRolesAsync(user);
-		List<Claim> claims = new() {
-			new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-			new Claim(ClaimTypes.NameIdentifier, user.Id),
-			new Claim(ClaimTypes.Name, user.Id),
-			new Claim("IsLoggedIn", true.ToString()),
-			new Claim("IsLoggedIn", true.ToString()),
-			new Claim("IsLoggedIn", true.ToString()),
-			new Claim("IsLoggedIn", true.ToString()),
-			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-		};
-		claims.AddRange(roles.Select(role => new Claim("role", role)));
-		SymmetricSecurityKey key = new("https://SinaMN75.com"u8.ToArray());
-		SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha256);
-		JwtSecurityToken token = new("https://SinaMN75.com", "https://SinaMN75.com", claims, expires: DateTime.Now.AddDays(365), signingCredentials: creds);
-
-		await _userManager.UpdateAsync(user);
-		return token;
-	}
-
-	private void FillUserData(UserCreateUpdateDto dto, UserEntity entity) {
-		entity.FirstName = dto.FirstName ?? entity.FirstName;
-		entity.LastName = dto.LastName ?? entity.LastName;
-		entity.FullName = dto.FullName ?? entity.FullName;
-		entity.Bio = dto.Bio ?? entity.Bio;
-		entity.AppUserName = dto.AppUserName ?? entity.AppUserName;
-		entity.AppEmail = dto.AppEmail ?? entity.AppEmail;
-		entity.Region = dto.Region ?? entity.Region;
-		entity.Suspend = dto.Suspend ?? entity.Suspend;
-		entity.Headline = dto.Headline ?? entity.Headline;
-		entity.AppPhoneNumber = dto.AppPhoneNumber ?? entity.AppPhoneNumber;
-		entity.Birthdate = dto.BirthDate ?? entity.Birthdate;
-		entity.Wallet = dto.Wallet ?? entity.Wallet;
-		entity.Gender = dto.Gender ?? entity.Gender;
-		entity.UseCase = dto.UseCase ?? entity.UseCase;
-		entity.Email = dto.Email ?? entity.Email;
-		entity.State = dto.State ?? entity.State;
-		entity.Type = dto.Type ?? entity.Type;
-		entity.Point = dto.Point ?? entity.Point;
-		entity.AccessLevel = dto.AccessLevel ?? entity.AccessLevel;
-		entity.VisitedProducts = dto.VisitedProducts ?? entity.VisitedProducts;
-		entity.BookmarkedProducts = dto.BookmarkedProducts ?? entity.BookmarkedProducts;
-		entity.FollowingUsers = dto.FollowingUsers ?? entity.FollowingUsers;
-		entity.FollowedUsers = dto.FollowedUsers ?? entity.FollowedUsers;
-		entity.BlockedUsers = dto.BlockedUsers ?? entity.BlockedUsers;
-		entity.Badge = dto.Badge ?? entity.Badge;
-		entity.UpdatedAt = DateTime.Now;
-		entity.IsOnline = dto.IsOnline ?? entity.IsOnline;
-		entity.ExpireUpgradeAccount = dto.ExpireUpgradeAccount ?? entity.ExpireUpgradeAccount;
-		entity.AgeCategory = dto.AgeCategory ?? entity.AgeCategory;
-		entity.JsonDetail = new UserJsonDetail {
-			Instagram = dto.Instagram ?? entity.JsonDetail.Instagram,
-			Telegram = dto.Telegram ?? entity.JsonDetail.Telegram,
-			WhatsApp = dto.WhatsApp ?? entity.JsonDetail.WhatsApp,
-			LinkedIn = dto.LinkedIn ?? entity.JsonDetail.LinkedIn,
-			Dribble = dto.Dribble ?? entity.JsonDetail.Dribble,
-			SoundCloud = dto.SoundCloud ?? entity.JsonDetail.SoundCloud,
-			Pinterest = dto.Pinterest ?? entity.JsonDetail.Pinterest,
-			Website = dto.Website ?? entity.JsonDetail.Website,
-			Activity = dto.Activity ?? entity.JsonDetail.Activity,
-			Color = dto.Color ?? entity.JsonDetail.Color,
-			PrivacyType = dto.PrivacyType ?? entity.JsonDetail.PrivacyType,
-			ShebaNumber = dto.ShebaNumber,
-			LegalAuthenticationType = dto.LegalAuthenticationType ?? entity.JsonDetail.LegalAuthenticationType,
-			NationalityType = dto.NationalityType ?? entity.JsonDetail.NationalityType,
-			Code = dto.Code ?? entity.JsonDetail.Code
-		};
-
-		if (dto.Categories.IsNotNullOrEmpty()) {
-			List<CategoryEntity> list = new();
-			foreach (Guid item in dto.Categories!) {
-				CategoryEntity? e = _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item).Result;
-				if (e != null) list.Add(e);
-			}
-
-			entity.Categories = list;
-		}
-	}
-
-	private TransactionEntity MakeTransactionEntity(string userId, double amount, string description, string? shebaNumber) {
-		return new TransactionEntity {
-			UserId = userId,
-			Amount = amount,
-			Descriptions = description
-		};
-	}
-
-	private async Task<bool> SendOtp(string userId, int codeLength) {
-		DateTime dd = DateTime.Now.AddMinutes(-10);
-		IQueryable<OtpEntity> oldOtp = _dbContext.Set<OtpEntity>().Where(x => x.UserId == userId && x.CreatedAt > dd);
-		if (oldOtp.Count() >= 2) return false;
-
-		string newOtp = Utils.Random(codeLength).ToString();
-		_dbContext.Set<OtpEntity>().Add(new OtpEntity {UserId = userId, OtpCode = newOtp, CreatedAt = DateTime.Now, UpdatedAt = DateTime.Now});
-		UserEntity? user = await ReadByIdMinimal(userId);
-		_sms.SendSms(user?.PhoneNumber!, newOtp);
-		await _dbContext.SaveChangesAsync();
-		return true;
-	}
-
-	private async Task<OtpResult> Verify(string userId, string otp) {
-		if (otp == "1375") return OtpResult.Ok;
-		OtpEntity? e = await _dbContext.Set<OtpEntity>().SingleOrDefaultAsync(x => x.UserId == userId &&
-		                                                                           x.CreatedAt > DateTime.Now.AddMinutes(-5) &&
-		                                                                           x.OtpCode == otp);
-		if (e != null) {
-			_dbContext.Set<OtpEntity>().Remove(e);
-			await _dbContext.SaveChangesAsync();
-			return OtpResult.Ok;
-		}
-		return OtpResult.Incorrect;
-	}
-
 	public async Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model) {
 		UserEntity? user = (await _userManager.FindByEmailAsync(model.Email!) ?? await _userManager.FindByNameAsync(model.Email!))
 		                   ?? await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == model.Email);
@@ -365,10 +251,10 @@ public class UserRepository : IUserRepository {
 	public async Task<GenericResponse> ToggleBlock(string userId) {
 		UserEntity? user = await ReadByIdMinimal(_userId);
 
-		await Update(new UserCreateUpdateDto {Id = user.Id, BlockedUsers = user.BlockedUsers + "," + userId});
+		await Update(new UserCreateUpdateDto { Id = user.Id, BlockedUsers = user.BlockedUsers + "," + userId });
 		if (user.BlockedUsers.Contains(userId))
-			await Update(new UserCreateUpdateDto {Id = user.Id, BlockedUsers = user.BlockedUsers.Replace($",{userId}", "")});
-		else await Update(new UserCreateUpdateDto {Id = user.Id, BlockedUsers = user.BlockedUsers + "," + userId});
+			await Update(new UserCreateUpdateDto { Id = user.Id, BlockedUsers = user.BlockedUsers.Replace($",{userId}", "") });
+		else await Update(new UserCreateUpdateDto { Id = user.Id, BlockedUsers = user.BlockedUsers + "," + userId });
 		return new GenericResponse();
 	}
 
@@ -377,9 +263,9 @@ public class UserRepository : IUserRepository {
 		UserEntity toUser = (await ReadByIdMinimal(dto.ToUserId))!;
 
 		if (fromUser.Wallet <= dto.Amount) return new GenericResponse(UtilitiesStatusCodes.NotEnoughMoney);
-		await Update(new UserCreateUpdateDto {Id = fromUser.Id, Wallet = fromUser.Wallet - dto.Amount});
+		await Update(new UserCreateUpdateDto { Id = fromUser.Id, Wallet = fromUser.Wallet - dto.Amount });
 		await _transactionRepository.Create(MakeTransactionEntity(fromUser.Id, dto.Amount, "کسر", null));
-		await Update(new UserCreateUpdateDto {Id = toUser.Id, Wallet = toUser.Wallet + dto.Amount});
+		await Update(new UserCreateUpdateDto { Id = toUser.Id, Wallet = toUser.Wallet + dto.Amount });
 		await _transactionRepository.Create(MakeTransactionEntity(toUser.Id, dto.Amount, "واریز", null));
 		return new GenericResponse();
 	}
@@ -408,5 +294,117 @@ public class UserRepository : IUserRepository {
 		await _dbContext.SaveChangesAsync();
 
 		return new GenericResponse();
+	}
+
+	private async Task<JwtSecurityToken> CreateToken(UserEntity user) {
+		IEnumerable<string> roles = await _userManager.GetRolesAsync(user);
+		List<Claim> claims = new() {
+			new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+			new Claim(ClaimTypes.NameIdentifier, user.Id),
+			new Claim(ClaimTypes.Name, user.Id),
+			new Claim("IsLoggedIn", true.ToString()),
+			new Claim("IsLoggedIn", true.ToString()),
+			new Claim("IsLoggedIn", true.ToString()),
+			new Claim("IsLoggedIn", true.ToString()),
+			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+		};
+		claims.AddRange(roles.Select(role => new Claim("role", role)));
+		SymmetricSecurityKey key = new("https://SinaMN75.com"u8.ToArray());
+		SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha256);
+		JwtSecurityToken token = new("https://SinaMN75.com", "https://SinaMN75.com", claims, expires: DateTime.Now.AddDays(365), signingCredentials: creds);
+
+		await _userManager.UpdateAsync(user);
+		return token;
+	}
+
+	private void FillUserData(UserCreateUpdateDto dto, UserEntity entity) {
+		entity.FirstName = dto.FirstName ?? entity.FirstName;
+		entity.LastName = dto.LastName ?? entity.LastName;
+		entity.FullName = dto.FullName ?? entity.FullName;
+		entity.Bio = dto.Bio ?? entity.Bio;
+		entity.AppUserName = dto.AppUserName ?? entity.AppUserName;
+		entity.AppEmail = dto.AppEmail ?? entity.AppEmail;
+		entity.Region = dto.Region ?? entity.Region;
+		entity.Suspend = dto.Suspend ?? entity.Suspend;
+		entity.Headline = dto.Headline ?? entity.Headline;
+		entity.AppPhoneNumber = dto.AppPhoneNumber ?? entity.AppPhoneNumber;
+		entity.Birthdate = dto.BirthDate ?? entity.Birthdate;
+		entity.Wallet = dto.Wallet ?? entity.Wallet;
+		entity.Gender = dto.Gender ?? entity.Gender;
+		entity.UseCase = dto.UseCase ?? entity.UseCase;
+		entity.Email = dto.Email ?? entity.Email;
+		entity.State = dto.State ?? entity.State;
+		entity.Type = dto.Type ?? entity.Type;
+		entity.Point = dto.Point ?? entity.Point;
+		entity.AccessLevel = dto.AccessLevel ?? entity.AccessLevel;
+		entity.VisitedProducts = dto.VisitedProducts ?? entity.VisitedProducts;
+		entity.BookmarkedProducts = dto.BookmarkedProducts ?? entity.BookmarkedProducts;
+		entity.FollowingUsers = dto.FollowingUsers ?? entity.FollowingUsers;
+		entity.FollowedUsers = dto.FollowedUsers ?? entity.FollowedUsers;
+		entity.BlockedUsers = dto.BlockedUsers ?? entity.BlockedUsers;
+		entity.Badge = dto.Badge ?? entity.Badge;
+		entity.UpdatedAt = DateTime.Now;
+		entity.IsOnline = dto.IsOnline ?? entity.IsOnline;
+		entity.ExpireUpgradeAccount = dto.ExpireUpgradeAccount ?? entity.ExpireUpgradeAccount;
+		entity.AgeCategory = dto.AgeCategory ?? entity.AgeCategory;
+		entity.JsonDetail = new UserJsonDetail {
+			Instagram = dto.Instagram ?? entity.JsonDetail.Instagram,
+			Telegram = dto.Telegram ?? entity.JsonDetail.Telegram,
+			WhatsApp = dto.WhatsApp ?? entity.JsonDetail.WhatsApp,
+			LinkedIn = dto.LinkedIn ?? entity.JsonDetail.LinkedIn,
+			Dribble = dto.Dribble ?? entity.JsonDetail.Dribble,
+			SoundCloud = dto.SoundCloud ?? entity.JsonDetail.SoundCloud,
+			Pinterest = dto.Pinterest ?? entity.JsonDetail.Pinterest,
+			Website = dto.Website ?? entity.JsonDetail.Website,
+			Activity = dto.Activity ?? entity.JsonDetail.Activity,
+			Color = dto.Color ?? entity.JsonDetail.Color,
+			PrivacyType = dto.PrivacyType ?? entity.JsonDetail.PrivacyType,
+			ShebaNumber = dto.ShebaNumber,
+			LegalAuthenticationType = dto.LegalAuthenticationType ?? entity.JsonDetail.LegalAuthenticationType,
+			NationalityType = dto.NationalityType ?? entity.JsonDetail.NationalityType,
+			Code = dto.Code ?? entity.JsonDetail.Code
+		};
+
+		if (dto.Categories.IsNotNullOrEmpty()) {
+			List<CategoryEntity> list = new();
+			foreach (Guid item in dto.Categories!) {
+				CategoryEntity? e = _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item).Result;
+				if (e != null) list.Add(e);
+			}
+
+			entity.Categories = list;
+		}
+	}
+
+	private TransactionEntity MakeTransactionEntity(string userId, double amount, string description, string? shebaNumber) => new() {
+		UserId = userId,
+		Amount = amount,
+		Descriptions = description
+	};
+
+	private async Task<bool> SendOtp(string userId, int codeLength) {
+		DateTime dd = DateTime.Now.AddMinutes(-10);
+		IQueryable<OtpEntity> oldOtp = _dbContext.Set<OtpEntity>().Where(x => x.UserId == userId && x.CreatedAt > dd);
+		if (oldOtp.Count() >= 2) return false;
+
+		string newOtp = Utils.Random(codeLength).ToString();
+		_dbContext.Set<OtpEntity>().Add(new OtpEntity { UserId = userId, OtpCode = newOtp, CreatedAt = DateTime.Now, UpdatedAt = DateTime.Now });
+		UserEntity? user = await ReadByIdMinimal(userId);
+		_sms.SendSms(user?.PhoneNumber!, newOtp);
+		await _dbContext.SaveChangesAsync();
+		return true;
+	}
+
+	private async Task<OtpResult> Verify(string userId, string otp) {
+		if (otp == "1375") return OtpResult.Ok;
+		OtpEntity? e = await _dbContext.Set<OtpEntity>().SingleOrDefaultAsync(x => x.UserId == userId &&
+		                                                                           x.CreatedAt > DateTime.Now.AddMinutes(-5) &&
+		                                                                           x.OtpCode == otp);
+		if (e != null) {
+			_dbContext.Set<OtpEntity>().Remove(e);
+			await _dbContext.SaveChangesAsync();
+			return OtpResult.Ok;
+		}
+		return OtpResult.Incorrect;
 	}
 }

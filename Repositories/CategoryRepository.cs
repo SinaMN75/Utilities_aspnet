@@ -11,7 +11,7 @@ public interface ICategoryRepository {
 public class CategoryRepository : ICategoryRepository {
 	private readonly DbContext _dbContext;
 
-	public CategoryRepository(DbContext context) { _dbContext = context; }
+	public CategoryRepository(DbContext context) => _dbContext = context;
 
 	public async Task<GenericResponse<CategoryEntity>> Create(CategoryCreateUpdateDto dto) {
 		CategoryEntity entity = new();
@@ -98,7 +98,7 @@ public static class CategoryEntityExtension {
 			Longitude = dto.Longitude ?? entity.JsonDetail.Longitude,
 			Date1 = dto.Date1 ?? entity.JsonDetail.Date1,
 			Date2 = dto.Date2 ?? entity.JsonDetail.Date2,
-			Value = dto.Value ?? entity.JsonDetail.Value,
+			Value = dto.Value ?? entity.JsonDetail.Value
 		};
 
 		return entity;

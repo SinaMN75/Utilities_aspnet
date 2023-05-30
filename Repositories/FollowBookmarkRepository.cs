@@ -31,7 +31,7 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 		BookmarkEntity? oldBookmark = _dbContext.Set<BookmarkEntity>()
 			.FirstOrDefault(x => x.ProductId != null && x.ProductId == dto.ProductId && x.UserId == _userId);
 		if (oldBookmark == null) {
-			BookmarkEntity e = new() {UserId = _userId};
+			BookmarkEntity e = new() { UserId = _userId };
 			if (dto.ProductId.HasValue) e.ProductId = dto.ProductId;
 			e.FolderName = dto.FolderName;
 			e.ParentId = dto.ParentId;

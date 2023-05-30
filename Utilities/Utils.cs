@@ -117,7 +117,7 @@ public static class StartupExtension {
 
 			c.AddSecurityRequirement(new OpenApiSecurityRequirement {
 				{
-					new OpenApiSecurityScheme {Reference = new OpenApiReference {Type = ReferenceType.SecurityScheme, Id = "Bearer"}},
+					new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } },
 					Array.Empty<string>()
 				}
 			});
@@ -182,11 +182,11 @@ public static class StartupExtension {
 internal class OutputCachePolicy : IOutputCachePolicy {
 	private readonly int _seconds;
 
-	public OutputCachePolicy(int seconds) { _seconds = seconds; }
+	public OutputCachePolicy(int seconds) => _seconds = seconds;
 
-	public ValueTask ServeFromCacheAsync(OutputCacheContext context, CancellationToken cancellation) { return ValueTask.CompletedTask; }
+	public ValueTask ServeFromCacheAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
 
-	public ValueTask ServeResponseAsync(OutputCacheContext context, CancellationToken cancellation) { return ValueTask.CompletedTask; }
+	public ValueTask ServeResponseAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
 
 	public ValueTask CacheRequestAsync(OutputCacheContext context, CancellationToken cancellation) {
 		context.AllowCacheLookup = true;

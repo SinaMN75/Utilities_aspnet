@@ -10,7 +10,5 @@ public static class Extension {
 		return str;
 	}
 
-	public static string GetLast(this string source, int tailLength) {
-		return tailLength >= source.Length ? source : source.Substring(source.Length - tailLength);
-	}
+	public static string GetLast(this string source, int tailLength) => tailLength >= source.Length ? source : source.Substring(source.Length - tailLength);
 }

@@ -22,9 +22,7 @@ public class TransactionRepository : ITransactionRepository {
 		return new GenericResponse<TransactionEntity>(entity);
 	}
 
-	public GenericResponse<IQueryable<TransactionEntity>> Read() {
-		return new GenericResponse<IQueryable<TransactionEntity>>(_dbContext.Set<TransactionEntity>());
-	}
+	public GenericResponse<IQueryable<TransactionEntity>> Read() => new(_dbContext.Set<TransactionEntity>());
 
 	public GenericResponse<IQueryable<TransactionEntity>> ReadMine() {
 		IQueryable<TransactionEntity> i = _dbContext.Set<TransactionEntity>()

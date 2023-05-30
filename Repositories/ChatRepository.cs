@@ -197,7 +197,7 @@ public class ChatRepository : IChatRepository {
 			Priority = dto.Priority ?? e.JsonDetail.Priority,
 			Value = dto.Value ?? e.JsonDetail.Value,
 			Description = dto.Description ?? e.JsonDetail.Description,
-			ChatStatus = dto.ChatStatus ?? e.JsonDetail.ChatStatus,
+			ChatStatus = dto.ChatStatus ?? e.JsonDetail.ChatStatus
 		};
 
 		EntityEntry<GroupChatEntity> entity = _dbContext.Set<GroupChatEntity>().Update(e);

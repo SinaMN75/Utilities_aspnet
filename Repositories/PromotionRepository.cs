@@ -70,18 +70,18 @@ public class PromotionRepository : IPromotionRepository {
 
 		List<StatePerUser> statePerUsers = users
 			.GroupBy(u => u.State)
-			.Select(g => new StatePerUser {State = g.Key, UserCount = g.Count()})
+			.Select(g => new StatePerUser { State = g.Key, UserCount = g.Count() })
 			.ToList();
 
 		List<SkillPerUser> skillPerUsers = users
 			.SelectMany(u => u.Categories)
-			.GroupBy(c => new {c.UseCase, c.Title})
-			.Select(g => new SkillPerUser {Skill = g?.Key.Title ?? "", UserCount = g?.Count() ?? 0})
+			.GroupBy(c => new { c.UseCase, c.Title })
+			.Select(g => new SkillPerUser { Skill = g?.Key.Title ?? "", UserCount = g?.Count() ?? 0 })
 			.ToList();
 
 		List<AgeCatgPerUser> ageCatgPerUsers = users
 			.GroupBy(u => u.AgeCategory)
-			.Select(g => new AgeCatgPerUser {AgeCategory = ((int) g.Key).ToString(), UserCount = g.Count()})
+			.Select(g => new AgeCatgPerUser { AgeCategory = ((int) g.Key).ToString(), UserCount = g.Count() })
 			.ToList();
 
 		return new GenericResponse<PromotionDetail?>(new PromotionDetail {
