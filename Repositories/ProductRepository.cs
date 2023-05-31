@@ -185,9 +185,9 @@ public class ProductRepository : IProductRepository {
 		if (i.ProductInsights?.Any() != null) {
 			List<IGrouping<ReactionEntity?, ProductInsight>> psGrouping = i.ProductInsights.GroupBy(g => g.Reaction).ToList();
 			i.ProductInsights = null;
-			List<ProductInsight> productInsights = new();
+			List<ProductInsight?> productInsights = new();
 			foreach (IGrouping<ReactionEntity?, ProductInsight> item in psGrouping) {
-				item.FirstOrDefault().Count = item.Count();
+				item.FirstOrDefault()!.Count = item.Count();
 				productInsights.Add(item.FirstOrDefault());
 			}
 			i.ProductInsights = productInsights;
