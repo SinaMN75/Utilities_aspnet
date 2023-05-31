@@ -52,14 +52,8 @@ public class OrderDetailEntity : BaseEntity {
 
 public class OrderCreateUpdateDto {
 	public Guid? Id { get; set; }
-	public int? DiscountPercent { get; set; }
 	public string? Description { get; set; }
 	public string? DiscountCode { get; set; }
-	public string? ProductUseCase { get; set; }
-	public string? UserId { get; set; }
-	public double? TotalPrice { get; set; }
-	public double? DiscountPrice { get; set; }
-	public double? SendPrice { get; set; }
 	public DateTime? ReceivedDate { get; set; }
 	public Guid? AddressId { get; set; }
 	public OrderStatuses? Status { get; set; } = OrderStatuses.Pending;

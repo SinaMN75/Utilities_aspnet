@@ -34,17 +34,14 @@ public class OrderRepository : IOrderRepository {
 		OrderEntity entityOrder = new() {
 			Description = dto.Description,
 			ReceivedDate = dto.ReceivedDate,
-			UserId = dto.UserId ?? _userId,
-			DiscountPercent = dto.DiscountPercent,
+			UserId = _userId,
 			DiscountCode = dto.DiscountCode,
 			PayType = dto.PayType,
-			SendPrice = dto.SendPrice,
 			SendType = dto.SendType,
 			AddressId = dto.AddressId,
 			Status = dto.Status,
 			CreatedAt = DateTime.Now,
 			UpdatedAt = DateTime.Now,
-			ProductUseCase = dto.ProductUseCase,
 			ProductOwnerId = listProducts.First().UserId
 		};
 
@@ -79,7 +76,6 @@ public class OrderRepository : IOrderRepository {
 			totalPrice += Convert.ToDouble(productEntity?.Price + categoryEntity?.Price ?? 0);
 		}
 		entityOrder.TotalPrice = totalPrice = entityOrder.OrderDetails.Where(o => o.DeletedAt == null).Sum(x => x.Price ?? 0);
-		entityOrder.DiscountPrice = totalPrice * dto.DiscountPercent / 100;
 
 		_dbContext.Set<OrderEntity>().Update(entityOrder);
 		await _dbContext.SaveChangesAsync();
@@ -94,15 +90,10 @@ public class OrderRepository : IOrderRepository {
 		oldOrder.Description = dto.Description ?? oldOrder.Description;
 		oldOrder.ReceivedDate = dto.ReceivedDate ?? oldOrder.ReceivedDate;
 		oldOrder.Status = dto.Status ?? oldOrder.Status;
-		oldOrder.TotalPrice = dto.TotalPrice ?? oldOrder.TotalPrice;
-		oldOrder.DiscountPrice = dto.DiscountPrice ?? oldOrder.DiscountPrice;
 		oldOrder.PayType = dto.PayType ?? oldOrder.PayType;
-		oldOrder.SendPrice = dto.SendPrice ?? oldOrder.SendPrice;
 		oldOrder.SendType = dto.SendType ?? oldOrder.SendType;
 		oldOrder.DiscountCode = dto.DiscountCode ?? oldOrder.DiscountCode;
-		oldOrder.DiscountPercent = dto.DiscountPercent ?? oldOrder.DiscountPercent;
 		oldOrder.UpdatedAt = DateTime.Now;
-		oldOrder.ProductUseCase = dto.ProductUseCase ?? oldOrder.ProductUseCase;
 		await _dbContext.SaveChangesAsync();
 
 		return new GenericResponse<OrderEntity?>(oldOrder);
