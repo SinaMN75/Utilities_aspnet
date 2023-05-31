@@ -77,7 +77,8 @@ public class ProductRepository : IProductRepository {
 	}
 
 	public async Task<GenericResponse<IQueryable<ProductEntity>>> Filter(ProductFilterDto dto) {
-		IQueryable<ProductEntity> q = _dbContext.Set<ProductEntity>();
+		IQueryable<ProductEntity> q = _dbContext.Set<ProductEntity>()
+			.Include(x => x.Parent);
 		q = q.Where(x => x.DeletedAt == null);
 		if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.Now);
 
@@ -360,7 +361,7 @@ public static class ProductEntityExtension {
 
 		if (dto.ParentId is not null) {
 			entity.ParentId = dto.ParentId ?? entity.ParentId;
-			entity.Product = context.Set<ProductEntity>().FirstOrDefault(f => f.Id == dto.ParentId);
+			entity.Parent = context.Set<ProductEntity>().FirstOrDefault(f => f.Id == dto.ParentId);
 		}
 
 		return entity;

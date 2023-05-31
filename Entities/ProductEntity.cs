@@ -28,7 +28,7 @@ public class ProductEntity : BaseEntity {
 	public string? SeenUsers { get; set; } = "";
 	public string? Teams { get; set; } = "";
 
-	public ProductEntity? Product { get; set; }
+	public ProductEntity? Parent { get; set; }
 	public Guid? ParentId { get; set; }
 
 	public string? UserId { get; set; }
