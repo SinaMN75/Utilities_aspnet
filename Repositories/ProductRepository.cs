@@ -77,9 +77,7 @@ public class ProductRepository : IProductRepository {
 	}
 
 	public async Task<GenericResponse<IQueryable<ProductEntity>>> Filter(ProductFilterDto dto) {
-		IQueryable<ProductEntity> q = _dbContext.Set<ProductEntity>()
-			.Include(x => x.Parent);
-		q = q.Where(x => x.DeletedAt == null);
+		IQueryable<ProductEntity> q = _dbContext.Set<ProductEntity>().AsNoTracking().Where(x => x.DeletedAt == null);
 		if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.Now);
 
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
@@ -136,6 +134,10 @@ public class ProductRepository : IProductRepository {
 		}
 
 		if (dto.Boosted) q = q.OrderByDescending(o => o.Boosted);
+		
+		q = q.Include(x => x.Parent).ThenInclude(x => x.Categories);
+		q = q.Include(x => x.Parent).ThenInclude(x => x.Media);
+		q = q.Include(x => x.Parent).ThenInclude(x => x.User);
 
 		int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
