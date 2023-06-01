@@ -383,7 +383,7 @@ public class UserRepository : IUserRepository {
 	};
 
 	private async Task<bool> SendOtp(string userId, int codeLength) {
-		DateTime dd = DateTime.Now.AddMinutes(-10);
+		DateTime dd = DateTime.Now.AddSeconds(-10);
 		IQueryable<OtpEntity> oldOtp = _dbContext.Set<OtpEntity>().Where(x => x.UserId == userId && x.CreatedAt > dd);
 		if (oldOtp.Count() >= 2) return false;
 
