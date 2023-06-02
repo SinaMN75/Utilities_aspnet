@@ -100,7 +100,7 @@ public class OrderRepository : IOrderRepository {
 	}
 
 	public GenericResponse<IQueryable<OrderEntity>> Filter(OrderFilterDto dto) {
-		IQueryable<OrderEntity> q = _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails.Where(x => x.DeletedAt == null));
+		IQueryable<OrderEntity> q = _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails.Where(y => y.DeletedAt == null)).ThenInclude(x => x.Category);
 
 		if (dto.ShowProducts.IsTrue()) {
 			q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(x => x.Media);
