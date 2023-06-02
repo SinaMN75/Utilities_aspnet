@@ -61,7 +61,6 @@ public class OrderCreateUpdateDto {
 }
 
 public class OrderDetailCreateUpdateDto {
-	public Guid? Id { get; set; }
 	public Guid? OrderId { get; set; }
 	public Guid? ProductId { get; set; }
 	public double? Price { get; set; }
@@ -72,8 +71,6 @@ public class OrderDetailCreateUpdateDto {
 public class OrderFilterDto {
 	public Guid? Id { get; set; }
 	public bool? ShowProducts { get; set; } = false;
-	public bool? ShowCategories { get; set; } = false;
-	public bool? ShowUser { get; set; } = false;
 	public OrderStatuses? Status { get; set; }
 	public SendType? SendType { get; set; }
 	public PayType? PayType { get; set; }
