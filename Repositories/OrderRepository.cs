@@ -87,7 +87,9 @@ public class OrderRepository : IOrderRepository {
 	}
 
 	public GenericResponse<IQueryable<OrderEntity>> Filter(OrderFilterDto dto) {
-		IQueryable<OrderEntity> q = _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails.Where(y => y.DeletedAt == null)).ThenInclude(x => x.Category);
+		IQueryable<OrderEntity> q = _dbContext.Set<OrderEntity>()
+			.Include(x => x.OrderDetails.Where(y => y.DeletedAt == null)).ThenInclude(x => x.Category)
+			.Include(x => x.Address);
 
 		if (dto.ShowProducts.IsTrue()) {
 			q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(x => x.Media);
@@ -160,7 +162,8 @@ public class OrderRepository : IOrderRepository {
 
 		e.TotalPrice = e.OrderDetails.Where(o => o.DeletedAt == null).Sum(x => x.Category?.Price ?? 0);
 		e.UpdatedAt = DateTime.Now;
-		e.ProductOwnerId = q.First() ?? p?.UserId;
+		e.ProductOwnerId = q.First() ?? p?.UserId; 
+		_dbContext.Set<OrderEntity>().Update(e);
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}
@@ -182,7 +185,7 @@ public class OrderRepository : IOrderRepository {
 
 			foreach (OrderDetailEntity i in oe.OrderDetails) { oe.TotalPrice += i.Price; }
 
-			_dbContext.Update(oe);
+			_dbContext.Set<OrderEntity>().Update(oe);
 			await _dbContext.SaveChangesAsync();
 			return new GenericResponse();
 		}
