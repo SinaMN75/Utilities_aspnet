@@ -33,13 +33,7 @@ public class AddressRepository : IAddressRepository {
 	}
 
 	public async Task<GenericResponse<AddressEntity?>> Update(AddressCreateUpdateDto addressDto) {
-		IQueryable<AddressEntity> userAddresses = _dbContext.Set<AddressEntity>().Where(w => w.UserId == _userId);
-		if (userAddresses.Any(a => a.PostalCode!.Contains(addressDto.PostalCode ?? string.Empty) && a.Id != addressDto.Id))
-			return new GenericResponse<AddressEntity?>(null, UtilitiesStatusCodes.BadRequest);
-
-		AddressEntity? e = await _dbContext.Set<AddressEntity>().FirstOrDefaultAsync(f => f.Id == addressDto.Id && f.DeletedAt == null);
-		if (e is null) return new GenericResponse<AddressEntity?>(null, UtilitiesStatusCodes.NotFound);
-
+		AddressEntity e = (await _dbContext.Set<AddressEntity>().FirstOrDefaultAsync(f => f.Id == addressDto.Id && f.DeletedAt == null))!;
 		e.PostalCode = addressDto.PostalCode ?? e.PostalCode;
 		e.Pelak = addressDto.Pelak ?? e.Pelak;
 		e.Unit = addressDto.Unit ?? e.Unit;
@@ -47,10 +41,8 @@ public class AddressRepository : IAddressRepository {
 		e.UpdatedAt = DateTime.UtcNow;
 		e.ReceiverFullName = addressDto.ReceiverFullName ?? e.ReceiverFullName;
 		e.ReceiverPhoneNumber = addressDto.ReceiverPhoneNumber ?? e.ReceiverPhoneNumber;
-
 		_dbContext.Update(e);
 		await _dbContext.SaveChangesAsync();
-
 		return new GenericResponse<AddressEntity?>(e);
 	}
 
