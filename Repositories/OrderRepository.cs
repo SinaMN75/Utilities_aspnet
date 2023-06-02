@@ -132,6 +132,7 @@ public class OrderRepository : IOrderRepository {
 	}
 
 	public async Task<GenericResponse> Delete(Guid id) {
+		await _dbContext.Set<OrderDetailEntity>().Where(i => i.OrderId == id).ExecuteDeleteAsync();
 		await _dbContext.Set<OrderEntity>().Where(i => i.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
 	}
