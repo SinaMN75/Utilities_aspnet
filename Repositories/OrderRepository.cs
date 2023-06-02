@@ -169,7 +169,7 @@ public class OrderRepository : IOrderRepository {
 			.Include(x => x.Category)
 			.SingleOrDefaultAsync(x => x.Id == dto.OrderDetailId);
 
-		if (ode.Category.Stock <= dto.Count) {
+		if (ode.Category.Stock >= dto.Count) {
 			ode.Count = dto.Count;
 			ode.Price += ode.Price * ode.Count;
 			_dbContext.Set<OrderDetailEntity>().Update(ode);
