@@ -7,6 +7,7 @@ public interface IOrderRepository {
 	Task<GenericResponse<OrderEntity?>> Update(OrderCreateUpdateDto dto);
 	Task<GenericResponse> Delete(Guid id);
 	Task<GenericResponse> CreateOrderDetail(OrderDetailCreateUpdateDto dto);
+	Task<GenericResponse> UpdateOrderDetail(OrderDetailCreateUpdateDto dto);
 	Task<GenericResponse> DeleteOrderDetail(Guid id);
 }
 
@@ -136,10 +137,9 @@ public class OrderRepository : IOrderRepository {
 	}
 
 	public async Task<GenericResponse> CreateOrderDetail(OrderDetailCreateUpdateDto dto) {
-		OrderEntity? e = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails.Where(x => x.DeletedAt == null))
+		OrderEntity e = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails.Where(x => x.DeletedAt == null))
 			.ThenInclude(y => y.Product)
 			.FirstOrDefaultAsync(x => x.Id == dto.OrderId);
-		if (e == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
 		if (e.PayDateTime != null) return new GenericResponse(UtilitiesStatusCodes.OrderPayed);
 
 		IEnumerable<string?>? q = e.OrderDetails?.GroupBy(x => x.Product?.UserId).Select(z => z.Key);
@@ -162,6 +162,30 @@ public class OrderRepository : IOrderRepository {
 		e.ProductOwnerId = q.First() ?? p?.UserId;
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
+	}
+
+	public async Task<GenericResponse> UpdateOrderDetail(OrderDetailCreateUpdateDto dto) {
+		OrderDetailEntity? ode = await _dbContext.Set<OrderDetailEntity>()
+			.Include(x => x.Category)
+			.SingleOrDefaultAsync(x => x.Id == dto.OrderDetailId);
+
+		if (ode.Category.Stock <= dto.Count) {
+			ode.Count = dto.Count;
+			ode.Price += ode.Price * ode.Count;
+			_dbContext.Set<OrderDetailEntity>().Update(ode);
+			await _dbContext.SaveChangesAsync();
+
+			OrderEntity? oe = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails.Where(x => x.DeletedAt == null))
+				.ThenInclude(y => y.Product)
+				.FirstOrDefaultAsync(x => x.Id == dto.OrderId);
+
+			foreach (OrderDetailEntity i in oe.OrderDetails) { oe.TotalPrice += i.Price; }
+
+			_dbContext.Update(oe);
+			await _dbContext.SaveChangesAsync();
+			return new GenericResponse();
+		}
+		return new GenericResponse(UtilitiesStatusCodes.OutOfStock);
 	}
 
 	public async Task<GenericResponse> DeleteOrderDetail(Guid id) {

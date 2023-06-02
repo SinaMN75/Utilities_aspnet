@@ -27,6 +27,10 @@ public class OrderController : BaseApiController {
 	[HttpPost("CreateOrderDetailToOrder")]
 	public async Task<ActionResult<GenericResponse<OrderEntity>>> CreateOrderDetailToOrder(OrderDetailCreateUpdateDto dto) =>
 		Result(await _repository.CreateOrderDetail(dto));
+	
+	[HttpPost("UpdateOrderDetailToOrder")]
+	public async Task<ActionResult<GenericResponse<OrderEntity>>> UpdateOrderDetailToOrder(OrderDetailCreateUpdateDto dto) =>
+		Result(await _repository.UpdateOrderDetail(dto));
 
 	[HttpDelete("DeleteOrderDetail")]
 	public async Task<ActionResult<GenericResponse<OrderEntity>>> DeleteOrderDetail(Guid id) => Result(await _repository.DeleteOrderDetail(id));
