@@ -30,7 +30,6 @@ public class OrderEntity : BaseEntity {
 	public string? ProductOwnerId { get; set; }
 
 	public IEnumerable<OrderDetailEntity>? OrderDetails { get; set; }
-	public string? State { get; set; }
 }
 
 [Table("OrderDetail")]
@@ -63,7 +62,6 @@ public class OrderCreateUpdateDto {
 public class OrderDetailCreateUpdateDto {
 	public Guid? OrderId { get; set; }
 	public Guid? ProductId { get; set; }
-	public double? Price { get; set; }
 	public int? Count { get; set; }
 	public Guid? Category { get; set; }
 }
