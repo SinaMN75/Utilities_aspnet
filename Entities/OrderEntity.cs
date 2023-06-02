@@ -75,8 +75,6 @@ public class OrderFilterDto {
 	public SendType? SendType { get; set; }
 	public PayType? PayType { get; set; }
 	public string? PayNumber { get; set; }
-	public DateTime? PayDateTime { get; set; }
-	public DateTime? ReceivedDate { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
 	public string? UserId { get; set; }

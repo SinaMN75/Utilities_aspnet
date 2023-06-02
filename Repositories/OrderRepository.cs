@@ -112,9 +112,7 @@ public class OrderRepository : IOrderRepository {
 		if (dto.Status.HasValue) q = q.Where(x => x.Status == dto.Status);
 		if (dto.SendType.HasValue) q = q.Where(x => x.SendType == dto.SendType);
 		if (dto.PayType.HasValue) q = q.Where(x => x.PayType == dto.PayType);
-		if (dto.PayDateTime.HasValue) q = q.Where(x => x.PayDateTime == dto.PayDateTime);
 		if (dto.PayNumber.IsNotNullOrEmpty()) q = q.Where(x => (x.PayNumber ?? "").Contains(dto.PayNumber!));
-		if (dto.ReceivedDate.HasValue) q = q.Where(x => x.ReceivedDate == dto.ReceivedDate);
 
 		if (dto.UserId.IsNotNullOrEmpty() && dto.ProductOwnerId.IsNotNullOrEmpty()) {
 			q = q.Where(x => x.ProductOwnerId == dto.ProductOwnerId || x.UserId == dto.UserId);
@@ -130,7 +128,7 @@ public class OrderRepository : IOrderRepository {
 
 		q = q.AsNoTracking().Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
-		return new GenericResponse<IQueryable<OrderEntity>>(q) {
+		return new GenericResponse<IQueryable<OrderEntity>>(q.AsSingleQuery()) {
 			TotalCount = totalCount,
 			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
 			PageSize = dto.PageSize
