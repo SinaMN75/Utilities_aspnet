@@ -35,6 +35,7 @@ public class OrderEntity : BaseEntity {
 [Table("OrderDetail")]
 public class OrderDetailEntity : BaseEntity {
 	public double? Price { get; set; }
+	public double? UnitPrice { get; set; }
 	public int? Count { get; set; }
 
 	public OrderEntity? Order { get; set; }
