@@ -11,7 +11,7 @@ public class OrderController : BaseApiController {
 
 	[HttpPost]
 	public async Task<ActionResult<GenericResponse<OrderEntity?>>> Create(OrderCreateUpdateDto dto) => Result(await _repository.Create(dto));
-	
+
 	[HttpPut]
 	public async Task<ActionResult<GenericResponse<OrderEntity?>>> Update(OrderCreateUpdateDto dto) => Result(await _repository.Update(dto));
 
@@ -27,7 +27,7 @@ public class OrderController : BaseApiController {
 	[HttpPost("CreateOrderDetail")]
 	public async Task<ActionResult<GenericResponse<OrderEntity>>> CreateOrderDetailToOrder(OrderDetailCreateUpdateDto dto) =>
 		Result(await _repository.CreateOrderDetail(dto));
-	
+
 	[HttpPut("UpdateOrderDetail")]
 	public async Task<ActionResult<GenericResponse<OrderEntity>>> UpdateOrderDetailToOrder(OrderDetailCreateUpdateDto dto) =>
 		Result(await _repository.UpdateOrderDetail(dto));

@@ -37,7 +37,7 @@ public class CategoryRepository : ICategoryRepository {
 		List<CategoryEntity> list = new();
 		foreach (CategoryCreateUpdateDto i in dto) {
 			GenericResponse<CategoryEntity> j = await Create(i);
-			list.Add(j.Result);
+			list.Add(j.Result!);
 		}
 		return new GenericResponse<IEnumerable<CategoryEntity>>(list);
 	}
@@ -98,7 +98,9 @@ public static class CategoryEntityExtension {
 			Longitude = dto.Longitude ?? entity.JsonDetail.Longitude,
 			Date1 = dto.Date1 ?? entity.JsonDetail.Date1,
 			Date2 = dto.Date2 ?? entity.JsonDetail.Date2,
-			Value = dto.Value ?? entity.JsonDetail.Value
+			Value = dto.Value ?? entity.JsonDetail.Value,
+			DiscountedPrice = dto.DiscountedPrice ?? entity.JsonDetail.DiscountedPrice,
+			SendPrice = dto.SendPrice ?? entity.JsonDetail.SendPrice
 		};
 
 		return entity;

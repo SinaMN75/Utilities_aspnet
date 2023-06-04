@@ -134,7 +134,7 @@ public class ProductRepository : IProductRepository {
 		}
 
 		if (dto.Boosted) q = q.OrderByDescending(o => o.Boosted);
-		
+
 		q = q.Include(x => x.Parent).ThenInclude(x => x.Categories);
 		q = q.Include(x => x.Parent).ThenInclude(x => x.Media);
 		q = q.Include(x => x.Parent).ThenInclude(x => x.User).ThenInclude(x => x.Media);

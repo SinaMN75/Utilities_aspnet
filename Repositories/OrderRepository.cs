@@ -41,7 +41,7 @@ public class OrderRepository : IOrderRepository {
 			Status = dto.Status,
 			CreatedAt = DateTime.Now,
 			UpdatedAt = DateTime.Now,
-			ProductOwnerId = products.First().UserId,
+			ProductOwnerId = products.First().UserId
 		};
 
 		await _dbContext.Set<OrderEntity>().AddAsync(entityOrder);
@@ -147,7 +147,7 @@ public class OrderRepository : IOrderRepository {
 			.FirstOrDefaultAsync(x => x.Id == dto.OrderId);
 
 		IEnumerable<string?>? q = o.OrderDetails?.GroupBy(x => x.Product?.UserId).Select(z => z.Key);
-		if (q.Count() > 1) return new GenericResponse<OrderDetailEntity?>(null, UtilitiesStatusCodes.MultipleSeller, "Cannot Add from multiple seller.");
+		if (q.Count() > 1) return new GenericResponse<OrderDetailEntity?>(null, UtilitiesStatusCodes.MultipleSeller);
 
 		EntityEntry<OrderDetailEntity> orderDetailEntity = await _dbContext.Set<OrderDetailEntity>().AddAsync(new OrderDetailEntity {
 			ProductId = dto.ProductId,
@@ -184,14 +184,14 @@ public class OrderRepository : IOrderRepository {
 
 			OrderEntity? oe = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails.Where(x => x.DeletedAt == null))
 				.FirstOrDefaultAsync(x => x.Id == dto.OrderId);
-			
-			foreach (OrderDetailEntity i in oe.OrderDetails) { oe.TotalPrice = i.Price; }
+
+			foreach (OrderDetailEntity i in oe.OrderDetails) oe.TotalPrice = i.Price;
 
 			_dbContext.Set<OrderEntity>().Update(oe);
 			await _dbContext.SaveChangesAsync();
 			return new GenericResponse<OrderDetailEntity?>(ode);
 		}
-		return new GenericResponse<OrderDetailEntity?>(null,UtilitiesStatusCodes.OutOfStock);
+		return new GenericResponse<OrderDetailEntity?>(null, UtilitiesStatusCodes.OutOfStock);
 	}
 
 	public async Task<GenericResponse> DeleteOrderDetail(Guid id) {
