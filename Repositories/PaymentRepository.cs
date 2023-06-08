@@ -32,6 +32,7 @@ public class PaymentRepository : IPaymentRepository {
 				CreatedAt = DateTime.Now,
 				Descriptions = desc,
 				GatewayName = "ZarinPal",
+				TransactionType = TransactionType.Recharge,
 				UserId = _userId,
 				StatusId = TransactionStatus.Pending
 			});
@@ -58,6 +59,7 @@ public class PaymentRepository : IPaymentRepository {
 				Amount = order.TotalPrice.ToInt(),
 				Authority = result.Authority,
 				CreatedAt = DateTime.Now,
+				TransactionType = TransactionType.Buy,
 				Descriptions = desc,
 				GatewayName = "ZarinPal",
 				UserId = _userId,
@@ -132,6 +134,11 @@ public class PaymentRepository : IPaymentRepository {
 			if (address is not null) {
 				address.IsDefault = true;
 				_dbContext.Update(address);
+				foreach(var item in _dbContext.Set<AddressEntity>().Where(w=>w.UserId == address.UserId && w.Id != address.Id))
+				{
+					item.IsDefault = false;
+					_dbContext.Update(item);
+				}
 			}
 		}
 

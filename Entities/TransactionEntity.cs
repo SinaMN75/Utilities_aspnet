@@ -10,8 +10,9 @@ public class TransactionEntity : BaseEntity {
 	public string? ShebaNumber { get; set; }
 	public long? RefId { get; set; }
 	public TransactionStatus? StatusId { get; set; } = TransactionStatus.Pending;
+	public TransactionType? TransactionType { get; set; } = Utilities.TransactionType.None;
 
-	public UserEntity? User { get; set; }
+    public UserEntity? User { get; set; }
 	public string? UserId { get; set; }
 
 	public OrderEntity? Order { get; set; }

@@ -244,3 +244,13 @@ public enum DisplayType {
 	Exploer = 101,
 	Channels = 102
 }
+
+public enum TransactionType
+{
+	None = 100,
+    DepositToWallet = 101,
+    WithdrawFromTheWallet = 102,
+	Buy = 103,
+	Sell = 104,
+	Recharge = 105
+}
