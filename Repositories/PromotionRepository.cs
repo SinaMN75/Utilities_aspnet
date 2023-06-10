@@ -79,13 +79,13 @@ public class PromotionRepository : IPromotionRepository {
 			.Select(g => new SkillPerUser { Skill = g?.Key.Title ?? "", UserCount = g?.Count() ?? 0 })
 			.ToList();
 
-		List<AgeCatgPerUser> ageCatgPerUsers = users
+		List<AgeCategoryPerUser> ageCategoryPerUsers = users
 			.GroupBy(u => u.AgeCategory)
-			.Select(g => new AgeCatgPerUser { AgeCategory = ((int) g.Key).ToString(), UserCount = g.Count() })
+			.Select(g => new AgeCategoryPerUser { AgeCategory = ((int) g.Key).ToString(), UserCount = g.Count() })
 			.ToList();
 
 		return new GenericResponse<PromotionDetail?>(new PromotionDetail {
-			AgeCatgPerUsers = ageCatgPerUsers,
+			AgeCategoryPerUsers = ageCategoryPerUsers,
 			SkillPerUsers = skillPerUsers,
 			StatePerUsers = statePerUsers,
 			TotalSeen = userPerHour

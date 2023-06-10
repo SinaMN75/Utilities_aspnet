@@ -1,8 +1,7 @@
 ﻿namespace Utilities_aspnet.Entities;
 
 [Table("Transactions")]
-public class TransactionEntity : BaseEntity
-{
+public class TransactionEntity : BaseEntity {
     public double? Amount { get; set; }
     public string? Descriptions { get; set; }
     public string? Authority { get; set; }

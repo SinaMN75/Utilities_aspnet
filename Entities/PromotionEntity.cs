@@ -31,7 +31,7 @@ public class PromotionDetail {
 	public double TotalSeen { get; set; }
 	public List<StatePerUser> StatePerUsers { get; set; }
 	public List<SkillPerUser> SkillPerUsers { get; set; }
-	public List<AgeCatgPerUser> AgeCatgPerUsers { get; set; }
+	public List<AgeCategoryPerUser> AgeCategoryPerUsers { get; set; }
 }
 
 public class StatePerUser {
@@ -44,7 +44,7 @@ public class SkillPerUser {
 	public int UserCount { get; set; }
 }
 
-public class AgeCatgPerUser {
+public class AgeCategoryPerUser {
 	public string AgeCategory { get; set; }
 	public int UserCount { get; set; }
 }
