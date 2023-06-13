@@ -129,8 +129,11 @@ public class OrderRepository : IOrderRepository {
 
 	public async Task<GenericResponse<OrderEntity>> ReadById(Guid id) {
 		OrderEntity? i = await _dbContext.Set<OrderEntity>()
-			.Include(i => i.OrderDetails)!.ThenInclude(p => p.Product)
+			.Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p.Media)
+			.Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p.Categories)
 			.Include(i => i.OrderDetails)!.ThenInclude(p => p.Category)
+			.Include(i => i.Address)
+			.Include(i => i.User).ThenInclude(i => i.Media)
 			.AsNoTracking()
 			.FirstOrDefaultAsync(i => i.Id == id && i.DeletedAt == null);
 		return new GenericResponse<OrderEntity>(i);
