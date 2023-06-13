@@ -82,6 +82,7 @@ public class OrderRepository : IOrderRepository {
 		oldOrder.PayType = dto.PayType ?? oldOrder.PayType;
 		oldOrder.SendType = dto.SendType ?? oldOrder.SendType;
 		oldOrder.DiscountCode = dto.DiscountCode ?? oldOrder.DiscountCode;
+		oldOrder.AddressId = dto.AddressId ?? oldOrder.AddressId;
 		oldOrder.UpdatedAt = DateTime.Now;
 		await _dbContext.SaveChangesAsync();
 
