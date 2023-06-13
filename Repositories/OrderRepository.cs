@@ -90,6 +90,7 @@ public class OrderRepository : IOrderRepository {
 
 	public GenericResponse<IQueryable<OrderEntity>> Filter(OrderFilterDto dto) {
 		IQueryable<OrderEntity> q = _dbContext.Set<OrderEntity>()
+			.Include(x => x.Address)
 			.Include(x => x.OrderDetails.Where(y => y.DeletedAt == null)).ThenInclude(x => x.Category)
 			.Include(x => x.Address);
 
