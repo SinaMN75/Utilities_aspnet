@@ -134,6 +134,7 @@ public class OrderRepository : IOrderRepository {
 			.Include(i => i.OrderDetails)!.ThenInclude(p => p.Category)
 			.Include(i => i.Address)
 			.Include(i => i.User).ThenInclude(i => i.Media)
+			.Include(i => i.ProductOwner).ThenInclude(i => i.Media)
 			.AsNoTracking()
 			.FirstOrDefaultAsync(i => i.Id == id && i.DeletedAt == null);
 		return new GenericResponse<OrderEntity>(i);
