@@ -15,7 +15,8 @@ public class CategoryRepository : ICategoryRepository {
 
 	public async Task<GenericResponse<CategoryEntity>> Create(CategoryCreateUpdateDto dto) {
 		CategoryEntity entity = new();
-		CategoryEntity i = entity.FillData(dto);
+		if (dto.Id is not null) entity.Id = (Guid) dto.Id;
+			CategoryEntity i = entity.FillData(dto);
 		if (dto.IsUnique) {
 			CategoryEntity? exists =
 				await _dbContext.Set<CategoryEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Title == dto.Title && x.DeletedAt != null);
