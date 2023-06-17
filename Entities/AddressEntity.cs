@@ -26,6 +26,7 @@ public class AddressCreateUpdateDto {
 
 public class AddressFilterDto
 {
+	public string? UserId { get; set; }
     public bool? OrderByReceiverFullName { get; set; }
     public bool? OrderByReceiverPhoneNumber { get; set; }
     public bool? OrderByAddress { get; set; }
