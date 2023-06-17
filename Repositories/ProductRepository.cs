@@ -88,6 +88,7 @@ public class ProductRepository : IProductRepository
 
         if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
         if (dto.Subtitle.IsNotNullOrEmpty()) q = q.Where(x => (x.Subtitle ?? "").Contains(dto.Subtitle!));
+        if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => (x.JsonDetail.Tags ?? "").Contains(dto.Tags!));
         if (dto.Type.IsNotNullOrEmpty()) q = q.Where(x => (x.Type ?? "").Contains(dto.Type!));
         if (dto.Description.IsNotNullOrEmpty()) q = q.Where(x => (x.Description ?? "").Contains(dto.Description!));
         if (dto.UseCase.IsNotNullOrEmpty()) q = q.Where(x => x.UseCase!.Contains(dto.UseCase!));
@@ -151,7 +152,7 @@ public class ProductRepository : IProductRepository
         int totalCount = q.Count();
         q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
-        return new GenericResponse<IQueryable<ProductEntity>>(q.AsSingleQuery())
+        return new GenericResponse<IQueryable<ProductEntity>>(q)
         {
             TotalCount = totalCount,
             PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
@@ -337,6 +338,7 @@ public static class ProductEntityExtension
             EndDate = dto.EndDate ?? entity.JsonDetail.EndDate,
             ShippingCost = dto.ShippingCost ?? entity.JsonDetail.ShippingCost,
             ShippingTime = dto.ShippingTime ?? entity.JsonDetail.ShippingTime,
+            Tags = dto.Tags ?? entity.JsonDetail.Tags,
             KeyValue = dto.KeyValue ?? entity.JsonDetail.KeyValue,
             KeyValues = dto.KeyValues ?? entity.JsonDetail.KeyValues
         };

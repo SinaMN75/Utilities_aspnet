@@ -70,6 +70,7 @@ public class ProductJsonDetail {
 	public double? MinPrice { get; set; }
 	public double? ShippingCost { get; set; }
 	public int? ShippingTime { get; set; }
+	public string? Tags { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
 	public List<KeyValue>? KeyValues { get; set; }
@@ -112,6 +113,7 @@ public class ProductCreateUpdateDto {
 	public string? UseCase { get; set; }
 	public string? KeyValue { get; set; }
 	public string? State { get; set; }
+	public string? Tags { get; set; }
 	public double? Latitude { get; set; }
 	public double? Longitude { get; set; }
 	public double? Price { get; set; }
@@ -161,6 +163,7 @@ public class ProductFilterDto {
 	public string? Type { get; set; }
 	public string? UseCase { get; set; }
 	public string? State { get; set; }
+	public string? Tags { get; set; }
 	public double? StartPriceRange { get; set; }
 	public double? EndPriceRange { get; set; }
 	public bool? Enabled { get; set; }
