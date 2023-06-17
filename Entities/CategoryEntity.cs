@@ -83,7 +83,7 @@ public class CategoryFilterDto {
 	public Guid? ParentId { get; set; }
 	public bool? ShowMedia { get; set; }
 	public bool? OrderByOrder { get; set; }
-	public bool? OrderByOrderDecending { get; set; }
+	public bool? OrderByOrderDescending { get; set; }
 	public bool? OrderByCreatedAt { get; set; }
-	public bool? OrderByCreatedAtDecending { get; set; }
+	public bool? OrderByCreatedAtDescending { get; set; }
 }

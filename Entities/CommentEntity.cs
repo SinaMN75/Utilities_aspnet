@@ -40,6 +40,7 @@ public class CommentReacts {
 }
 
 public class CommentCreateUpdateDto {
+	public Guid? Id { get; set; }
 	public Guid? ParentId { get; set; }
 	public double? Score { get; set; }
 	public string? Comment { get; set; }

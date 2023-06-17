@@ -20,7 +20,7 @@ public class ReportController : BaseApiController {
 
 	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse<ReportEntity?>>> Create(ReportEntity parameters) => Result(await _repository.Create(parameters));
+	public async Task<ActionResult<GenericResponse<ReportEntity?>>> Create(ReportCreateUpdateDto parameters) => Result(await _repository.Create(parameters));
 
 	[HttpDelete]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

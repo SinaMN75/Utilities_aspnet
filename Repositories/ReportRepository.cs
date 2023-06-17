@@ -1,7 +1,7 @@
 namespace Utilities_aspnet.Repositories;
 
 public interface IReportRepository {
-	Task<GenericResponse<ReportEntity?>> Create(ReportEntity dto);
+	Task<GenericResponse<ReportEntity?>> Create(ReportCreateUpdateDto dto);
 	GenericResponse<IQueryable<ReportEntity>> Read(ReportFilterDto dto);
 	Task<GenericResponse<ReportEntity?>> ReadById(Guid id);
 	Task<GenericResponse> Delete(Guid id);
@@ -16,7 +16,7 @@ public class ReportRepository : IReportRepository {
 		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 	}
 
-	public async Task<GenericResponse<ReportEntity?>> Create(ReportEntity dto) {
+	public async Task<GenericResponse<ReportEntity?>> Create(ReportCreateUpdateDto dto) {
 		ReportEntity entity = new() {
 			CreatorUserId = _userId,
 			Title = dto.Title,

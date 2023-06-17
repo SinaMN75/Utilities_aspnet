@@ -179,13 +179,13 @@ public class ProductFilterDto {
 	public bool? ShowCreator { get; set; } = false;
 	public bool? ShowCategoryMedia { get; set; } = false;
 	public bool? OrderByVotes { get; set; } = false;
-	public bool? OrderByVotesDecending { get; set; } = false;
+	public bool? OrderByVotesDescending { get; set; } = false;
 	public bool? OrderByAtoZ { get; set; } = false;
 	public bool? OrderByZtoA { get; set; } = false;
-	public bool? OrderByPriceAccending { get; set; } = false;
-	public bool? OrderByPriceDecending { get; set; } = false;
+	public bool? OrderByPriceAscending { get; set; } = false;
+	public bool? OrderByPriceDescending { get; set; } = false;
 	public bool? OrderByCreatedDate { get; set; } = true;
-	public bool? OrderByCreaedDateDecending { get; set; } = false;
+	public bool? OrderByCreatedDateDescending { get; set; } = false;
 	public bool? OrderByMostUsedHashtag { get; set; }
 	public bool? OrderByAgeCategory { get; set; }
 	public bool? OrderByCategory { get; set; }

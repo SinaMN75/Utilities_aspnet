@@ -56,4 +56,10 @@ public class UserController : BaseApiController {
 	[HttpPost("Authorize")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	public async Task<ActionResult<GenericResponse>> Authorize(AuthorizeUserDto dto) => Result(await _repository.Authorize(dto));
+	
+	[HttpGet("ReadMyBlockList")]
+	public async Task<ActionResult<GenericResponse<IQueryable<UserEntity>>>> ReadMyBlockList() => Result(await _repository.ReadMyBlockList());
+
+	[HttpPost("ToggleBlock")]
+	public async Task<ActionResult<GenericResponse>> Block(string userId) => Result(await _repository.ToggleBlock(userId));
 }

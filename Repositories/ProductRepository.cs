@@ -113,13 +113,13 @@ public class ProductRepository : IProductRepository
         if (dto.ShowMedia.IsTrue()) q = q.Include(i => i.Media);
         if (dto.ShowVisitProducts.IsTrue()) q = q.Include(i => i.VisitProducts);
         if (dto.OrderByVotes.IsTrue()) q = q.OrderBy(x => x.VoteCount);
-        if (dto.OrderByVotesDecending.IsTrue()) q = q.OrderByDescending(x => x.VoteCount);
+        if (dto.OrderByVotesDescending.IsTrue()) q = q.OrderByDescending(x => x.VoteCount);
         if (dto.OrderByAtoZ.IsTrue()) q = q.OrderBy(x => x.Title);
         if (dto.OrderByZtoA.IsTrue()) q = q.OrderByDescending(x => x.Title);
-        if (dto.OrderByPriceAccending.IsTrue()) q = q.OrderBy(x => x.Price);
-        if (dto.OrderByPriceDecending.IsTrue()) q = q.OrderByDescending(x => x.Price);
+        if (dto.OrderByPriceAscending.IsTrue()) q = q.OrderBy(x => x.Price);
+        if (dto.OrderByPriceDescending.IsTrue()) q = q.OrderByDescending(x => x.Price);
         if (dto.OrderByCreatedDate.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
-        if (dto.OrderByCreaedDateDecending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
+        if (dto.OrderByCreatedDateDescending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
         if (dto.OrderByAgeCategory.IsTrue()) q = q.OrderBy(o => o.AgeCategory);
         if (dto.OrderByMostUsedHashtag.IsTrue()) q = q.OrderBy(o => o.Categories!.Count(c => c.UseCase!.ToLower() == "tag"));
 
