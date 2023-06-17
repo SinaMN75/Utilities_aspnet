@@ -12,9 +12,9 @@ public interface IFollowBookmarkRepository {
 
 public class FollowBookmarkRepository : IFollowBookmarkRepository {
 	private readonly DbContext _dbContext;
-	private readonly IUserRepository _userRepository;
 	private readonly INotificationRepository _notificationRepository;
 	private readonly string _userId;
+	private readonly IUserRepository _userRepository;
 
 	public FollowBookmarkRepository(
 		DbContext dbContext,
@@ -29,11 +29,9 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 
 	public async Task<GenericResponse<BookmarkEntity?>> ToggleBookmark(BookmarkCreateDto dto) {
 		BookmarkEntity? oldBookmark = _dbContext.Set<BookmarkEntity>()
-			.FirstOrDefault(x => (x.ProductId != null && x.ProductId == dto.ProductId ||
-			                      x.CategoryId != null && x.CategoryId == dto.CategoryId) &&
-			                     x.UserId == _userId);
+			.FirstOrDefault(x => x.ProductId != null && x.ProductId == dto.ProductId && x.UserId == _userId);
 		if (oldBookmark == null) {
-			BookmarkEntity e = new() {UserId = _userId};
+			BookmarkEntity e = new() { UserId = _userId };
 			if (dto.ProductId.HasValue) e.ProductId = dto.ProductId;
 			e.FolderName = dto.FolderName;
 			e.ParentId = dto.ParentId;
@@ -48,19 +46,17 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 
 		GenericResponse<UserEntity?> userRespository = await _userRepository.ReadById(_userId);
 		UserEntity user = userRespository.Result!;
-		if (user.BookmarkedProducts.Contains(dto.ProductId.ToString())) {
+		if (user.BookmarkedProducts.Contains(dto.ProductId.ToString()))
 			await _userRepository.Update(new UserCreateUpdateDto {
 				Id = _userId,
 				BookmarkedProducts = user.BookmarkedProducts.Replace($",{dto.ProductId}", "")
 			});
-		}
-		else {
+		else
 			await _userRepository.Update(new UserCreateUpdateDto {
 				Id = _userId,
 				BookmarkedProducts = user.BookmarkedProducts + "," + dto.ProductId
 			});
-		}
-		return new GenericResponse<BookmarkEntity?>(oldBookmark, UtilitiesStatusCodes.Success);
+		return new GenericResponse<BookmarkEntity?>(oldBookmark);
 	}
 
 	public GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarks(string? userId) {
@@ -68,18 +64,14 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 		IQueryable<BookmarkEntity> bookmark = _dbContext.Set<BookmarkEntity>().Include(x => x.Media)
 			.Where(x => x.UserId == uId)
 			.Include(x => x.Product).ThenInclude(x => x.Media)
-			.Include(x => x.Product).ThenInclude(i => i.User).ThenInclude(x => x.Media)
-			.Include(x => x.Product).ThenInclude(i => i.Categories)
 			.Include(x => x.Children).ThenInclude(x => x.Product)
-			.Include(x => x.Children).Include(x => x.Product).ThenInclude(x => x.Media)
-			.Include(x => x.Children).Include(x => x.Product).ThenInclude(i => i.User).ThenInclude(x => x.Media)
-			.Include(x => x.Children).Include(x => x.Product).ThenInclude(i => i.Categories);
+			.Include(x => x.Children).Include(x => x.Product).ThenInclude(x => x.Media);
 		return new GenericResponse<IQueryable<BookmarkEntity>?>(bookmark);
 	}
 
 	public async Task<GenericResponse<IQueryable<UserEntity>>> GetFollowers(string id) {
 		UserEntity myUser = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!;
-		GenericResponse<IQueryable<UserEntity>> q = await _userRepository.Filter(new UserFilterDto {
+		GenericResponse<IQueryable<UserEntity>> q = _userRepository.Filter(new UserFilterDto {
 				UserIds = myUser.FollowedUsers.Split(","),
 				ShowCategories = true,
 				ShowMedia = true
@@ -90,7 +82,7 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 
 	public async Task<GenericResponse<IQueryable<UserEntity>>> GetFollowing(string id) {
 		UserEntity myUser = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!;
-		GenericResponse<IQueryable<UserEntity>> q = await _userRepository.Filter(new UserFilterDto {
+		GenericResponse<IQueryable<UserEntity>> q = _userRepository.Filter(new UserFilterDto {
 				UserIds = myUser.FollowingUsers.Split(","),
 				ShowCategories = true,
 				ShowMedia = true

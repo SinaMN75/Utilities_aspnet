@@ -14,8 +14,8 @@ public class UserController : BaseApiController {
 	public async Task<ActionResult<GenericResponse>> LoginWithPassword(LoginWithPasswordDto dto) => Result(await _repository.LoginWithPassword(dto));
 
 	[HttpPost("GetVerificationCodeForLogin")]
-	public async Task<ActionResult<GenericResponse>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto)
-		=> Result(await _repository.GetVerificationCodeForLogin(dto));
+	public async Task<ActionResult<GenericResponse>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto) =>
+		Result(await _repository.GetVerificationCodeForLogin(dto));
 
 	[HttpPost("VerifyCodeForLogin")]
 	public async Task<ActionResult<GenericResponse>> VerifyCodeForLogin(VerifyMobileForLoginDto dto) => Result(await _repository.VerifyCodeForLogin(dto));
@@ -26,16 +26,14 @@ public class UserController : BaseApiController {
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	[AllowAnonymous]
 	[HttpPost("Filter")]
-	public async Task<ActionResult<GenericResponse<IEnumerable<UserEntity>>>> Filter(UserFilterDto dto) => Result(await _repository.Filter(dto));
-	
+	public ActionResult<GenericResponse<IEnumerable<UserEntity>>> Filter(UserFilterDto dto) => Result(_repository.Filter(dto));
+
 	[HttpGet]
-	[OutputCache(PolicyName = "default")]
-	public async Task<ActionResult<GenericResponse<IEnumerable<UserEntity>>>> Read([FromQuery] UserFilterDto dto) => Result(await _repository.Filter(dto));
+	public ActionResult<GenericResponse<IEnumerable<UserEntity>>> Read([FromQuery] UserFilterDto dto) => Result(_repository.Filter(dto));
 
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	[AllowAnonymous]
 	[HttpGet("{id}")]
-	[OutputCache(PolicyName = "default")]
 	public async Task<ActionResult<GenericResponse<UserEntity?>>> ReadById(string id) => Result(await _repository.ReadById(id));
 
 	[HttpPut]
@@ -44,7 +42,6 @@ public class UserController : BaseApiController {
 
 	[HttpGet("ReadMyBlockList")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	[OutputCache(PolicyName = "10s")]
 	public async Task<ActionResult<GenericResponse<IQueryable<UserEntity>>>> ReadMine() => Result(await _repository.ReadMyBlockList());
 
 	[HttpPost("ToggleBlock")]
@@ -53,8 +50,8 @@ public class UserController : BaseApiController {
 
 	[HttpPost("TransferWalletToWallet")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse>> TransferWalletToWallet(TransferFromWalletToWalletDto dto)
-		=> Result(await _repository.TransferWalletToWallet(dto));
+	public async Task<ActionResult<GenericResponse>> TransferWalletToWallet(TransferFromWalletToWalletDto dto) =>
+		Result(await _repository.TransferWalletToWallet(dto));
 
 	[HttpPost("Authorize")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

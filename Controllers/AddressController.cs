@@ -4,6 +4,7 @@
 [Route("api/address")]
 public class AddressController : BaseApiController {
 	private readonly IAddressRepository _repository;
+
 	public AddressController(IAddressRepository repository) => _repository = repository;
 
 	[HttpPost]
@@ -14,11 +15,11 @@ public class AddressController : BaseApiController {
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	public async Task<ActionResult<GenericResponse<AddressEntity>>> Update(AddressCreateUpdateDto dto) => Result(await _repository.Update(dto));
 
-	[HttpGet("ReadMyAddresses")]
-	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public ActionResult<GenericResponse<IQueryable<AddressEntity>>> ReadUserAddresses() => Result(_repository.ReadMyAddresses());
-
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpPost("Filter")]
+    public ActionResult<GenericResponse<IQueryable<AddressEntity>>> Filter(AddressFilterDto dto) => Result(_repository.Filter(dto));
+    
 	[HttpDelete("{addressId:guid}")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse>> Delete(Guid addressId) => Result(await _repository.DeleteAddress(addressId));
+	public async Task<ActionResult<GenericResponse>> Delete(Guid addressId) => Result(await _repository.Delete(addressId));
 }

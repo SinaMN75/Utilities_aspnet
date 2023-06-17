@@ -7,7 +7,13 @@ public class BaseEntity {
 
 	public DateTime? CreatedAt { get; set; }
 	public DateTime? UpdatedAt { get; set; }
-	
+
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public DateTime? DeletedAt { get; set; }
+}
+
+public class KeyValue {
+	public string? Key { get; set; }
+	public string? Value { get; set; }
 }

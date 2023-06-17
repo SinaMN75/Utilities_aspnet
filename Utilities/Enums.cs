@@ -1,10 +1,8 @@
 namespace Utilities_aspnet.Utilities;
 
 public static class EnumExtension {
-	public static IEnumerable<IdTitleDto> GetValues<T>() {
-		return (from int itemType in Enum.GetValues(typeof(T))
-			select new IdTitleDto {Title = Enum.GetName(typeof(T), itemType), Id = itemType}).ToList();
-	}
+	public static IEnumerable<IdTitleDto> GetValues<T>() => (from int itemType in Enum.GetValues(typeof(T))
+		select new IdTitleDto { Title = Enum.GetName(typeof(T), itemType), Id = itemType }).ToList();
 }
 
 public static class UtilitiesStatusCodesExtension {
@@ -25,17 +23,18 @@ public enum UtilitiesStatusCodes {
 	MultipleSeller = 607,
 	OrderPayed = 608,
 	OutOfStock = 610,
-	NotEnoughMoney  = 611,
+	NotEnoughMoney = 611,
 	UserRecieverBlocked = 612,
 	UserSenderBlocked = 613,
 	MoreThan2UserIsInPrivateChat = 614,
 	Overused = 615,
-	MoreThanAllowedMoney = 616
+	MoreThanAllowedMoney = 616,
+	WrongPassword = 617
 }
 
 public enum NotoficationType {
 	WalletMoneyGain = 100,
-	WalletMoneyLost = 101,
+	WalletMoneyLost = 101
 }
 
 public enum OtpResult {
@@ -61,7 +60,7 @@ public enum OrderStatuses {
 	Refund = 108, //not used yet
 	RefundComplete = 109, //not used yet
 	Complete = 110,
-	PaidFail = 112,
+	PaidFail = 112
 }
 
 public enum PayType {
@@ -163,6 +162,33 @@ public enum Reaction {
 	Awful = 104
 }
 
+public enum GenderType {
+	Male = 100,
+	Female = 101,
+	Unknown = 102,
+	Company = 103,
+	Team = 104,
+	Both = 105,
+	All = 106,
+	None = 107
+}
+
+public enum PrivacyType {
+	Private = 100,
+	Public = 101,
+	FollowersOnly = 102
+}
+
+public enum NationalityType {
+	Iranian = 100,
+	NonIranian = 101
+}
+
+public enum LegalAuthenticationType {
+	Authenticated = 100,
+	NotAutenticated = 101
+}
+
 public enum AgeCategory {
 	None = 100,
 	Kids = 101,
@@ -171,12 +197,11 @@ public enum AgeCategory {
 	Adult = 104
 }
 
-public enum ProductState
-{
+public enum ProductState {
 	None = 100,
-	New = 101, //kalaye no va jadid
-	KindOfNew = 102, // dar hade no
-	UsedGoods = 103, //daste dovom
+	New = 101,
+	KindOfNew = 102,
+	UsedGoods = 103
 }
 
 public enum OrderReportType {
@@ -201,24 +226,30 @@ public enum ReferenceIdType {
 	User = 102
 }
 
-public enum CallerType
-{
-    CreateGroupChat = 100,
-    CreateComment = 101,
-    CreateProduct = 102,
-    None = 99999
+public enum CallerType {
+	CreateGroupChat = 100,
+	CreateComment = 101,
+	CreateProduct = 102,
+	None = 99999
 }
 
-public enum WithdrawState
-{
+public enum WithdrawState {
 	None = 100,
 	Requested = 101,
 	Accepted = 102
 }
 
-public enum DisplayType
-{
+public enum DisplayType {
 	None = 100,
 	Exploer = 101,
 	Channels = 102
+}
+
+public enum TransactionType {
+	None = 100,
+	DepositToWallet = 101,
+	WithdrawFromTheWallet = 102,
+	Buy = 103,
+	Sell = 104,
+	Recharge = 105
 }

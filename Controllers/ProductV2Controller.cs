@@ -1,5 +1,3 @@
-using Utilities_aspnet.Entities;
-
 namespace Utilities_aspnet.Controllers;
 
 [ApiController]
@@ -11,13 +9,13 @@ public class ProductV2Controller : BaseApiController {
 
 	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse<ProductEntity>>> Create(ProductCreateUpdateDto dto, CancellationToken ct)
-		=> Result(await _repository.Create(dto, ct));
+	public async Task<ActionResult<GenericResponse<ProductEntity>>> Create(ProductCreateUpdateDto dto, CancellationToken ct) =>
+		Result(await _repository.Create(dto, ct));
 
 	[HttpPost("CreateWithMedia")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse<ProductEntity>>> CreateWithMedia([FromForm] ProductCreateUpdateDto dto, CancellationToken ct)
-		=> Result(await _repository.CreateWithFiles(dto, ct));
+	public async Task<ActionResult<GenericResponse<ProductEntity>>> CreateWithMedia([FromForm] ProductCreateUpdateDto dto, CancellationToken ct) =>
+		Result(await _repository.CreateWithFiles(dto, ct));
 
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	[AllowAnonymous]
@@ -37,24 +35,18 @@ public class ProductV2Controller : BaseApiController {
 
 	[HttpPut]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse<ProductEntity>>> Update(ProductCreateUpdateDto dto, CancellationToken ct)
-		=> Result(await _repository.Update(dto, ct));
+	public async Task<ActionResult<GenericResponse<ProductEntity>>> Update(ProductCreateUpdateDto dto, CancellationToken ct) =>
+		Result(await _repository.Update(dto, ct));
 
 	[HttpDelete("{id:guid}")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	public async Task<IActionResult> Delete(Guid id, CancellationToken ct) => Result(await _repository.Delete(id, ct));
 
-	[HttpPost("SimpleSell")]
+	[HttpPost("CreateReaction")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse<ProductEntity>>> SimpleSell(SimpleSellDto dto) => Result(await _repository.SimpleSell(dto));
-
-    [HttpPost("CreateReaction")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<ActionResult<GenericResponse>> CreateReaction(ReactionCreateUpdateDto dto) => Result(await _repository.CreateReaction(dto));
+	public async Task<ActionResult<GenericResponse>> CreateReaction(ReactionCreateUpdateDto dto) => Result(await _repository.CreateReaction(dto));
 
 	[HttpGet("ReadReactions/{id:guid}")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	public ActionResult<GenericResponse<IQueryable<ReactionEntity>>> ReadReactionsById(Guid id) => Result(_repository.ReadReactionsById(id));
-
-
 }

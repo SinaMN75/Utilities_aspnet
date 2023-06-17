@@ -1,10 +1,10 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
 public interface IDiscountRepository {
-	public Task<GenericResponse<DiscountEntity>> Create(DiscountEntity dto);
-	public GenericResponse<IQueryable<DiscountEntity>> Filter(DiscountFilterDto dto);
-	public Task<GenericResponse<DiscountEntity?>> Update(DiscountEntity dto);
-	public Task<GenericResponse> Delete(Guid id);
+	Task<GenericResponse<DiscountEntity>> Create(DiscountEntity dto);
+	GenericResponse<IQueryable<DiscountEntity>> Filter(DiscountFilterDto dto);
+	Task<GenericResponse<DiscountEntity?>> Update(DiscountEntity dto);
+	Task<GenericResponse> Delete(Guid id);
 	Task<GenericResponse<DiscountEntity?>> ReadDiscountCode(string code);
 }
 
@@ -60,23 +60,17 @@ public class DiscountRepository : IDiscountRepository {
 	}
 
 	public async Task<GenericResponse> Delete(Guid id) {
-		DiscountEntity? e = await _dbContext.Set<DiscountEntity>().FirstOrDefaultAsync(x => x.Id == id);
-
-		if (e == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
-		_dbContext.Remove(e);
-		await _dbContext.SaveChangesAsync();
-
+		await _dbContext.Set<DiscountEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
 	}
 
 	public async Task<GenericResponse<DiscountEntity?>> ReadDiscountCode(string code) {
-		DiscountEntity? discountEntity = await _dbContext.Set<DiscountEntity>().FirstOrDefaultAsync(p => p.Code!.ToLower().Trim() == code.ToLower().Trim());
-		if (discountEntity == null) throw new ArgumentException("Code not found!");
-
+		DiscountEntity? discountEntity = await _dbContext.Set<DiscountEntity>().FirstOrDefaultAsync(p => p.Code == code);
+		if (discountEntity == null) return new GenericResponse<DiscountEntity?>(null, UtilitiesStatusCodes.NotFound);
 		IQueryable<OrderEntity> orders = _dbContext.Set<OrderEntity>()
 			.Where(p => p.UserId == _userId && p.DiscountCode == code && p.Status != OrderStatuses.Canceled);
-		return orders.Count() >= discountEntity.NumberUses
-			? new GenericResponse<DiscountEntity?>(null, UtilitiesStatusCodes.Forbidden, "Maximum use of this code!")
+		return await orders.CountAsync() >= discountEntity.NumberUses
+			? new GenericResponse<DiscountEntity?>(null, UtilitiesStatusCodes.MaximumLimitReached)
 			: new GenericResponse<DiscountEntity?>(discountEntity);
 	}
 }

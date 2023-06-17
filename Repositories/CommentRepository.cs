@@ -1,227 +1,175 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
-public interface ICommentRepository
-{
-    Task<GenericResponse<CommentEntity?>> Create(CommentCreateUpdateDto dto);
-    Task<GenericResponse<CommentEntity?>> ToggleLikeComment(Guid commentId);
-    Task<GenericResponse> AddReactionToComment(Guid commentId, Reaction reaction);
-    Task<GenericResponse<CommentEntity?>> Read(Guid id);
-    GenericResponse<IQueryable<CommentEntity>?> ReadByProductId(Guid id);
-    GenericResponse<IQueryable<CommentEntity>?> Filter(CommentFilterDto dto);
-    Task<GenericResponse<CommentEntity?>> Update(Guid id, CommentCreateUpdateDto dto);
-    Task<GenericResponse> Delete(Guid id);
+public interface ICommentRepository {
+	Task<GenericResponse<CommentEntity?>> Create(CommentCreateUpdateDto dto);
+	Task<GenericResponse> AddReactionToComment(Guid commentId, Reaction reaction);
+	Task<GenericResponse<CommentEntity?>> Read(Guid id);
+	GenericResponse<IQueryable<CommentEntity>?> ReadByProductId(Guid id);
+	GenericResponse<IQueryable<CommentEntity>?> Filter(CommentFilterDto dto);
+	Task<GenericResponse<CommentEntity?>> Update(Guid id, CommentCreateUpdateDto dto);
+	Task<GenericResponse> Delete(Guid id);
 }
 
-public class CommentRepository : ICommentRepository
-{
-    private readonly DbContext _dbContext;
-    private readonly INotificationRepository _notificationRepository;
-    private readonly string? _userId;
-    private readonly IConfiguration _config;
+public class CommentRepository : ICommentRepository {
+	private readonly IConfiguration _config;
+	private readonly DbContext _dbContext;
+	private readonly IMediaRepository _mediaRepository;
+	private readonly INotificationRepository _notificationRepository;
+	private readonly IProductRepository _productRepository;
+	private readonly string? _userId;
 
+	public CommentRepository(
+		DbContext dbContext,
+		IHttpContextAccessor httpContextAccessor,
+		INotificationRepository notificationRepository,
+		IConfiguration config,
+		IMediaRepository mediaRepository,
+		IProductRepository productRepository) {
+		_dbContext = dbContext;
+		_notificationRepository = notificationRepository;
+		_config = config;
+		_mediaRepository = mediaRepository;
+		_productRepository = productRepository;
+		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
+	}
 
-    public CommentRepository(
-        DbContext dbContext,
-        IHttpContextAccessor httpContextAccessor,
-        INotificationRepository notificationRepository,
-        IConfiguration config)
-    {
-        _dbContext = dbContext;
-        _notificationRepository = notificationRepository;
-        _config = config;
-        _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
-    }
+	public GenericResponse<IQueryable<CommentEntity>?> ReadByProductId(Guid id) {
+		IQueryable<CommentEntity> comment = _dbContext.Set<CommentEntity>()
+			.Include(x => x.Media)
+			.Where(x => x.ProductId == id && x.ParentId == null && x.DeletedAt == null)
+			.Include(x => x.User).ThenInclude(x => x!.Media)
+			.Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Media).Where(x => x.DeletedAt == null)
+			.Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.User).ThenInclude(x => x.Media)
+			.Where(x => x.DeletedAt == null)
+			.OrderByDescending(x => x.CreatedAt).AsNoTracking();
+		return new GenericResponse<IQueryable<CommentEntity>?>(comment);
+	}
 
-    public GenericResponse<IQueryable<CommentEntity>?> ReadByProductId(Guid id)
-    {
-        IQueryable<CommentEntity> comment = _dbContext.Set<CommentEntity>()
-            .Include(x => x.User).ThenInclude(x => x!.Media)
-            .Include(x => x.Media)
-            .Include(x => x.LikeComments)
-            .Include(x => x.CommentReacts)
-            .Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Children.Where(x => x.DeletedAt == null))
-            .Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Media).Where(x => x.DeletedAt == null)
-            .Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.LikeComments).Where(x => x.DeletedAt == null)
-            .Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.User).ThenInclude(x => x.Media).Where(x => x.DeletedAt == null)
-            .Where(x => x.ProductId == id && x.ParentId == null && x.DeletedAt == null)
-            .OrderByDescending(x => x.CreatedAt).AsNoTracking();
-        return new GenericResponse<IQueryable<CommentEntity>?>(comment);
-    }
+	public GenericResponse<IQueryable<CommentEntity>?> Filter(CommentFilterDto dto) {
+		IQueryable<CommentEntity> q = _dbContext.Set<CommentEntity>();
+		if (!dto.ShowDeleted) q = q.Where(x => x.DeletedAt != null);
 
-    public GenericResponse<IQueryable<CommentEntity>?> Filter(CommentFilterDto dto)
-    {
-        IQueryable<CommentEntity> q = _dbContext.Set<CommentEntity>();
-        if (!dto.ShowDeleted) q = q.Where(x => x.DeletedAt != null);
+		if (dto.ProductId.HasValue) q = q.Where(x => x.ProductId == dto.ProductId);
+		if (dto.Status.HasValue) q = q.Where(x => x.Status == dto.Status);
+		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => x.UserId == dto.UserId);
 
-        if (dto.ProductId.HasValue) q = q.Where(x => x.ProductId == dto.ProductId);
-        if (dto.Status.HasValue) q = q.Where(x => x.Status == dto.Status);
-        if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => x.UserId == dto.UserId);
+		q = q.Include(x => x.User).ThenInclude(x => x!.Media)
+			.Include(x => x.Media)
+			.Include(x => x.Product).ThenInclude(x => x.Media)
+			.Include(x => x.Children.Where(x => x.DeletedAt == null))!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
+			.OrderByDescending(x => x.CreatedAt)
+			.AsNoTracking();
 
-        q = q.Include(x => x.User).ThenInclude(x => x!.Media)
-            .Include(x => x.Media)
-            .Include(x => x.Product).ThenInclude(x => x.Media)
-            .Include(x => x.LikeComments.Where(x => x.DeletedAt == null))
-            .Include(x => x.Children.Where(x => x.DeletedAt == null))!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
-            .OrderByDescending(x => x.CreatedAt)
-            .AsNoTracking();
+		if (dto.ShowProducts.IsTrue()) q = q.Include(x => x.Product).ThenInclude(x => x.Media);
 
-        if (dto.ShowProducts.IsTrue()) q = q.Include(x => x.Product).ThenInclude(x => x.Media);
+		return new GenericResponse<IQueryable<CommentEntity>?>(q);
+	}
 
-        return new GenericResponse<IQueryable<CommentEntity>?>(q);
-    }
+	public async Task<GenericResponse<CommentEntity?>> Read(Guid id) {
+		CommentEntity? comment = await _dbContext.Set<CommentEntity>()
+			.Include(x => x.User).ThenInclude(x => x!.Media)
+			.Include(x => x.Media)
+			.Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.User).ThenInclude(x => x.Media)
+			.Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Media)
+			.Where(x => x.Id == id && x.DeletedAt == null)
+			.OrderByDescending(x => x.CreatedAt)
+			.AsNoTracking()
+			.FirstOrDefaultAsync();
 
-    public async Task<GenericResponse<CommentEntity?>> Read(Guid id)
-    {
-        CommentEntity? comment = await _dbContext.Set<CommentEntity>()
-            .Include(x => x.User).ThenInclude(x => x!.Media)
-            .Include(x => x.Media)
-            .Include(x => x.LikeComments)
-            .Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.User).ThenInclude(x => x.Media)
-            .Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Media)
-            .Where(x => x.Id == id && x.DeletedAt == null)
-            .OrderByDescending(x => x.CreatedAt)
-            .AsNoTracking()
-            .FirstOrDefaultAsync();
+		return new GenericResponse<CommentEntity?>(comment);
+	}
 
-        return new GenericResponse<CommentEntity?>(comment);
-    }
+	public async Task<GenericResponse<CommentEntity?>> Create(CommentCreateUpdateDto dto) {
+		AppSettings appSettings = new();
+		_config.GetSection("AppSettings").Bind(appSettings);
+		Tuple<bool, UtilitiesStatusCodes>? overUsedCheck =
+			Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, CallerType.CreateComment, null, null, appSettings.UsageRules!);
+		if (overUsedCheck.Item1)
+			return new GenericResponse<CommentEntity?>(null, overUsedCheck.Item2);
 
-    public async Task<GenericResponse<CommentEntity?>> Create(CommentCreateUpdateDto dto)
-    {
-        AppSettings appSettings = new();
-        _config.GetSection("AppSettings").Bind(appSettings);
-        var overUsedCheck = Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, CallerType.CreateComment, null, null, appSettings.UsageRules!);
-        if (overUsedCheck.Item1)
-            return new GenericResponse<CommentEntity?>(null, overUsedCheck.Item2);
+		ProductEntity? prdct = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == dto.ProductId);
+		if (prdct is not null) {
+			Tuple<bool, UtilitiesStatusCodes>? blockedState = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == prdct.UserId),
+			                                                                      _dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == _userId));
+			if (blockedState.Item1)
+				return new GenericResponse<CommentEntity?>(null, blockedState.Item2);
+		}
 
-        var prdct = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == dto.ProductId);
-        if (prdct is not null)
-        {
-            var blockedState = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == prdct.UserId), _dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == _userId));
-            if (blockedState.Item1)
-                return new GenericResponse<CommentEntity?>(null, blockedState.Item2);
-        }
+		CommentEntity comment = new() {
+			CreatedAt = DateTime.Now,
+			UpdatedAt = DateTime.Now,
+			Comment = dto.Comment,
+			ProductId = dto.ProductId,
+			Score = dto.Score,
+			ParentId = dto.ParentId,
+			UserId = _userId,
+			Status = dto.Status
+		};
+		await _dbContext.AddAsync(comment);
+		try {
+			ProductEntity product = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == comment.ProductId))!;
+			product.CommentsCount += 1;
 
+			if (product.UserId != _userId)
+				await _notificationRepository.Create(new NotificationCreateUpdateDto {
+					UserId = product.UserId,
+					Message = dto.Comment ?? "",
+					Title = "Comment",
+					UseCase = "Comment",
+					CreatorUserId = comment.UserId,
+					Link = product.Id.ToString(),
+					ProductId = product.Id
+				});
+		}
+		catch { }
+		await _dbContext.SaveChangesAsync();
+		return await Read(comment.Id);
+	}
 
-        CommentEntity comment = new()
-        {
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now,
-            Comment = dto.Comment,
-            ProductId = dto.ProductId,
-            Score = dto.Score,
-            ParentId = dto.ParentId,
-            UserId = _userId,
-            Status = dto.Status
-        };
-        await _dbContext.AddAsync(comment);
-        await _dbContext.SaveChangesAsync();
+	public async Task<GenericResponse<CommentEntity?>> Update(Guid id, CommentCreateUpdateDto dto) {
+		CommentEntity? comment = await _dbContext.Set<CommentEntity>().FirstOrDefaultAsync(x => x.Id == id);
 
-        try
-        {
-            ProductEntity? product = _dbContext.Set<ProductEntity>()
-                .Include(x => x.Media)
-                .Include(x => x.User)
-                .FirstOrDefault(x => x.Id == comment.ProductId);
+		if (comment == null) return new GenericResponse<CommentEntity?>(null);
+		if (!string.IsNullOrEmpty(dto.Comment)) comment.Comment = dto.Comment;
+		if (dto.Score.HasValue) comment.Score = dto.Score;
+		if (dto.ProductId.HasValue) comment.ProductId = dto.ProductId;
+		if (dto.Status.HasValue) comment.Status = dto.Status;
 
-            if (product != null && product.UserId != _userId)
-            {
-                await _notificationRepository.Create(new NotificationCreateUpdateDto
-                {
-                    UserId = product.UserId,
-                    Message = dto.Comment ?? "",
-                    Title = "Comment",
-                    UseCase = "Comment",
-                    CreatorUserId = comment.UserId,
-                    Link = product.Id.ToString(),
-                    ProductId = product.Id
-                });
-            }
-        }
-        catch { }
+		comment.UpdatedAt = DateTime.Now;
+		_dbContext.Set<CommentEntity>().Update(comment);
+		await _dbContext.SaveChangesAsync();
 
-        return await Read(comment.Id);
-    }
+		return await Read(comment.Id);
+	}
 
-    public async Task<GenericResponse<CommentEntity?>> ToggleLikeComment(Guid commentId)
-    {
-        CommentEntity? comment = await _dbContext.Set<CommentEntity>().FirstOrDefaultAsync(x => x.Id == commentId);
-        LikeCommentEntity? oldLikeComment = await _dbContext.Set<LikeCommentEntity>()
-            .FirstOrDefaultAsync(x => x.CommentId == commentId && x.UserId == _userId);
-        comment.Score ??= 0;
-        if (oldLikeComment != null)
-        {
-            comment.Score -= 1;
-            _dbContext.Set<LikeCommentEntity>().Remove(oldLikeComment);
-            await _dbContext.SaveChangesAsync();
-        }
-        else
-        {
-            comment.Score += 1;
-            await _dbContext.AddAsync(new LikeCommentEntity { UserId = _userId, CommentId = commentId });
-            await _dbContext.SaveChangesAsync();
-        }
+	public async Task<GenericResponse> Delete(Guid id) {
+		CommentEntity? comment = await _dbContext.Set<CommentEntity>().Include(i => i.Media).Include(i => i.Children).FirstOrDefaultAsync(x => x.Id == id);
+		if (comment == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
+		foreach (MediaEntity i in comment.Media) await _mediaRepository.Delete(i.Id);
+		foreach (CommentEntity i in comment.Children) await Delete(i.Id);
+		_dbContext.Set<CommentEntity>().Remove(comment);
+		await _dbContext.SaveChangesAsync();
+		return new GenericResponse();
+	}
 
-        return await Read(comment.Id);
-    }
+	public async Task<GenericResponse> AddReactionToComment(Guid commentId, Reaction reaction) {
+		UserEntity? user = await _dbContext.Set<UserEntity>().Where(w => w.Id == _userId).FirstOrDefaultAsync();
+		if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound, "User Donest Logged In");
 
-    public async Task<GenericResponse<CommentEntity?>> Update(Guid id, CommentCreateUpdateDto dto)
-    {
-        CommentEntity? comment = await _dbContext.Set<CommentEntity>().FirstOrDefaultAsync(x => x.Id == id);
+		CommentEntity? comment = await _dbContext.Set<CommentEntity>().Where(w => w.Id == commentId).FirstOrDefaultAsync();
+		if (comment is null) return new GenericResponse(UtilitiesStatusCodes.NotFound, "Comment Not Found");
 
-        if (comment == null) return new GenericResponse<CommentEntity?>(null);
-        if (!string.IsNullOrEmpty(dto.Comment)) comment.Comment = dto.Comment;
-        if (dto.Score.HasValue) comment.Score = dto.Score;
-        if (dto.ProductId.HasValue) comment.ProductId = dto.ProductId;
-        if (dto.Status.HasValue) comment.Status = dto.Status;
-
-        comment.UpdatedAt = DateTime.Now;
-        _dbContext.Set<CommentEntity>().Update(comment);
-        await _dbContext.SaveChangesAsync();
-
-        return await Read(comment.Id);
-    }
-
-    public async Task<GenericResponse> Delete(Guid id)
-    {
-        CommentEntity? comment = await _dbContext.Set<CommentEntity>().FirstOrDefaultAsync(x => x.Id == id);
-        if (comment == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
-        comment.DeletedAt = DateTime.Now;
-        _dbContext.Update(comment);
-        await _dbContext.SaveChangesAsync();
-        return new GenericResponse();
-    }
-
-    public async Task<GenericResponse> AddReactionToComment(Guid commentId, Reaction reaction)
-    {
-        UserEntity? user = await _dbContext.Set<UserEntity>().Where(w => w.Id == _userId).FirstOrDefaultAsync();
-        if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound, "User Donest Logged In");
-
-        CommentEntity? comment = await _dbContext.Set<CommentEntity>().Where(w => w.Id == commentId).FirstOrDefaultAsync();
-        if (comment is null) return new GenericResponse(UtilitiesStatusCodes.NotFound, "Comment Not Found");
-
-        CommentReacts? oldReaction = await _dbContext.Set<CommentReacts>().Where(w => w.UserId == _userId && w.CommentId == comment.Id).FirstOrDefaultAsync();
-        if (oldReaction is null)
-        {
-            CommentReacts? react = new CommentReacts
-            {
-                CommentId = comment.Id,
-                Reaction = reaction,
-                CreatedAt = DateTime.UtcNow,
-                UserId = user.Id
-            };
-            await _dbContext.Set<CommentReacts>().AddAsync(react);
-        }
-        else if (oldReaction.Reaction != reaction)
-        {
-            oldReaction.Reaction = reaction;
-            _dbContext.Set<CommentReacts>().Update(oldReaction);
-        }
-        else
-        {
-            _dbContext.Set<CommentReacts>().Remove(oldReaction);
-        }
-        await _dbContext.SaveChangesAsync();
-        return new GenericResponse(UtilitiesStatusCodes.Success, "Ok");
-    }
+		CommentReacts? oldReaction = comment.JsonDetail.Reacts.FirstOrDefault(w => w.UserId == _userId);
+		if (oldReaction is null) {
+			CommentReacts? react = new() {
+				Reaction = reaction,
+				UserId = user.Id
+			};
+			comment.JsonDetail.Reacts.Add(react);
+		}
+		else if (oldReaction.Reaction != reaction) { oldReaction.Reaction = reaction; }
+		else { comment.JsonDetail.Reacts.Remove(oldReaction); }
+		await _dbContext.SaveChangesAsync();
+		return new GenericResponse(UtilitiesStatusCodes.Success, "Ok");
+	}
 }

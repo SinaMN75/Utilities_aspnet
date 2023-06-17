@@ -9,12 +9,12 @@ public class FormController : BaseApiController {
 	public FormController(IFormRepository repository) => _repository = repository;
 
 	[HttpPost("CreateFormField")]
-	public async Task<ActionResult<GenericResponse<IQueryable<FormFieldEntity>>>> CreateFormField(FormFieldEntity dto)
-		=> Result(await _repository.CreateFormFields(dto));
+	public async Task<ActionResult<GenericResponse<IQueryable<FormFieldEntity>>>> CreateFormField(FormFieldEntity dto) =>
+		Result(await _repository.CreateFormFields(dto));
 
 	[HttpPut("UpdateFormField")]
-	public async Task<ActionResult<GenericResponse<IQueryable<FormFieldEntity>>>> UpdateFormField(FormFieldEntity dto)
-		=> Result(await _repository.UpdateFormFields(dto));
+	public async Task<ActionResult<GenericResponse<IQueryable<FormFieldEntity>>>> UpdateFormField(FormFieldEntity dto) =>
+		Result(await _repository.UpdateFormFields(dto));
 
 	[AllowAnonymous]
 	[HttpGet("{categoryId:guid}")]

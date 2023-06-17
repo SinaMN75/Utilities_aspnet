@@ -28,6 +28,6 @@ public class NotificationController : BaseApiController {
 
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	[HttpPost("UpdateSeenStatus")]
-	public async Task<ActionResult<GenericResponse>> UpdateSeenStatus(IEnumerable<Guid> ids, SeenStatus seenStatus)
-		=> Result(await _repository.UpdateSeenStatus(ids, seenStatus));
+	public async Task<ActionResult<GenericResponse>> UpdateSeenStatus(IEnumerable<Guid> ids, SeenStatus seenStatus) =>
+		Result(await _repository.UpdateSeenStatus(ids, seenStatus));
 }

@@ -2,33 +2,19 @@
 
 [Table("Transactions")]
 public class TransactionEntity : BaseEntity {
-	public double? Amount { get; set; }
-
-	[StringLength(500)]
-	public string? Descriptions { get; set; }
-
-	[StringLength(500)]
-	public string? Authority { get; set; }
-
-	[StringLength(500)]
-	public string? GatewayName { get; set; }
-
-	[StringLength(500)]
-	public string? PaymentId { get; set; }
-	
-	[StringLength(500)]
+    public double? Amount { get; set; }
+    public string? Descriptions { get; set; }
+    public string? Authority { get; set; }
+    public string? GatewayName { get; set; }
+    public string? PaymentId { get; set; }
     public string? ShebaNumber { get; set; }
-    
-    [StringLength(2000)]
-    public string? JsonDetail { get; set; }
-
     public long? RefId { get; set; }
+    public TransactionStatus? StatusId { get; set; } = TransactionStatus.Pending;
+    public TransactionType? TransactionType { get; set; } = Utilities.TransactionType.None;
 
-	public TransactionStatus? StatusId { get; set; } = TransactionStatus.Pending;
+    public UserEntity? User { get; set; }
+    public string? UserId { get; set; }
 
-	public UserEntity? User { get; set; }
-	public string? UserId { get; set; }
-
-	public OrderEntity? Order { get; set; }
-	public Guid? OrderId { get; set; }
+    public OrderEntity? Order { get; set; }
+    public Guid? OrderId { get; set; }
 }

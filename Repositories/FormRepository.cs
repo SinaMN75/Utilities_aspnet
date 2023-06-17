@@ -18,10 +18,9 @@ public class FormRepository : IFormRepository {
 		foreach (FormTitleDto item in model.Form!)
 			try {
 				FormEntity? up = await _dbContext.Set<FormEntity>()
-					.FirstOrDefaultAsync(x => (x.ProductId == model.ProductId &&
-						                     model.ProductId != null || x.UserId == model.UserId &&
-						                     model.UserId != null || x.OrderDetailId == model.OrderDetailId &&
-						                     model.OrderDetailId != null) && x.FormFieldId == item.Id);
+					.FirstOrDefaultAsync(x => ((x.ProductId == model.ProductId &&
+					                            model.ProductId != null) || (x.UserId == model.UserId && model.UserId != null)) &&
+					                          x.FormFieldId == item.Id);
 				if (up != null) {
 					up.Title = item.Title ?? "";
 					await _dbContext.SaveChangesAsync();
@@ -30,9 +29,8 @@ public class FormRepository : IFormRepository {
 					_dbContext.Set<FormEntity>().Add(new FormEntity {
 						ProductId = model.ProductId,
 						UserId = model.UserId,
-						OrderDetailId = model.OrderDetailId,
 						FormFieldId = item.Id,
-						Title = item.Title ?? "",
+						Title = item.Title ?? ""
 					});
 				}
 
@@ -41,9 +39,7 @@ public class FormRepository : IFormRepository {
 			catch { }
 
 		IQueryable<FormEntity> entity = _dbContext.Set<FormEntity>()
-			.Where(x => x.ProductId == model.ProductId && model.ProductId != null
-			            || x.UserId == model.UserId && model.UserId != null
-			            || x.OrderDetailId == model.OrderDetailId && model.OrderDetailId != null)
+			.Where(x => (x.ProductId == model.ProductId && model.ProductId != null) || (x.UserId == model.UserId && model.UserId != null))
 			.AsNoTracking();
 		return new GenericResponse<IQueryable<FormEntity>>(entity);
 	}
@@ -80,12 +76,12 @@ public class FormRepository : IFormRepository {
 			: new GenericResponse<IQueryable<FormFieldEntity>?>(null);
 	}
 
-	public GenericResponse<IQueryable<FormFieldEntity>> ReadFormFields(Guid categoryId) => new(_dbContext.Set<FormFieldEntity>()
-		                                                                                           .Where(x => x.DeletedAt == null)
-		                                                                                           .Where(x => x.CategoryId == categoryId)
-		                                                                                           .Where(x => x.ParentId == null)
-		                                                                                           .Include(i => i.Children.Where(x => x.DeletedAt == null))
-		                                                                                           .AsNoTracking());
+	public GenericResponse<IQueryable<FormFieldEntity>> ReadFormFields(Guid categoryId) {
+		return new GenericResponse<IQueryable<FormFieldEntity>>(_dbContext.Set<FormFieldEntity>()
+			                                                        .Where(x => x.DeletedAt == null)
+			                                                        .Where(x => x.CategoryId == categoryId)
+			                                                        .AsNoTracking());
+	}
 
 	public async Task<GenericResponse> DeleteFormField(Guid id) {
 		FormFieldEntity? entity = await _dbContext.Set<FormFieldEntity>()

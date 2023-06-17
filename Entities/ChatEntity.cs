@@ -2,6 +2,11 @@
 
 [Table("Chats")]
 public class ChatEntity : BaseEntity {
+	public bool ReadMessage { get; set; }
+
+	[StringLength(2000)]
+	public string MessageText { get; set; } = null!;
+
 	[ForeignKey(nameof(FromUser))]
 	public string FromUserId { get; set; } = null!;
 
@@ -12,11 +17,6 @@ public class ChatEntity : BaseEntity {
 
 	public UserEntity ToUser { get; set; } = null!;
 
-	[StringLength(2000)]
-	public string MessageText { get; set; } = null!;
-
-	public bool ReadMessage { get; set; }
-
 	public Guid? ParentId { get; set; }
 	public ChatEntity? Parent { get; set; }
 
@@ -25,31 +25,17 @@ public class ChatEntity : BaseEntity {
 	public IEnumerable<ProductEntity?>? Products { get; set; }
 }
 
-
 [Table("GroupChat")]
 public class GroupChatEntity : BaseEntity {
-	[StringLength(500)]
 	public string? Title { get; set; }
 
-	[StringLength(500)]
-	public string? Description { get; set; }
-
-	[StringLength(500)]
-	public string? Value { get; set; }
-
-	[StringLength(500)]
-	public string? Department { get; set; }
-
-	[StringLength(500)]
 	public string? CreatorUserId { get; set; }
-
-	public ChatStatus? ChatStatus { get; set; }
 
 	public ChatType? Type { get; set; }
 
-	public Priority? Priority { get; set; }
-    public DateTime? Boosted { get; set; }
-    public IEnumerable<MediaEntity>? Media { get; set; }
+	public GroupChatJsonDetail JsonDetail { get; set; } = new();
+
+	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<UserEntity>? Users { get; set; }
 	public IEnumerable<ProductEntity>? Products { get; set; }
 	public IEnumerable<GroupChatMessageEntity>? GroupChatMessage { get; set; }
@@ -59,18 +45,28 @@ public class GroupChatEntity : BaseEntity {
 	public int CountOfUnreadMessages { get; set; }
 }
 
+public class GroupChatJsonDetail {
+	public string? Description { get; set; }
+	public string? Value { get; set; }
+	public string? Department { get; set; }
+	public ChatStatus? ChatStatus { get; set; }
+	public Priority? Priority { get; set; }
+	public DateTime? Boosted { get; set; }
+}
+
 [Table("GroupChatMessage")]
 public class GroupChatMessageEntity : BaseEntity {
 	[StringLength(2000)]
 	public string? Message { get; set; }
 
-	[StringLength(500)]
 	public string? Type { get; set; }
 
-	[StringLength(500)]
 	public string? UseCase { get; set; }
 
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public GroupChatEntity? GroupChat { get; set; }
+
 	public Guid? GroupChatId { get; set; }
 
 	public UserEntity? User { get; set; }
@@ -98,14 +94,14 @@ public class GroupChatMessageEntity : BaseEntity {
 
 [Table("SeenUsers")]
 public class SeenUsers : BaseEntity {
-	public Guid? Fk_GroupChat { get; set; }
-	public string? Fk_UserId { get; set; }
-	public Guid? Fk_GroupChatMessage { get; set; }
+	public Guid? FkGroupChat { get; set; }
+	public string? FkUserId { get; set; }
+	public Guid? FkGroupChatMessage { get; set; }
 }
 
 public class ChatReadDto {
 	public Guid? Id { get; set; }
-	public string? UserId { get; set; } = null!;
+	public string? UserId { get; set; }
 	public string? MessageText { get; set; }
 	public DateTime? DateTime { get; set; }
 	public bool? Send { get; set; }
@@ -136,14 +132,13 @@ public class GroupChatFilterDto {
 	public bool? ShowUsers { get; set; }
 	public bool? ShowProducts { get; set; }
 	public bool? ShowCategories { get; set; }
-    public bool ShowAhtorized { get; set; }
-
-    public bool? OrderByAtoZ { get; set; } = false;
+	public bool ShowAhtorized { get; set; }
+	public bool? OrderByAtoZ { get; set; } = false;
 	public bool? OrderByZtoA { get; set; } = false;
 	public bool? OrderByCreatedDate { get; set; } = false;
 	public bool? OrderByCreaedDateDecending { get; set; } = false;
-    public bool Boosted { get; set; }
-    public int PageSize { get; set; } = 100;
+	public bool Boosted { get; set; }
+	public int PageSize { get; set; } = 100;
 	public int PageNumber { get; set; } = 1;
 }
 

@@ -27,29 +27,31 @@ public class ChatController : BaseApiController {
 	public async Task<ActionResult<GenericResponse>> Delete(Guid id) => Result(await _repository.Delete(id));
 
 	[HttpPost("CreateGroupChat")]
-	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> CreateGroupChat(GroupChatCreateUpdateDto dto)
-		=> Result(await _repository.CreateGroupChat(dto));
+	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> CreateGroupChat(GroupChatCreateUpdateDto dto) =>
+		Result(await _repository.CreateGroupChat(dto));
 
 	[HttpPost("FilterGroupChat")]
 	public ActionResult<GenericResponse<GroupChatEntity?>> FilterGroupChat(GroupChatFilterDto dto) => Result(_repository.FilterGroupChats(dto));
 
 	[HttpPut("UpdateGroupChat")]
-	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> UpdateGroupChat(GroupChatCreateUpdateDto dto)
-		=> Result(await _repository.UpdateGroupChat(dto));
+	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> UpdateGroupChat(GroupChatCreateUpdateDto dto) =>
+		Result(await _repository.UpdateGroupChat(dto));
 
 	[HttpDelete("DeleteGroupChat/{id}")]
 	public async Task<ActionResult<GenericResponse>> DeleteGroupChat(Guid id) => Result(await _repository.DeleteGroupChat(id));
 
 	[HttpPost("CreateGroupChatMessage")]
-	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> CreateGroupChatMessage(GroupChatMessageCreateUpdateDto dto)
-		=> Result(await _repository.CreateGroupChatMessage(dto));
+	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> CreateGroupChatMessage(GroupChatMessageCreateUpdateDto dto) =>
+		Result(await _repository.CreateGroupChatMessage(dto));
 
 	[HttpGet("ReadMyGroupChats")]
 	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> ReadMyGroupChats() => Result(await _repository.ReadMyGroupChats());
 
 	[HttpGet("ReadGroupChatMessages/{id:guid}")]
-	public ActionResult<GenericResponse<GroupChatMessageEntity?>> ReadGroupChatMessages(Guid id, [FromQuery] int pageSize = 100, [FromQuery] int pageNumber = 1)
-		=> Result(_repository.ReadGroupChatMessages(id, pageSize, pageNumber));
+	public ActionResult<GenericResponse<GroupChatMessageEntity?>> ReadGroupChatMessages(
+		Guid id,
+		[FromQuery] int pageSize = 100,
+		[FromQuery] int pageNumber = 1) => Result(_repository.ReadGroupChatMessages(id, pageSize, pageNumber));
 
 	[HttpPost("SeenGroupChatMessage/{id:guid}")]
 	public async Task<ActionResult<GenericResponse>> SeenGroupChatMesDeleteGroupChatsage(Guid id) => Result(await _repository.SeenGroupChatMessage(id));
@@ -58,12 +60,12 @@ public class ChatController : BaseApiController {
 	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> ReadGroupChatById(Guid id) => Result(await _repository.ReadGroupChatById(id));
 
 	[HttpPost("AddReactionToMessage/{emoji}/{messageId:guid}")]
-	public async Task<ActionResult<GenericResponse>> AddReactionToMessage(Reaction emoji, Guid messageId)
-		=> Result(await _repository.AddReactionToMessage(emoji, messageId));
+	public async Task<ActionResult<GenericResponse>> AddReactionToMessage(Reaction emoji, Guid messageId) =>
+		Result(await _repository.AddReactionToMessage(emoji, messageId));
 
 	[HttpPut("UpdateGroupChatMessage")]
-	public async Task<ActionResult<GenericResponse<GroupChatMessageEntity?>>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto)
-		=> Result(await _repository.UpdateGroupChatMessage(dto));
+	public async Task<ActionResult<GenericResponse<GroupChatMessageEntity?>>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto) =>
+		Result(await _repository.UpdateGroupChatMessage(dto));
 
 	[HttpDelete("DeleteGroupChatMessage/{id}")]
 	public async Task<ActionResult<GenericResponse>> DeleteGroupChatMessage(Guid id) => Result(await _repository.DeleteGroupChatMessage(id));

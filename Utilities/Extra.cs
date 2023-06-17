@@ -29,17 +29,21 @@ public static class BoolExtension {
 
 public static class EnumerableExtension {
 	public static bool IsNotNullOrEmpty<T>(this IEnumerable<T>? list) => list != null && list.Any();
+
 	public static bool IsNotNull<T>(this IEnumerable<T>? list) => list != null;
 }
 
 public static class NumberExtension {
 	public static int ToInt(this double value) => (int) value;
+
 	public static int ToInt(this double? value) => (int) (value ?? 0.0);
 }
 
 public static class StringExtension {
 	public static bool IsEmail(this string email) => Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.(com|net|org|gov)$", RegexOptions.IgnoreCase);
-	public static bool IsNotNullOrEmpty(this string? s) => s is {Length: > 0};
+
+	public static bool IsNotNullOrEmpty(this string? s) => s is { Length: > 0 };
+
 	public static bool IsNullOrEmpty(this string? s) => string.IsNullOrEmpty(s);
 
 	public static string? GetShebaNumber(this string s) {
@@ -50,12 +54,11 @@ public static class StringExtension {
 		return null;
 	}
 
-    public static string? AddCommaSeperatorUsers(this string? baseString, string? userId)
-    {
+	public static string? AddCommaSeperatorUsers(this string? baseString, string? userId) {
 		if (string.IsNullOrEmpty(baseString)) return userId;
-		else if (baseString.Contains(userId ?? "")) return baseString;
-		else return baseString + "," + userId;
-    }
+		if (baseString.Contains(userId ?? "")) return baseString;
+		return baseString + "," + userId;
+	}
 }
 
 public class Utils {
@@ -93,7 +96,7 @@ public class Utils {
 		ChatType? chatType,
 		string? useCaseProduct,
 		UsageRules usageRules) {
-		var user = context.Set<UserEntity>().FirstOrDefault(f => f.Id == userId);
+		UserEntity? user = context.Set<UserEntity>().FirstOrDefault(f => f.Id == userId);
 		if (user == null) return new Tuple<bool, UtilitiesStatusCodes>(true, UtilitiesStatusCodes.UserNotFound);
 		bool overUsed;
 		try {
@@ -148,36 +151,32 @@ public class Utils {
 			if (overUsed) return new Tuple<bool, UtilitiesStatusCodes>(overUsed, UtilitiesStatusCodes.Overused);
 			return new Tuple<bool, UtilitiesStatusCodes>(false, UtilitiesStatusCodes.Success);
 		}
-		catch (Exception) {
-			return new Tuple<bool, UtilitiesStatusCodes>(true, UtilitiesStatusCodes.BadRequest);
+		catch (Exception) { return new Tuple<bool, UtilitiesStatusCodes>(true, UtilitiesStatusCodes.BadRequest); }
+	}
+
+	public static string DisplayCountOfCompleteOrder(int countOfCompleteOrder) {
+		switch (countOfCompleteOrder) {
+			case <= 50: return countOfCompleteOrder.ToString();
+			case > 50 and <= 100: return "+50";
+			case > 100 and <= 200: return "+100";
+			case > 200 and <= 300: return "+200";
+			case > 300 and <= 400: return "+300";
+			case > 400 and <= 500: return "+400";
+			case > 500 and <= 600: return "+500";
+			case > 600 and <= 700: return "+600";
+			case > 700 and <= 800: return "+700";
+			case > 800 and <= 900: return "+800";
+			case > 900 and <= 1000: return "+900";
+			case > 1000 and <= 2000: return "+1000";
+			case > 2000 and <= 3000: return "+2000";
+			case > 3000 and <= 4000: return "+3000";
+			case > 4000 and <= 5000: return "+4000";
+			case > 5000 and <= 6000: return "+5000";
+			case > 6000 and <= 7000: return "+6000";
+			case > 7000 and <= 8000: return "+7000";
+			case > 8000 and <= 9000: return "+8000";
+			case > 9000 and <= 10000: return "+9000";
+			case > 10000: return "+10000";
 		}
 	}
-    public static string DisplayCountOfCompleteOrder(int countOfCompleteOrder)
-    {
-        switch (countOfCompleteOrder)
-        {
-            case <= 50: return countOfCompleteOrder.ToString();
-            case > 50 and <= 100: return "+50";
-            case > 100 and <= 200: return "+100";
-            case > 200 and <= 300: return "+200";
-            case > 300 and <= 400: return "+300";
-            case > 400 and <= 500: return "+400";
-            case > 500 and <= 600: return "+500";
-            case > 600 and <= 700: return "+600";
-            case > 700 and <= 800: return "+700";
-            case > 800 and <= 900: return "+800";
-            case > 900 and <= 1000: return "+900";
-            case > 1000 and <= 2000: return "+1000";
-            case > 2000 and <= 3000: return "+2000";
-            case > 3000 and <= 4000: return "+3000";
-            case > 4000 and <= 5000: return "+4000";
-            case > 5000 and <= 6000: return "+5000";
-            case > 6000 and <= 7000: return "+6000";
-            case > 7000 and <= 8000: return "+7000";
-            case > 8000 and <= 9000: return "+8000";
-            case > 9000 and <= 10000: return "+9000";
-            case > 10000: return "+10000";
-        }
-    }
-
 }

@@ -7,8 +7,8 @@ public interface IMediaRepository {
 }
 
 public class MediaRepository : IMediaRepository {
-	private readonly IWebHostEnvironment _env;
 	private readonly DbContext _dbContext;
+	private readonly IWebHostEnvironment _env;
 
 	public MediaRepository(IWebHostEnvironment env, DbContext dbContext) {
 		_env = env;
@@ -18,9 +18,8 @@ public class MediaRepository : IMediaRepository {
 	public async Task<GenericResponse<IEnumerable<MediaEntity>?>> Upload(UploadDto model) {
 		List<MediaEntity> medias = new();
 
-		if (model.Files != null) {
+		if (model.Files != null)
 			foreach (IFormFile file in model.Files) {
-
 				string name = Guid.NewGuid() + Path.GetExtension(file.FileName);
 
 				List<string> allowedExtensions = new() {".png", ".gif", ".jpg", ".jpeg", ".mp4", ".mp3", ".pdf", ".aac", ".apk", ".zip" , ".rar"};
@@ -38,26 +37,25 @@ public class MediaRepository : IMediaRepository {
 					BookmarkId = model.BookmarkId,
 					CreatedAt = DateTime.Now,
 					UseCase = model.UseCase,
-					Title = model.Title,
-					IsPrivate = model.IsPrivate,
-					Size = model.Size,
-					Time = model.Time,
-					Artist = model.Artist,
-					Album = model.Album,
-					JsonDetail = model.JsonDetail,
 					NotificationId = model.NotificationId,
 					GroupChatId = model.GroupChatId,
-					GroupChatMessageId = model.GroupChatMessageId
+					GroupChatMessageId = model.GroupChatMessageId,
+					JsonDetail = {
+						Title = model.Title,
+						IsPrivate = model.PrivacyType,
+						Size = model.Size,
+						Time = model.Time,
+						Artist = model.Artist,
+						Album = model.Album
+					}
 				};
 				await _dbContext.Set<MediaEntity>().AddAsync(media);
 				await _dbContext.SaveChangesAsync();
 				medias.Add(media);
 				SaveMedia(file, name);
 			}
-		}
-		if (model.Links != null) {
+		if (model.Links != null)
 			foreach (MediaEntity media in model.Links.Select(link => new MediaEntity {
-				         Link = link,
 				         UserId = model.UserId,
 				         ProductId = model.ProductId,
 				         ContentId = model.ContentId,
@@ -66,16 +64,21 @@ public class MediaRepository : IMediaRepository {
 				         CommentId = model.CommentId,
 				         CreatedAt = DateTime.Now,
 				         UseCase = model.UseCase,
-				         JsonDetail = model.JsonDetail,
-				         Title = model.Title,
-				         Size = model.Size,
-				         NotificationId = model.NotificationId
+				         NotificationId = model.NotificationId,
+				         Order = model.Order,
+				         JsonDetail = {
+					         Title = model.Title,
+					         IsPrivate = model.PrivacyType,
+					         Size = model.Size,
+					         Time = model.Time,
+					         Artist = model.Artist,
+					         Album = model.Album
+				         }
 			         })) {
 				await _dbContext.Set<MediaEntity>().AddAsync(media);
 				await _dbContext.SaveChangesAsync();
 				medias.Add(media);
 			}
-		}
 
 		return new GenericResponse<IEnumerable<MediaEntity>?>(medias);
 	}
@@ -83,9 +86,7 @@ public class MediaRepository : IMediaRepository {
 	public async Task<GenericResponse> Delete(Guid id) {
 		MediaEntity? media = await _dbContext.Set<MediaEntity>().FirstOrDefaultAsync(x => x.Id == id);
 		if (media == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
-		try {
-			File.Delete(Path.Combine(_env.WebRootPath, "Medias", media.FileName!));
-		}
+		try { File.Delete(Path.Combine(_env.WebRootPath, "Medias", media.FileName!)); }
 		catch (Exception) { }
 		_dbContext.Set<MediaEntity>().Remove(media);
 		await _dbContext.SaveChangesAsync();
@@ -97,10 +98,14 @@ public class MediaRepository : IMediaRepository {
 		if (media is null)
 			throw new Exception("media is not found");
 
-		media.Title = model.Title ?? media.Title;
-		media.Size = model.Size ?? media.Size;
+		media.JsonDetail.Title = model.Title ?? media.JsonDetail.Title;
+		media.JsonDetail.Size = model.Size ?? media.JsonDetail.Size;
+		media.JsonDetail.Time = model.Time ?? media.JsonDetail.Time;
+		media.JsonDetail.Artist = model.Artist ?? media.JsonDetail.Artist;
+		media.JsonDetail.Album = model.Album ?? media.JsonDetail.Album;
 		media.UpdatedAt = DateTime.Now;
 		media.UseCase = model.UseCase ?? media.UseCase;
+		media.Order = model.Order ?? media.Order;
 
 		_dbContext.Set<MediaEntity>().Update(media);
 		await _dbContext.SaveChangesAsync();
@@ -116,12 +121,8 @@ public class MediaRepository : IMediaRepository {
 		if (!Directory.Exists(uploadDir))
 			Directory.CreateDirectory(uploadDir);
 		try {
-			try {
-				File.Delete(path);
-			}
-			catch (Exception ex) {
-				throw new ArgumentException("Exception in SaveMedia- Delete! " + ex.Message);
-			}
+			try { File.Delete(path); }
+			catch (Exception ex) { throw new ArgumentException("Exception in SaveMedia- Delete! " + ex.Message); }
 
 			using FileStream stream = new(path, FileMode.Create);
 			image.CopyTo(stream);

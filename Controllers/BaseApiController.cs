@@ -3,9 +3,7 @@
 [ApiController]
 public abstract class BaseApiController : ControllerBase {
 	[NonAction]
-	protected static ObjectResult Result(GenericResponse response) {
-		return new ObjectResult(response) {
-			StatusCode = response.Status.Value()
-		};
-	}
+	protected static ObjectResult Result(GenericResponse response) => new(response) {
+		StatusCode = response.Status.Value()
+	};
 }

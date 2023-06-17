@@ -2,27 +2,16 @@
 
 [Table("Bookmarks")]
 public class BookmarkEntity : BaseEntity {
-	[System.Text.Json.Serialization.JsonIgnore]
-	public UserEntity? User { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	public string? UserId { get; set; }
-
-	[StringLength(500)]
 	public string? FolderName { get; set; }
 
-	public ProductEntity? Product { get; set; }
+	public UserEntity? User { get; set; }
+	public string? UserId { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
+	public ProductEntity? Product { get; set; }
 	public Guid? ProductId { get; set; }
 
-	public CategoryEntity? Category { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	public Guid? CategoryId { get; set; }
-
-	public Guid? ParentId { get; set; }
 	public BookmarkEntity? Parent { get; set; }
+	public Guid? ParentId { get; set; }
 
 	[InverseProperty("Parent")]
 	public IEnumerable<BookmarkEntity>? Children { get; set; }
@@ -33,7 +22,6 @@ public class BookmarkEntity : BaseEntity {
 public class BookmarkCreateDto {
 	public string? FolderName { get; set; }
 	public Guid? ProductId { get; set; }
-	public Guid? CategoryId { get; set; }
 	public Guid? ParentId { get; set; }
 }
 

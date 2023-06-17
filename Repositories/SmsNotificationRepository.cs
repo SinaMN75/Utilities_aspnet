@@ -1,6 +1,4 @@
-﻿using System.Net.Http.Headers;
-
-namespace Utilities_aspnet.Repositories;
+﻿namespace Utilities_aspnet.Repositories;
 
 public interface ISmsNotificationRepository {
 	void SendSms(string mobileNumber, string message);
@@ -18,19 +16,29 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 		SmsPanelSettings smsSetting = appSettings.SmsPanelSettings;
 
 		if (mobileNumber.Contains("+98")) {
-			mobileNumber = mobileNumber.TrimStart(new[] {'+'});
-			mobileNumber = mobileNumber.TrimStart(new[] {'9'});
-			mobileNumber = mobileNumber.TrimStart(new[] {'8'});
+			mobileNumber = mobileNumber.TrimStart(new[] { '+' });
+			mobileNumber = mobileNumber.TrimStart(new[] { '9' });
+			mobileNumber = mobileNumber.TrimStart(new[] { '8' });
 		}
-		else mobileNumber = mobileNumber.TrimStart(new[] {'0'});
+		else { mobileNumber = mobileNumber.TrimStart(new[] { '0' }); }
 
 		switch (smsSetting.Provider) {
 			case "ghasedak": {
 				Api sms = new(smsSetting.SmsApiKey);
-				sms.VerifyAsync(1, smsSetting.PatternCode, new[] {mobileNumber}, message);
+				sms.VerifyAsync(1, smsSetting.PatternCode, new[] { mobileNumber }, message);
 				break;
 			}
 			case "faraz": {
+				var body = new {
+					op = "pattern",
+					user = smsSetting.UserName,
+					pass = smsSetting.SmsSecret,
+					fromNum = "03000505".TrimStart(new[] { '0' }),
+					toNum = mobileNumber,
+					patternCode = smsSetting.PatternCode,
+					inputData = "[{\"verification-code\":" + message + "}]}"
+				};
+
 				RestClient client = new("http://ippanel.com/api/select");
 				RestRequest request = new(Method.POST);
 				request.AddHeader("cache-control", "no-cache");
@@ -38,7 +46,8 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 				request.AddHeader("Authorization", "AccessKey " + smsSetting.SmsApiKey);
 				request.AddParameter("undefined",
 				                     "{\"op\" : \"pattern\"" + ",\"user\" : \"" + smsSetting.UserName + "\"" + ",\"pass\": \"" + smsSetting.SmsSecret + "\"" +
-				                     ",\"fromNum\" : " + "03000505".TrimStart(new[] {'0'}) + "" + ",\"toNum\": " + mobileNumber + "" + ",\"patternCode\": \" " +
+				                     ",\"fromNum\" : " + "03000505".TrimStart(new[] { '0' }) + "" + ",\"toNum\": " + mobileNumber + "" +
+				                     ",\"patternCode\": \" " +
 				                     smsSetting.PatternCode + "\"" + ",\"inputData\" : [{\"verification-code\":" + message + "}]}", ParameterType.RequestBody);
 
 				client.Execute(request);
@@ -54,27 +63,26 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 
 		switch (setting.Provider) {
 			case "pushe": {
-                    var body = new
-                    {
-                        app_ids = setting.AppId,
-                        data = new
-                        {
-                            title = dto.Title,
-                            content = dto.Content,
-                            bigContent = dto.BigContent,
-                            action = new { action_type = dto.ActionType, url = dto.Url }
-                        },
-                        is_draft = false,
-                        filter = new { custom_id = dto.UserIds }
-                    };
+				var body = new {
+					app_ids = setting.AppId,
+					data = new {
+						title = dto.Title,
+						content = dto.Content,
+						bigContent = dto.BigContent,
+						action = new { action_type = dto.ActionType, url = dto.Url }
+					},
+					is_draft = false,
+					filter = new { custom_id = dto.UserIds }
+				};
 
-                    var client = new CustomHttpClient<object, object>();
-                    client.DefaultRequestHeaders.Add("Content-Type", "application/json");
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "Token " + setting.Token);
+				CustomHttpClient<object, object> client = new();
+				client.DefaultRequestHeaders.Add("Content-Type", "application/json");
+				client.DefaultRequestHeaders.Add("Authorization", "Token " + setting.Token);
+				client.DefaultRequestHeaders.Add("Content-Type", "application/json");
+				client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "Token " + setting.Token);
 
-					var result = await client.Post("https://api.pushe.co/v2/messaging/notifications/", body);
+				object result = await client.Post("https://api.pushe.co/v2/messaging/notifications/", body);
 				break;
-
 
 				//RestRequest request = new(Method.POST);
 				//request.AddHeader("Content-Type", "application/json");

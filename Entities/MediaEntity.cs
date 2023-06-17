@@ -2,100 +2,107 @@
 
 [Table("Media")]
 public class MediaEntity : BaseEntity {
-	[StringLength(500)]
 	public string? FileName { get; set; }
-
-	[StringLength(500)]
 	public string? UseCase { get; set; }
-
-	[StringLength(500)]
-	public string? Link { get; set; }
-
-	[StringLength(500)]
-	public string? Title { get; set; }
-
-	[StringLength(500)]
-	public string? Size { get; set; }
-
-	[StringLength(500)]
-	public string? Time { get; set; }
-
-	[StringLength(500)]
-	public string? Artist { get; set; }
-
-	[StringLength(500)]
-	public string? Album { get; set; }
-	
-	[StringLength(2000)]
-	public string? JsonDetail { get; set; }
-	
-	public bool? IsPrivate { get; set; }
+	public int? Order { get; set; }
+	public MediaJsonDetail JsonDetail { get; set; } = new();
 
 	[NotMapped]
 	public string Url => $"{Server.ServerAddress}/Medias/{FileName}";
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public ContentEntity? Content { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public Guid? ContentId { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public UserEntity? User { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public string? UserId { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public ProductEntity? Product { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public Guid? ProductId { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public CommentEntity? Comment { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public Guid? CommentId { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public ChatEntity? Chat { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public Guid? ChatId { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public NotificationEntity? Notification { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public Guid? NotificationId { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public CategoryEntity? Category { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public Guid? CategoryId { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public GroupChatEntity? GroupChat { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public Guid? GroupChatId { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public GroupChatMessageEntity? GroupChatMessage { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public Guid? GroupChatMessageId { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public Guid? BookmarkId { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public BookmarkEntity? Bookmark { get; set; }
 }
 
+public class MediaJsonDetail {
+	public string? Link { get; set; }
+	public string? Title { get; set; }
+	public string? Size { get; set; }
+	public string? Time { get; set; }
+	public string? Artist { get; set; }
+	public string? Album { get; set; }
+	public PrivacyType? IsPrivate { get; set; }
+}
+
 public class UploadDto {
+	public int? Order { get; set; }
 	public string? UseCase { get; set; }
 	public string? UserId { get; set; }
 	public string? Title { get; set; }
@@ -103,8 +110,7 @@ public class UploadDto {
 	public string? Time { get; set; }
 	public string? Artist { get; set; }
 	public string? Album { get; set; }
-	public string? JsonDetail { get; set; }
-	public bool? IsPrivate { get; set; }
+	public PrivacyType? PrivacyType { get; set; }
 	public Guid? ProductId { get; set; }
 	public Guid? ContentId { get; set; }
 	public Guid? CategoryId { get; set; }
@@ -125,4 +131,5 @@ public class UpdateMediaDto {
 	public string? Time { get; set; }
 	public string? Artist { get; set; }
 	public string? Album { get; set; }
+	public int? Order { get; set; }
 }
