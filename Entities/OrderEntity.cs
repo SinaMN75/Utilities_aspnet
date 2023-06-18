@@ -46,6 +46,7 @@ public class OrderDetailEntity : BaseEntity {
 
 	public CategoryEntity? Category { get; set; }
 	public Guid? CategoryId { get; set; }
+    public int? Vote { get; set; }
 }
 
 public class OrderCreateUpdateDto {
@@ -81,4 +82,10 @@ public class OrderFilterDto {
 	public string? ProductOwnerId { get; set; }
 	public int PageSize { get; set; } = 100;
 	public int PageNumber { get; set; } = 1;
+}
+
+public class OrderVoteDto
+{
+	public Guid? Id { get; set; }
+    public int Vote { get; set; }
 }

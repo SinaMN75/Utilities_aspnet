@@ -18,6 +18,9 @@ public class OrderController : BaseApiController {
 	[HttpPost("Filter")]
 	public ActionResult<GenericResponse<IEnumerable<OrderEntity>>> Filter(OrderFilterDto dto) => Result(_repository.Filter(dto));
 
+	[HttpPost("Vote")]
+	public async Task<ActionResult<GenericResponse>> Vote(OrderVoteDto dto) => Result(await _repository.Vote(dto));
+
 	[HttpGet("{id:guid}")]
 	public async Task<ActionResult<GenericResponse<OrderEntity>>> ReadById(Guid id) => Result(await _repository.ReadById(id));
 
