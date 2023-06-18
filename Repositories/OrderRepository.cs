@@ -56,7 +56,7 @@ public class OrderRepository : IOrderRepository
 
         foreach (OrderDetailCreateUpdateDto item in dto.OrderDetails)
         {
-            CategoryEntity? categoryEntity = await _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item.Category);
+            CategoryEntity? categoryEntity = await _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item.CategoryId);
             if (categoryEntity != null && categoryEntity.Stock < item.Count) return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.OutOfStock);
 
             OrderDetailEntity orderDetailEntity = new()
@@ -65,7 +65,7 @@ public class OrderRepository : IOrderRepository
                 ProductId = item.ProductId,
                 Price = categoryEntity?.Price * item.Count,
                 Count = item.Count,
-                CategoryId = item.Category,
+                CategoryId = item.CategoryId,
                 UnitPrice = categoryEntity?.Price
             };
 
@@ -166,7 +166,7 @@ public class OrderRepository : IOrderRepository
     public async Task<GenericResponse<OrderDetailEntity?>> CreateOrderDetail(OrderDetailCreateUpdateDto dto)
     {
         ProductEntity p = (await _dbContext.Set<ProductEntity>().AsNoTracking().FirstOrDefaultAsync(p => p.Id == dto.ProductId))!;
-        CategoryEntity c = (await _dbContext.Set<CategoryEntity>().AsNoTracking().FirstOrDefaultAsync(p => p.Id == dto.Category))!;
+        CategoryEntity c = (await _dbContext.Set<CategoryEntity>().AsNoTracking().FirstOrDefaultAsync(p => p.Id == dto.CategoryId))!;
         OrderEntity o = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails.Where(x => x.DeletedAt == null))
             .FirstOrDefaultAsync(x => x.Id == dto.OrderId);
 
@@ -180,7 +180,7 @@ public class OrderRepository : IOrderRepository
             OrderId = dto.OrderId,
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now,
-            CategoryId = dto.Category,
+            CategoryId = dto.CategoryId,
             Price = c.Price * dto.Count
         });
 
@@ -240,8 +240,8 @@ public class OrderRepository : IOrderRepository
     public async Task<GenericResponse<OrderEntity?>> CreateUpdateOrderDetail(OrderDetailCreateUpdateDto dto)
     {
         ProductEntity p = (await _dbContext.Set<ProductEntity>().AsNoTracking().FirstOrDefaultAsync(p => p.Id == dto.ProductId))!;
-        CategoryEntity c = (await _dbContext.Set<CategoryEntity>().AsNoTracking().FirstOrDefaultAsync(p => p.Id == dto.Category))!;
-        OrderEntity o = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails.Where(x => x.DeletedAt == null))
+        CategoryEntity c = (await _dbContext.Set<CategoryEntity>().AsNoTracking().FirstOrDefaultAsync(p => p.Id == dto.CategoryId))!;
+        OrderEntity o = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails.Where(x => x.DeletedAt == null)).ThenInclude(x=>x.Category)
             .FirstOrDefaultAsync(f => f.ProductOwnerId == p.UserId && f.UserId == _userId);
 
         if (o is null)
@@ -265,13 +265,16 @@ public class OrderRepository : IOrderRepository
                 OrderId = dto.OrderId,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
-                CategoryId = dto.Category,
+                CategoryId = dto.CategoryId,
                 Price = c.Price * dto.Count
             });
 
             await _dbContext.SaveChangesAsync();
             return new GenericResponse<OrderEntity?>(orderEntity.Entity);
         }
+
+        if (o.OrderDetails?.Any(a => a.Category?.Type != c.Type) ?? false)
+            return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.OrderCantHaveBothTypeOfOrderCategory);
 
         EntityEntry<OrderDetailEntity> orderDetailEntity = await _dbContext.Set<OrderDetailEntity>().AddAsync(new OrderDetailEntity
         {
@@ -280,7 +283,7 @@ public class OrderRepository : IOrderRepository
             OrderId = dto.OrderId,
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now,
-            CategoryId = dto.Category,
+            CategoryId = dto.CategoryId,
             Price = c.Price * dto.Count
         });
 

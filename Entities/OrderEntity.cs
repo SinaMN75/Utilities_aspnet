@@ -66,7 +66,7 @@ public class OrderDetailCreateUpdateDto {
 	public Guid? OrderDetailId { get; set; }
 	public Guid? ProductId { get; set; }
 	public int? Count { get; set; }
-	public Guid? Category { get; set; }
+	public Guid? CategoryId { get; set; }
 }
 
 public class OrderFilterDto {

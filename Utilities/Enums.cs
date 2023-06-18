@@ -29,7 +29,8 @@ public enum UtilitiesStatusCodes {
 	MoreThan2UserIsInPrivateChat = 614,
 	Overused = 615,
 	MoreThanAllowedMoney = 616,
-	WrongPassword = 617
+	WrongPassword = 617,
+	OrderCantHaveBothTypeOfOrderCategory = 618
 }
 
 public enum NotoficationType {
