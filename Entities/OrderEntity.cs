@@ -80,7 +80,8 @@ public class OrderFilterDto {
 	public DateTime? EndDate { get; set; }
 	public string? UserId { get; set; }
 	public string? ProductOwnerId { get; set; }
-	public int PageSize { get; set; } = 100;
+    public bool? IsPhysical { get; set; }
+    public int PageSize { get; set; } = 100;
 	public int PageNumber { get; set; } = 1;
 }
 

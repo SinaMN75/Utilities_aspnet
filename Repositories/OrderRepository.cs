@@ -130,6 +130,17 @@ public class OrderRepository : IOrderRepository
         if (dto.StartDate.HasValue) q = q.Where(x => x.CreatedAt >= dto.StartDate);
         if (dto.EndDate.HasValue) q = q.Where(x => x.CreatedAt <= dto.EndDate);
 
+        if (dto.IsPhysical.HasValue)
+        {
+            if (dto.IsPhysical.Value)
+            {
+                q = q.Where(w => w.OrderDetails.All(a => a.Category.Type == "Physical"));
+            }
+            else
+            {
+                q = q.Where(w => w.OrderDetails.All(a => a.Category.Type == "Digital"));
+            }
+        }
         int totalCount = q.Count();
 
         q = q.AsNoTracking().Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
