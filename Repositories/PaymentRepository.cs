@@ -1,25 +1,30 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
-public interface IPaymentRepository {
+public interface IPaymentRepository
+{
     Task<GenericResponse<string?>> IncreaseWalletBalance(double amount);
     Task<GenericResponse<string?>> PayOrderZarinPal(Guid orderId);
     Task<GenericResponse> WalletCallBack(int amount, string authority, string status, string userId);
     Task<GenericResponse> CallBack(Guid orderId, string authority, string status);
 }
 
-public class PaymentRepository : IPaymentRepository {
+public class PaymentRepository : IPaymentRepository
+{
     private readonly AppSettings _appSettings = new();
     private readonly DbContext _dbContext;
     private readonly string? _userId;
 
-    public PaymentRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IConfiguration config) {
+    public PaymentRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IConfiguration config)
+    {
         _dbContext = dbContext;
         config.GetSection("AppSettings").Bind(_appSettings);
         _userId = httpContextAccessor.HttpContext?.User.Identity?.Name;
     }
 
-    public async Task<GenericResponse<string?>> IncreaseWalletBalance(double amount) {
-        try {
+    public async Task<GenericResponse<string?>> IncreaseWalletBalance(double amount)
+    {
+        try
+        {
             UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
             Payment payment = new(_appSettings.PaymentSettings!.Id, amount.ToInt());
             string callbackUrl = $"{Server.ServerAddress}/Payment/WalletCallBack/{user?.Id}/{amount}";
@@ -136,7 +141,10 @@ public class PaymentRepository : IPaymentRepository {
                 ProductEntity? prdct = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == item.ProductId);
                 if (prdct is not null)
                 {
-                    prdct.Stock = prdct.Stock >= 1 ? prdct.Stock -= 1 : prdct.Stock;
+                    prdct.Stock = prdct.Stock >= 1 && prdct.Stock >= item.Count ? prdct.Stock -= item.Count : prdct.Stock;
+                    //Todo : inja ye exception hast ke nabayad rokh bede va pardakht ham anjam shode nemitonim throw konim 
+                    //       double check  ghabl az vorod be inn safhe okaye vali mitarsam ham zaman ye filed update beshe
+                    //       fek konamm bayad az ye transaction estefade konim
                     _dbContext.Update(prdct);
                 }
             }
