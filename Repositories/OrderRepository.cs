@@ -164,6 +164,20 @@ public class OrderRepository : IOrderRepository
             .Include(i => i.ProductOwner).ThenInclude(i => i.Media)
             .AsNoTracking()
             .FirstOrDefaultAsync(i => i.Id == id && i.DeletedAt == null);
+
+        if(i != null && i.Status == OrderStatuses.Pending && i.OrderDetails != null)
+        {
+            foreach(var item in i.OrderDetails)
+            {
+                if(item.Category != null)
+                {
+                    item.Category.Price = item.Product?.Price ?? item.Price;
+                    _dbContext.Update(item.Category);
+                    await _dbContext.SaveChangesAsync();
+                }
+                
+            }
+        }
         return new GenericResponse<OrderEntity>(i);
     }
 

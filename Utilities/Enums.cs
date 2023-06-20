@@ -254,3 +254,9 @@ public enum TransactionType {
 	Sell = 104,
 	Recharge = 105
 }
+
+public enum ProductType { 
+	None = 100,
+	Digital = 101,
+	Physical = 102
+}
