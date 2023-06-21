@@ -1,11 +1,13 @@
 ﻿namespace Utilities_aspnet.Controllers;
 
+[ApiController]
+[Route("api/[controller]")]
 public class PromotionController : BaseApiController {
 	private readonly IPromotionRepository _repository;
 
 	public PromotionController(IPromotionRepository repository) => _repository = repository;
 
-	[HttpPost("CreatePromotion")]
+	[HttpPost()]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	public async Task<ActionResult<GenericResponse>> CreatePromotion(CreateUpdatePromotionDto dto) => Result(await _repository.CreatePromotion(dto));
 
