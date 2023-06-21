@@ -18,6 +18,7 @@ public class UserEntity : IdentityUser {
 	public string? Region { get; set; }
 	public string? State { get; set; }
 	public string? Badge { get; set; }
+	public string? JobStatus { get; set; }
 	public string? MutedChats { get; set; }
 	public GenderType? Gender { get; set; }
 	public double? Wallet { get; set; } = 0;
@@ -198,6 +199,7 @@ public class UserCreateUpdateDto {
 	public bool? Suspend { get; set; }
 	public string? Instagram { get; set; }
 	public string? Telegram { get; set; }
+	public string? JobStatus { get; set; }
 	public string? WhatsApp { get; set; }
 	public string? LinkedIn { get; set; }
 	public string? Dribble { get; set; }
@@ -232,6 +234,7 @@ public class UserFilterDto {
 	public string? FullName { get; set; }
 	public string? Bio { get; set; }
 	public string? Headline { get; set; }
+	public string? JobStatus { get; set; }
 	public string? AppUserName { get; set; }
 	public string? AppPhoneNumber { get; set; }
 	public string? AppEmail { get; set; }

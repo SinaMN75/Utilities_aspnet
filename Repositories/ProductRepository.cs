@@ -340,6 +340,8 @@ public static class ProductEntityExtension
             ShippingTime = dto.ShippingTime ?? entity.JsonDetail.ShippingTime,
             Tags = dto.Tags ?? entity.JsonDetail.Tags,
             KeyValue = dto.KeyValue ?? entity.JsonDetail.KeyValue,
+            Type1 = dto.Type1 ?? entity.JsonDetail.Type1,
+            Type2 = dto.Type2 ?? entity.JsonDetail.Type2,
             KeyValues = dto.KeyValues ?? entity.JsonDetail.KeyValues
         };
 

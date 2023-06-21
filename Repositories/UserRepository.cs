@@ -86,6 +86,7 @@ public class UserRepository : IUserRepository
         if (dto.Email != null) q = q.Where(x => x.Email!.Contains(dto.Email));
         if (dto.Gender != null) q = q.Where(x => x.Gender == dto.Gender);
         if (dto.Headline != null) q = q.Where(x => x.Headline!.Contains(dto.Headline));
+        if (dto.JobStatus != null) q = q.Where(x => x.Headline!.Contains(dto.JobStatus));
         if (dto.Region != null) q = q.Where(x => x.Region!.Contains(dto.Region));
         if (dto.State != null) q = q.Where(x => x.State!.Contains(dto.State));
         if (dto.Type != null) q = q.Where(x => x.Type!.Contains(dto.Type));
@@ -370,6 +371,7 @@ public class UserRepository : IUserRepository
         entity.FollowedUsers = dto.FollowedUsers ?? entity.FollowedUsers;
         entity.BlockedUsers = dto.BlockedUsers ?? entity.BlockedUsers;
         entity.Badge = dto.Badge ?? entity.Badge;
+        entity.JobStatus = dto.JobStatus ?? entity.JobStatus;
         entity.UpdatedAt = DateTime.Now;
         entity.IsOnline = dto.IsOnline ?? entity.IsOnline;
         entity.ExpireUpgradeAccount = dto.ExpireUpgradeAccount ?? entity.ExpireUpgradeAccount;
