@@ -12,6 +12,7 @@ public interface IOrderRepository
     Task<GenericResponse<OrderDetailEntity?>> UpdateOrderDetail(OrderDetailCreateUpdateDto dto);
     Task<GenericResponse> DeleteOrderDetail(Guid id);
     Task<GenericResponse<OrderEntity?>> CreateUpdateOrderDetail(OrderDetailCreateUpdateDto dto);
+    Task<GenericResponse<List<OrderHistoryEntity>>> OrderHistory();
 }
 
 public class OrderRepository : IOrderRepository
@@ -337,5 +338,16 @@ public class OrderRepository : IOrderRepository
         _dbContext.Update(orderDetail);
         await _dbContext.SaveChangesAsync();
         return new GenericResponse(UtilitiesStatusCodes.Success);
+    }
+
+    public async Task<GenericResponse<List<OrderHistoryEntity>>> OrderHistory()
+    {
+        IQueryable<OrderHistoryEntity> orderHistories = _dbContext.Set<OrderHistoryEntity>()
+                                                                  .Where(w => w.UserId == _userId)
+                                                                  .Include(x => x.Products)!
+                                                                  .ThenInclude(x => x.Media);
+
+        return new GenericResponse<List<OrderHistoryEntity>>(await orderHistories.ToListAsync());
+
     }
 }

@@ -164,6 +164,23 @@ public class PaymentRepository : IPaymentRepository
             }
         }
 
+        foreach (var item in order.OrderDetails)
+        {
+            if (item.Category != null)
+            {
+                var orderHistory = new OrderHistoryEntity
+                {
+                    Price = item.Category.Price,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    Products = new List<ProductEntity>() { item.Product },
+                    DeliverDate = order.ReceivedDate,
+                    UserId = order.UserId
+                };
+                _dbContext.Set<OrderHistoryEntity>().Add(orderHistory);
+            }
+        }
+
         await _dbContext.SaveChangesAsync();
         return new GenericResponse();
     }
