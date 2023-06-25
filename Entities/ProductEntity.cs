@@ -33,16 +33,17 @@ public class ProductEntity : BaseEntity {
 
 	public string? UserId { get; set; }
 	public UserEntity? User { get; set; }
-
-	public ProductJsonDetail JsonDetail { get; set; } = new();
+    public ProductJsonDetail JsonDetail { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<FormEntity>? Forms { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
 	public IEnumerable<ProductInsight>? ProductInsights { get; set; }
 	public IEnumerable<VisitProducts>? VisitProducts { get; set; }
+    public IEnumerable<OrderHistoryEntity>? OrderHistories { get; set; }
 
-	[NotMapped]
+
+    [NotMapped]
 	public string? SuccessfulPurchase { get; set; }
 }
 

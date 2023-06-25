@@ -49,6 +49,17 @@ public class OrderDetailEntity : BaseEntity {
     public int? Vote { get; set; }
 }
 
+[Table("OrderHistory")]
+public class OrderHistoryEntity : BaseEntity
+{
+    public double? Price { get; set; }
+    public DateTime? DeliverDate { get; set; }
+    public UserEntity? User { get; set; }
+    public string? UserId { get; set; }
+    public IEnumerable<ProductEntity>? Products { get; set; }	
+}
+
+
 public class OrderCreateUpdateDto {
 	public Guid? Id { get; set; }
 	public string? Description { get; set; }
