@@ -177,7 +177,8 @@ public enum GenderType {
 public enum PrivacyType {
 	Private = 100,
 	Public = 101,
-	FollowersOnly = 102
+	FollowersOnly = 102,
+	Business = 103
 }
 
 public enum NationalityType {

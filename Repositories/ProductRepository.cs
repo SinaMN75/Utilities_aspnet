@@ -20,6 +20,7 @@ public class ProductRepository : IProductRepository
     private readonly IPromotionRepository _promotionRepository;
     private readonly string? _userId;
     private readonly IUserRepository _userRepository;
+    private readonly IFormRepository _formRepository;
 
     public ProductRepository(
         DbContext dbContext,
@@ -27,7 +28,8 @@ public class ProductRepository : IProductRepository
         IMediaRepository mediaRepository,
         IUserRepository userRepository,
         IConfiguration config,
-        IPromotionRepository promotionRepository)
+        IPromotionRepository promotionRepository,
+        IFormRepository formRepository)
     {
         _dbContext = dbContext;
         _mediaRepository = mediaRepository;
@@ -35,6 +37,7 @@ public class ProductRepository : IProductRepository
         _config = config;
         _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
         _promotionRepository = promotionRepository;
+        _formRepository = formRepository;
     }
 
     public async Task<GenericResponse<ProductEntity?>> Create(ProductCreateUpdateDto dto, CancellationToken ct)
@@ -53,6 +56,12 @@ public class ProductRepository : IProductRepository
 
         EntityEntry<ProductEntity> i = await _dbContext.Set<ProductEntity>().AddAsync(e, ct);
         await _dbContext.SaveChangesAsync(ct);
+
+        if (dto.Form is not null)
+            await _formRepository.CreateForm(new FormCreateDto {
+                ProductId = i.Entity.Id,
+                Form = dto.Form.Form
+            });
 
         return new GenericResponse<ProductEntity?>(i.Entity);
     }

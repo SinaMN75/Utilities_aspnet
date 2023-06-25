@@ -158,6 +158,7 @@ public class ProductCreateUpdateDto {
 	public IEnumerable<Guid>? Categories { get; set; }
 	public IEnumerable<string>? Teams { get; set; }
 	public IEnumerable<UploadDto>? Upload { get; set; }
+	public FormCreateDto? Form { get; set; }
 }
 
 public class ProductFilterDto {

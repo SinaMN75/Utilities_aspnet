@@ -2,11 +2,11 @@ namespace Utilities_aspnet.Repositories;
 
 public interface IFormRepository {
 	GenericResponse<IQueryable<FormFieldEntity>> ReadFormFields(Guid categoryId);
-	Task<GenericResponse<IQueryable<FormFieldEntity>?>> CreateFormFields(FormFieldEntity dto);
-	Task<GenericResponse<IQueryable<FormEntity>>> UpdateForm(FormCreateDto model);
-	Task<GenericResponse<IQueryable<FormFieldEntity>?>> UpdateFormFields(FormFieldEntity dto);
+	Task<GenericResponse<IQueryable<FormFieldEntity>?>> CreateFormField(FormFieldEntity dto);
+	Task<GenericResponse<IQueryable<FormEntity>>> CreateForm(FormCreateDto model);
+	Task<GenericResponse<IQueryable<FormFieldEntity>?>> UpdateFormField(FormFieldEntity dto);
 	Task<GenericResponse> DeleteFormField(Guid id);
-	Task<GenericResponse> DeleteFormBuilder(Guid id);
+	Task<GenericResponse> DeleteForm(Guid id);
 }
 
 public class FormRepository : IFormRepository {
@@ -14,7 +14,7 @@ public class FormRepository : IFormRepository {
 
 	public FormRepository(DbContext dbContext) => _dbContext = dbContext;
 
-	public async Task<GenericResponse<IQueryable<FormEntity>>> UpdateForm(FormCreateDto model) {
+	public async Task<GenericResponse<IQueryable<FormEntity>>> CreateForm(FormCreateDto model) {
 		foreach (FormTitleDto item in model.Form!)
 			try {
 				FormEntity? up = await _dbContext.Set<FormEntity>()
@@ -44,7 +44,7 @@ public class FormRepository : IFormRepository {
 		return new GenericResponse<IQueryable<FormEntity>>(entity);
 	}
 
-	public async Task<GenericResponse<IQueryable<FormFieldEntity>?>> CreateFormFields(FormFieldEntity dto) {
+	public async Task<GenericResponse<IQueryable<FormFieldEntity>?>> CreateFormField(FormFieldEntity dto) {
 		Guid? categoryId = dto.CategoryId;
 		try {
 			await _dbContext.Set<FormFieldEntity>().AddAsync(dto);
@@ -56,7 +56,7 @@ public class FormRepository : IFormRepository {
 			: new GenericResponse<IQueryable<FormFieldEntity>?>(null);
 	}
 
-	public async Task<GenericResponse<IQueryable<FormFieldEntity>?>> UpdateFormFields(FormFieldEntity dto) {
+	public async Task<GenericResponse<IQueryable<FormFieldEntity>?>> UpdateFormField(FormFieldEntity dto) {
 		Guid? categoryId = dto.CategoryId;
 		FormFieldEntity? entity = await _dbContext.Set<FormFieldEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id);
 		if (entity == null) return new GenericResponse<IQueryable<FormFieldEntity>?>(null, UtilitiesStatusCodes.NotFound);
@@ -93,7 +93,7 @@ public class FormRepository : IFormRepository {
 		return new GenericResponse();
 	}
 
-	public async Task<GenericResponse> DeleteFormBuilder(Guid id) {
+	public async Task<GenericResponse> DeleteForm(Guid id) {
 		FormEntity? entity = await _dbContext.Set<FormEntity>()
 			.Include(x => x.Product)
 			.Include(x => x.User)
