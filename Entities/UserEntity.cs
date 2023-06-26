@@ -247,7 +247,8 @@ public class UserFilterDto {
 	public bool? ShowMedia { get; set; }
 	public bool? ShowCategories { get; set; }
 	public bool? ShowSuspend { get; set; }
-	public bool? OrderByUserName { get; set; }
+    public bool? ShowMyCustomers { get; set; }
+    public bool? OrderByUserName { get; set; }
 	public IEnumerable<string>? UserIds { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 }

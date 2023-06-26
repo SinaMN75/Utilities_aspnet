@@ -119,6 +119,27 @@ public class UserRepository : IUserRepository
         if (dto.ShowMedia.IsTrue()) q = q.Include(u => u.Media);
         if (dto.ShowCategories.IsTrue()) q = q.Include(u => u.Categories);
 
+        if (dto.ShowMyCustomers.IsTrue())
+        {
+            var orders = _dbContext.Set<OrderEntity>()
+                                             .Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p.Media)
+                                             .Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p.Categories)
+                                             .Include(i => i.OrderDetails)!.ThenInclude(p => p.Category)
+                                             .Include(i => i.Address)
+                                             .Include(i => i.User).ThenInclude(i => i.Media)
+                                             .Include(i => i.ProductOwner).ThenInclude(i => i.Media)
+                                             .AsNoTracking()
+                                             .Where(w => w.OrderDetails != null ? w.OrderDetails.Any(a => a.Product != null ? a.Product.UserId == _userId : true) : true);
+            if (orders != null && orders?.Count() > 0)
+            {
+                var customers = orders.Select(s => s.UserId).ToList();
+                List<UserEntity> tempQ = q.ToList();
+                tempQ.Where(w => customers.Any(a => a == w.Id));
+                q = null;
+                q = tempQ.AsQueryable();
+            }
+        }
+
         int totalCount = q.Count();
         q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 

@@ -12,7 +12,6 @@ public interface IOrderRepository
     Task<GenericResponse<OrderDetailEntity?>> UpdateOrderDetail(OrderDetailCreateUpdateDto dto);
     Task<GenericResponse> DeleteOrderDetail(Guid id);
     Task<GenericResponse<OrderEntity?>> CreateUpdateOrderDetail(OrderDetailCreateUpdateDto dto);
-    Task<GenericResponse<List<OrderHistoryEntity>>> OrderHistory();
 }
 
 public class OrderRepository : IOrderRepository
@@ -47,6 +46,7 @@ public class OrderRepository : IOrderRepository
             SendType = dto.SendType,
             AddressId = dto.AddressId,
             Status = dto.Status,
+            OrderType = dto.OrderType,
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now,
             ProductOwnerId = products.First().UserId
@@ -131,15 +131,11 @@ public class OrderRepository : IOrderRepository
         if (dto.StartDate.HasValue) q = q.Where(x => x.CreatedAt >= dto.StartDate);
         if (dto.EndDate.HasValue) q = q.Where(x => x.CreatedAt <= dto.EndDate);
 
-        if (dto.IsPhysical.HasValue)
+        if (dto.OrderType.HasValue)
         {
-            if (dto.IsPhysical.Value)
+            if (dto.OrderType.Value != OrderType.None)
             {
-                q = q.Where(w => w.OrderDetails.All(a => a.Category.Type == "Physical"));
-            }
-            else
-            {
-                q = q.Where(w => w.OrderDetails.All(a => a.Category.Type == "Digital"));
+                q = q.Where(w => w.OrderType == dto.OrderType.Value);
             }
         }
         int totalCount = q.Count();
@@ -166,17 +162,17 @@ public class OrderRepository : IOrderRepository
             .AsNoTracking()
             .FirstOrDefaultAsync(i => i.Id == id && i.DeletedAt == null);
 
-        if(i != null && i.Status == OrderStatuses.Pending && i.OrderDetails != null)
+        if (i != null && i.Status == OrderStatuses.Pending && i.OrderDetails != null)
         {
-            foreach(var item in i.OrderDetails)
+            foreach (var item in i.OrderDetails)
             {
-                if(item.Category != null)
+                if (item.Category != null)
                 {
                     item.Category.Price = item.Product?.Price ?? item.Price;
                     _dbContext.Update(item.Category);
                     await _dbContext.SaveChangesAsync();
                 }
-                
+
             }
         }
         return new GenericResponse<OrderEntity>(i);
@@ -213,8 +209,6 @@ public class OrderRepository : IOrderRepository
         o.OrderDetails.Append(orderDetailEntity.Entity);
 
         o.TotalPrice = o.OrderDetails.Where(o => o.DeletedAt == null).Sum(x => x.Price ?? 0);
-        Console.WriteLine("kkkkkk");
-        Console.WriteLine(o.TotalPrice);
         o.UpdatedAt = DateTime.Now;
         o.ProductOwnerId = q.First() ?? p.UserId;
         _dbContext.Set<OrderEntity>().Update(o);
@@ -267,7 +261,7 @@ public class OrderRepository : IOrderRepository
     {
         ProductEntity p = (await _dbContext.Set<ProductEntity>().AsNoTracking().FirstOrDefaultAsync(p => p.Id == dto.ProductId))!;
         CategoryEntity c = (await _dbContext.Set<CategoryEntity>().AsNoTracking().FirstOrDefaultAsync(p => p.Id == dto.CategoryId))!;
-        OrderEntity o = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails.Where(x => x.DeletedAt == null)).ThenInclude(x=>x.Category)
+        OrderEntity o = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Category)
             .FirstOrDefaultAsync(f => f.ProductOwnerId == p.UserId && f.UserId == _userId);
 
         if (o is null)
@@ -281,7 +275,8 @@ public class OrderRepository : IOrderRepository
                 Status = OrderStatuses.Pending,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
-                ProductOwnerId = p.UserId
+                ProductOwnerId = p.UserId,
+                OrderType = dto.OrderType
             });
 
             EntityEntry<OrderDetailEntity> oDetailEntity = await _dbContext.Set<OrderDetailEntity>().AddAsync(new OrderDetailEntity
@@ -299,7 +294,7 @@ public class OrderRepository : IOrderRepository
             return new GenericResponse<OrderEntity?>(orderEntity.Entity);
         }
 
-        if (o.OrderDetails?.Any(a => a.Category?.Type != c.Type) ?? false)
+        if (o.OrderDetails?.Any(a => a.Category?.Type != c.Type) ?? false || o.OrderType != dto.OrderType)
             return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.OrderCantHaveBothTypeOfOrderCategory);
 
         EntityEntry<OrderDetailEntity> orderDetailEntity = await _dbContext.Set<OrderDetailEntity>().AddAsync(new OrderDetailEntity
@@ -314,7 +309,6 @@ public class OrderRepository : IOrderRepository
         });
 
         o.OrderDetails.Append(orderDetailEntity.Entity);
-
         o.TotalPrice = o.OrderDetails.Where(o => o.DeletedAt == null).Sum(x => x.Price ?? 0);
         o.UpdatedAt = DateTime.Now;
         o.ProductOwnerId = p.UserId;
@@ -338,16 +332,5 @@ public class OrderRepository : IOrderRepository
         _dbContext.Update(orderDetail);
         await _dbContext.SaveChangesAsync();
         return new GenericResponse(UtilitiesStatusCodes.Success);
-    }
-
-    public async Task<GenericResponse<List<OrderHistoryEntity>>> OrderHistory()
-    {
-        IQueryable<OrderHistoryEntity> orderHistories = _dbContext.Set<OrderHistoryEntity>()
-                                                                  .Where(w => w.UserId == _userId)
-                                                                  .Include(x => x.Products)!
-                                                                  .ThenInclude(x => x.Media);
-
-        return new GenericResponse<List<OrderHistoryEntity>>(await orderHistories.ToListAsync());
-
     }
 }
