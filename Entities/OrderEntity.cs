@@ -2,7 +2,8 @@
 
 [Table("Order")]
 public class OrderEntity : BaseEntity {
-	public string? Description { get; set; }
+	public OrderType OrderType { get; set; } = OrderType.None;
+    public string? Description { get; set; }
 	public string? DiscountCode { get; set; }
 	public string? ProductUseCase { get; set; }
 	public string? PayNumber { get; set; }
@@ -15,8 +16,8 @@ public class OrderEntity : BaseEntity {
 	public PayType? PayType { get; set; }
 	public DateTime? PayDateTime { get; set; }
 	public DateTime? ReceivedDate { get; set; }
-
-	public AddressEntity? Address { get; set; }
+    public DateTime? DeliverDate { get; set; }
+    public AddressEntity? Address { get; set; }
 	public Guid? AddressId { get; set; }
 
 	public UserEntity? User { get; set; }
@@ -47,18 +48,8 @@ public class OrderDetailEntity : BaseEntity {
 	public CategoryEntity? Category { get; set; }
 	public Guid? CategoryId { get; set; }
     public int? Vote { get; set; }
+    public double? FinalPrice { get; set; }
 }
-
-[Table("OrderHistory")]
-public class OrderHistoryEntity : BaseEntity
-{
-    public double? Price { get; set; }
-    public DateTime? DeliverDate { get; set; }
-    public UserEntity? User { get; set; }
-    public string? UserId { get; set; }
-    public IEnumerable<ProductEntity>? Products { get; set; }	
-}
-
 
 public class OrderCreateUpdateDto {
 	public Guid? Id { get; set; }
@@ -69,14 +60,16 @@ public class OrderCreateUpdateDto {
 	public OrderStatuses? Status { get; set; } = OrderStatuses.Pending;
 	public PayType? PayType { get; set; } = Utilities.PayType.Online;
 	public SendType? SendType { get; set; } = Utilities.SendType.Custom;
-	public IEnumerable<OrderDetailCreateUpdateDto>? OrderDetails { get; set; }
+	public OrderType OrderType { get; set; } = OrderType.None;
+    public IEnumerable<OrderDetailCreateUpdateDto>? OrderDetails { get; set; }
 }
 
 public class OrderDetailCreateUpdateDto {
 	public Guid? OrderId { get; set; }
 	public Guid? OrderDetailId { get; set; }
 	public Guid? ProductId { get; set; }
-	public int? Count { get; set; }
+	public OrderType OrderType { get; set; } = OrderType.None;
+    public int? Count { get; set; }
 	public Guid? CategoryId { get; set; }
 }
 
@@ -86,12 +79,12 @@ public class OrderFilterDto {
 	public OrderStatuses? Status { get; set; }
 	public SendType? SendType { get; set; }
 	public PayType? PayType { get; set; }
-	public string? PayNumber { get; set; }
+    public OrderType? OrderType { get; set; }
+    public string? PayNumber { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
 	public string? UserId { get; set; }
 	public string? ProductOwnerId { get; set; }
-    public bool? IsPhysical { get; set; }
     public int PageSize { get; set; } = 100;
 	public int PageNumber { get; set; } = 1;
 }

@@ -135,7 +135,8 @@ public class PaymentRepository : IPaymentRepository
         }
         order.Status = OrderStatuses.Paid;
 
-        if (order.OrderDetails is not null)
+        if (order.OrderDetails != null)
+        {
             foreach (OrderDetailEntity? item in order.OrderDetails)
             {
                 ProductEntity? prdct = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == item.ProductId);
@@ -147,7 +148,11 @@ public class PaymentRepository : IPaymentRepository
                     //       fek konamm bayad az ye transaction estefade konim
                     _dbContext.Update(prdct);
                 }
+
+                item.FinalPrice = item.Category != null ? item.Category.Price : item.Price;
+                _dbContext.Update(item);
             }
+        }
 
         if (order.AddressId is not null)
         {
@@ -164,23 +169,7 @@ public class PaymentRepository : IPaymentRepository
             }
         }
 
-        foreach (var item in order.OrderDetails)
-        {
-            if (item.Category != null)
-            {
-                var orderHistory = new OrderHistoryEntity
-                {
-                    Price = item.Category.Price,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
-                    Products = new List<ProductEntity>() { item.Product },
-                    DeliverDate = order.ReceivedDate,
-                    UserId = order.UserId
-                };
-                _dbContext.Set<OrderHistoryEntity>().Add(orderHistory);
-            }
-        }
-
+        _dbContext.Update(order);
         await _dbContext.SaveChangesAsync();
         return new GenericResponse();
     }

@@ -59,7 +59,7 @@ public enum OrderStatuses {
 	InProcess = 106,
 	Shipping = 107, //not used yet
 	Refund = 108, //not used yet
-	RefundComplete = 109, //not used yet
+	RefundComplete = 109, //not used yet	
 	Complete = 110,
 	PaidFail = 112
 }
@@ -149,11 +149,19 @@ public enum Priority {
 	Low = 103
 }
 
-public enum OrderType {
-	Sale = 100,
-	Purchase = 101,
-	All = 102
+//public enum OrderType {
+//	Sale = 100,
+//	Purchase = 101,
+//	All = 102
+//}
+
+public enum OrderType
+{
+	None = 100,
+	Physical = 101,
+	Digital = 102
 }
+
 
 public enum Reaction {
 	None = 100,
