@@ -77,6 +77,15 @@ public class ProductJsonDetail {
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
 	public List<KeyValue>? KeyValues { get; set; }
+	public List<ProductAttribute>? Attributes { get; set; }
+}
+
+public class ProductAttribute {
+	public string? Title { get; set; }
+	public double? Price { get; set; }
+	public double? DiscountedPrice { get; set; }
+	public string? Color { get; set; }
+	public int Stock { get; set; }
 }
 
 [Table("ProductsInsight")]
@@ -151,6 +160,7 @@ public class ProductCreateUpdateDto {
 	public DateTime? Boosted { get; set; }
 	public Guid? ParentId { get; set; }
 	public List<KeyValue>? KeyValues { get; set; }
+	public List<ProductAttribute>? Attributes { get; set; }
 
 	[JsonIgnore]
 	[System.Text.Json.Serialization.JsonIgnore]

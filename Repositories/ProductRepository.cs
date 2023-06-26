@@ -350,7 +350,8 @@ public static class ProductEntityExtension
             KeyValue = dto.KeyValue ?? entity.JsonDetail.KeyValue,
             Type1 = dto.Type1 ?? entity.JsonDetail.Type1,
             Type2 = dto.Type2 ?? entity.JsonDetail.Type2,
-            KeyValues = dto.KeyValues ?? entity.JsonDetail.KeyValues
+            KeyValues = dto.KeyValues ?? entity.JsonDetail.KeyValues,
+            Attributes = dto.Attributes ?? entity.JsonDetail.Attributes
         };
 
         if (dto.ScorePlus.HasValue)
