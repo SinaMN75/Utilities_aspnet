@@ -40,9 +40,6 @@ public class ProductEntity : BaseEntity {
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
 	public IEnumerable<ProductInsight>? ProductInsights { get; set; }
 	public IEnumerable<VisitProducts>? VisitProducts { get; set; }
-    public IEnumerable<OrderHistoryEntity>? OrderHistories { get; set; }
-
-
     [NotMapped]
 	public string? SuccessfulPurchase { get; set; }
 }
