@@ -138,7 +138,7 @@ public class OrderRepository : IOrderRepository
         }
         int totalCount = q.Count();
 
-        q = q.AsNoTracking().Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
+        //q = q.AsNoTracking().Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
         return new GenericResponse<IQueryable<OrderEntity>>(q.AsSingleQuery())
         {
