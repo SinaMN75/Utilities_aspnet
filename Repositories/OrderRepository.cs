@@ -218,14 +218,14 @@ public class OrderRepository : IOrderRepository
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
                 ProductOwnerId = p.UserId,
-                OrderType = dto.OrderType
+                OrderType = dto.OrderType,                
             });
 
             EntityEntry<OrderDetailEntity> oDetailEntity = await _dbContext.Set<OrderDetailEntity>().AddAsync(new OrderDetailEntity
             {
                 ProductId = dto.ProductId,
                 Count = dto.Count,
-                OrderId = dto.OrderId,
+                OrderId = orderEntity.Entity.Id,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
                 CategoryId = dto.CategoryId,
