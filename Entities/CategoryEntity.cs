@@ -5,11 +5,8 @@ public class CategoryEntity : BaseEntity {
 	public string? Title { get; set; }
 	public string? TitleTr1 { get; set; }
 	public string? TitleTr2 { get; set; }
-	public string? Color { get; set; }
 	public string? UseCase { get; set; }
 	public string? Type { get; set; }
-	public int? Price { get; set; }
-	public int? Stock { get; set; }
 	public int? Order { get; set; }
 	public CategoryJsonDetail JsonDetail { get; set; } = new();
 
@@ -46,6 +43,9 @@ public class CategoryJsonDetail {
 	public double? Value { get; set; }
 	public int? DiscountedPrice { get; set; }
 	public int? SendPrice { get; set; }
+	public int? Price { get; set; }
+	public int? Stock { get; set; }
+	public string? Color { get; set; }
 	public DateTime? Date1 { get; set; }
 	public DateTime? Date2 { get; set; }
 }
