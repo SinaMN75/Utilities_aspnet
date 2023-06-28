@@ -113,6 +113,7 @@ public class ProductRepository : IProductRepository
         if (dto.Categories.IsNotNullOrEmpty()) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
         if (dto.UserIds.IsNotNullOrEmpty()) q = q.Where(x => dto.UserIds!.Contains(x.UserId));
 
+        if (dto.ShowAttribute.IsTrue()) q = q.Include(i => i.Attributes);
         if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories);
         if (dto.ShowCategoriesFormFields.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.FormFields);
         if (dto.ShowCategoryMedia.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.Media);

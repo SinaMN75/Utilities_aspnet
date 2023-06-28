@@ -197,6 +197,7 @@ public class ProductFilterDto {
 	public bool? ShowVisitProducts { get; set; } = false;
 	public bool? ShowCreator { get; set; } = false;
 	public bool? ShowCategoryMedia { get; set; } = false;
+	public bool? ShowAttribute { get; set; } = false;
 	public bool? OrderByVotes { get; set; } = false;
 	public bool? OrderByVotesDescending { get; set; } = false;
 	public bool? OrderByAtoZ { get; set; } = false;
