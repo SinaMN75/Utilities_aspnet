@@ -138,7 +138,7 @@ public class OrderRepository : IOrderRepository
         }
         int totalCount = q.Count();
 
-        q = q.AsNoTracking().Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
+        //q = q.AsNoTracking().Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
         return new GenericResponse<IQueryable<OrderEntity>>(q.AsSingleQuery())
         {
@@ -205,14 +205,14 @@ public class OrderRepository : IOrderRepository
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
                 ProductOwnerId = p.UserId,
-                OrderType = dto.OrderType
+                OrderType = dto.OrderType,                
             });
 
             EntityEntry<OrderDetailEntity> oDetailEntity = await _dbContext.Set<OrderDetailEntity>().AddAsync(new OrderDetailEntity
             {
                 ProductId = dto.ProductId,
                 Count = dto.Count,
-                OrderId = dto.OrderId,
+                OrderId = orderEntity.Entity.Id,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
                 ProductAttributeId = dto.ProductAttributeId,
