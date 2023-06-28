@@ -16,7 +16,6 @@ public class ProductEntity : BaseEntity {
 	public double? VoteCount { get; set; }
 	public int? DiscountPercent { get; set; }
 	public int? CommentsCount { get; set; }
-	public bool? Enabled { get; set; }
 	public double? DiscountPrice { get; set; }
 	public double? Price { get; set; }
 	public Currency? Currency { get; set; }
@@ -30,6 +29,9 @@ public class ProductEntity : BaseEntity {
 
 	public ProductEntity? Parent { get; set; }
 	public Guid? ParentId { get; set; }
+	
+	[InverseProperty("Parent")]
+	public IEnumerable<ProductEntity>? Children { get; set; }
 
 	public string? UserId { get; set; }
 	public UserEntity? User { get; set; }
@@ -170,7 +172,6 @@ public class ProductFilterDto {
 	public string? Tags { get; set; }
 	public double? StartPriceRange { get; set; }
 	public double? EndPriceRange { get; set; }
-	public bool? Enabled { get; set; }
 	public bool? IsFollowing { get; set; }
 	public bool? IsBookmarked { get; set; }
 	public bool? HasDiscount { get; set; }
@@ -182,7 +183,7 @@ public class ProductFilterDto {
 	public bool? ShowVisitProducts { get; set; } = false;
 	public bool? ShowCreator { get; set; } = false;
 	public bool? ShowCategoryMedia { get; set; } = false;
-	public bool? ShowAttribute { get; set; } = false;
+	public bool? ShowChildren { get; set; } = false;
 	public bool? OrderByVotes { get; set; } = false;
 	public bool? OrderByVotesDescending { get; set; } = false;
 	public bool? OrderByAtoZ { get; set; } = false;

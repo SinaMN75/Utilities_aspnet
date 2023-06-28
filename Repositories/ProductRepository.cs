@@ -21,7 +21,6 @@ public class ProductRepository : IProductRepository
     private readonly string? _userId;
     private readonly IUserRepository _userRepository;
     private readonly IFormRepository _formRepository;
-    private readonly ICategoryRepository _categoryRepository;
 
     public ProductRepository(
         DbContext dbContext,
@@ -30,7 +29,6 @@ public class ProductRepository : IProductRepository
         IUserRepository userRepository,
         IConfiguration config,
         IPromotionRepository promotionRepository,
-        ICategoryRepository categoryRepository,
         IFormRepository formRepository)
     {
         _dbContext = dbContext;
@@ -40,7 +38,6 @@ public class ProductRepository : IProductRepository
         _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
         _promotionRepository = promotionRepository;
         _formRepository = formRepository;
-        _categoryRepository = categoryRepository;
     }
 
     public async Task<GenericResponse<ProductEntity?>> Create(ProductCreateUpdateDto dto, CancellationToken ct)
@@ -92,7 +89,7 @@ public class ProductRepository : IProductRepository
     public async Task<GenericResponse<IQueryable<ProductEntity>>> Filter(ProductFilterDto dto)
     {
         IQueryable<ProductEntity> q = _dbContext.Set<ProductEntity>().AsNoTracking().Where(x => x.DeletedAt == null);
-        if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.Now);
+        if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.Now && w.ParentId == null);
 
         if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
         if (dto.Subtitle.IsNotNullOrEmpty()) q = q.Where(x => (x.Subtitle ?? "").Contains(dto.Subtitle!));
@@ -105,7 +102,6 @@ public class ProductRepository : IProductRepository
         if (dto.Currency.HasValue) q = q.Where(x => x.Currency == dto.Currency);
         if (dto.HasDiscount.IsTrue()) q = q.Where(x => x.DiscountPercent != null || x.DiscountPrice != null);
         if (dto.EndPriceRange.HasValue) q = q.Where(x => x.Price <= dto.EndPriceRange);
-        if (dto.Enabled.HasValue) q = q.Where(x => x.Enabled == dto.Enabled);
         if (dto.Status.HasValue) q = q.Where(x => x.Status == dto.Status);
         if (dto.Query.IsNotNullOrEmpty())
             q = q.Where(x => (x.Title ?? "").Contains(dto.Query!) || (x.Subtitle ?? "").Contains(dto.Query!) || (x.Description ?? "").Contains(dto.Query!));
@@ -113,6 +109,7 @@ public class ProductRepository : IProductRepository
         if (dto.Categories.IsNotNullOrEmpty()) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
         if (dto.UserIds.IsNotNullOrEmpty()) q = q.Where(x => dto.UserIds!.Contains(x.UserId));
 
+        if (dto.ShowChildren.IsTrue()) q = q.Include(i => i.Children);
         if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories);
         if (dto.ShowCategoriesFormFields.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.FormFields);
         if (dto.ShowCategoryMedia.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.Media);
@@ -172,6 +169,7 @@ public class ProductRepository : IProductRepository
     {
         ProductEntity? i = await _dbContext.Set<ProductEntity>()
             .Include(i => i.Media)
+            .Include(i => i.Children)
             .Include(i => i.Categories)!.ThenInclude(x => x.Media)
             .Include(i => i.User).ThenInclude(x => x!.Media)
             .Include(i => i.User).ThenInclude(x => x!.Categories)
@@ -310,7 +308,6 @@ public static class ProductEntityExtension
         entity.Description = dto.Description ?? entity.Description;
         entity.UseCase = dto.UseCase ?? entity.UseCase;
         entity.Price = dto.Price ?? entity.Price;
-        entity.Enabled = dto.Enabled ?? entity.Enabled;
         entity.Stock = dto.Stock ?? entity.Stock;
         entity.Status = dto.Status ?? entity.Status;
         entity.CommentsCount = dto.CommentsCount ?? entity.CommentsCount;
