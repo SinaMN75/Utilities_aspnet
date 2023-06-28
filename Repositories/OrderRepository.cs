@@ -2,7 +2,6 @@ namespace Utilities_aspnet.Repositories;
 
 public interface IOrderRepository
 {
-    Task<GenericResponse<OrderEntity?>> Create(OrderCreateUpdateDto dto);
     GenericResponse<IQueryable<OrderEntity>> Filter(OrderFilterDto dto);
     Task<GenericResponse> Vote(OrderVoteDto dto);
     Task<GenericResponse<OrderEntity>> ReadById(Guid id);
@@ -22,62 +21,7 @@ public class OrderRepository : IOrderRepository
         _dbContext = dbContext;
         _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
     }
-
-    public async Task<GenericResponse<OrderEntity?>> Create(OrderCreateUpdateDto dto)
-    {
-        double totalPrice = 0;
-
-        List<ProductEntity> products = new();
-        foreach (OrderDetailCreateUpdateDto item in dto.OrderDetails!)
-            products.Add((await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == item.ProductId))!);
-
-        IEnumerable<string?> q = products.GroupBy(x => x.UserId).Select(z => z.Key);
-        if (q.Count() > 1) return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.MultipleSeller);
-
-        OrderEntity entityOrder = new()
-        {
-            Description = dto.Description,
-            ReceivedDate = dto.ReceivedDate,
-            UserId = _userId,
-            DiscountCode = dto.DiscountCode,
-            PayType = dto.PayType,
-            SendType = dto.SendType,
-            AddressId = dto.AddressId,
-            Status = dto.Status,
-            OrderType = dto.OrderType,
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now,
-            ProductOwnerId = products.First().UserId
-        };
-
-        await _dbContext.Set<OrderEntity>().AddAsync(entityOrder);
-        await _dbContext.SaveChangesAsync();
-
-        foreach (OrderDetailCreateUpdateDto item in dto.OrderDetails)
-        {
-            ProductEntity? product = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == item.ProductId);
-            if (product != null && product.Stock < item.Count) return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.OutOfStock);
-
-            OrderDetailEntity orderDetailEntity = new()
-            {
-                OrderId = entityOrder.Id,
-                ProductId = item.ProductId,
-                Price = product?.Price * item.Count,
-                Count = item.Count,
-                UnitPrice = product?.Price
-            };
-
-            await _dbContext.Set<OrderDetailEntity>().AddAsync(orderDetailEntity);
-            await _dbContext.SaveChangesAsync();
-
-            totalPrice += Convert.ToDouble((product?.Price ?? 0) * item.Count);
-        }
-        entityOrder.TotalPrice = totalPrice;
-        _dbContext.Set<OrderEntity>().Update(entityOrder);
-        await _dbContext.SaveChangesAsync();
-        return new GenericResponse<OrderEntity?>(entityOrder);
-    }
-
+    
     public async Task<GenericResponse<OrderEntity?>> Update(OrderCreateUpdateDto dto)
     {
         OrderEntity? oldOrder = await _dbContext.Set<OrderEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id);
@@ -100,14 +44,15 @@ public class OrderRepository : IOrderRepository
     {
         IQueryable<OrderEntity> q = _dbContext.Set<OrderEntity>()
             .Include(x => x.Address)
-            .Include(x => x.OrderDetails.Where(y => y.DeletedAt == null)).ThenInclude(x => x.Product)
+            .Include(x => x.OrderDetails.Where(y => y.DeletedAt == null))
             .Include(x => x.Address);
 
         if (dto.ShowProducts.IsTrue())
         {
+            q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(x => x.Parent).ThenInclude(x => x.Media);
+            q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(x => x.Parent).ThenInclude(x => x.Categories);
+            q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(x => x.Parent).ThenInclude(x => x.User);
             q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(x => x.Media);
-            q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(i => i.Categories);
-            q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(i => i.User);
             q = q.Include(x => x.User).ThenInclude(x => x.Media);
         }
         if (dto.Id.HasValue) q = q.Where(x => x.Id == dto.Id);
@@ -156,7 +101,7 @@ public class OrderRepository : IOrderRepository
             .Include(i => i.User).ThenInclude(i => i.Media)
             .Include(i => i.ProductOwner).ThenInclude(i => i.Media)
             .AsNoTracking()
-            .FirstOrDefaultAsync(i => i.Id == id && i.DeletedAt == null);
+            .FirstOrDefaultAsync(i => i.Id == id);
         
         return new GenericResponse<OrderEntity>(i);
     }

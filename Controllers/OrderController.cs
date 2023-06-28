@@ -9,9 +9,6 @@ public class OrderController : BaseApiController {
 
 	public OrderController(IOrderRepository repository) => _repository = repository;
 
-	[HttpPost]
-	public async Task<ActionResult<GenericResponse<OrderEntity?>>> Create(OrderCreateUpdateDto dto) => Result(await _repository.Create(dto));
-
 	[HttpPut]
 	public async Task<ActionResult<GenericResponse<OrderEntity?>>> Update(OrderCreateUpdateDto dto) => Result(await _repository.Update(dto));
 
