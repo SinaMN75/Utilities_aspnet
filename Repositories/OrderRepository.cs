@@ -55,23 +55,22 @@ public class OrderRepository : IOrderRepository
 
         foreach (OrderDetailCreateUpdateDto item in dto.OrderDetails)
         {
-            ProductAttributeEntity? ProductAttributeEntity = await _dbContext.Set<ProductAttributeEntity>().FirstOrDefaultAsync(x => x.Id == item.ProductAttributeId);
-            if (ProductAttributeEntity != null && ProductAttributeEntity.Stock < item.Count) return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.OutOfStock);
+            ProductEntity? product = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == item.ProductId);
+            if (product != null && product.Stock < item.Count) return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.OutOfStock);
 
             OrderDetailEntity orderDetailEntity = new()
             {
                 OrderId = entityOrder.Id,
                 ProductId = item.ProductId,
-                Price = ProductAttributeEntity?.Price * item.Count,
+                Price = product?.Price * item.Count,
                 Count = item.Count,
-                ProductAttributeId = item.ProductAttributeId,
-                UnitPrice = ProductAttributeEntity?.Price
+                UnitPrice = product?.Price
             };
 
             await _dbContext.Set<OrderDetailEntity>().AddAsync(orderDetailEntity);
             await _dbContext.SaveChangesAsync();
 
-            totalPrice += Convert.ToDouble((ProductAttributeEntity?.Price ?? 0) * item.Count);
+            totalPrice += Convert.ToDouble((product?.Price ?? 0) * item.Count);
         }
         entityOrder.TotalPrice = totalPrice;
         _dbContext.Set<OrderEntity>().Update(entityOrder);
@@ -101,7 +100,7 @@ public class OrderRepository : IOrderRepository
     {
         IQueryable<OrderEntity> q = _dbContext.Set<OrderEntity>()
             .Include(x => x.Address)
-            .Include(x => x.OrderDetails.Where(y => y.DeletedAt == null)).ThenInclude(x => x.ProductAttribute)
+            .Include(x => x.OrderDetails.Where(y => y.DeletedAt == null)).ThenInclude(x => x.Product)
             .Include(x => x.Address);
 
         if (dto.ShowProducts.IsTrue())
@@ -153,7 +152,6 @@ public class OrderRepository : IOrderRepository
         OrderEntity? i = await _dbContext.Set<OrderEntity>()
             .Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p.Media)
             .Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p.Categories)
-            .Include(i => i.OrderDetails)!.ThenInclude(p => p.ProductAttribute)
             .Include(i => i.Address)
             .Include(i => i.User).ThenInclude(i => i.Media)
             .Include(i => i.ProductOwner).ThenInclude(i => i.Media)
@@ -189,8 +187,8 @@ public class OrderRepository : IOrderRepository
     public async Task<GenericResponse<OrderEntity?>> CreateUpdateOrderDetail(OrderDetailCreateUpdateDto dto)
     {
         ProductEntity p = (await _dbContext.Set<ProductEntity>().AsNoTracking().FirstOrDefaultAsync(p => p.Id == dto.ProductId))!;
-        ProductAttributeEntity c = (await _dbContext.Set<ProductAttributeEntity>().AsNoTracking().FirstOrDefaultAsync(p => p.Id == dto.ProductAttributeId))!;
-        OrderEntity o = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails.Where(x => x.DeletedAt == null)).ThenInclude(x => x.ProductAttribute)
+        ProductEntity c = (await _dbContext.Set<ProductEntity>().AsNoTracking().FirstOrDefaultAsync(p => p.Id == dto.ProductId))!;
+        OrderEntity o = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Product)
             .FirstOrDefaultAsync(f => f.ProductOwnerId == p.UserId && f.UserId == _userId);
 
         if (o is null)
@@ -215,7 +213,6 @@ public class OrderRepository : IOrderRepository
                 OrderId = orderEntity.Entity.Id,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
-                ProductAttributeId = dto.ProductAttributeId,
                 Price = c.Price * dto.Count
             });
 
@@ -230,7 +227,6 @@ public class OrderRepository : IOrderRepository
             OrderId = dto.OrderId,
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now,
-            ProductAttributeId = dto.ProductAttributeId,
             Price = c.Price * dto.Count
         });
 

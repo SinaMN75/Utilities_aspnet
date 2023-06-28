@@ -3,7 +3,7 @@
 [Table("Order")]
 public class OrderEntity : BaseEntity {
 	public OrderType OrderType { get; set; } = OrderType.None;
-    public string? Description { get; set; }
+	public string? Description { get; set; }
 	public string? DiscountCode { get; set; }
 	public string? ProductUseCase { get; set; }
 	public string? PayNumber { get; set; }
@@ -16,8 +16,8 @@ public class OrderEntity : BaseEntity {
 	public PayType? PayType { get; set; }
 	public DateTime? PayDateTime { get; set; }
 	public DateTime? ReceivedDate { get; set; }
-    public DateTime? DeliverDate { get; set; }
-    public AddressEntity? Address { get; set; }
+	public DateTime? DeliverDate { get; set; }
+	public AddressEntity? Address { get; set; }
 	public Guid? AddressId { get; set; }
 
 	public UserEntity? User { get; set; }
@@ -45,11 +45,8 @@ public class OrderDetailEntity : BaseEntity {
 	public ProductEntity? Product { get; set; }
 	public Guid? ProductId { get; set; }
 
-	public ProductAttributeEntity? ProductAttribute { get; set; }
-	public Guid? ProductAttributeId { get; set; }
-	
-    public int? Vote { get; set; }
-    public double? FinalPrice { get; set; }
+	public int? Vote { get; set; }
+	public double? FinalPrice { get; set; }
 }
 
 public class OrderCreateUpdateDto {
@@ -62,15 +59,14 @@ public class OrderCreateUpdateDto {
 	public PayType? PayType { get; set; } = Utilities.PayType.Online;
 	public SendType? SendType { get; set; } = Utilities.SendType.Custom;
 	public OrderType OrderType { get; set; } = OrderType.None;
-    public IEnumerable<OrderDetailCreateUpdateDto>? OrderDetails { get; set; }
+	public IEnumerable<OrderDetailCreateUpdateDto>? OrderDetails { get; set; }
 }
 
 public class OrderDetailCreateUpdateDto {
 	public Guid? OrderId { get; set; }
 	public Guid? ProductId { get; set; }
 	public OrderType OrderType { get; set; } = OrderType.None;
-    public int? Count { get; set; }
-	public Guid? ProductAttributeId { get; set; }
+	public int? Count { get; set; }
 }
 
 public class OrderFilterDto {
@@ -79,18 +75,17 @@ public class OrderFilterDto {
 	public OrderStatuses? Status { get; set; }
 	public SendType? SendType { get; set; }
 	public PayType? PayType { get; set; }
-    public OrderType? OrderType { get; set; }
-    public string? PayNumber { get; set; }
+	public OrderType? OrderType { get; set; }
+	public string? PayNumber { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
 	public string? UserId { get; set; }
 	public string? ProductOwnerId { get; set; }
-    public int PageSize { get; set; } = 100;
+	public int PageSize { get; set; } = 100;
 	public int PageNumber { get; set; } = 1;
 }
 
-public class OrderVoteDto
-{
+public class OrderVoteDto {
 	public Guid? Id { get; set; }
-    public int Vote { get; set; }
+	public int Vote { get; set; }
 }

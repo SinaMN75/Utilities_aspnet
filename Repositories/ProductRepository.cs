@@ -113,7 +113,6 @@ public class ProductRepository : IProductRepository
         if (dto.Categories.IsNotNullOrEmpty()) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
         if (dto.UserIds.IsNotNullOrEmpty()) q = q.Where(x => dto.UserIds!.Contains(x.UserId));
 
-        if (dto.ShowAttribute.IsTrue()) q = q.Include(i => i.Attributes);
         if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories);
         if (dto.ShowCategoriesFormFields.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.FormFields);
         if (dto.ShowCategoryMedia.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.Media);
@@ -375,21 +374,6 @@ public static class ProductEntityExtension
                 if (e != null) listCategory.Add(e);
             }
             entity.Categories = listCategory;
-        }
-
-        if (dto.Attributes.IsNotNull())
-        {
-            List<ProductAttributeEntity> list = new();
-            foreach (ProductAttributeEntity item in dto.Attributes!)
-            {
-                ProductAttributeEntity? e = await context.Set<ProductAttributeEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == item.Id);
-                if (e != null) list.Add(e);
-                else {
-                    EntityEntry<ProductAttributeEntity> newE = await context.Set<ProductAttributeEntity>().AddAsync(item);
-                    list.Add(newE.Entity);
-                }
-            }
-            entity.Attributes = list;
         }
 
         if (dto.Teams.IsNotNull())
