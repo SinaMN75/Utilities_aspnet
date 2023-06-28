@@ -55,23 +55,23 @@ public class OrderRepository : IOrderRepository
 
         foreach (OrderDetailCreateUpdateDto item in dto.OrderDetails)
         {
-            CategoryEntity? categoryEntity = await _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item.CategoryId);
-            if (categoryEntity != null && categoryEntity.Stock < item.Count) return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.OutOfStock);
+            ProductAttributeEntity? ProductAttributeEntity = await _dbContext.Set<ProductAttributeEntity>().FirstOrDefaultAsync(x => x.Id == item.ProductAttributeId);
+            if (ProductAttributeEntity != null && ProductAttributeEntity.Stock < item.Count) return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.OutOfStock);
 
             OrderDetailEntity orderDetailEntity = new()
             {
                 OrderId = entityOrder.Id,
                 ProductId = item.ProductId,
-                Price = categoryEntity?.Price * item.Count,
+                Price = ProductAttributeEntity?.Price * item.Count,
                 Count = item.Count,
-                CategoryId = item.CategoryId,
-                UnitPrice = categoryEntity?.Price
+                ProductAttributeId = item.ProductAttributeId,
+                UnitPrice = ProductAttributeEntity?.Price
             };
 
             await _dbContext.Set<OrderDetailEntity>().AddAsync(orderDetailEntity);
             await _dbContext.SaveChangesAsync();
 
-            totalPrice += Convert.ToDouble((categoryEntity?.Price ?? 0) * item.Count);
+            totalPrice += Convert.ToDouble((ProductAttributeEntity?.Price ?? 0) * item.Count);
         }
         entityOrder.TotalPrice = totalPrice;
         _dbContext.Set<OrderEntity>().Update(entityOrder);
@@ -101,7 +101,7 @@ public class OrderRepository : IOrderRepository
     {
         IQueryable<OrderEntity> q = _dbContext.Set<OrderEntity>()
             .Include(x => x.Address)
-            .Include(x => x.OrderDetails.Where(y => y.DeletedAt == null)).ThenInclude(x => x.Category)
+            .Include(x => x.OrderDetails.Where(y => y.DeletedAt == null)).ThenInclude(x => x.ProductAttribute)
             .Include(x => x.Address);
 
         if (dto.ShowProducts.IsTrue())
@@ -153,26 +153,13 @@ public class OrderRepository : IOrderRepository
         OrderEntity? i = await _dbContext.Set<OrderEntity>()
             .Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p.Media)
             .Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p.Categories)
-            .Include(i => i.OrderDetails)!.ThenInclude(p => p.Category)
+            .Include(i => i.OrderDetails)!.ThenInclude(p => p.ProductAttribute)
             .Include(i => i.Address)
             .Include(i => i.User).ThenInclude(i => i.Media)
             .Include(i => i.ProductOwner).ThenInclude(i => i.Media)
             .AsNoTracking()
             .FirstOrDefaultAsync(i => i.Id == id && i.DeletedAt == null);
-
-        if (i != null && i.Status == OrderStatuses.Pending && i.OrderDetails != null)
-        {
-            foreach (var item in i.OrderDetails)
-            {
-                if (item.Category != null)
-                {
-                    item.Category.Price = item.Product?.Price ?? item.Price;
-                    _dbContext.Update(item.Category);
-                    await _dbContext.SaveChangesAsync();
-                }
-
-            }
-        }
+        
         return new GenericResponse<OrderEntity>(i);
     }
 
@@ -202,8 +189,8 @@ public class OrderRepository : IOrderRepository
     public async Task<GenericResponse<OrderEntity?>> CreateUpdateOrderDetail(OrderDetailCreateUpdateDto dto)
     {
         ProductEntity p = (await _dbContext.Set<ProductEntity>().AsNoTracking().FirstOrDefaultAsync(p => p.Id == dto.ProductId))!;
-        CategoryEntity c = (await _dbContext.Set<CategoryEntity>().AsNoTracking().FirstOrDefaultAsync(p => p.Id == dto.CategoryId))!;
-        OrderEntity o = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Category)
+        ProductAttributeEntity c = (await _dbContext.Set<ProductAttributeEntity>().AsNoTracking().FirstOrDefaultAsync(p => p.Id == dto.ProductAttributeId))!;
+        OrderEntity o = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails.Where(x => x.DeletedAt == null)).ThenInclude(x => x.ProductAttribute)
             .FirstOrDefaultAsync(f => f.ProductOwnerId == p.UserId && f.UserId == _userId);
 
         if (o is null)
@@ -228,16 +215,13 @@ public class OrderRepository : IOrderRepository
                 OrderId = dto.OrderId,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
-                CategoryId = dto.CategoryId,
+                ProductAttributeId = dto.ProductAttributeId,
                 Price = c.Price * dto.Count
             });
 
             await _dbContext.SaveChangesAsync();
             return new GenericResponse<OrderEntity?>(orderEntity.Entity);
         }
-
-        if (o.OrderDetails?.Any(a => a.Category?.Type != c.Type) ?? false || o.OrderType != dto.OrderType)
-            return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.OrderCantHaveBothTypeOfOrderCategory);
 
         EntityEntry<OrderDetailEntity> orderDetailEntity = await _dbContext.Set<OrderDetailEntity>().AddAsync(new OrderDetailEntity
         {
@@ -246,7 +230,7 @@ public class OrderRepository : IOrderRepository
             OrderId = dto.OrderId,
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now,
-            CategoryId = dto.CategoryId,
+            ProductAttributeId = dto.ProductAttributeId,
             Price = c.Price * dto.Count
         });
 

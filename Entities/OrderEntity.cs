@@ -45,8 +45,9 @@ public class OrderDetailEntity : BaseEntity {
 	public ProductEntity? Product { get; set; }
 	public Guid? ProductId { get; set; }
 
-	public CategoryEntity? Category { get; set; }
-	public Guid? CategoryId { get; set; }
+	public ProductAttributeEntity? ProductAttribute { get; set; }
+	public Guid? ProductAttributeId { get; set; }
+	
     public int? Vote { get; set; }
     public double? FinalPrice { get; set; }
 }
@@ -66,11 +67,10 @@ public class OrderCreateUpdateDto {
 
 public class OrderDetailCreateUpdateDto {
 	public Guid? OrderId { get; set; }
-	public Guid? OrderDetailId { get; set; }
 	public Guid? ProductId { get; set; }
 	public OrderType OrderType { get; set; } = OrderType.None;
     public int? Count { get; set; }
-	public Guid? CategoryId { get; set; }
+	public Guid? ProductAttributeId { get; set; }
 }
 
 public class OrderFilterDto {

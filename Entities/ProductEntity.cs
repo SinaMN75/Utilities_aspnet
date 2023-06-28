@@ -40,7 +40,9 @@ public class ProductEntity : BaseEntity {
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
 	public IEnumerable<ProductInsight>? ProductInsights { get; set; }
 	public IEnumerable<VisitProducts>? VisitProducts { get; set; }
-    [NotMapped]
+	public IEnumerable<ProductAttributeEntity>? Attributes { get; set; }
+
+	[NotMapped]
 	public string? SuccessfulPurchase { get; set; }
 }
 
@@ -74,15 +76,19 @@ public class ProductJsonDetail {
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
 	public List<KeyValue>? KeyValues { get; set; }
-	public List<ProductAttribute>? Attributes { get; set; }
 }
 
-public class ProductAttribute {
-	public string? Title { get; set; }
-	public double? Price { get; set; }
+[Table("ProductAttributeEntity")]
+public class ProductAttributeEntity : BaseEntity {
+	public string Title { get; set; } = null!;
+	public double Price { get; set; }
+	public int Stock { get; set; }
+
 	public double? DiscountedPrice { get; set; }
 	public string? Color { get; set; }
-	public int Stock { get; set; }
+	
+	public Guid ProductId { get; set; }
+	public ProductEntity Product { get; set; } = null!;
 }
 
 [Table("ProductsInsight")]
@@ -157,7 +163,7 @@ public class ProductCreateUpdateDto {
 	public DateTime? Boosted { get; set; }
 	public Guid? ParentId { get; set; }
 	public List<KeyValue>? KeyValues { get; set; }
-	public List<ProductAttribute>? Attributes { get; set; }
+	public List<ProductAttributeEntity>? Attributes { get; set; }
 
 	[JsonIgnore]
 	[System.Text.Json.Serialization.JsonIgnore]
@@ -216,9 +222,4 @@ public class ProductFilterDto {
 public class ProductInsightDto {
 	public ReactionEntity? Reaction { get; set; }
 	public string? UserId { get; set; }
-}
-
-public class SimpleSellDto {
-	public string? BuyerUserId { get; set; }
-	public Guid ProductId { get; set; }
 }

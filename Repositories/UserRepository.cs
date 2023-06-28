@@ -125,7 +125,7 @@ public class UserRepository : IUserRepository
             var orders = _dbContext.Set<OrderEntity>()
                                              .Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p.Media)
                                              .Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p.Categories)
-                                             .Include(i => i.OrderDetails)!.ThenInclude(p => p.Category)
+                                             .Include(i => i.OrderDetails)!.ThenInclude(p => p.ProductAttribute)
                                              .Include(i => i.Address)
                                              .Include(i => i.User).ThenInclude(i => i.Media)
                                              .Include(i => i.ProductOwner).ThenInclude(i => i.Media)

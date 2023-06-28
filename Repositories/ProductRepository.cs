@@ -351,7 +351,6 @@ public static class ProductEntityExtension
             Type1 = dto.Type1 ?? entity.JsonDetail.Type1,
             Type2 = dto.Type2 ?? entity.JsonDetail.Type2,
             KeyValues = dto.KeyValues ?? entity.JsonDetail.KeyValues,
-            Attributes = dto.Attributes ?? entity.JsonDetail.Attributes
         };
 
         if (dto.ScorePlus.HasValue)
@@ -375,6 +374,21 @@ public static class ProductEntityExtension
                 if (e != null) listCategory.Add(e);
             }
             entity.Categories = listCategory;
+        }
+
+        if (dto.Attributes.IsNotNull())
+        {
+            List<ProductAttributeEntity> list = new();
+            foreach (ProductAttributeEntity item in dto.Attributes!)
+            {
+                ProductAttributeEntity? e = await context.Set<ProductAttributeEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == item.Id);
+                if (e != null) list.Add(e);
+                else {
+                    EntityEntry<ProductAttributeEntity> newE = await context.Set<ProductAttributeEntity>().AddAsync(item);
+                    list.Add(newE.Entity);
+                }
+            }
+            entity.Attributes = list;
         }
 
         if (dto.Teams.IsNotNull())
