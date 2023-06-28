@@ -21,7 +21,7 @@ public class UserEntity : IdentityUser {
 	public string? JobStatus { get; set; }
 	public string? MutedChats { get; set; }
 	public GenderType? Gender { get; set; }
-	public double? Wallet { get; set; } = 0;
+	public int? Wallet { get; set; } = 0;
 	public double? Point { get; set; } = 0;
 	public DateTime? Birthdate { get; set; }
 	public DateTime? CreatedAt { get; set; }
@@ -194,7 +194,7 @@ public class UserCreateUpdateDto {
 	public string? FollowedUsers { get; set; }
 	public string? FollowingUsers { get; set; }
 	public string? BlockedUsers { get; set; }
-	public double? Wallet { get; set; }
+	public int? Wallet { get; set; }
 	public double? Point { get; set; } = 0;
 	public bool? Suspend { get; set; }
 	public string? Instagram { get; set; }
@@ -259,7 +259,7 @@ public class UserFilterDto {
 public class TransferFromWalletToWalletDto {
 	public string FromUserId { get; set; } = null!;
 	public string ToUserId { get; set; } = null!;
-	public double Amount { get; set; }
+	public int Amount { get; set; }
 }
 
 public class AuthorizeUserDto {

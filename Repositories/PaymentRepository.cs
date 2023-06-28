@@ -2,7 +2,7 @@
 
 public interface IPaymentRepository
 {
-    Task<GenericResponse<string?>> IncreaseWalletBalance(double amount);
+    Task<GenericResponse<string?>> IncreaseWalletBalance(int amount);
     Task<GenericResponse<string?>> PayOrderZarinPal(Guid orderId);
     Task<GenericResponse> WalletCallBack(int amount, string authority, string status, string userId);
     Task<GenericResponse> CallBack(Guid orderId, string authority, string status);
@@ -21,12 +21,12 @@ public class PaymentRepository : IPaymentRepository
         _userId = httpContextAccessor.HttpContext?.User.Identity?.Name;
     }
 
-    public async Task<GenericResponse<string?>> IncreaseWalletBalance(double amount)
+    public async Task<GenericResponse<string?>> IncreaseWalletBalance(int amount)
     {
         try
         {
             UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
-            Payment payment = new(_appSettings.PaymentSettings!.Id, amount.ToInt());
+            Payment payment = new(_appSettings.PaymentSettings!.Id, amount);
             string callbackUrl = $"{Server.ServerAddress}/Payment/WalletCallBack/{user?.Id}/{amount}";
             string desc = $"شارژ کیف پول به مبلغ {amount}";
             PaymentRequestResponse? result = payment.PaymentRequest(desc, callbackUrl, "", user?.PhoneNumber).Result;
@@ -60,13 +60,13 @@ public class PaymentRepository : IPaymentRepository
         {
             OrderEntity order = (await _dbContext.Set<OrderEntity>().FirstOrDefaultAsync(x => x.Id == orderId))!;
             UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
-            Payment payment = new(_appSettings.PaymentSettings!.Id, order.TotalPrice.ToInt());
+            Payment payment = new(_appSettings.PaymentSettings.Id, order.TotalPrice!.Value);
             string callbackUrl = $"{Server.ServerAddress}/Payment/CallBack/{orderId}";
             string desc = $"خرید محصول {order.Description}";
             PaymentRequestResponse? result = payment.PaymentRequest(desc, callbackUrl, "", user?.PhoneNumber).Result;
             await _dbContext.Set<TransactionEntity>().AddAsync(new TransactionEntity
             {
-                Amount = order.TotalPrice.ToInt(),
+                Amount = order.TotalPrice,
                 Authority = result.Authority,
                 CreatedAt = DateTime.Now,
                 TransactionType = TransactionType.Buy,
@@ -122,7 +122,7 @@ public class PaymentRepository : IPaymentRepository
         string status)
     {
         OrderEntity order = (await _dbContext.Set<OrderEntity>().Include(i => i.OrderDetails).FirstOrDefaultAsync(x => x.Id == orderId))!;
-        Payment payment = new(_appSettings.PaymentSettings!.Id, order.TotalPrice.ToInt());
+        Payment payment = new(_appSettings.PaymentSettings.Id, order.TotalPrice!.Value);
         if (!status.Equals("OK")) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
         PaymentVerificationResponse? verify = payment.Verification(authority).Result;
         TransactionEntity? pay = await _dbContext.Set<TransactionEntity>().FirstOrDefaultAsync(x => x.Authority == authority);

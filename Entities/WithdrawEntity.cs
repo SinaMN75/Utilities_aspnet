@@ -3,7 +3,7 @@
 [Table("Withdraw")]
 public class WithdrawEntity : BaseEntity {
 	public string? ShebaNumber { get; set; }
-	public double? Amount { get; set; }
+	public int? Amount { get; set; }
 	public WithdrawState? WithdrawState { get; set; }
 	public UserEntity? User { get; set; }
 	public string? UserId { get; set; }
@@ -11,7 +11,7 @@ public class WithdrawEntity : BaseEntity {
 
 public class WalletWithdrawalDto {
 	public required string ShebaNumber { get; set; }
-	public required double Amount { get; set; }
+	public required int Amount { get; set; }
 }
 
 public class WithdrawalFilterDto {

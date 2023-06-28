@@ -428,7 +428,7 @@ public class UserRepository : IUserRepository
         }
     }
 
-    private TransactionEntity MakeTransactionEntity(string userId, double amount, string description, string? shebaNumber, TransactionType transactionType) => new()
+    private TransactionEntity MakeTransactionEntity(string userId, int amount, string description, string? shebaNumber, TransactionType transactionType) => new()
     {
         UserId = userId,
         Amount = amount,

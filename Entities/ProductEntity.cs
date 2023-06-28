@@ -12,12 +12,12 @@ public class ProductEntity : BaseEntity {
 	public string? Type { get; set; }
 	public string? State { get; set; }
 	public DateTime Boosted { get; set; }
-	public double? Stock { get; set; }
-	public double? VoteCount { get; set; }
+	public int? Stock { get; set; }
+	public int? VoteCount { get; set; }
 	public int? DiscountPercent { get; set; }
 	public int? CommentsCount { get; set; }
-	public double? DiscountPrice { get; set; }
-	public double? Price { get; set; }
+	public int? DiscountPrice { get; set; }
+	public int? Price { get; set; }
 	public Currency? Currency { get; set; }
 	public ProductStatus? Status { get; set; }
 	public AgeCategory? AgeCategory { get; set; }
@@ -60,18 +60,18 @@ public class ProductJsonDetail {
 	public string? Type1 { get; set; }
 	public string? Type2 { get; set; }
 	public double? Latitude { get; set; }
-	public double? ResponseTime { get; set; }
-	public double? OnTimeDelivery { get; set; }
+	public int? ResponseTime { get; set; }
+	public int? OnTimeDelivery { get; set; }
 	public double? Longitude { get; set; }
-	public double? Length { get; set; }
-	public double? Width { get; set; }
-	public double? Height { get; set; }
-	public double? Weight { get; set; }
-	public double? MinOrder { get; set; }
-	public double? MaxOrder { get; set; }
-	public double? MaxPrice { get; set; }
-	public double? MinPrice { get; set; }
-	public double? ShippingCost { get; set; }
+	public int? Length { get; set; }
+	public int? Width { get; set; }
+	public int? Height { get; set; }
+	public int? Weight { get; set; }
+	public int? MinOrder { get; set; }
+	public int? MaxOrder { get; set; }
+	public int? MaxPrice { get; set; }
+	public int? MinPrice { get; set; }
+	public int? ShippingCost { get; set; }
 	public int? ShippingTime { get; set; }
 	public string? Tags { get; set; }
 	public DateTime? StartDate { get; set; }
@@ -121,24 +121,23 @@ public class ProductCreateUpdateDto {
 	public string? Tags { get; set; }
 	public double? Latitude { get; set; }
 	public double? Longitude { get; set; }
-	public double? Price { get; set; }
-	public double? Length { get; set; }
-	public double? Width { get; set; }
-	public double? Height { get; set; }
-	public double? Weight { get; set; }
-	public double? MinOrder { get; set; }
-	public double? MaxOrder { get; set; }
-	public double? MaxPrice { get; set; }
-	public double? MinPrice { get; set; }
-	public double? ScorePlus { get; set; }
-	public double? ScoreMinus { get; set; }
-	public double? DiscountPrice { get; set; }
-	public double? ResponseTime { get; set; }
-	public double? OnTimeDelivery { get; set; }
+	public int? Price { get; set; }
+	public int? Length { get; set; }
+	public int? Width { get; set; }
+	public int? Height { get; set; }
+	public int? Weight { get; set; }
+	public int? MinOrder { get; set; }
+	public int? MaxOrder { get; set; }
+	public int? MaxPrice { get; set; }
+	public int? MinPrice { get; set; }
+	public int? ScorePlus { get; set; }
+	public int? ScoreMinus { get; set; }
+	public int? DiscountPrice { get; set; }
+	public int? ResponseTime { get; set; }
+	public int? OnTimeDelivery { get; set; }
 	public int? DiscountPercent { get; set; }
 	public int? CommentsCount { get; set; }
 	public int? Stock { get; set; }
-	public bool? Enabled { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
 	public DateTime? ExpireDate { get; set; }
@@ -147,7 +146,7 @@ public class ProductCreateUpdateDto {
 	public AgeCategory? AgeCategory { get; set; }
 	public ProductState? ProductState { get; set; }
 	public int? ShippingTime { get; set; }
-	public double? ShippingCost { get; set; }
+	public int? ShippingCost { get; set; }
 	public DateTime? Boosted { get; set; }
 	public Guid? ParentId { get; set; }
 	public List<KeyValue>? KeyValues { get; set; }
@@ -170,8 +169,8 @@ public class ProductFilterDto {
 	public string? UseCase { get; set; }
 	public string? State { get; set; }
 	public string? Tags { get; set; }
-	public double? StartPriceRange { get; set; }
-	public double? EndPriceRange { get; set; }
+	public int? StartPriceRange { get; set; }
+	public int? EndPriceRange { get; set; }
 	public bool? IsFollowing { get; set; }
 	public bool? IsBookmarked { get; set; }
 	public bool? HasDiscount { get; set; }

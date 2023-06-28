@@ -2,7 +2,7 @@
 
 [Table("Transactions")]
 public class TransactionEntity : BaseEntity {
-    public double? Amount { get; set; }
+    public int? Amount { get; set; }
     public string? Descriptions { get; set; }
     public string? Authority { get; set; }
     public string? GatewayName { get; set; }

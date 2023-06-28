@@ -66,7 +66,7 @@ public class PromotionRepository : IPromotionRepository {
 			users.Add(user);
 		}
 
-		double userPerHour = users.Count() / hoursPassed * 100;
+		int userPerHour = (users.Count() / hoursPassed * 100).ToInt();
 
 		List<StatePerUser> statePerUsers = users
 			.GroupBy(u => u.State)

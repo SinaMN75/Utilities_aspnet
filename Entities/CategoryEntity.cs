@@ -8,7 +8,7 @@ public class CategoryEntity : BaseEntity {
 	public string? Color { get; set; }
 	public string? UseCase { get; set; }
 	public string? Type { get; set; }
-	public double? Price { get; set; }
+	public int? Price { get; set; }
 	public int? Stock { get; set; }
 	public int? Order { get; set; }
 	public CategoryJsonDetail JsonDetail { get; set; } = new();
@@ -44,8 +44,8 @@ public class CategoryJsonDetail {
 	public double? Latitude { get; set; }
 	public double? Longitude { get; set; }
 	public double? Value { get; set; }
-	public double? DiscountedPrice { get; set; }
-	public double? SendPrice { get; set; }
+	public int? DiscountedPrice { get; set; }
+	public int? SendPrice { get; set; }
 	public DateTime? Date1 { get; set; }
 	public DateTime? Date2 { get; set; }
 }
@@ -62,10 +62,10 @@ public class CategoryCreateUpdateDto {
 	public string? Type { get; set; }
 	public double? Latitude { get; set; }
 	public double? Longitude { get; set; }
-	public double? Price { get; set; }
-	public double? DiscountedPrice { get; set; }
-	public double? SendPrice { get; set; }
-	public double? Value { get; set; }
+	public int? Price { get; set; }
+	public int? DiscountedPrice { get; set; }
+	public int? SendPrice { get; set; }
+	public int? Value { get; set; }
 	public int? Stock { get; set; }
 	public int? Order { get; set; }
 	public DateTime? Date1 { get; set; }

@@ -8,10 +8,10 @@ public class OrderEntity : BaseEntity {
 	public string? ProductUseCase { get; set; }
 	public string? PayNumber { get; set; }
 	public OrderStatuses? Status { get; set; }
-	public double? TotalPrice { get; set; }
-	public double? DiscountPrice { get; set; }
+	public int? TotalPrice { get; set; }
+	public int? DiscountPrice { get; set; }
 	public int? DiscountPercent { get; set; }
-	public double? SendPrice { get; set; }
+	public int? SendPrice { get; set; }
 	public SendType? SendType { get; set; }
 	public PayType? PayType { get; set; }
 	public DateTime? PayDateTime { get; set; }
@@ -35,7 +35,7 @@ public class OrderEntity : BaseEntity {
 
 [Table("OrderDetail")]
 public class OrderDetailEntity : BaseEntity {
-	public double? UnitPrice { get; set; }
+	public int? UnitPrice { get; set; }
 	public int? Count { get; set; }
 
 	public OrderEntity? Order { get; set; }
@@ -45,7 +45,7 @@ public class OrderDetailEntity : BaseEntity {
 	public Guid? ProductId { get; set; }
 
 	public int? Vote { get; set; }
-	public double? FinalPrice { get; set; }
+	public int? FinalPrice { get; set; }
 }
 
 public class OrderCreateUpdateDto {
@@ -58,7 +58,6 @@ public class OrderCreateUpdateDto {
 	public PayType? PayType { get; set; } = Utilities.PayType.Online;
 	public SendType? SendType { get; set; } = Utilities.SendType.Custom;
 	public OrderType OrderType { get; set; } = OrderType.None;
-	public IEnumerable<OrderDetailCreateUpdateDto>? OrderDetails { get; set; }
 }
 
 public class OrderDetailCreateUpdateDto {

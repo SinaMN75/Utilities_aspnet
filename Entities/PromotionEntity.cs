@@ -28,7 +28,7 @@ public class CreateUpdatePromotionDto {
 }
 
 public class PromotionDetail {
-	public double TotalSeen { get; set; }
+	public int TotalSeen { get; set; }
 	public List<StatePerUser> StatePerUsers { get; set; }
 	public List<SkillPerUser> SkillPerUsers { get; set; }
 	public List<AgeCategoryPerUser> AgeCategoryPerUsers { get; set; }
