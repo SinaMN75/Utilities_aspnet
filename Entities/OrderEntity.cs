@@ -35,7 +35,6 @@ public class OrderEntity : BaseEntity {
 
 [Table("OrderDetail")]
 public class OrderDetailEntity : BaseEntity {
-	public double? Price { get; set; }
 	public double? UnitPrice { get; set; }
 	public int? Count { get; set; }
 
@@ -63,7 +62,6 @@ public class OrderCreateUpdateDto {
 }
 
 public class OrderDetailCreateUpdateDto {
-	public Guid? OrderId { get; set; }
 	public Guid? ProductId { get; set; }
 	public OrderType OrderType { get; set; } = OrderType.None;
 	public int? Count { get; set; }

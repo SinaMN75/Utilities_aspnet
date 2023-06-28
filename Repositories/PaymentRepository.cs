@@ -149,7 +149,7 @@ public class PaymentRepository : IPaymentRepository
                     _dbContext.Update(prdct);
                 }
 
-                item.FinalPrice = item.Product != null ? item.Product.Price : item.Price;
+                item.FinalPrice = item.Product != null ? item.Product.Price : item.FinalPrice;
                 _dbContext.Update(item);
             }
         }
