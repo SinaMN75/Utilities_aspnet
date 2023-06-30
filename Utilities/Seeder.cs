@@ -8,6 +8,10 @@ public static class Seeder {
 
 	public const string SampleTitle = "لورم ایپسوم یا طرح‌نما (به انگلیسی: Lorem ipsum)";
 
+	public static void SetupModelConfigurationBuilder(this ModelConfigurationBuilder builder) {
+		builder.Properties<string>().AreFixedLength().HaveMaxLength(127);
+	}
+	
 	public static void SetupModelBuilder(this ModelBuilder builder) {
 		foreach (IMutableForeignKey fk in builder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys())) fk.DeleteBehavior = DeleteBehavior.NoAction;
 		builder.Entity<CategoryEntity>().OwnsOne(e => e.JsonDetail, b => b.ToJson());

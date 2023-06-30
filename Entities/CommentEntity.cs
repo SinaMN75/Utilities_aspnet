@@ -50,6 +50,7 @@ public class CommentCreateUpdateDto {
 
 public class CommentFilterDto {
 	public string? UserId { get; set; }
+	public string? ProductOwnerId { get; set; }
 	public Guid? ProductId { get; set; }
 	public bool? ShowProducts { get; set; }
 	public ChatStatus? Status { get; set; }

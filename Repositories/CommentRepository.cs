@@ -15,7 +15,6 @@ public class CommentRepository : ICommentRepository {
 	private readonly DbContext _dbContext;
 	private readonly IMediaRepository _mediaRepository;
 	private readonly INotificationRepository _notificationRepository;
-	private readonly IProductRepository _productRepository;
 	private readonly string? _userId;
 
 	public CommentRepository(
@@ -23,13 +22,11 @@ public class CommentRepository : ICommentRepository {
 		IHttpContextAccessor httpContextAccessor,
 		INotificationRepository notificationRepository,
 		IConfiguration config,
-		IMediaRepository mediaRepository,
-		IProductRepository productRepository) {
+		IMediaRepository mediaRepository) {
 		_dbContext = dbContext;
 		_notificationRepository = notificationRepository;
 		_config = config;
 		_mediaRepository = mediaRepository;
-		_productRepository = productRepository;
 		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 	}
 
@@ -47,21 +44,20 @@ public class CommentRepository : ICommentRepository {
 
 	public GenericResponse<IQueryable<CommentEntity>?> Filter(CommentFilterDto dto) {
 		IQueryable<CommentEntity> q = _dbContext.Set<CommentEntity>();
-		if (!dto.ShowDeleted) q = q.Where(x => x.DeletedAt != null);
-
-		if (dto.ProductId.HasValue) q = q.Where(x => x.ProductId == dto.ProductId);
-		if (dto.Status.HasValue) q = q.Where(x => x.Status == dto.Status);
-		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => x.UserId == dto.UserId);
-
+		
 		q = q.Include(x => x.User).ThenInclude(x => x!.Media)
 			.Include(x => x.Media)
 			.Include(x => x.Product).ThenInclude(x => x.Media)
-			.Include(x => x.Children.Where(x => x.DeletedAt == null))!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
+			.Include(x => x.Children!.Where(x => x.DeletedAt == null))!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
 			.OrderByDescending(x => x.CreatedAt)
 			.AsNoTracking();
 
-		if (dto.ShowProducts.IsTrue()) q = q.Include(x => x.Product).ThenInclude(x => x.Media);
-
+		if (!dto.ShowDeleted) q = q.Where(x => x.DeletedAt != null);
+		if (dto.ProductId is not null) q = q.Where(x => x.ProductId == dto.ProductId);
+		if (dto.Status is not null) q = q.Where(x => x.Status == dto.Status);
+		if (dto.UserId  is not null) q = q.Where(x => x.UserId == dto.UserId);
+		if (dto.ProductOwnerId  is not null) q = q.Where(x => x.Product!.UserId == dto.ProductOwnerId);
+		
 		return new GenericResponse<IQueryable<CommentEntity>?>(q);
 	}
 

@@ -50,7 +50,7 @@ public static class StartupExtension {
 		});
 		builder.Services.AddScoped<DbContext, T>();
 
-		builder.Services.AddDbContext<T>(options => {
+		builder.Services.AddDbContextPool<T>(options => {
 			switch (databaseType) {
 				case DatabaseType.SqlServer:
 					options.UseSqlServer(connectionStrings, o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
