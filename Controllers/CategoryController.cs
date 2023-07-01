@@ -9,15 +9,15 @@ public class CategoryController : BaseApiController {
 
 	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Create(CategoryCreateUpdateDto dto) => Result(await _repository.Create(dto));
+	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Create(CategoryCreateUpdateDto dto, CancellationToken ct) => Result(await _repository.Create(dto, ct));
 
 	[HttpPost("BulkCreate")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse<IEnumerable<CategoryEntity>>>> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto) =>
-		Result(await _repository.BulkCreate(dto));
+	public async Task<ActionResult<GenericResponse<IEnumerable<CategoryEntity>>>> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto, CancellationToken ct) =>
+		Result(await _repository.BulkCreate(dto, ct));
 
 	[HttpGet]
-	[OutputCache(PolicyName = "default")]
+	[OutputCache(PolicyName = "category")]
 	public ActionResult<GenericResponse<IQueryable<CategoryEntity>>> Read([FromQuery] CategoryFilterDto dto) => Result(_repository.Filter(dto));
 
 	[HttpPost("Filter")]
@@ -25,9 +25,9 @@ public class CategoryController : BaseApiController {
 
 	[HttpPut]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Update(CategoryCreateUpdateDto dto) => Result(await _repository.Update(dto));
+	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Update(CategoryCreateUpdateDto dto, CancellationToken ct) => Result(await _repository.Update(dto, ct));
 
 	[HttpDelete("{id:guid}")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-	public async Task<IActionResult> Delete(Guid id) => Result(await _repository.Delete(id));
+	public async Task<IActionResult> Delete(Guid id, CancellationToken ct) => Result(await _repository.Delete(id, ct));
 }

@@ -1,43 +1,48 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
 public interface ICategoryRepository {
-	public Task<GenericResponse<CategoryEntity>> Create(CategoryCreateUpdateDto dto);
-	public Task<GenericResponse<IEnumerable<CategoryEntity>>> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto);
+	public Task<GenericResponse<CategoryEntity>> Create(CategoryCreateUpdateDto dto, CancellationToken ct);
+	public Task<GenericResponse<IEnumerable<CategoryEntity>>> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto, CancellationToken ct);
 	public GenericResponse<IEnumerable<CategoryEntity>> Filter(CategoryFilterDto dto);
-	public Task<GenericResponse<CategoryEntity?>> Update(CategoryCreateUpdateDto dto);
-	public Task<GenericResponse> Delete(Guid id);
+	public Task<GenericResponse<CategoryEntity?>> Update(CategoryCreateUpdateDto dto, CancellationToken ct);
+	public Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 }
 
 public class CategoryRepository : ICategoryRepository {
 	private readonly DbContext _dbContext;
+	private readonly IOutputCacheStore _outputCache;
 
-	public CategoryRepository(DbContext context) => _dbContext = context;
+	public CategoryRepository(DbContext context, IOutputCacheStore outputCache) {
+		_dbContext = context;
+		_outputCache = outputCache;
+	}
 
-	public async Task<GenericResponse<CategoryEntity>> Create(CategoryCreateUpdateDto dto) {
+	public async Task<GenericResponse<CategoryEntity>> Create(CategoryCreateUpdateDto dto, CancellationToken ct) {
 		CategoryEntity entity = new();
 		if (dto.Id is not null) entity.Id = (Guid) dto.Id;
 			CategoryEntity i = entity.FillData(dto);
-		if (dto.IsUnique) {
+			await _outputCache.EvictByTagAsync("content", ct);
+			if (dto.IsUnique) {
 			CategoryEntity? exists =
-				await _dbContext.Set<CategoryEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Title == dto.Title && x.DeletedAt != null);
+				await _dbContext.Set<CategoryEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Title == dto.Title && x.DeletedAt != null, ct);
 			if (exists == null) {
-				await _dbContext.AddAsync(i);
-				await _dbContext.SaveChangesAsync();
+				await _dbContext.AddAsync(i, ct);
+				await _dbContext.SaveChangesAsync(ct);
 				return new GenericResponse<CategoryEntity>(i);
 			}
 			return new GenericResponse<CategoryEntity>(exists);
 		}
 		{
-			await _dbContext.AddAsync(i);
-			await _dbContext.SaveChangesAsync();
+			await _dbContext.AddAsync(i, ct);
+			await _dbContext.SaveChangesAsync(ct);
 			return new GenericResponse<CategoryEntity>(i);
 		}
 	}
 
-	public async Task<GenericResponse<IEnumerable<CategoryEntity>>> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto) {
+	public async Task<GenericResponse<IEnumerable<CategoryEntity>>> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto, CancellationToken ct) {
 		List<CategoryEntity> list = new();
 		foreach (CategoryCreateUpdateDto i in dto) {
-			GenericResponse<CategoryEntity> j = await Create(i);
+			GenericResponse<CategoryEntity> j = await Create(i, ct);
 			list.Add(j.Result!);
 		}
 		return new GenericResponse<IEnumerable<CategoryEntity>>(list);
@@ -65,16 +70,18 @@ public class CategoryRepository : ICategoryRepository {
 		return new GenericResponse<IEnumerable<CategoryEntity>>(q.AsNoTracking());
 	}
 
-	public async Task<GenericResponse> Delete(Guid id) {
-		await _dbContext.Set<CategoryEntity>().Where(x => x.Id == id).ExecuteUpdateAsync(x => x.SetProperty(y => y.DeletedAt, DateTime.Now));
+	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
+		await _dbContext.Set<CategoryEntity>().Where(x => x.Id == id).ExecuteUpdateAsync(x => x.SetProperty(y => y.DeletedAt, DateTime.Now), ct);
+		await _outputCache.EvictByTagAsync("content", ct);
 		return new GenericResponse();
 	}
 
-	public async Task<GenericResponse<CategoryEntity?>> Update(CategoryCreateUpdateDto dto) {
-		CategoryEntity? entity = await _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id);
+	public async Task<GenericResponse<CategoryEntity?>> Update(CategoryCreateUpdateDto dto, CancellationToken ct) {
+		CategoryEntity? entity = await _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id, ct);
 		if (entity == null) return new GenericResponse<CategoryEntity?>(null, UtilitiesStatusCodes.NotFound);
 		entity.FillData(dto);
-		await _dbContext.SaveChangesAsync();
+		await _dbContext.SaveChangesAsync(ct);
+		await _outputCache.EvictByTagAsync("content", ct);
 		return new GenericResponse<CategoryEntity?>(entity);
 	}
 }

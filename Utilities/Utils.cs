@@ -26,9 +26,10 @@ public static class StartupExtension {
 	private static void AddUtilitiesServices<T>(this WebApplicationBuilder builder, string connectionStrings, DatabaseType databaseType) where T : DbContext {
 		builder.Services.AddOptions();
 		builder.Services.AddOutputCache(x => {
-			x.AddPolicy("default", new OutputCachePolicy(60));
-			x.AddPolicy("short", new OutputCachePolicy(10));
+			x.AddPolicy("content", new OutputCachePolicy(TimeSpan.FromHours(24), "content"));
+			x.AddPolicy("category", new OutputCachePolicy(TimeSpan.FromHours(24), "category"));
 		});
+		
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
 		builder.Services.AddRateLimiter(x => {
@@ -181,20 +182,25 @@ public static class StartupExtension {
 }
 
 internal class OutputCachePolicy : IOutputCachePolicy {
-	private readonly int _seconds;
+	private readonly TimeSpan _timeSpan;
+	private readonly string _tag;
 
-	public OutputCachePolicy(int seconds) => _seconds = seconds;
+	public OutputCachePolicy(TimeSpan seconds, string tag) {
+		_timeSpan = seconds;
+		_tag = tag;
+	}
 
 	public ValueTask ServeFromCacheAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
 
 	public ValueTask ServeResponseAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
 
 	public ValueTask CacheRequestAsync(OutputCacheContext context, CancellationToken cancellation) {
+		context.Tags.Add(_tag);
 		context.AllowCacheLookup = true;
 		context.AllowCacheStorage = true;
 		context.AllowLocking = true;
 		context.EnableOutputCaching = true;
-		context.ResponseExpirationTimeSpan = TimeSpan.FromSeconds(_seconds);
+		context.ResponseExpirationTimeSpan = _timeSpan;
 		context.CacheVaryByRules.QueryKeys = "*";
 		context.CacheVaryByRules.VaryByHost = true;
 		context.CacheVaryByRules.HeaderNames = "*";
