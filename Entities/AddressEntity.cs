@@ -2,12 +2,24 @@
 
 [Table("Address")]
 public class AddressEntity : BaseEntity {
+	[MaxLength(50)]
 	public string? ReceiverFullName { get; set; }
+
+	[MaxLength(20)]
 	public string? ReceiverPhoneNumber { get; set; }
+
+	[MaxLength(100)]
 	public string? Address { get; set; }
+
+	[MaxLength(20)]
 	public string? Pelak { get; set; }
+
+	[MaxLength(20)]
 	public string? Unit { get; set; }
+
+	[MaxLength(20)]
 	public string? PostalCode { get; set; }
+
 	public bool IsDefault { get; set; }
 	public UserEntity? User { get; set; }
 	public string? UserId { get; set; }
@@ -24,17 +36,15 @@ public class AddressCreateUpdateDto {
 	public bool? IsDefault { get; set; }
 }
 
-public class AddressFilterDto
-{
+public class AddressFilterDto {
 	public string? UserId { get; set; }
-    public bool? OrderByReceiverFullName { get; set; }
-    public bool? OrderByReceiverPhoneNumber { get; set; }
-    public bool? OrderByAddress { get; set; }
-    public bool? OrderByPelak { get; set; }
-    public bool? OrderByUnit { get; set; }
-    public bool? OrderByPostalCode { get; set; }
-    public bool? OrderByIsDefault { get; set; }
-    public int PageSize { get; set; } = 100;
-    public int PageNumber { get; set; } = 1;
-
+	public bool? OrderByReceiverFullName { get; set; }
+	public bool? OrderByReceiverPhoneNumber { get; set; }
+	public bool? OrderByAddress { get; set; }
+	public bool? OrderByPelak { get; set; }
+	public bool? OrderByUnit { get; set; }
+	public bool? OrderByPostalCode { get; set; }
+	public bool? OrderByIsDefault { get; set; }
+	public int PageSize { get; set; } = 100;
+	public int PageNumber { get; set; } = 1;
 }

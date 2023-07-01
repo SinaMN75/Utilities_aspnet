@@ -3,10 +3,16 @@
 [Table("Order")]
 public class OrderEntity : BaseEntity {
 	public OrderType OrderType { get; set; } = OrderType.None;
+
+	[MaxLength(500)]
 	public string? Description { get; set; }
+
+	[MaxLength(20)]
 	public string? DiscountCode { get; set; }
-	public string? ProductUseCase { get; set; }
+
+	[MaxLength(20)]
 	public string? PayNumber { get; set; }
+
 	public OrderStatuses? Status { get; set; }
 	public int? TotalPrice { get; set; }
 	public int? DiscountPrice { get; set; }

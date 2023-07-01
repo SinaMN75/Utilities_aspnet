@@ -135,8 +135,8 @@ public class UserRepository : IUserRepository
                                              .Include(i => i.User).ThenInclude(i => i.Media)
                                              .Include(i => i.ProductOwner).ThenInclude(i => i.Media)
                                              .AsNoTracking()
-                                             .Where(w => w.OrderDetails != null ? w.OrderDetails.Any(a => a.Product != null ? a.Product.UserId == _userId : true) : true);
-            if (orders != null && orders?.Count() > 0)
+                                             .Where(w => w.OrderDetails == null || w.OrderDetails.Any(a => a.Product == null || a.Product.UserId == _userId));
+            if (orders.Any())
             {
                 var customers = orders.Select(s => s.UserId).ToList();
                 List<UserEntity> tempQ = q.ToList();
@@ -200,8 +200,6 @@ public class UserRepository : IUserRepository
             Email = dto.Email ?? "",
             UserName = dto.UserName ?? dto.Email ?? dto.PhoneNumber,
             PhoneNumber = dto.PhoneNumber,
-            EmailConfirmed = false,
-            PhoneNumberConfirmed = false,
             FullName = "",
             Wallet = 0,
             Suspend = false,
@@ -252,8 +250,6 @@ public class UserRepository : IUserRepository
             Email = "",
             PhoneNumber = mobile,
             UserName = mobile,
-            EmailConfirmed = false,
-            PhoneNumberConfirmed = false,
             FullName = "",
             Wallet = 0,
             Suspend = false

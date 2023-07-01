@@ -2,11 +2,21 @@ namespace Utilities_aspnet.Entities;
 
 [Table("Categories")]
 public class CategoryEntity : BaseEntity {
+	[MaxLength(100)]
 	public string? Title { get; set; }
+
+	[MaxLength(100)]
 	public string? TitleTr1 { get; set; }
+
+	[MaxLength(100)]
 	public string? TitleTr2 { get; set; }
+
+	[MaxLength(20)]
 	public string? UseCase { get; set; }
+
+	[MaxLength(20)]
 	public string? Type { get; set; }
+
 	public int? Order { get; set; }
 	public CategoryJsonDetail JsonDetail { get; set; } = new();
 

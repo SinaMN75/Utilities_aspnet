@@ -2,7 +2,10 @@ namespace Utilities_aspnet.Entities;
 
 [Table("Reports")]
 public class ReportEntity : BaseEntity {
+	[MaxLength(100)]
 	public string? Title { get; set; }
+
+	[MaxLength(500)]
 	public string? Description { get; set; }
 
 	public string? CreatorUserId { get; set; }

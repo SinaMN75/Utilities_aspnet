@@ -2,6 +2,7 @@
 
 [Table("Bookmarks")]
 public class BookmarkEntity : BaseEntity {
+	[MaxLength(50)]
 	public string? FolderName { get; set; }
 
 	public UserEntity? User { get; set; }

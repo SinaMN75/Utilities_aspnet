@@ -2,12 +2,19 @@ namespace Utilities_aspnet.Entities;
 
 [Table("Contents")]
 public class ContentEntity : BaseEntity {
+	[MaxLength(100)]
 	public string? Title { get; set; }
+
+	[MaxLength(100)]
 	public string? SubTitle { get; set; }
+
+	[MaxLength(20)]
 	public string? UseCase { get; set; }
+
+	[MaxLength(20)]
 	public string? Type { get; set; }
 
-	[StringLength(2000)]
+	[StringLength(5000)]
 	public string? Description { get; set; }
 
 	public IEnumerable<MediaEntity>? Media { get; set; }

@@ -2,8 +2,12 @@
 
 [Table("Media")]
 public class MediaEntity : BaseEntity {
+	[MaxLength(50)]
 	public string? FileName { get; set; }
+
+	[MaxLength(20)]
 	public string? UseCase { get; set; }
+
 	public int? Order { get; set; }
 	public MediaJsonDetail JsonDetail { get; set; } = new();
 

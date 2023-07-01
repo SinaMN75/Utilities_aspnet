@@ -2,15 +2,24 @@ namespace Utilities_aspnet.Entities;
 
 [Table("Products")]
 public class ProductEntity : BaseEntity {
+	[MaxLength(100)]
 	public string? Title { get; set; }
+
+	[MaxLength(100)]
 	public string? Subtitle { get; set; }
 
 	[StringLength(2000)]
 	public string? Description { get; set; }
 
+	[MaxLength(20)]
 	public string? UseCase { get; set; }
+
+	[MaxLength(20)]
 	public string? Type { get; set; }
+
+	[MaxLength(100)]
 	public string? State { get; set; }
+
 	public DateTime Boosted { get; set; }
 	public int? Stock { get; set; }
 	public int? VoteCount { get; set; }
@@ -29,13 +38,13 @@ public class ProductEntity : BaseEntity {
 
 	public ProductEntity? Parent { get; set; }
 	public Guid? ParentId { get; set; }
-	
+
 	[InverseProperty("Parent")]
 	public IEnumerable<ProductEntity>? Children { get; set; }
 
 	public string? UserId { get; set; }
 	public UserEntity? User { get; set; }
-    public ProductJsonDetail JsonDetail { get; set; } = new();
+	public ProductJsonDetail JsonDetail { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<FormEntity>? Forms { get; set; }

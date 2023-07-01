@@ -2,8 +2,12 @@
 
 [Table("Discount")]
 public class DiscountEntity : BaseEntity {
+	[MaxLength(100)]
 	public string? Title { get; set; }
+
+	[MaxLength(20)]
 	public string? Code { get; set; }
+
 	public int? DiscountPercent { get; set; }
 	public int? NumberUses { get; set; }
 	public DateTime? StartDate { get; set; }

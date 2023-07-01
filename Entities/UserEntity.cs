@@ -1,24 +1,62 @@
 ﻿namespace Utilities_aspnet.Entities;
 
-public class UserEntity : IdentityUser {
+public class UserEntity {
+	public string Id { get; set; }
+
+	[MaxLength(50)]
 	public string? FirstName { get; set; }
+
+	[MaxLength(50)]
 	public string? LastName { get; set; }
+
+	[MaxLength(50)]
 	public string? FullName { get; set; }
+
+	[MaxLength(100)]
 	public string? Headline { get; set; }
 
 	[StringLength(2000)]
 	public string? Bio { get; set; }
 
+	[MaxLength(50)]
+	public string? UserName { get; set; }
+
+	[MaxLength(50)]
 	public string? AppUserName { get; set; }
+
+	[MaxLength(20)]
+	public string? PhoneNumber { get; set; }
+
+	[MaxLength(20)]
 	public string? AppPhoneNumber { get; set; }
+
+	[MaxLength(100)]
+	public string? Email { get; set; }
+
+	[MaxLength(100)]
 	public string? AppEmail { get; set; }
+
+	[MaxLength(20)]
 	public string? UseCase { get; set; }
+
+	[MaxLength(20)]
 	public string? Type { get; set; }
+
+	[MaxLength(100)]
 	public string? AccessLevel { get; set; }
+
+	[MaxLength(100)]
 	public string? Region { get; set; }
+
+	[MaxLength(100)]
 	public string? State { get; set; }
+
+	[MaxLength(100)]
 	public string? Badge { get; set; }
+
+	[MaxLength(20)]
 	public string? JobStatus { get; set; }
+
 	public string? MutedChats { get; set; }
 	public GenderType? Gender { get; set; }
 	public int? Wallet { get; set; } = 0;
@@ -74,50 +112,6 @@ public class UserEntity : IdentityUser {
 
 	[NotMapped]
 	public string? Token { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public override string? PasswordHash { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public override string? NormalizedUserName { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public override string? NormalizedEmail { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public override bool EmailConfirmed { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public override string? SecurityStamp { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public override string? ConcurrencyStamp { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public override bool PhoneNumberConfirmed { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public override bool TwoFactorEnabled { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public override DateTimeOffset? LockoutEnd { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public override bool LockoutEnabled { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public override int AccessFailedCount { get; set; }
 }
 
 public class UserJsonDetail {
@@ -242,8 +236,8 @@ public class UserFilterDto {
 	public bool? ShowMedia { get; set; }
 	public bool? ShowCategories { get; set; }
 	public bool? ShowSuspend { get; set; }
-    public bool? ShowMyCustomers { get; set; }
-    public bool? OrderByUserName { get; set; }
+	public bool? ShowMyCustomers { get; set; }
+	public bool? OrderByUserName { get; set; }
 	public IEnumerable<string>? UserIds { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 }

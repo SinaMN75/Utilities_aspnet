@@ -2,7 +2,10 @@
 
 [Table("Forms")]
 public class FormEntity : BaseEntity {
+	[MaxLength(50)]
 	public string? Title { get; set; }
+
+	[MaxLength(20)]
 	public string? UseCase { get; set; }
 
 	[ForeignKey(nameof(FormFieldId))]
