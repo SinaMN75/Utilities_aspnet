@@ -1,8 +1,6 @@
 ﻿namespace Utilities_aspnet.Entities;
 
-public class UserEntity {
-	public string Id { get; set; }
-
+public class UserEntity : IdentityUser {
 	[MaxLength(50)]
 	public string? FirstName { get; set; }
 
@@ -19,21 +17,12 @@ public class UserEntity {
 	public string? Bio { get; set; }
 
 	[MaxLength(50)]
-	public string? UserName { get; set; }
-
-	[MaxLength(50)]
 	public string? AppUserName { get; set; }
-
-	[MaxLength(20)]
-	public string? PhoneNumber { get; set; }
 
 	[MaxLength(20)]
 	public string? AppPhoneNumber { get; set; }
 
-	[MaxLength(100)]
-	public string? Email { get; set; }
-
-	[MaxLength(100)]
+	[MaxLength(50)]
 	public string? AppEmail { get; set; }
 
 	[MaxLength(20)]
@@ -54,7 +43,7 @@ public class UserEntity {
 	[MaxLength(100)]
 	public string? Badge { get; set; }
 
-	[MaxLength(20)]
+	[MaxLength(100)]
 	public string? JobStatus { get; set; }
 
 	public string? MutedChats { get; set; }
@@ -112,6 +101,50 @@ public class UserEntity {
 
 	[NotMapped]
 	public string? Token { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public override string? PasswordHash { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public override string? NormalizedUserName { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public override string? NormalizedEmail { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public override bool EmailConfirmed { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public override string? SecurityStamp { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public override string? ConcurrencyStamp { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public override bool PhoneNumberConfirmed { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public override bool TwoFactorEnabled { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public override DateTimeOffset? LockoutEnd { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public override bool LockoutEnabled { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public override int AccessFailedCount { get; set; }
 }
 
 public class UserJsonDetail {
