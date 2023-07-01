@@ -64,6 +64,7 @@ public static class StartupExtension {
 			}
 		});
 
+		builder.Services.AddMemoryCache();
 		builder.Services.AddHttpContextAccessor();
 		builder.Services.AddSignalR();
 		builder.Services.AddScoped<CustomInterceptor>();

@@ -138,17 +138,9 @@ public class UserJsonDetail {
 	public NationalityType? NationalityType { get; set; }
 }
 
-[Table("Otps")]
-public class OtpEntity : BaseEntity {
-	public required string OtpCode { get; set; }
-
-	public UserEntity? User { get; set; }
-	public string? UserId { get; set; }
-}
-
 public class GetMobileVerificationCodeForLoginDto {
 	public required string Mobile { get; set; }
-	public required bool SendSMS { get; set; }
+	public bool SendSms { get; set; } = true;
 	public string? Token { get; set; }
 }
 

@@ -1,4 +1,6 @@
-﻿namespace Utilities_aspnet.Repositories;
+﻿using Microsoft.Extensions.Caching.Memory;
+
+namespace Utilities_aspnet.Repositories;
 
 public interface IUserRepository
 {
@@ -24,19 +26,23 @@ public class UserRepository : IUserRepository
     private readonly ITransactionRepository _transactionRepository;
     private readonly string? _userId;
     private readonly UserManager<UserEntity> _userManager;
+    private readonly IMemoryCache _memoryCache;
 
     public UserRepository(
         DbContext dbContext,
         UserManager<UserEntity> userManager,
         ISmsNotificationRepository sms,
         IHttpContextAccessor httpContextAccessor,
-        ITransactionRepository transactionRepository)
+        ITransactionRepository transactionRepository,
+        IMemoryCache memoryCache
+        )
     {
         _dbContext = dbContext;
         _userManager = userManager;
         _sms = sms;
         _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
         _transactionRepository = transactionRepository;
+        _memoryCache = memoryCache;
     }
 
     public async Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null)
@@ -235,7 +241,7 @@ public class UserRepository : IUserRepository
                                                                                                x.UserName == mobile);
 
         if (existingUser != null)
-            if (dto.SendSMS)
+            if (dto.SendSms)
             {
                 if (!await SendOtp(existingUser.Id, 4))
                     return new GenericResponse<string?>("برای دریافت کد تایید جدید کمی صبر کنید", UtilitiesStatusCodes.MaximumLimitReached);
@@ -257,7 +263,7 @@ public class UserRepository : IUserRepository
         if (!result.Succeeded)
             return new GenericResponse<string?>("", UtilitiesStatusCodes.BadRequest, result.Errors.First().Code + result.Errors.First().Description);
 
-        if (dto.SendSMS) await SendOtp(user.Id, 4);
+        if (dto.SendSms) await SendOtp(user.Id, 4);
 
         return new GenericResponse<string?>(":)");
     }
@@ -272,7 +278,7 @@ public class UserRepository : IUserRepository
         await _dbContext.SaveChangesAsync();
         JwtSecurityToken token = await CreateToken(user);
 
-        if (await Verify(user.Id, dto.VerificationCode) != OtpResult.Ok)
+        if (Verify(user.Id, dto.VerificationCode) != OtpResult.Ok)
             return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.WrongVerificationCode);
 
         return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result);
@@ -436,32 +442,23 @@ public class UserRepository : IUserRepository
         TransactionType = transactionType
     };
 
-    private async Task<bool> SendOtp(string userId, int codeLength)
-    {
-        DateTime dd = DateTime.Now.AddSeconds(-10);
-        IQueryable<OtpEntity> oldOtp = _dbContext.Set<OtpEntity>().Where(x => x.UserId == userId && x.CreatedAt > dd);
-        if (oldOtp.Count() >= 2) return false;
+    private async Task<bool> SendOtp(string userId, int codeLength) {
+        if (_memoryCache.Get<string>(userId) != null) return false;
 
         string newOtp = Utils.Random(codeLength).ToString();
-        _dbContext.Set<OtpEntity>().Add(new OtpEntity { UserId = userId, OtpCode = newOtp, CreatedAt = DateTime.Now, UpdatedAt = DateTime.Now });
+        _memoryCache.GetOrCreate<string>(userId, entry => {
+            entry.Value = newOtp;
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(120);
+            return newOtp;
+        });
         UserEntity? user = await ReadByIdMinimal(userId);
         _sms.SendSms(user?.PhoneNumber!, newOtp);
         await _dbContext.SaveChangesAsync();
         return true;
     }
 
-    private async Task<OtpResult> Verify(string userId, string otp)
-    {
+    private OtpResult Verify(string userId, string otp) {
         if (otp == "1375") return OtpResult.Ok;
-        OtpEntity? e = await _dbContext.Set<OtpEntity>().SingleOrDefaultAsync(x => x.UserId == userId &&
-                                                                                   x.CreatedAt > DateTime.Now.AddMinutes(-5) &&
-                                                                                   x.OtpCode == otp);
-        if (e != null)
-        {
-            _dbContext.Set<OtpEntity>().Remove(e);
-            await _dbContext.SaveChangesAsync();
-            return OtpResult.Ok;
-        }
-        return OtpResult.Incorrect;
+        return otp == _memoryCache.Get<string>(userId) ? OtpResult.Ok : OtpResult.Incorrect;
     }
 }
