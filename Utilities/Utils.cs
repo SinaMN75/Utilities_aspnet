@@ -133,7 +133,11 @@ public static class StartupExtension {
 	public static void AddUtilitiesIdentity(this WebApplicationBuilder builder) {
 		builder.Services.AddIdentity<UserEntity, IdentityRole>(options => { options.SignIn.RequireConfirmedAccount = false; }).AddRoles<IdentityRole>()
 			.AddEntityFrameworkStores<DbContext>().AddDefaultTokenProviders();
-		builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => {
+		builder.Services.AddAuthentication(options => {
+			options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+			options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+			options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+		}).AddJwtBearer(options => {
 			options.RequireHttpsMetadata = false;
 			options.SaveToken = true;
 			options.TokenValidationParameters = new TokenValidationParameters {

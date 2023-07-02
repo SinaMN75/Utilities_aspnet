@@ -8,10 +8,10 @@ public class WithdrawController : BaseApiController {
 	public WithdrawController(IWithdrawRepository repository) => _repository = repository;
 
 	[HttpPost("WalletWithdrawal")]
-	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+	[Authorize]
 	public async Task<ActionResult<GenericResponse>> WalletWithdrawal(WalletWithdrawalDto dto) => Result(await _repository.WalletWithdrawal(dto));
 
 	[HttpPost("Filter")]
-	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+	[Authorize]
 	public ActionResult<GenericResponse<IQueryable<WithdrawEntity>>> Filter(WithdrawalFilterDto dto) => Result(_repository.Filter(dto));
 }

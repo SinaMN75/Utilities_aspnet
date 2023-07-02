@@ -8,10 +8,10 @@ public class PromotionController : BaseApiController {
 	public PromotionController(IPromotionRepository repository) => _repository = repository;
 
 	[HttpPost()]
-	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+	[Authorize]
 	public async Task<ActionResult<GenericResponse>> CreatePromotion(CreateUpdatePromotionDto dto) => Result(await _repository.CreatePromotion(dto));
 
 	[HttpGet("ReadPromotion/{id:guid}")]
-	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+	[Authorize]
 	public async Task<ActionResult<GenericResponse<PromotionDetail?>>> ReadPromotion(Guid id) => Result(await _repository.ReadPromotion(id));
 }

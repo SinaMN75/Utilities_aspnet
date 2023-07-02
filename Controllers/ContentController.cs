@@ -12,15 +12,15 @@ public class ContentController : BaseApiController {
 	public ActionResult<GenericResponse<IQueryable<ContentEntity>>> Read() => Result(_repository.Read());
 
 	[HttpPost]
-	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+	[Authorize]
 	public async Task<ActionResult<GenericResponse<ContentEntity>>> Create(ContentCreateUpdateDto dto, CancellationToken ct) =>
 		Result(await _repository.Create(dto, ct));
 
 	[HttpPut]
-	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+	[Authorize]
 	public async Task<ActionResult<GenericResponse<ContentEntity>>> Update(ContentCreateUpdateDto dto, CancellationToken ct) => Result(await _repository.Update(dto, ct));
 
 	[HttpDelete("{id:guid}")]
-	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+	[Authorize]
 	public async Task<IActionResult> Delete(Guid id, CancellationToken ct) => Result(await _repository.Delete(id, ct));
 }

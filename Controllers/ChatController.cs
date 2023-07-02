@@ -1,7 +1,7 @@
 namespace Utilities_aspnet.Controllers;
 
 [ApiController]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[Authorize]
 [Route("api/[controller]")]
 public class ChatController : BaseApiController {
 	private readonly IChatRepository _repository;

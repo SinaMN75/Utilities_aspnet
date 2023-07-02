@@ -2,7 +2,7 @@ namespace Utilities_aspnet.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[Authorize]
 [AllowAnonymous]
 public class OrderController : BaseApiController {
 	private readonly IOrderRepository _repository;
