@@ -14,7 +14,7 @@ public interface IUserRepository
     Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model);
     Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList();
     Task<GenericResponse> ToggleBlock(string userId);
-    Task<GenericResponse> TransferWalletToWallet(TransferFromWalletToWalletDto dto);
+    Task<GenericResponse> TransferWalletToWallet(TransferFromWalletToWalletDto dto, CancellationToken ct);
     Task<UserEntity?> ReadByIdMinimal(string? idOrUserName, string? token = null);
     Task<GenericResponse> Authorize(AuthorizeUserDto dto);
 }
@@ -302,16 +302,16 @@ public class UserRepository : IUserRepository
         return new GenericResponse();
     }
 
-    public async Task<GenericResponse> TransferWalletToWallet(TransferFromWalletToWalletDto dto)
+    public async Task<GenericResponse> TransferWalletToWallet(TransferFromWalletToWalletDto dto, CancellationToken ct)
     {
         UserEntity fromUser = (await ReadByIdMinimal(dto.FromUserId))!;
         UserEntity toUser = (await ReadByIdMinimal(dto.ToUserId))!;
 
         if (fromUser.Wallet <= dto.Amount) return new GenericResponse(UtilitiesStatusCodes.NotEnoughMoney);
         await Update(new UserCreateUpdateDto { Id = fromUser.Id, Wallet = fromUser.Wallet - dto.Amount });
-        await _transactionRepository.Create(MakeTransactionEntity(fromUser.Id, dto.Amount, "کسر", null, TransactionType.WithdrawFromTheWallet));
+        await _transactionRepository.Create(MakeTransactionEntity(fromUser.Id, dto.Amount, "کسر", null, TransactionType.WithdrawFromTheWallet), ct);
         await Update(new UserCreateUpdateDto { Id = toUser.Id, Wallet = toUser.Wallet + dto.Amount });
-        await _transactionRepository.Create(MakeTransactionEntity(toUser.Id, dto.Amount, "واریز", null, TransactionType.DepositToWallet));
+        await _transactionRepository.Create(MakeTransactionEntity(toUser.Id, dto.Amount, "واریز", null, TransactionType.DepositToWallet), ct);
         return new GenericResponse();
     }
 
