@@ -26,18 +26,18 @@ public static class StartupExtension {
 	private static void AddUtilitiesServices<T>(this WebApplicationBuilder builder, string connectionStrings, DatabaseType databaseType) where T : DbContext {
 		builder.Services.AddOptions();
 		builder.Services.AddOutputCache(x => {
-			x.AddPolicy("content", new OutputCachePolicy(TimeSpan.FromHours(24), "content"));
-			x.AddPolicy("category", new OutputCachePolicy(TimeSpan.FromHours(24), "category"));
+			x.AddPolicy("24h", new OutputCachePolicy(TimeSpan.FromHours(24), new List<string> { "content", "category", "address", "comment", "transaction" }));
 		});
-		
+
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
 		builder.Services.AddRateLimiter(x => {
+			x.RejectionStatusCode = 429;
 			x.AddFixedWindowLimiter("fixed", y => {
-				y.PermitLimit = 10;
-				y.Window = TimeSpan.FromSeconds(1);
+				y.PermitLimit = 5;
+				y.Window = TimeSpan.FromSeconds(2);
 				y.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-				y.QueueLimit = 2;
+				y.QueueLimit = 10;
 			});
 		});
 
@@ -181,13 +181,13 @@ public static class StartupExtension {
 	}
 }
 
-internal class OutputCachePolicy : IOutputCachePolicy {
+internal partial class OutputCachePolicy : IOutputCachePolicy {
 	private readonly TimeSpan _timeSpan;
-	private readonly string _tag;
+	private readonly List<string> _tags;
 
-	public OutputCachePolicy(TimeSpan seconds, string tag) {
+	public OutputCachePolicy(TimeSpan seconds, List<string> tags) {
 		_timeSpan = seconds;
-		_tag = tag;
+		_tags = tags;
 	}
 
 	public ValueTask ServeFromCacheAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
@@ -195,7 +195,7 @@ internal class OutputCachePolicy : IOutputCachePolicy {
 	public ValueTask ServeResponseAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
 
 	public ValueTask CacheRequestAsync(OutputCacheContext context, CancellationToken cancellation) {
-		context.Tags.Add(_tag);
+		foreach (string tag in _tags) context.Tags.Add(tag);
 		context.AllowCacheLookup = true;
 		context.AllowCacheStorage = true;
 		context.AllowLocking = true;

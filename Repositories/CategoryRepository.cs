@@ -21,7 +21,7 @@ public class CategoryRepository : ICategoryRepository {
 		CategoryEntity entity = new();
 		if (dto.Id is not null) entity.Id = (Guid) dto.Id;
 			CategoryEntity i = entity.FillData(dto);
-			await _outputCache.EvictByTagAsync("content", ct);
+			await _outputCache.EvictByTagAsync("category", ct);
 			if (dto.IsUnique) {
 			CategoryEntity? exists =
 				await _dbContext.Set<CategoryEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Title == dto.Title && x.DeletedAt != null, ct);
@@ -72,7 +72,7 @@ public class CategoryRepository : ICategoryRepository {
 
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
 		await _dbContext.Set<CategoryEntity>().Where(x => x.Id == id).ExecuteUpdateAsync(x => x.SetProperty(y => y.DeletedAt, DateTime.Now), ct);
-		await _outputCache.EvictByTagAsync("content", ct);
+		await _outputCache.EvictByTagAsync("category", ct);
 		return new GenericResponse();
 	}
 
@@ -81,7 +81,7 @@ public class CategoryRepository : ICategoryRepository {
 		if (entity == null) return new GenericResponse<CategoryEntity?>(null, UtilitiesStatusCodes.NotFound);
 		entity.FillData(dto);
 		await _dbContext.SaveChangesAsync(ct);
-		await _outputCache.EvictByTagAsync("content", ct);
+		await _outputCache.EvictByTagAsync("category", ct);
 		return new GenericResponse<CategoryEntity?>(entity);
 	}
 }

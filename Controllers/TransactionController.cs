@@ -9,13 +9,12 @@ public class TransactionController : BaseApiController {
 	public TransactionController(ITransactionRepository repository) => _repository = repository;
 
 	[HttpPost]
-	public async Task<ActionResult<GenericResponse<TransactionEntity>>> Create(TransactionEntity dto) => Result(await _repository.Create(dto));
+	public async Task<ActionResult<GenericResponse<TransactionEntity>>> Create(TransactionEntity dto, CancellationToken ct) => Result(await _repository.Create(dto, ct));
 
 	[HttpGet]
-	[OutputCache(PolicyName = "default")]
-	public ActionResult<GenericResponse<IQueryable<TransactionEntity>>> Read() => Result(_repository.Read());
+	[OutputCache(PolicyName = "24h")]
+	public ActionResult<GenericResponse<IQueryable<TransactionEntity>>> Read(TransactionFilterDto dto) => Result(_repository.Filter(dto));
 
 	[HttpGet("Mine")]
-	[OutputCache(PolicyName = "default")]
 	public ActionResult<GenericResponse<IQueryable<TransactionEntity>>> ReadMine() => Result(_repository.ReadMine());
 }

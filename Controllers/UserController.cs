@@ -52,6 +52,6 @@ public class UserController : BaseApiController {
 	[HttpGet("ReadMyBlockList")]
 	public async Task<ActionResult<GenericResponse<IQueryable<UserEntity>>>> ReadMyBlockList() => Result(await _repository.ReadMyBlockList());
 
-	[HttpPost("ToggleBlock")]
-	public async Task<ActionResult<GenericResponse>> Block(string userId) => Result(await _repository.ToggleBlock(userId));
+	[HttpPost("ToggleBlock/{id}")]
+	public async Task<ActionResult<GenericResponse>> Block(string id) => Result(await _repository.ToggleBlock(id));
 }

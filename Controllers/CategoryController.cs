@@ -17,7 +17,7 @@ public class CategoryController : BaseApiController {
 		Result(await _repository.BulkCreate(dto, ct));
 
 	[HttpGet]
-	[OutputCache(PolicyName = "category")]
+	[OutputCache(PolicyName = "24h")]
 	public ActionResult<GenericResponse<IQueryable<CategoryEntity>>> Read([FromQuery] CategoryFilterDto dto) => Result(_repository.Filter(dto));
 
 	[HttpPost("Filter")]
