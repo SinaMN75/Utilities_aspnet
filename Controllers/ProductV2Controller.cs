@@ -24,7 +24,6 @@ public class ProductV2Controller : BaseApiController {
 
 	[Authorize]
 	[AllowAnonymous]
-	[OutputCache(PolicyName = "default")]
 	[HttpGet]
 	public async Task<ActionResult<GenericResponse<IQueryable<ProductEntity>>>> Read([FromQuery] ProductFilterDto dto) => Result(await _repository.Filter(dto));
 

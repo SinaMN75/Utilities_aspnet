@@ -11,11 +11,9 @@ public class ReportController : BaseApiController {
 	public ActionResult<GenericResponse<IEnumerable<ReportEntity>>> Filter(ReportFilterDto parameters) => Result(_repository.Read(parameters));
 
 	[HttpGet]
-	[OutputCache(PolicyName = "default")]
 	public ActionResult<GenericResponse<IEnumerable<ReportEntity>>> Read([FromQuery] ReportFilterDto parameters) => Result(_repository.Read(parameters));
 
 	[HttpGet("{id:guid}")]
-	[OutputCache(PolicyName = "default")]
 	public async Task<ActionResult<GenericResponse<ReportEntity>>> ReadById(Guid id) => Result(await _repository.ReadById(id));
 
 	[HttpPost]

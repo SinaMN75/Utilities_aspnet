@@ -2,7 +2,6 @@
 
 [ApiController]
 [Route("api/[controller]")]
-[OutputCache(PolicyName = "default")]
 public class AppSettingsController : BaseApiController {
 	private readonly IConfiguration _config;
 

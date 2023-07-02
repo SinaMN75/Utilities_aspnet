@@ -9,12 +9,10 @@ public class NotificationController : BaseApiController {
 
 	[Authorize]
 	[AllowAnonymous]
-	[OutputCache(PolicyName = "default")]
 	[HttpGet]
 	public ActionResult<GenericResponse<IQueryable<NotificationEntity>>> Read() => Result(_repository.Read());
 
 	[Authorize]
-	[OutputCache(PolicyName = "default")]
 	[HttpGet("{id}")]
 	public async Task<ActionResult<GenericResponse<IQueryable<NotificationEntity>>>> ReadById(Guid id) => Result(await _repository.ReadById(id));
 

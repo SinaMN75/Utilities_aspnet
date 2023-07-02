@@ -18,7 +18,6 @@ public class FormController : BaseApiController {
 
 	[AllowAnonymous]
 	[HttpGet("{categoryId:guid}")]
-	[OutputCache(PolicyName = "default")]
 	public ActionResult<GenericResponse<IQueryable<FormFieldEntity>>> ReadFormFieldById(Guid categoryId) => Result(_repository.ReadFormFields(categoryId));
 
 	[HttpPost]
