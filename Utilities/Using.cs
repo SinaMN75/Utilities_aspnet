@@ -1,6 +1,4 @@
-﻿#region
-
-global using System;
+﻿global using System;
 global using System.Collections.Generic;
 global using System.Linq;
 global using System.Text;
@@ -34,7 +32,6 @@ global using Utilities_aspnet.Entities;
 global using Utilities_aspnet.Repositories;
 global using Newtonsoft.Json;
 global using Newtonsoft.Json.Serialization;
-global using StackExchange.Redis;
 global using RestSharp;
 global using Swashbuckle.AspNetCore.SwaggerUI;
 global using Zarinpal;
@@ -46,8 +43,4 @@ global using Utilities_aspnet.Hubs;
 global using Microsoft.AspNetCore.SignalR;
 global using System.Threading.RateLimiting;
 global using Microsoft.AspNetCore.RateLimiting;
-global using System.Reflection;
-global using Swashbuckle.AspNetCore.SwaggerGen;
 global using System.Net.Http.Headers;
-
-#endregion

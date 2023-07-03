@@ -44,11 +44,6 @@ public enum OtpResult {
 	TimeOut = 3
 }
 
-public enum DatabaseType {
-	SqlServer = 0,
-	MySql = 1
-}
-
 public enum OrderStatuses {
 	Pending = 100,
 	Canceled = 101,

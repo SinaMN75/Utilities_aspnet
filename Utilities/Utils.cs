@@ -4,12 +4,9 @@ public static class StartupExtension {
 	public static void SetupUtilities<T>(
 		this WebApplicationBuilder builder,
 		string connectionStrings,
-		DatabaseType databaseType = DatabaseType.SqlServer,
 		string? redisConnectionString = null) where T : DbContext {
-		builder.AddUtilitiesServices<T>(connectionStrings, databaseType);
-
-		if (redisConnectionString != null) builder.AddRedis(redisConnectionString);
-
+		builder.AddUtilitiesServices<T>(connectionStrings);
+		
 		IServiceProvider? serviceProvider = builder.Services.BuildServiceProvider().GetService<IServiceProvider>();
 
 		builder.AddUtilitiesSwagger(serviceProvider);
@@ -23,7 +20,7 @@ public static class StartupExtension {
 		builder.Services.Configure<IISServerOptions>(options => options.MaxRequestBodySize = int.MaxValue);
 	}
 
-	private static void AddUtilitiesServices<T>(this WebApplicationBuilder builder, string connectionStrings, DatabaseType databaseType) where T : DbContext {
+	private static void AddUtilitiesServices<T>(this WebApplicationBuilder builder, string connectionStrings) where T : DbContext {
 		builder.Services.AddOptions();
 		builder.Services.AddOutputCache(x => {
 			x.AddPolicy("24h", new OutputCachePolicy(TimeSpan.FromHours(24), new List<string> { "content", "category", "address", "comment", "transaction" }));
@@ -52,17 +49,7 @@ public static class StartupExtension {
 		builder.Services.AddScoped<DbContext, T>();
 
 		builder.Services.AddDbContextPool<T>(options => {
-			switch (databaseType) {
-				case DatabaseType.SqlServer:
-					options.UseSqlServer(connectionStrings, o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
-					break;
-				case DatabaseType.MySql:
-					options.UseMySql(connectionStrings, new MySqlServerVersion(new Version(8, 0, 28)),
-					                 o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
-					break;
-				default:
-					throw new ArgumentOutOfRangeException(nameof(databaseType), databaseType, null);
-			}
+			options.UseSqlServer(connectionStrings, o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
 		});
 
 		builder.Services.AddMemoryCache();
@@ -126,10 +113,6 @@ public static class StartupExtension {
 		});
 	}
 
-	private static void AddRedis(this WebApplicationBuilder builder, string connectionString) {
-		builder.Services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(connectionString));
-	}
-
 	public static void AddUtilitiesIdentity(this WebApplicationBuilder builder) {
 		builder.Services.AddIdentity<UserEntity, IdentityRole>(options => { options.SignIn.RequireConfirmedAccount = false; }).AddRoles<IdentityRole>()
 			.AddEntityFrameworkStores<DbContext>().AddDefaultTokenProviders();
@@ -185,7 +168,7 @@ public static class StartupExtension {
 	}
 }
 
-internal partial class OutputCachePolicy : IOutputCachePolicy {
+internal class OutputCachePolicy : IOutputCachePolicy {
 	private readonly TimeSpan _timeSpan;
 	private readonly List<string> _tags;
 
