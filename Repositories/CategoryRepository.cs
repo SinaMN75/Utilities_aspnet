@@ -50,7 +50,7 @@ public class CategoryRepository : ICategoryRepository {
 
 	public GenericResponse<IEnumerable<CategoryEntity>> Filter(CategoryFilterDto dto) {
 		IQueryable<CategoryEntity> q = _dbContext.Set<CategoryEntity>().AsNoTracking()
-			.Where(x => x.DeletedAt == null && x.ParentId == null)
+			.Where(x => x.DeletedAt == null)
 			.Include(x => x.Children!.Where(y => y.DeletedAt == null));
 
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => x.Title!.Contains(dto.Title!));
