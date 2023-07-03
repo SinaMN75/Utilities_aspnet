@@ -264,3 +264,8 @@ public enum ProductType {
 	Digital = 101,
 	Physical = 102
 }
+
+public enum ProductTag {
+	Product = 100,
+	Post = 101,
+}
