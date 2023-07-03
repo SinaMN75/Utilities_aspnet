@@ -62,6 +62,7 @@ public class UserEntity : IdentityUser {
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
+	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
