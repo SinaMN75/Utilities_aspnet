@@ -266,14 +266,14 @@ public class ProductRepository : IProductRepository
         if (reaction is not null && reaction.Reaction != dto.Reaction)
         {
             reaction.Reaction = dto.Reaction;
-            reaction.UpdatedAt = DateTime.UtcNow;
+            reaction.UpdatedAt = DateTime.Now;
             _dbContext.Update(reaction);
         }
         else
         {
             reaction = new ReactionEntity
             {
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.Now,
                 ProductId = dto.ProductId,
                 Reaction = dto.Reaction,
                 UserId = _userId

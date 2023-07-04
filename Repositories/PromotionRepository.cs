@@ -24,7 +24,7 @@ public class PromotionRepository : IPromotionRepository {
 			return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 
 		promotion = new PromotionEntity {
-			CreatedAt = DateTime.UtcNow,
+			CreatedAt = DateTime.Now,
 			ProductId = dto.ProductId,
 			UserId = _userId,
 			DisplayType = dto.DisplayType,

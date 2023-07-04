@@ -29,7 +29,7 @@ public class WithdrawRepository : IWithdrawRepository {
 		WithdrawEntity withdraw = new() {
 			Amount = dto.Amount,
 			UserId = user.Id,
-			CreatedAt = DateTime.UtcNow,
+			CreatedAt = DateTime.Now,
 			ShebaNumber = dto.ShebaNumber,
 			WithdrawState = WithdrawState.Requested
 		};
