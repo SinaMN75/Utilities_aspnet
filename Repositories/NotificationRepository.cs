@@ -44,6 +44,7 @@ public class NotificationRepository : INotificationRepository {
 		if (dto.CreatorUserId.IsNotNullOrEmpty()) q = q.Where(x => (x.CreatorUserId ?? "").Contains(dto.CreatorUserId!));
 		if (dto.UseCase.IsNotNullOrEmpty()) q = q.Where(x => (x.UseCase ?? "").Contains(dto.UseCase!));
 		if (dto.Message.IsNotNullOrEmpty()) q = q.Where(x => (x.Message ?? "").Contains(dto.Message!));
+		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => x.Tags!.Any(y => dto.Tags!.Contains(y)));
 
 		int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize).AsNoTracking();
@@ -91,6 +92,7 @@ public class NotificationRepository : INotificationRepository {
 			CreatorUserId = model.CreatorUserId,
 			CreatedAt = DateTime.Now,
 			UpdatedAt = DateTime.Now,
+			Tags = model.Tags,
 			Visited = false
 		};
 		await _dbContext.Set<NotificationEntity>().AddAsync(notification);

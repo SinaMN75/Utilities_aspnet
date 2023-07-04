@@ -12,7 +12,7 @@ public class MediaEntity : BaseEntity {
 	public MediaJsonDetail JsonDetail { get; set; } = new();
 	
 	[MaxLength(500)]
-	public List<TagCategory>? Tags { get; set; } = new();
+	public List<TagMedia>? Tags { get; set; } = new();
 
 	[NotMapped]
 	public string Url => $"{Server.ServerAddress}/Medias/{FileName}";
@@ -129,7 +129,7 @@ public class UploadDto {
 	public Guid? BookmarkId { get; set; }
 	public IEnumerable<string>? Links { get; set; }
 	public IEnumerable<IFormFile>? Files { get; set; }
-	public List<TagCategory>? Tags { get; set; }
+	public List<TagMedia>? Tags { get; set; }
 }
 
 public class UpdateMediaDto {
@@ -140,5 +140,5 @@ public class UpdateMediaDto {
 	public string? Artist { get; set; }
 	public string? Album { get; set; }
 	public int? Order { get; set; }
-	public List<TagCategory>? Tags { get; set; }
+	public List<TagMedia>? Tags { get; set; }
 }

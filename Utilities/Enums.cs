@@ -289,3 +289,7 @@ public enum TagMedia {
 	Profile,
 	Cover
 }
+
+public enum TagNotification {
+}
+
