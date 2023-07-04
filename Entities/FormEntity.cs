@@ -30,6 +30,7 @@ public class FormEntity : BaseEntity {
 
 [Table("FormFields")]
 public class FormFieldEntity : BaseEntity {
+	[MaxLength(100)]
 	public string? Label { get; set; }
 	public bool? IsRequired { get; set; } = false;
 
