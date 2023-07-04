@@ -11,10 +11,10 @@ public class AddressEntity : BaseEntity {
 	[MaxLength(100)]
 	public string? Address { get; set; }
 
-	[MaxLength(20)]
+	[MaxLength(10)]
 	public string? Pelak { get; set; }
 
-	[MaxLength(20)]
+	[MaxLength(10)]
 	public string? Unit { get; set; }
 
 	[MaxLength(20)]
@@ -38,13 +38,6 @@ public class AddressCreateUpdateDto {
 
 public class AddressFilterDto {
 	public string? UserId { get; set; }
-	public bool? OrderByReceiverFullName { get; set; }
-	public bool? OrderByReceiverPhoneNumber { get; set; }
-	public bool? OrderByAddress { get; set; }
-	public bool? OrderByPelak { get; set; }
-	public bool? OrderByUnit { get; set; }
-	public bool? OrderByPostalCode { get; set; }
-	public bool? OrderByIsDefault { get; set; }
 	public int PageSize { get; set; } = 100;
 	public int PageNumber { get; set; } = 1;
 }
