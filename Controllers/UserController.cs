@@ -14,7 +14,7 @@ public class UserController : BaseApiController {
 	public async Task<ActionResult<GenericResponse>> LoginWithPassword(LoginWithPasswordDto dto) => Result(await _repository.LoginWithPassword(dto));
 
 	[HttpPost("GetVerificationCodeForLogin")]
-	public async Task<ActionResult<GenericResponse>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto) =>
+	public async Task<ActionResult<GenericResponse<UserEntity>>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto) =>
 		Result(await _repository.GetVerificationCodeForLogin(dto));
 
 	[HttpPost("VerifyCodeForLogin")]

@@ -8,7 +8,7 @@ public interface IUserRepository
     Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null);
     Task<GenericResponse<UserEntity?>> Update(UserCreateUpdateDto dto);
     Task<GenericResponse<UserEntity?>> GetTokenForTest(string? mobile);
-    Task<GenericResponse<string?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto);
+    Task<GenericResponse<UserEntity?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto);
     Task<GenericResponse<UserEntity?>> VerifyCodeForLogin(VerifyMobileForLoginDto dto);
     Task<GenericResponse<UserEntity?>> Register(RegisterDto dto);
     Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model);
@@ -220,7 +220,7 @@ public class UserRepository : IUserRepository
         return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result);
     }
 
-    public async Task<GenericResponse<string?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto)
+    public async Task<GenericResponse<UserEntity?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto)
     {
         //string salt = $"{DateTime.Now.Year}{DateTime.Now.Month}{DateTime.Now.Day}{DateTime.Now.Hour}{DateTime.Now.Minute}SinaMN75";
         //bool isOk = dto.token == Encryption.GetMd5HashData(salt).ToLower();
@@ -229,7 +229,7 @@ public class UserRepository : IUserRepository
         string mobile = dto.Mobile.DeleteAdditionsInsteadNumber();
         mobile = mobile.GetLast(10);
         mobile = mobile.Insert(0, "0");
-        if (mobile.Length is > 12 or < 9) return new GenericResponse<string?>("شماره موبایل وارد شده صحیح نیست", UtilitiesStatusCodes.BadRequest);
+        if (mobile.Length is > 12 or < 9) return new GenericResponse<UserEntity?>(null,UtilitiesStatusCodes.BadRequest);
         UserEntity? existingUser = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Email == mobile ||
                                                                                                x.PhoneNumber == mobile ||
                                                                                                x.AppUserName == mobile ||
@@ -239,9 +239,8 @@ public class UserRepository : IUserRepository
         if (existingUser != null)
             if (dto.SendSms)
             {
-                if (!await SendOtp(existingUser.Id, 4))
-                    return new GenericResponse<string?>("برای دریافت کد تایید جدید کمی صبر کنید", UtilitiesStatusCodes.MaximumLimitReached);
-                return new GenericResponse<string?>(":)");
+                if (!await SendOtp(existingUser.Id, 4)) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.MaximumLimitReached);
+                return new GenericResponse<UserEntity?>(existingUser);
             }
         UserEntity user = new()
         {
@@ -255,11 +254,11 @@ public class UserRepository : IUserRepository
 
         IdentityResult? result = await _userManager.CreateAsync(user, "SinaMN75");
         if (!result.Succeeded)
-            return new GenericResponse<string?>("", UtilitiesStatusCodes.BadRequest, result.Errors.First().Code + result.Errors.First().Description);
+            return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.BadRequest, result.Errors.First().Code + result.Errors.First().Description);
 
         if (dto.SendSms) await SendOtp(user.Id, 4);
 
-        return new GenericResponse<string?>(":)");
+        return new GenericResponse<UserEntity?>(user);
     }
 
     public async Task<GenericResponse<UserEntity?>> VerifyCodeForLogin(VerifyMobileForLoginDto dto)
