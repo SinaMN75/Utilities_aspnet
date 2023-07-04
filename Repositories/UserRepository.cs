@@ -95,13 +95,11 @@ public class UserRepository : IUserRepository
         if (dto.JobStatus != null) q = q.Where(x => x.Headline!.Contains(dto.JobStatus));
         if (dto.Region != null) q = q.Where(x => x.Region!.Contains(dto.Region));
         if (dto.State != null) q = q.Where(x => x.State!.Contains(dto.State));
-        if (dto.Type != null) q = q.Where(x => x.Type!.Contains(dto.Type));
         if (dto.AccessLevel != null) q = q.Where(x => x.AccessLevel!.Contains(dto.AccessLevel));
         if (dto.AppEmail != null) q = q.Where(x => x.AppEmail!.Contains(dto.AppEmail));
         if (dto.FirstName != null) q = q.Where(x => x.FirstName!.Contains(dto.FirstName));
         if (dto.LastName != null) q = q.Where(x => x.LastName!.Contains(dto.LastName));
         if (dto.FullName != null) q = q.Where(x => x.FullName!.Contains(dto.FullName));
-        if (dto.UseCase != null) q = q.Where(x => x.UseCase!.Contains(dto.UseCase));
         if (dto.PhoneNumber != null) q = q.Where(x => x.PhoneNumber!.Contains(dto.PhoneNumber));
         if (dto.AppUserName != null) q = q.Where(x => x.AppUserName!.Contains(dto.AppUserName));
         if (dto.AppPhoneNumber != null) q = q.Where(x => x.AppPhoneNumber!.Contains(dto.AppPhoneNumber));
@@ -381,10 +379,8 @@ public class UserRepository : IUserRepository
         entity.Birthdate = dto.BirthDate ?? entity.Birthdate;
         entity.Wallet = dto.Wallet ?? entity.Wallet;
         entity.Gender = dto.Gender ?? entity.Gender;
-        entity.UseCase = dto.UseCase ?? entity.UseCase;
         entity.Email = dto.Email ?? entity.Email;
         entity.State = dto.State ?? entity.State;
-        entity.Type = dto.Type ?? entity.Type;
         entity.Point = dto.Point ?? entity.Point;
         entity.AccessLevel = dto.AccessLevel ?? entity.AccessLevel;
         entity.VisitedProducts = dto.VisitedProducts ?? entity.VisitedProducts;

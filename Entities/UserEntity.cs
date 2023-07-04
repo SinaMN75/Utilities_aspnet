@@ -25,12 +25,6 @@ public class UserEntity : IdentityUser {
 	[MaxLength(50)]
 	public string? AppEmail { get; set; }
 
-	[MaxLength(20)]
-	public string? UseCase { get; set; }
-
-	[MaxLength(20)]
-	public string? Type { get; set; }
-
 	[MaxLength(100)]
 	public string? AccessLevel { get; set; }
 
@@ -204,8 +198,6 @@ public class UserCreateUpdateDto {
 	public string? AppUserName { get; set; }
 	public string? AppPhoneNumber { get; set; }
 	public string? AppEmail { get; set; }
-	public string? UseCase { get; set; }
-	public string? Type { get; set; }
 	public string? Region { get; set; }
 	public string? State { get; set; }
 	public string? Badge { get; set; }
@@ -259,8 +251,6 @@ public class UserFilterDto {
 	public string? AppPhoneNumber { get; set; }
 	public string? AppEmail { get; set; }
 	public GenderType? Gender { get; set; } = null!;
-	public string? UseCase { get; set; }
-	public string? Type { get; set; }
 	public string? Region { get; set; }
 	public string? State { get; set; }
 	public string? AccessLevel { get; set; }
