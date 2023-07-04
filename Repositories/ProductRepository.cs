@@ -93,7 +93,6 @@ public class ProductRepository : IProductRepository
 
         if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
         if (dto.Subtitle.IsNotNullOrEmpty()) q = q.Where(x => (x.Subtitle ?? "").Contains(dto.Subtitle!));
-        if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => (x.JsonDetail.Tags ?? "").Contains(dto.Tags!));
         if (dto.Type.IsNotNullOrEmpty()) q = q.Where(x => (x.Type ?? "").Contains(dto.Type!));
         if (dto.Description.IsNotNullOrEmpty()) q = q.Where(x => (x.Description ?? "").Contains(dto.Description!));
         if (dto.UseCase.IsNotNullOrEmpty()) q = q.Where(x => x.UseCase!.Contains(dto.UseCase!));
@@ -342,7 +341,6 @@ public static class ProductEntityExtension
             EndDate = dto.EndDate ?? entity.JsonDetail.EndDate,
             ShippingCost = dto.ShippingCost ?? entity.JsonDetail.ShippingCost,
             ShippingTime = dto.ShippingTime ?? entity.JsonDetail.ShippingTime,
-            Tags = dto.Tags ?? entity.JsonDetail.Tags,
             KeyValue = dto.KeyValue ?? entity.JsonDetail.KeyValue,
             Type1 = dto.Type1 ?? entity.JsonDetail.Type1,
             Type2 = dto.Type2 ?? entity.JsonDetail.Type2,

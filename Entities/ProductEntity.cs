@@ -45,6 +45,7 @@ public class ProductEntity : BaseEntity {
 	public string? UserId { get; set; }
 	public UserEntity? User { get; set; }
 	public ProductJsonDetail JsonDetail { get; set; } = new();
+	public List<TagProduct> Tags { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<FormEntity>? Forms { get; set; }
@@ -82,7 +83,6 @@ public class ProductJsonDetail {
 	public int? MinPrice { get; set; }
 	public int? ShippingCost { get; set; }
 	public int? ShippingTime { get; set; }
-	public string? Tags { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
 	public List<KeyValue>? KeyValues { get; set; }
