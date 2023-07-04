@@ -23,6 +23,7 @@ public class ContentRepository : IContentRepository {
 			Type = dto.Type,
 			SubTitle = dto.SubTitle,
 			UseCase = dto.UseCase,
+			Tags = dto.Tags,
 			CreatedAt = DateTime.Now,
 			UpdatedAt = DateTime.Now
 		};
@@ -43,6 +44,7 @@ public class ContentRepository : IContentRepository {
 		e.Type = dto.Type ?? e.Type;
 		e.SubTitle = dto.SubTitle ?? e.SubTitle;
 		e.Description = dto.Description ?? e.Description;
+		e.Tags = dto.Tags ?? e.Tags;
 		_dbContext.Update(e);
 		await _dbContext.SaveChangesAsync(ct);
 		await _outputCache.EvictByTagAsync("content", ct);

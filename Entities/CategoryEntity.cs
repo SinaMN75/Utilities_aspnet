@@ -18,7 +18,12 @@ public class CategoryEntity : BaseEntity {
 	public string? Type { get; set; }
 
 	public int? Order { get; set; }
+	
+	[MaxLength(1000)]
 	public CategoryJsonDetail JsonDetail { get; set; } = new();
+
+	[MaxLength(500)]
+	public List<TagCategory> Tags { get; set; } = new();
 
 	public Guid? ParentId { get; set; }
 	public CategoryEntity? Parent { get; set; }
@@ -82,6 +87,7 @@ public class CategoryCreateUpdateDto {
 	public DateTime? Date2 { get; set; }
 	public Guid? ParentId { get; set; }
 	public bool IsUnique { get; set; } = true;
+	public List<TagCategory>? Tags { get; set; }
 }
 
 public class CategoryFilterDto {
@@ -90,6 +96,7 @@ public class CategoryFilterDto {
 	public string? TitleTr2 { get; set; }
 	public string? UseCase { get; set; }
 	public string? Type { get; set; }
+	public List<TagCategory>? Tags { get; set; }
 	public Guid? ParentId { get; set; }
 	public bool? ShowMedia { get; set; }
 	public bool? OrderByOrder { get; set; }

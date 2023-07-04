@@ -16,6 +16,8 @@ public class ContentEntity : BaseEntity {
 
 	[StringLength(5000)]
 	public string? Description { get; set; }
+	
+	public List<TagContent>? Tags { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 }
@@ -27,4 +29,5 @@ public class ContentCreateUpdateDto {
 	public string? Description { get; set; }
 	public string? UseCase { get; set; }
 	public string? Type { get; set; }
+	public List<TagContent>? Tags { get; set; }
 }

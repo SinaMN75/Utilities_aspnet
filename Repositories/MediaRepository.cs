@@ -40,6 +40,7 @@ public class MediaRepository : IMediaRepository {
 					NotificationId = model.NotificationId,
 					GroupChatId = model.GroupChatId,
 					GroupChatMessageId = model.GroupChatMessageId,
+					Tags = model.Tags,
 					JsonDetail = {
 						Title = model.Title,
 						IsPrivate = model.PrivacyType,
@@ -66,6 +67,7 @@ public class MediaRepository : IMediaRepository {
 				         UseCase = model.UseCase,
 				         NotificationId = model.NotificationId,
 				         Order = model.Order,
+				         Tags = model.Tags,
 				         JsonDetail = {
 					         Title = model.Title,
 					         IsPrivate = model.PrivacyType,
@@ -105,6 +107,7 @@ public class MediaRepository : IMediaRepository {
 		media.JsonDetail.Album = model.Album ?? media.JsonDetail.Album;
 		media.UpdatedAt = DateTime.Now;
 		media.UseCase = model.UseCase ?? media.UseCase;
+		media.Tags = model.Tags ?? media.Tags;
 		media.Order = model.Order ?? media.Order;
 
 		_dbContext.Set<MediaEntity>().Update(media);

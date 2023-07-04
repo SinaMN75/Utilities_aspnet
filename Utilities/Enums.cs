@@ -269,3 +269,23 @@ public enum ProductTag {
 	Product = 100,
 	Post = 101,
 }
+
+public enum TagCategory {
+	Category = 100,
+	Hashtag = 101
+}
+
+public enum TagProduct {
+	PhysicalProduct,
+	DigitalProduct
+}
+
+public enum TagContent {
+	Terms,
+	AboutUs
+}
+
+public enum TagMedia {
+	Profile,
+	Cover
+}

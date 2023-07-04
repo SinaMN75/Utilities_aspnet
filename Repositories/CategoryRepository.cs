@@ -50,7 +50,7 @@ public class CategoryRepository : ICategoryRepository {
 
 	public GenericResponse<IEnumerable<CategoryEntity>> Filter(CategoryFilterDto dto) {
 		IQueryable<CategoryEntity> q = _dbContext.Set<CategoryEntity>().AsNoTracking()
-			.Where(x => x.DeletedAt == null)
+			.Where(x => x.DeletedAt == null && x.ParentId == null)
 			.Include(x => x.Children!.Where(y => y.DeletedAt == null));
 
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => x.Title!.Contains(dto.Title!));
@@ -59,7 +59,8 @@ public class CategoryRepository : ICategoryRepository {
 		if (dto.TitleTr1.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr1!.Contains(dto.TitleTr1!));
 		if (dto.TitleTr2.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr2!.Contains(dto.TitleTr2!));
 		if (dto.ParentId != null) q = q.Where(x => x.ParentId == dto.ParentId);
-
+		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => x.Tags.Except(dto.Tags!).Any());
+		
 		if (dto.OrderByOrder.IsTrue()) q = q.OrderBy(x => x.Order);
 		if (dto.OrderByCreatedAtDescending.IsTrue()) q = q.OrderByDescending(x => x.Order);
 		if (dto.OrderByCreatedAt.IsTrue()) q = q.OrderBy(x => x.CreatedAt);
@@ -96,6 +97,7 @@ public static class CategoryEntityExtension {
 		entity.Type = dto.Type ?? entity.Type;
 		entity.Order = dto.Order ?? entity.Order;
 		entity.ParentId = dto.ParentId ?? entity.ParentId;
+		entity.Tags = dto.Tags ?? entity.Tags;
 		entity.JsonDetail = new CategoryJsonDetail {
 			Subtitle = dto.Subtitle ?? entity.JsonDetail.Subtitle,
 			Price = dto.Price ?? entity.JsonDetail.Price,

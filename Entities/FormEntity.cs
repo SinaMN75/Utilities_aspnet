@@ -5,9 +5,6 @@ public class FormEntity : BaseEntity {
 	[MaxLength(50)]
 	public string? Title { get; set; }
 
-	[MaxLength(20)]
-	public string? UseCase { get; set; }
-
 	[ForeignKey(nameof(FormFieldId))]
 	[InverseProperty(nameof(FormFieldEntity.Forms))]
 	public FormFieldEntity? FormField { get; set; }
@@ -34,7 +31,6 @@ public class FormEntity : BaseEntity {
 [Table("FormFields")]
 public class FormFieldEntity : BaseEntity {
 	public string? Label { get; set; }
-	public string? UseCase { get; set; }
 	public bool? IsRequired { get; set; } = false;
 
 	[StringLength(2000)]
