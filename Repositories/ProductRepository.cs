@@ -127,11 +127,6 @@ public class ProductRepository : IProductRepository
         if (dto.OrderByCreatedDateDescending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
         if (dto.OrderByAgeCategory.IsTrue()) q = q.OrderBy(o => o.AgeCategory);
         if (dto.OrderByMostUsedHashtag.IsTrue()) q = q.OrderBy(o => o.Categories!.Count(c => c.UseCase!.ToLower() == "tag"));
-        if (dto.ShowPostOfPrivateUser != null && !dto.ShowPostOfPrivateUser.Value)
-        {
-            q = q.Include(i => i.User);
-            q = q.Where(w => w.User.IsPrivate == false);
-        }
         if (dto.OrderByCategory.IsTrue())
             q = q.AsEnumerable().OrderBy(o => o.Categories != null && o.Categories.Any()
                                              ? o.Categories.OrderBy(op => op.Title)
