@@ -13,7 +13,7 @@ public class MediaEntity : BaseEntity {
 	[MaxLength(1000)]
 	public MediaJsonDetail JsonDetail { get; set; } = new();
 	
-	[MaxLength(500)]
+	[MaxLength(100)]
 	public List<TagMedia>? Tags { get; set; } = new();
 
 	[NotMapped]
