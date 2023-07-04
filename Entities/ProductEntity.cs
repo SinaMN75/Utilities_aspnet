@@ -127,7 +127,6 @@ public class ProductCreateUpdateDto {
 	public string? UseCase { get; set; }
 	public string? KeyValue { get; set; }
 	public string? State { get; set; }
-	public string? Tags { get; set; }
 	public double? Latitude { get; set; }
 	public double? Longitude { get; set; }
 	public int? Price { get; set; }
@@ -159,6 +158,7 @@ public class ProductCreateUpdateDto {
 	public DateTime? Boosted { get; set; }
 	public Guid? ParentId { get; set; }
 	public List<KeyValue>? KeyValues { get; set; }
+	public List<TagProduct>? Tags { get; set; }
 
 	[JsonIgnore]
 	[System.Text.Json.Serialization.JsonIgnore]
@@ -177,7 +177,6 @@ public class ProductFilterDto {
 	public string? Type { get; set; }
 	public string? UseCase { get; set; }
 	public string? State { get; set; }
-	public string? Tags { get; set; }
 	public int? StartPriceRange { get; set; }
 	public int? EndPriceRange { get; set; }
 	public bool? IsFollowing { get; set; }
@@ -192,7 +191,6 @@ public class ProductFilterDto {
 	public bool? ShowCreator { get; set; } = false;
 	public bool? ShowCategoryMedia { get; set; } = false;
 	public bool? ShowChildren { get; set; } = false;
-	public bool? ShowPostOfPrivateUser { get; set; } = false;
     public bool? OrderByVotes { get; set; } = false;
 	public bool? OrderByVotesDescending { get; set; } = false;
 	public bool? OrderByAtoZ { get; set; } = false;
@@ -209,6 +207,7 @@ public class ProductFilterDto {
 	public ProductStatus? Status { get; set; }
 	public Currency? Currency { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
+	public List<TagProduct>? Tags { get; set; }
 	public IEnumerable<string>? UserIds { get; set; }
 	public string? Query { get; set; }
 	public bool ShowExpired { get; set; } = false;

@@ -106,6 +106,7 @@ public class ProductRepository : IProductRepository
             q = q.Where(x => (x.Title ?? "").Contains(dto.Query!) || (x.Subtitle ?? "").Contains(dto.Query!) || (x.Description ?? "").Contains(dto.Query!));
 
         if (dto.Categories.IsNotNullOrEmpty()) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
+        if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => x.Tags!.Any(y => dto.Tags!.Contains(y)));
         if (dto.UserIds.IsNotNullOrEmpty()) q = q.Where(x => dto.UserIds!.Contains(x.UserId));
 
         if (dto.ShowChildren.IsTrue()) q = q.Include(i => i.Children);
@@ -315,6 +316,7 @@ public static class ProductEntityExtension
         entity.ProductState = dto.ProductState ?? entity.ProductState;
         entity.Boosted = dto.Boosted ?? entity.Boosted;
         entity.UpdatedAt = DateTime.Now;
+        entity.Tags = dto.Tags ?? entity.Tags;
         entity.JsonDetail = new ProductJsonDetail
         {
             Details = dto.Details ?? entity.JsonDetail.Details,
