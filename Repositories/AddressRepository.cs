@@ -21,7 +21,7 @@ public class AddressRepository : IAddressRepository {
 	public async Task<GenericResponse<AddressEntity?>> Create(AddressCreateUpdateDto addressDto, CancellationToken ct) {
 		AddressEntity e = new() {
 			Address = addressDto.Address,
-			CreatedAt = DateTime.UtcNow,
+			CreatedAt = DateTime.Now,
 			Pelak = addressDto.Pelak,
 			PostalCode = addressDto.PostalCode,
 			ReceiverFullName = addressDto.ReceiverFullName,
@@ -41,7 +41,7 @@ public class AddressRepository : IAddressRepository {
 		e.Pelak = addressDto.Pelak ?? e.Pelak;
 		e.Unit = addressDto.Unit ?? e.Unit;
 		e.Address = addressDto.Address ?? e.Address;
-		e.UpdatedAt = DateTime.UtcNow;
+		e.UpdatedAt = DateTime.Now;
 		e.ReceiverFullName = addressDto.ReceiverFullName ?? e.ReceiverFullName;
 		e.ReceiverPhoneNumber = addressDto.ReceiverPhoneNumber ?? e.ReceiverPhoneNumber;
 		if (addressDto.IsDefault.IsTrue() && _dbContext.Set<AddressEntity>().Any(a => a.UserId == e.UserId && a.Id != e.Id && e.IsDefault))

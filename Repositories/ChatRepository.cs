@@ -504,7 +504,7 @@ public class ChatRepository : IChatRepository {
 			ReactionEntity react = new() {
 				ChatsId = chat.Id,
 				Reaction = reaction,
-				CreatedAt = DateTime.UtcNow,
+				CreatedAt = DateTime.Now,
 				UserId = user.Id
 			};
 			await _dbContext.Set<ReactionEntity>().AddAsync(react);
