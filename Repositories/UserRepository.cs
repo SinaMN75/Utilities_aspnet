@@ -8,7 +8,7 @@ public interface IUserRepository
     Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null);
     Task<GenericResponse<UserEntity?>> Update(UserCreateUpdateDto dto);
     Task<GenericResponse<UserEntity?>> GetTokenForTest(string? mobile);
-    Task<GenericResponse<UserEntity?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto);
+    Task<GenericResponse<string?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto);
     Task<GenericResponse<UserEntity?>> VerifyCodeForLogin(VerifyMobileForLoginDto dto);
     Task<GenericResponse<UserEntity?>> Register(RegisterDto dto);
     Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model);
@@ -25,20 +25,16 @@ public class UserRepository : IUserRepository
     private readonly ISmsNotificationRepository _sms;
     private readonly ITransactionRepository _transactionRepository;
     private readonly string? _userId;
-    private readonly UserManager<UserEntity> _userManager;
     private readonly IMemoryCache _memoryCache;
 
     public UserRepository(
         DbContext dbContext,
-        UserManager<UserEntity> userManager,
         ISmsNotificationRepository sms,
         IHttpContextAccessor httpContextAccessor,
         ITransactionRepository transactionRepository,
-        IMemoryCache memoryCache
-        )
+        IMemoryCache memoryCache)
     {
         _dbContext = dbContext;
-        _userManager = userManager;
         _sms = sms;
         _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
         _transactionRepository = transactionRepository;
@@ -160,7 +156,7 @@ public class UserRepository : IUserRepository
         string m = mobile ?? "09351902721";
         UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == m);
         if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
-        JwtSecurityToken token = await CreateToken(user);
+        JwtSecurityToken token = CreateToken(user);
         return new GenericResponse<UserEntity?>(ReadByIdMinimal(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result);
     }
 
@@ -171,18 +167,16 @@ public class UserRepository : IUserRepository
         return e;
     }
 
-    public async Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model)
-    {
-        UserEntity? user = (await _userManager.FindByEmailAsync(model.Email!) ?? await _userManager.FindByNameAsync(model.Email!))
-                           ?? await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == model.Email);
+    public async Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model) {
+        UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => (x.Email == model.Email ||
+                                                                                        x.UserName == model.Email ||
+                                                                                        x.PhoneNumber == model.Email) ||
+                                                                                       x.Password == model.Password);
 
         if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
 
-        bool result = await _userManager.CheckPasswordAsync(user, model.Password!);
-        if (!result) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.BadRequest);
-
         await _dbContext.SaveChangesAsync();
-        JwtSecurityToken token = await CreateToken(user);
+        JwtSecurityToken token = CreateToken(user);
 
         return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result);
     }
@@ -201,15 +195,16 @@ public class UserRepository : IUserRepository
             FullName = "",
             Wallet = 0,
             Suspend = false,
+            Password = dto.Password,
             FirstName = dto.FirstName,
             LastName = dto.LastName,
             JsonDetail = dto.JsonDetail
         };
 
-        IdentityResult? result = await _userManager.CreateAsync(user, dto.Password!);
-        if (!result.Succeeded) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.Unhandled);
+        await _dbContext.AddAsync(user);
+        await _dbContext.SaveChangesAsync();
 
-        JwtSecurityToken token = await CreateToken(user);
+        JwtSecurityToken token = CreateToken(user);
 
         if (dto.SendSms)
         {
@@ -220,7 +215,7 @@ public class UserRepository : IUserRepository
         return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result);
     }
 
-    public async Task<GenericResponse<UserEntity?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto)
+    public async Task<GenericResponse<string?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto)
     {
         //string salt = $"{DateTime.Now.Year}{DateTime.Now.Month}{DateTime.Now.Day}{DateTime.Now.Hour}{DateTime.Now.Minute}SinaMN75";
         //bool isOk = dto.token == Encryption.GetMd5HashData(salt).ToLower();
@@ -229,36 +224,27 @@ public class UserRepository : IUserRepository
         string mobile = dto.Mobile.DeleteAdditionsInsteadNumber();
         mobile = mobile.GetLast(10);
         mobile = mobile.Insert(0, "0");
-        if (mobile.Length is > 12 or < 9) return new GenericResponse<UserEntity?>(null,UtilitiesStatusCodes.BadRequest);
+        if (mobile.Length is > 12 or < 9) return new GenericResponse<string?>("شماره موبایل وارد شده صحیح نیست", UtilitiesStatusCodes.BadRequest);
         UserEntity? existingUser = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Email == mobile ||
                                                                                                x.PhoneNumber == mobile ||
                                                                                                x.AppUserName == mobile ||
                                                                                                x.AppPhoneNumber == mobile ||
                                                                                                x.UserName == mobile);
 
-        if (existingUser != null)
-            if (dto.SendSms)
-            {
-                if (!await SendOtp(existingUser.Id, 4)) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.MaximumLimitReached);
-                return new GenericResponse<UserEntity?>(existingUser);
-            }
+        if (existingUser != null) {
+                if (!await SendOtp(existingUser.Id, 4)) return new GenericResponse<string?>(null, UtilitiesStatusCodes.MaximumLimitReached);
+                return new GenericResponse<string?>(":)");
+        }
         UserEntity user = new()
         {
-            Email = "",
             PhoneNumber = mobile,
             UserName = mobile,
-            FullName = "",
-            Wallet = 0,
-            Suspend = false
         };
-
-        IdentityResult? result = await _userManager.CreateAsync(user, "SinaMN75");
-        if (!result.Succeeded)
-            return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.BadRequest, result.Errors.First().Code + result.Errors.First().Description);
-
-        if (dto.SendSms) await SendOtp(user.Id, 4);
-
-        return new GenericResponse<UserEntity?>(user);
+        
+        await _dbContext.AddAsync(user);
+        await _dbContext.SaveChangesAsync();
+        await SendOtp(user.Id, 4);
+        return new GenericResponse<string?>(":)");
     }
 
     public async Task<GenericResponse<UserEntity?>> VerifyCodeForLogin(VerifyMobileForLoginDto dto)
@@ -269,7 +255,7 @@ public class UserRepository : IUserRepository
         if (user.Suspend ?? false) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.UserSuspended);
 
         await _dbContext.SaveChangesAsync();
-        JwtSecurityToken token = await CreateToken(user);
+        JwtSecurityToken token = CreateToken(user);
 
         if (Verify(user.Id, dto.VerificationCode) != OtpResult.Ok)
             return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.WrongVerificationCode);
@@ -341,25 +327,17 @@ public class UserRepository : IUserRepository
         return new GenericResponse();
     }
 
-    private async Task<JwtSecurityToken> CreateToken(UserEntity user)
+    private static JwtSecurityToken CreateToken(UserEntity user)
     {
-        IEnumerable<string> roles = await _userManager.GetRolesAsync(user);
         List<Claim> claims = new() {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id),
             new Claim(ClaimTypes.NameIdentifier, user.Id),
             new Claim(ClaimTypes.Name, user.Id),
-            new Claim("IsLoggedIn", true.ToString()),
-            new Claim("IsLoggedIn", true.ToString()),
-            new Claim("IsLoggedIn", true.ToString()),
-            new Claim("IsLoggedIn", true.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
-        claims.AddRange(roles.Select(role => new Claim("role", role)));
         SymmetricSecurityKey key = new("https://SinaMN75.com"u8.ToArray());
         SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha256);
         JwtSecurityToken token = new("https://SinaMN75.com", "https://SinaMN75.com", claims, expires: DateTime.Now.AddDays(365), signingCredentials: creds);
-
-        await _userManager.UpdateAsync(user);
         return token;
     }
 

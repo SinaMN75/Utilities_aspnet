@@ -114,8 +114,6 @@ public static class StartupExtension {
 	}
 
 	public static void AddUtilitiesIdentity(this WebApplicationBuilder builder) {
-		builder.Services.AddIdentity<UserEntity, IdentityRole>(options => { options.SignIn.RequireConfirmedAccount = false; }).AddRoles<IdentityRole>()
-			.AddEntityFrameworkStores<DbContext>().AddDefaultTokenProviders();
 		builder.Services.AddAuthentication(options => {
 			options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
 			options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -132,18 +130,11 @@ public static class StartupExtension {
 				ClockSkew = TimeSpan.Zero,
 				ValidAudience = "https://SinaMN75.com",
 				ValidIssuer = "https://SinaMN75.com",
-				IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("https://SinaMN75.com"))
+				IssuerSigningKey = new SymmetricSecurityKey("https://SinaMN75.com"u8.ToArray())
 			};
 		});
 
-		builder.Services.Configure<IdentityOptions>(options => {
-			options.Password.RequireDigit = false;
-			options.Password.RequiredLength = 4;
-			options.Password.RequireNonAlphanumeric = false;
-			options.Password.RequireUppercase = false;
-			options.Password.RequireLowercase = false;
-			options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@";
-		});
+		builder.Services.AddAuthorization();
 	}
 
 	public static void UseUtilitiesServices(this WebApplication app) {
