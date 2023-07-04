@@ -1,4 +1,6 @@
-﻿namespace Utilities_aspnet.Repositories;
+﻿using Utilities_aspnet.Entities;
+
+namespace Utilities_aspnet.Repositories;
 
 public interface IChatRepository {
 	Task<GenericResponse<ChatReadDto?>> Create(ChatCreateUpdateDto model);
@@ -144,17 +146,18 @@ public class ChatRepository : IChatRepository {
 			if (blockedState.Item1)
 				return new GenericResponse<GroupChatEntity?>(null, blockedState.Item2);
 
-			GroupChatEntity? e = await _dbContext.Set<GroupChatEntity>().AsNoTracking()
+            GroupChatEntity? e = await _dbContext.Set<GroupChatEntity>().AsNoTracking()
 				.Include(x => x.Users)!.ThenInclude(x => x.Media)
 				.Include(x => x.Products)!.ThenInclude(x => x.Media)
 				.Include(x => x.Products)!.ThenInclude(x => x.Categories)
 				.Include(x => x.Media)
-				.FirstOrDefaultAsync(x => x.Users.Count() == 2 &&
-				                          x.Users.Any(x => x.Id == firstUserId) &&
-				                          x.Users.Any(x => x.Id == secondUserId) &&
-				                          x.Type == ChatType.Private &&
-				                          x.DeletedAt == null);
-			if (e == null) return await CreateGroupChatLogic(dto);
+                .FirstOrDefaultAsync(x => x.Users.Count() == 2 &&
+                                          x.Users.Any(x => x.Id == firstUserId) &&
+                                          x.Users.Any(x => x.Id == secondUserId) &&
+                                          x.Type == ChatType.Private &&
+                                          x.DeletedAt == null);
+
+            if (e == null) return await CreateGroupChatLogic(dto);
 			return new GenericResponse<GroupChatEntity?>(e);
 		}
 		return await CreateGroupChatLogic(dto);
@@ -586,7 +589,7 @@ public class ChatRepository : IChatRepository {
 		if (dto.UserIds.Count() > 2 && dto.Type == ChatType.Private)
 			return new GenericResponse<GroupChatEntity?>(null, UtilitiesStatusCodes.MoreThan2UserIsInPrivateChat);
 		List<UserEntity> users = new();
-		if (dto.UserIds.IsNotNull())
+		if (dto.UserIds.IsNotNullOrEmpty())
 			foreach (string id in dto.UserIds!) {
 				Tuple<bool, UtilitiesStatusCodes>? isBlocked = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == id),
 				                                                                   _dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == _userId));
@@ -594,7 +597,7 @@ public class ChatRepository : IChatRepository {
 			}
 
 		List<ProductEntity> products = new();
-		if (dto.Products.IsNotNull())
+		if (dto.Products.IsNotNullOrEmpty())
 			foreach (Guid id in dto.Products!)
 				products.Add((await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
 
@@ -616,7 +619,7 @@ public class ChatRepository : IChatRepository {
 		};
 		if (dto.Id != null) entity.Id = (Guid) dto.Id;
 
-		if (dto.Categories.IsNotNull()) {
+		if (dto.Categories.IsNotNullOrEmpty()) {
 			List<CategoryEntity> listCategory = new();
 			foreach (Guid item in dto.Categories!) {
 				CategoryEntity? ce = await _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item);

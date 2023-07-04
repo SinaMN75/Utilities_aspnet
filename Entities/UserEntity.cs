@@ -55,13 +55,14 @@ public class UserEntity : IdentityUser {
 	public DateTime? UpdatedAt { get; set; }
 	public bool? IsOnline { get; set; }
 	public bool? Suspend { get; set; }
-	public bool? IsPrivate { get; set; } = true;
+	public bool IsPrivate { get; set; } = true;
 	public DateTime? ExpireUpgradeAccount { get; set; }
 	public AgeCategory? AgeCategory { get; set; }
 	public UserJsonDetail JsonDetail { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
+	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
