@@ -62,17 +62,6 @@ public static class StringExtension {
 }
 
 public class Utils {
-	public static int Random(int codeLength) {
-		Random rnd = new();
-		int otp = codeLength switch {
-			4 => rnd.Next(1001, 9999),
-			5 => rnd.Next(1001, 99999),
-			_ => rnd.Next(1001, 999999)
-		};
-
-		return otp;
-	}
-
 	public static Tuple<bool, UtilitiesStatusCodes> IsBlockedUser(UserEntity? reciever, UserEntity? sender) {
 		bool isBlocked = false;
 		UtilitiesStatusCodes utilCode = UtilitiesStatusCodes.Success;

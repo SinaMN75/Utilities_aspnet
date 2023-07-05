@@ -16,7 +16,7 @@ public class TransactionEntity : BaseEntity {
 	[MaxLength(20)]
 	public string? PaymentId { get; set; }
 
-	[MaxLength(50)]
+	[MaxLength(30)]
 	public string? ShebaNumber { get; set; }
 
 	public long? RefId { get; set; }

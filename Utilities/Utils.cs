@@ -1,10 +1,7 @@
 ﻿namespace Utilities_aspnet.Utilities;
 
 public static class StartupExtension {
-	public static void SetupUtilities<T>(
-		this WebApplicationBuilder builder,
-		string connectionStrings,
-		string? redisConnectionString = null) where T : DbContext {
+	public static void SetupUtilities<T>(this WebApplicationBuilder builder, string connectionStrings) where T : DbContext {
 		builder.AddUtilitiesServices<T>(connectionStrings);
 		
 		IServiceProvider? serviceProvider = builder.Services.BuildServiceProvider().GetService<IServiceProvider>();
