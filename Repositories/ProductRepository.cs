@@ -57,6 +57,13 @@ public class ProductRepository : IProductRepository
         EntityEntry<ProductEntity> i = await _dbContext.Set<ProductEntity>().AddAsync(e, ct);
         await _dbContext.SaveChangesAsync(ct);
 
+        if (dto.Children is not null) {
+            foreach (ProductCreateUpdateDto childDto in dto.Children) {
+                childDto.ParentId = i.Entity.Id;
+                await Create(childDto, ct);
+            }
+        }
+
         if (dto.Form is not null) await _formRepository.CreateForm(new FormCreateDto { ProductId = i.Entity.Id, Form = dto.Form });
 
         return new GenericResponse<ProductEntity?>(i.Entity);

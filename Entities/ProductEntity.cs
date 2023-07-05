@@ -174,6 +174,7 @@ public class ProductCreateUpdateDto {
 	public IEnumerable<string>? Teams { get; set; }
 	public IEnumerable<UploadDto>? Upload { get; set; }
 	public IEnumerable<FormTitleDto>? Form { get; set; }
+	public List<ProductCreateUpdateDto>? Children { get; set; }
 }
 
 public class ProductFilterDto {
