@@ -38,8 +38,8 @@ public class CommentRepository : ICommentRepository {
 			.Include(x => x.Media)
 			.Where(x => x.ProductId == id && x.ParentId == null)
 			.Include(x => x.User).ThenInclude(x => x!.Media)
-			.Include(x => x.Children).ThenInclude(x => x.Media)
-			.Include(x => x.Children).ThenInclude(x => x.User).ThenInclude(x => x.Media)
+			.Include(x => x.Children)!.ThenInclude(x => x.Media)
+			.Include(x => x.Children)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
 			.OrderByDescending(x => x.CreatedAt).AsNoTracking();
 		return new GenericResponse<IQueryable<CommentEntity>?>(comment);
 	}
@@ -49,8 +49,8 @@ public class CommentRepository : ICommentRepository {
 
 		q = q.Include(x => x.User).ThenInclude(x => x!.Media)
 			.Include(x => x.Media)
-			.Include(x => x.Product).ThenInclude(x => x.Media)
-			.Include(x => x.Children).ThenInclude(x => x.User).ThenInclude(x => x!.Media)
+			.Include(x => x.Product).ThenInclude(x => x!.Media)
+			.Include(x => x.Children)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
 			.OrderByDescending(x => x.CreatedAt)
 			.AsNoTracking();
 
@@ -66,8 +66,8 @@ public class CommentRepository : ICommentRepository {
 		CommentEntity? comment = await _dbContext.Set<CommentEntity>()
 			.Include(x => x.User).ThenInclude(x => x!.Media)
 			.Include(x => x.Media)
-			.Include(x => x.Children).ThenInclude(x => x.User).ThenInclude(x => x.Media)
-			.Include(x => x.Children).ThenInclude(x => x.Media)
+			.Include(x => x.Children)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
+			.Include(x => x.Children)!.ThenInclude(x => x.Media)
 			.Where(x => x.Id == id)
 			.OrderByDescending(x => x.CreatedAt)
 			.AsNoTracking()

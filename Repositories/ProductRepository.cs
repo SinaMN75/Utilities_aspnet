@@ -88,10 +88,9 @@ public class ProductRepository : IProductRepository {
 		return new GenericResponse<ProductEntity?>(i.Entity);
 	}
 
-    public async Task<GenericResponse<IQueryable<ProductEntity>>> Filter(ProductFilterDto dto)
-    {
-        IQueryable<ProductEntity> q = _dbContext.Set<ProductEntity>().AsNoTracking();
-        if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.Now && w.ParentId == null);
+	public async Task<GenericResponse<IQueryable<ProductEntity>>> Filter(ProductFilterDto dto) {
+		IQueryable<ProductEntity> q = _dbContext.Set<ProductEntity>().AsNoTracking();
+		if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.Now && w.ParentId == null);
 
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
 		if (dto.Subtitle.IsNotNullOrEmpty()) q = q.Where(x => (x.Subtitle ?? "").Contains(dto.Subtitle!));
@@ -180,25 +179,16 @@ public class ProductRepository : IProductRepository {
 			.Include(i => i.Parent).ThenInclude(i => i!.Categories)
 			.Include(i => i.Parent).ThenInclude(i => i!.Media)
 			.Include(i => i.Parent).ThenInclude(i => i!.User).ThenInclude(i => i!.Media)
-			.FirstOrDefaultAsync(i => i.Id == id && i.DeletedAt == null, ct);
+			.FirstOrDefaultAsync(i => i.Id == id, ct);
 		if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound);
 
-    public async Task<GenericResponse<ProductEntity?>> ReadById(Guid id, CancellationToken ct)
-    {
-        ProductEntity? i = await _dbContext.Set<ProductEntity>()
-            .Include(i => i.Media)
-            .Include(i => i.Children)
-            .Include(i => i.Categories)!.ThenInclude(x => x.Media)
-            .Include(i => i.User).ThenInclude(x => x!.Media)
-            .Include(i => i.User).ThenInclude(x => x!.Categories)
-            .Include(i => i.Forms)!.ThenInclude(x => x.FormField)
-            .Include(i => i.VisitProducts)!.ThenInclude(i => i.User)
-            .Include(i => i.ProductInsights)
-            .Include(i => i.Parent).ThenInclude(i => i.Categories)
-            .Include(i => i.Parent).ThenInclude(i => i.Media)
-            .Include(i => i.Parent).ThenInclude(i => i.User).ThenInclude(i => i.Media)
-            .FirstOrDefaultAsync(i => i.Id == id, ct);
-        if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound);
+		if (_userId.IsNotNullOrEmpty()) {
+			UserEntity? user = await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == _userId, ct);
+			if (!user!.VisitedProducts.Contains(i.Id.ToString()))
+				await _userRepository.Update(new UserCreateUpdateDto {
+					Id = _userId,
+					VisitedProducts = user.VisitedProducts + "," + i.Id
+				});
 
 			VisitProducts? vp = await _dbContext.Set<VisitProducts>().FirstOrDefaultAsync(a => a.UserId == user.Id && a.ProductId == i.Id, ct);
 			if (vp is null) {
@@ -231,7 +221,7 @@ public class ProductRepository : IProductRepository {
 			            c.Status == OrderStatuses.Complete);
 		string displayOrderComplete = Utils.DisplayCountOfCompleteOrder(completeOrder.Count());
 		i.SuccessfulPurchase = displayOrderComplete;
-		
+
 		await _promotionRepository.UserSeened(i.Id);
 
 		return new GenericResponse<ProductEntity?>(i);
@@ -256,7 +246,7 @@ public class ProductRepository : IProductRepository {
 
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
 		await _dbContext.Set<ProductEntity>().Where(x => x.Id == id || x.ParentId == id)
-			.ExecuteUpdateAsync(x => x.SetProperty(y => y.DeletedAt, DateTime.Now), ct);
+			.ExecuteDeleteAsync(ct);
 		return new GenericResponse();
 	}
 
@@ -280,112 +270,67 @@ public class ProductRepository : IProductRepository {
 		return new GenericResponse();
 	}
 
-        return new GenericResponse<ProductEntity>(e);
-    }
-
-    public async Task<GenericResponse> Delete(Guid id, CancellationToken ct)
-    {
-        ProductEntity i = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id, ct))!;
-        foreach (ProductEntity c in i.Children!) {
-            _dbContext.Remove(c);
-            foreach (MediaEntity m in c.Media!) await _mediaRepository.Delete(m.Id);
-        }
-        _dbContext.Remove(i);
-        foreach (MediaEntity m in i.Media!) await _mediaRepository.Delete(m.Id);
-
-        await _dbContext.SaveChangesAsync(ct);
-        return new GenericResponse();
-    }
-
-    public async Task<GenericResponse> CreateReaction(ReactionCreateUpdateDto dto)
-    {
-        ReactionEntity? reaction = await _dbContext.Set<ReactionEntity>().FirstOrDefaultAsync(f => f.UserId == _userId && f.ProductId == dto.ProductId);
-        if (reaction is not null && reaction.Reaction != dto.Reaction)
-        {
-            reaction.Reaction = dto.Reaction;
-            reaction.UpdatedAt = DateTime.Now;
-            _dbContext.Update(reaction);
-        }
-        else
-        {
-            reaction = new ReactionEntity
-            {
-                CreatedAt = DateTime.Now,
-                ProductId = dto.ProductId,
-                Reaction = dto.Reaction,
-                UserId = _userId
-            };
-            await _dbContext.Set<ReactionEntity>().AddAsync(reaction);
-        }
-        await _dbContext.SaveChangesAsync();
-        return new GenericResponse();
-    }
-
-    public GenericResponse<IQueryable<ReactionEntity>> ReadReactionsById(Guid id)
-    {
-        IQueryable<ReactionEntity> reactions = _dbContext.Set<ReactionEntity>()
-            .Include(i => i.User)
-            .Where(w => w.ProductId == id)
-            .OrderBy(o => o.Reaction);
-        return new GenericResponse<IQueryable<ReactionEntity>>(reactions);
-    }
+	public GenericResponse<IQueryable<ReactionEntity>> ReadReactionsById(Guid id) {
+		IQueryable<ReactionEntity> reactions = _dbContext.Set<ReactionEntity>()
+			.Include(i => i.User)
+			.Where(w => w.ProductId == id)
+			.OrderBy(o => o.Reaction);
+		return new GenericResponse<IQueryable<ReactionEntity>>(reactions);
+	}
 }
 
-public static class ProductEntityExtension
-{
-    public static async Task<ProductEntity> FillData(this ProductEntity entity, ProductCreateUpdateDto dto, DbContext context)
-    {
-        entity.Title = dto.Title ?? entity.Title;
-        entity.Subtitle = dto.Subtitle ?? entity.Subtitle;
-        entity.Type = dto.Type ?? entity.Type;
-        entity.State = dto.State ?? entity.State;
-        entity.DiscountPrice = dto.DiscountPrice ?? entity.DiscountPrice;
-        entity.DiscountPercent = dto.DiscountPercent ?? entity.DiscountPercent;
-        entity.Description = dto.Description ?? entity.Description;
-        entity.UseCase = dto.UseCase ?? entity.UseCase;
-        entity.Price = dto.Price ?? entity.Price;
-        entity.Stock = dto.Stock ?? entity.Stock;
-        entity.Status = dto.Status ?? entity.Status;
-        entity.CommentsCount = dto.CommentsCount ?? entity.CommentsCount;
-        entity.Currency = dto.Currency ?? entity.Currency;
-        entity.ExpireDate = dto.ExpireDate ?? entity.ExpireDate;
-        entity.AgeCategory = dto.AgeCategory ?? entity.AgeCategory;
-        entity.ProductState = dto.ProductState ?? entity.ProductState;
-        entity.Boosted = dto.Boosted ?? entity.Boosted;
-        entity.UpdatedAt = DateTime.Now;
-        entity.Tags = dto.Tags ?? entity.Tags;
-        entity.JsonDetail = new ProductJsonDetail
-        {
-            Details = dto.Details ?? entity.JsonDetail.Details,
-            Author = dto.Author ?? entity.JsonDetail.Author,
-            Color = dto.Color ?? entity.JsonDetail.Color,
-            PhoneNumber = dto.PhoneNumber ?? entity.JsonDetail.PhoneNumber,
-            Link = dto.Link ?? entity.JsonDetail.Link,
-            Website = dto.Website ?? entity.JsonDetail.Website,
-            Email = dto.Email ?? entity.JsonDetail.Email,
-            Longitude = dto.Longitude ?? entity.JsonDetail.Longitude,
-            Latitude = dto.Latitude ?? entity.JsonDetail.Latitude,
-            ResponseTime = dto.ResponseTime ?? entity.JsonDetail.ResponseTime,
-            OnTimeDelivery = dto.OnTimeDelivery ?? entity.JsonDetail.OnTimeDelivery,
-            Length = dto.Length ?? entity.JsonDetail.Length,
-            Width = dto.Width ?? entity.JsonDetail.Width,
-            Height = dto.Height ?? entity.JsonDetail.Height,
-            Weight = dto.Weight ?? entity.JsonDetail.Weight,
-            MinOrder = dto.MinOrder ?? entity.JsonDetail.MinOrder,
-            MaxOrder = dto.MaxOrder ?? entity.JsonDetail.MaxOrder,
-            MinPrice = dto.MinPrice ?? entity.JsonDetail.MinPrice,
-            MaxPrice = dto.MaxPrice ?? entity.JsonDetail.MaxPrice,
-            Unit = dto.Unit ?? entity.JsonDetail.Unit,
-            Address = dto.Address ?? entity.JsonDetail.Address,
-            StartDate = dto.StartDate ?? entity.JsonDetail.StartDate,
-            EndDate = dto.EndDate ?? entity.JsonDetail.EndDate,
-            ShippingCost = dto.ShippingCost ?? entity.JsonDetail.ShippingCost,
-            ShippingTime = dto.ShippingTime ?? entity.JsonDetail.ShippingTime,
-            KeyValue = dto.KeyValue ?? entity.JsonDetail.KeyValue,
-            Type1 = dto.Type1 ?? entity.JsonDetail.Type1,
-            Type2 = dto.Type2 ?? entity.JsonDetail.Type2,
-            KeyValues = dto.KeyValues ?? entity.JsonDetail.KeyValues,
-        };
+public static class ProductEntityExtension {
+	public static async Task<ProductEntity> FillData(this ProductEntity entity, ProductCreateUpdateDto dto, DbContext context) {
+		entity.Title = dto.Title ?? entity.Title;
+		entity.Subtitle = dto.Subtitle ?? entity.Subtitle;
+		entity.Type = dto.Type ?? entity.Type;
+		entity.State = dto.State ?? entity.State;
+		entity.DiscountPrice = dto.DiscountPrice ?? entity.DiscountPrice;
+		entity.DiscountPercent = dto.DiscountPercent ?? entity.DiscountPercent;
+		entity.Description = dto.Description ?? entity.Description;
+		entity.UseCase = dto.UseCase ?? entity.UseCase;
+		entity.Price = dto.Price ?? entity.Price;
+		entity.Stock = dto.Stock ?? entity.Stock;
+		entity.Status = dto.Status ?? entity.Status;
+		entity.CommentsCount = dto.CommentsCount ?? entity.CommentsCount;
+		entity.Currency = dto.Currency ?? entity.Currency;
+		entity.ExpireDate = dto.ExpireDate ?? entity.ExpireDate;
+		entity.AgeCategory = dto.AgeCategory ?? entity.AgeCategory;
+		entity.ProductState = dto.ProductState ?? entity.ProductState;
+		entity.Boosted = dto.Boosted ?? entity.Boosted;
+		entity.UpdatedAt = DateTime.Now;
+		entity.Tags = dto.Tags ?? entity.Tags;
+		entity.JsonDetail = new ProductJsonDetail {
+			Details = dto.Details ?? entity.JsonDetail.Details,
+			Color = dto.Color ?? entity.JsonDetail.Color,
+			Author = dto.Author ?? entity.JsonDetail.Author,
+			PhoneNumber = dto.PhoneNumber ?? entity.JsonDetail.PhoneNumber,
+			Link = dto.Link ?? entity.JsonDetail.Link,
+			Website = dto.Website ?? entity.JsonDetail.Website,
+			Email = dto.Email ?? entity.JsonDetail.Email,
+			Longitude = dto.Longitude ?? entity.JsonDetail.Longitude,
+			Latitude = dto.Latitude ?? entity.JsonDetail.Latitude,
+			ResponseTime = dto.ResponseTime ?? entity.JsonDetail.ResponseTime,
+			OnTimeDelivery = dto.OnTimeDelivery ?? entity.JsonDetail.OnTimeDelivery,
+			Length = dto.Length ?? entity.JsonDetail.Length,
+			Width = dto.Width ?? entity.JsonDetail.Width,
+			Height = dto.Height ?? entity.JsonDetail.Height,
+			Weight = dto.Weight ?? entity.JsonDetail.Weight,
+			MinOrder = dto.MinOrder ?? entity.JsonDetail.MinOrder,
+			MaxOrder = dto.MaxOrder ?? entity.JsonDetail.MaxOrder,
+			MinPrice = dto.MinPrice ?? entity.JsonDetail.MinPrice,
+			MaxPrice = dto.MaxPrice ?? entity.JsonDetail.MaxPrice,
+			Unit = dto.Unit ?? entity.JsonDetail.Unit,
+			Address = dto.Address ?? entity.JsonDetail.Address,
+			StartDate = dto.StartDate ?? entity.JsonDetail.StartDate,
+			EndDate = dto.EndDate ?? entity.JsonDetail.EndDate,
+			ShippingCost = dto.ShippingCost ?? entity.JsonDetail.ShippingCost,
+			ShippingTime = dto.ShippingTime ?? entity.JsonDetail.ShippingTime,
+			KeyValue = dto.KeyValue ?? entity.JsonDetail.KeyValue,
+			Type1 = dto.Type1 ?? entity.JsonDetail.Type1,
+			Type2 = dto.Type2 ?? entity.JsonDetail.Type2,
+			KeyValues = dto.KeyValues ?? entity.JsonDetail.KeyValues,
+		};
 
 		if (dto.ScorePlus.HasValue) {
 			if (entity.VoteCount == null) entity.VoteCount = 1;

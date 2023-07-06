@@ -38,7 +38,7 @@ public class OrderRepository : IOrderRepository {
 	public GenericResponse<IQueryable<OrderEntity>> Filter(OrderFilterDto dto) {
 		IQueryable<OrderEntity> q = _dbContext.Set<OrderEntity>()
 			.Include(x => x.Address)
-			.Include(x => x.OrderDetails).ThenInclude(x => x.Product)
+			.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product)
 			.Include(x => x.OrderDetails)
 			.Include(x => x.Address);
 

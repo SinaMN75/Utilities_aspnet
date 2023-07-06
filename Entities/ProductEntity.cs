@@ -134,7 +134,6 @@ public class ProductCreateUpdateDto {
 	public string? Type { get; set; }
 	public string? Type1 { get; set; }
 	public string? Type2 { get; set; }
-	public string? Color { get; set; }
 	public string? Unit { get; set; }
 	public string? UseCase { get; set; }
 	public string? KeyValue { get; set; }

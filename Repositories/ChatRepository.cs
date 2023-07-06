@@ -144,9 +144,9 @@ public class ChatRepository : IChatRepository {
 				.Include(x => x.Products)!.ThenInclude(x => x.Media)
 				.Include(x => x.Products)!.ThenInclude(x => x.Categories)
 				.Include(x => x.Media)
-				.FirstOrDefaultAsync(x => x.Users.Count() == 2 &&
-				                          x.Users.Any(x => x.Id == firstUserId) &&
-				                          x.Users.Any(x => x.Id == secondUserId) &&
+				.FirstOrDefaultAsync(x => x.Users!.Count() == 2 &&
+				                          x.Users!.Any(y => y.Id == firstUserId) &&
+				                          x.Users!.Any(y => y.Id == secondUserId) &&
 				                          x.Type == ChatType.Private
 				);
 
