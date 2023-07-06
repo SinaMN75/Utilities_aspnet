@@ -88,7 +88,7 @@ public class ProductRepository : IProductRepository
 
     public async Task<GenericResponse<IQueryable<ProductEntity>>> Filter(ProductFilterDto dto)
     {
-        IQueryable<ProductEntity> q = _dbContext.Set<ProductEntity>().AsNoTracking().Where(x => x.DeletedAt == null);
+        IQueryable<ProductEntity> q = _dbContext.Set<ProductEntity>().AsNoTracking();
         if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.Now && w.ParentId == null);
 
         if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
@@ -178,7 +178,7 @@ public class ProductRepository : IProductRepository
             .Include(i => i.Parent).ThenInclude(i => i.Categories)
             .Include(i => i.Parent).ThenInclude(i => i.Media)
             .Include(i => i.Parent).ThenInclude(i => i.User).ThenInclude(i => i.Media)
-            .FirstOrDefaultAsync(i => i.Id == id && i.DeletedAt == null, ct);
+            .FirstOrDefaultAsync(i => i.Id == id, ct);
         if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound);
 
         if (_userId.IsNotNullOrEmpty())
@@ -255,8 +255,7 @@ public class ProductRepository : IProductRepository
 
     public async Task<GenericResponse> Delete(Guid id, CancellationToken ct)
     {
-        await _dbContext.Set<ProductEntity>().Where(x => x.Id == id || x.ParentId == id)
-            .ExecuteUpdateAsync(x => x.SetProperty(y => y.DeletedAt, DateTime.Now), ct);
+        await _dbContext.Set<ProductEntity>().Where(x => x.Id == id || x.ParentId == id).ExecuteDeleteAsync(ct);
         return new GenericResponse();
     }
 

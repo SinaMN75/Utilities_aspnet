@@ -36,7 +36,7 @@ public class AddressRepository : IAddressRepository {
 	}
 
 	public async Task<GenericResponse<AddressEntity?>> Update(AddressCreateUpdateDto addressDto, CancellationToken ct) {
-		AddressEntity e = (await _dbContext.Set<AddressEntity>().FirstOrDefaultAsync(f => f.Id == addressDto.Id && f.DeletedAt == null, ct))!;
+		AddressEntity e = (await _dbContext.Set<AddressEntity>().FirstOrDefaultAsync(f => f.Id == addressDto.Id, ct))!;
 		e.PostalCode = addressDto.PostalCode ?? e.PostalCode;
 		e.Pelak = addressDto.Pelak ?? e.Pelak;
 		e.Unit = addressDto.Unit ?? e.Unit;
@@ -57,12 +57,13 @@ public class AddressRepository : IAddressRepository {
 	}
 	
 	public async Task<GenericResponse> Delete(Guid addressId, CancellationToken ct) {
-		await _dbContext.Set<AddressEntity>().Where(f => f.Id == addressId).ExecuteUpdateAsync(x => x.SetProperty(y => y.DeletedAt, DateTime.Now), ct);
+		await _dbContext.Set<AddressEntity>().Where(f => f.Id == addressId).ExecuteDeleteAsync(ct);
+		await _outputCache.EvictByTagAsync("address", ct);
 		return new GenericResponse();
 	}
 
 	public GenericResponse<IQueryable<AddressEntity>> Filter(AddressFilterDto dto) {
-		IQueryable<AddressEntity> q = _dbContext.Set<AddressEntity>().AsNoTracking().Where(x => x.DeletedAt == null);
+		IQueryable<AddressEntity> q = _dbContext.Set<AddressEntity>().AsNoTracking();
 		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(o => o.UserId == dto.UserId);
 		if (dto.OrderByIsDefault.IsTrue()) q = q.OrderBy(o => o.IsDefault);
 		if (dto.OrderByPelak.IsTrue()) q = q.OrderBy(o => o.Pelak);

@@ -13,7 +13,7 @@ public static class Seeder {
 	}
 	
 	public static void SetupModelBuilder(this ModelBuilder builder) {
-		foreach (IMutableForeignKey fk in builder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys())) fk.DeleteBehavior = DeleteBehavior.NoAction;
+		foreach (IMutableForeignKey fk in builder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys())) fk.DeleteBehavior = DeleteBehavior.Cascade;
 		builder.Entity<CategoryEntity>().OwnsOne(e => e.JsonDetail, b => b.ToJson());
 		builder.Entity<UserEntity>().OwnsOne(e => e.JsonDetail, b => b.ToJson());
 		builder.Entity<GroupChatEntity>().OwnsOne(e => e.JsonDetail, b => b.ToJson());

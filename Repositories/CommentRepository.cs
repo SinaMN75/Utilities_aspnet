@@ -36,11 +36,10 @@ public class CommentRepository : ICommentRepository {
 	public GenericResponse<IQueryable<CommentEntity>?> ReadByProductId(Guid id) {
 		IQueryable<CommentEntity> comment = _dbContext.Set<CommentEntity>()
 			.Include(x => x.Media)
-			.Where(x => x.ProductId == id && x.ParentId == null && x.DeletedAt == null)
+			.Where(x => x.ProductId == id && x.ParentId == null)
 			.Include(x => x.User).ThenInclude(x => x!.Media)
-			.Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Media).Where(x => x.DeletedAt == null)
-			.Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.User).ThenInclude(x => x.Media)
-			.Where(x => x.DeletedAt == null)
+			.Include(x => x.Children).ThenInclude(x => x.Media)
+			.Include(x => x.Children).ThenInclude(x => x.User).ThenInclude(x => x.Media)
 			.OrderByDescending(x => x.CreatedAt).AsNoTracking();
 		return new GenericResponse<IQueryable<CommentEntity>?>(comment);
 	}
@@ -51,11 +50,10 @@ public class CommentRepository : ICommentRepository {
 		q = q.Include(x => x.User).ThenInclude(x => x!.Media)
 			.Include(x => x.Media)
 			.Include(x => x.Product).ThenInclude(x => x.Media)
-			.Include(x => x.Children!.Where(x => x.DeletedAt == null))!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
+			.Include(x => x.Children).ThenInclude(x => x.User).ThenInclude(x => x!.Media)
 			.OrderByDescending(x => x.CreatedAt)
 			.AsNoTracking();
 
-		if (!dto.ShowDeleted) q = q.Where(x => x.DeletedAt != null);
 		if (dto.ProductId is not null) q = q.Where(x => x.ProductId == dto.ProductId);
 		if (dto.Status is not null) q = q.Where(x => x.Status == dto.Status);
 		if (dto.UserId is not null) q = q.Where(x => x.UserId == dto.UserId);
@@ -68,9 +66,9 @@ public class CommentRepository : ICommentRepository {
 		CommentEntity? comment = await _dbContext.Set<CommentEntity>()
 			.Include(x => x.User).ThenInclude(x => x!.Media)
 			.Include(x => x.Media)
-			.Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.User).ThenInclude(x => x.Media)
-			.Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Media)
-			.Where(x => x.Id == id && x.DeletedAt == null)
+			.Include(x => x.Children).ThenInclude(x => x.User).ThenInclude(x => x.Media)
+			.Include(x => x.Children).ThenInclude(x => x.Media)
+			.Where(x => x.Id == id)
 			.OrderByDescending(x => x.CreatedAt)
 			.AsNoTracking()
 			.FirstOrDefaultAsync();

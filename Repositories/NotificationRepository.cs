@@ -23,7 +23,7 @@ public class NotificationRepository : INotificationRepository {
 			.Include(x => x.CreatorUser).ThenInclude(x => x!.Media)
 			.Include(x => x.CreatorUser).ThenInclude(x => x!.Categories)
 			.Include(x => x.User)
-			.Where(x => (x.UserId == null || x.UserId == _userId) && x.DeletedAt == null)
+			.Where(x => x.UserId == null || x.UserId == _userId)
 			.OrderByDescending(x => x.CreatedAt)
 			.AsNoTracking()
 			.Take(100);
@@ -70,7 +70,7 @@ public class NotificationRepository : INotificationRepository {
 			.Include(x => x.Media)
 			.Include(x => x.CreatorUser).ThenInclude(x => x!.Media)
 			.Include(x => x.CreatorUser).ThenInclude(x => x!.Categories)
-			.Where(x => (x.UserId == null || x.UserId == _userId) && x.DeletedAt == null)
+			.Where(x => x.UserId == null || x.UserId == _userId)
 			.Where(x => ids.Contains(x.Id))
 			.OrderByDescending(x => x.CreatedAt);
 
