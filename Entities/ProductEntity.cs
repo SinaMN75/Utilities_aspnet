@@ -75,6 +75,7 @@ public class ProductJsonDetail {
 	public string? KeyValue { get; set; }
 	public string? Type1 { get; set; }
 	public string? Type2 { get; set; }
+	public string? Color { get; set; }
 	public double? Latitude { get; set; }
 	public int? ResponseTime { get; set; }
 	public int? OnTimeDelivery { get; set; }
@@ -133,6 +134,7 @@ public class ProductCreateUpdateDto {
 	public string? UseCase { get; set; }
 	public string? KeyValue { get; set; }
 	public string? State { get; set; }
+	public string? Color { get; set; }
 	public double? Latitude { get; set; }
 	public double? Longitude { get; set; }
 	public int? Price { get; set; }

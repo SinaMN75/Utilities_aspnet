@@ -333,6 +333,7 @@ public static class ProductEntityExtension
         entity.JsonDetail = new ProductJsonDetail
         {
             Details = dto.Details ?? entity.JsonDetail.Details,
+            Color = dto.Color ?? entity.JsonDetail.Color,
             Author = dto.Author ?? entity.JsonDetail.Author,
             PhoneNumber = dto.PhoneNumber ?? entity.JsonDetail.PhoneNumber,
             Link = dto.Link ?? entity.JsonDetail.Link,
