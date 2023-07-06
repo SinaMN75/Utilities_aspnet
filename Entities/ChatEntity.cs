@@ -27,12 +27,15 @@ public class ChatEntity : BaseEntity {
 
 [Table("GroupChat")]
 public class GroupChatEntity : BaseEntity {
+	[MaxLength(100)]
 	public string? Title { get; set; }
 
+	[MaxLength(50)]
 	public string? CreatorUserId { get; set; }
 
 	public ChatType? Type { get; set; }
 
+	[MaxLength(1000)]
 	public GroupChatJsonDetail JsonDetail { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
@@ -59,8 +62,10 @@ public class GroupChatMessageEntity : BaseEntity {
 	[StringLength(2000)]
 	public string? Message { get; set; }
 
+	[MaxLength(50)]
 	public string? Type { get; set; }
 
+	[MaxLength(50)]
 	public string? UseCase { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
@@ -95,6 +100,7 @@ public class GroupChatMessageEntity : BaseEntity {
 [Table("SeenUsers")]
 public class SeenUsers : BaseEntity {
 	public Guid? FkGroupChat { get; set; }
+	[MaxLength(50)]
 	public string? FkUserId { get; set; }
 	public Guid? FkGroupChatMessage { get; set; }
 }

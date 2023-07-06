@@ -414,7 +414,7 @@ public class UserRepository : IUserRepository
     private async Task<bool> SendOtp(string userId, int codeLength) {
         if (_memoryCache.Get<string>(userId) != null) return false;
 
-        string newOtp = Utils.Random(codeLength).ToString();
+        string newOtp = Random.Shared.Next(1000, 9999).ToString();
         _memoryCache.GetOrCreate<string>(userId, entry => {
             entry.Value = newOtp;
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(120);

@@ -34,6 +34,8 @@ public class ProductEntity : BaseEntity {
 	public DateTime? ExpireDate { get; set; }
 
 	public string? SeenUsers { get; set; } = "";
+	
+	[MaxLength(500)]
 	public string? Teams { get; set; } = "";
 
 	public ProductEntity? Parent { get; set; }
@@ -44,7 +46,11 @@ public class ProductEntity : BaseEntity {
 
 	public string? UserId { get; set; }
 	public UserEntity? User { get; set; }
+	
+	[MaxLength(1000)]
 	public ProductJsonDetail JsonDetail { get; set; } = new();
+	
+	[MaxLength(100)]
 	public List<TagProduct>? Tags { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
@@ -170,6 +176,7 @@ public class ProductCreateUpdateDto {
 	public IEnumerable<string>? Teams { get; set; }
 	public IEnumerable<UploadDto>? Upload { get; set; }
 	public IEnumerable<FormTitleDto>? Form { get; set; }
+	public List<ProductCreateUpdateDto>? Children { get; set; }
 }
 
 public class ProductFilterDto {
@@ -193,6 +200,7 @@ public class ProductFilterDto {
 	public bool? ShowCreator { get; set; } = false;
 	public bool? ShowCategoryMedia { get; set; } = false;
 	public bool? ShowChildren { get; set; } = false;
+    public bool? ShowPostOfPrivateUser { get; set; }
     public bool? OrderByVotes { get; set; } = false;
 	public bool? OrderByVotesDescending { get; set; } = false;
 	public bool? OrderByAtoZ { get; set; } = false;

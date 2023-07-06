@@ -65,13 +65,6 @@ public class AddressRepository : IAddressRepository {
 	public GenericResponse<IQueryable<AddressEntity>> Filter(AddressFilterDto dto) {
 		IQueryable<AddressEntity> q = _dbContext.Set<AddressEntity>().AsNoTracking();
 		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(o => o.UserId == dto.UserId);
-		if (dto.OrderByIsDefault.IsTrue()) q = q.OrderBy(o => o.IsDefault);
-		if (dto.OrderByPelak.IsTrue()) q = q.OrderBy(o => o.Pelak);
-		if (dto.OrderByAddress.IsTrue()) q = q.OrderBy(o => o.Address);
-		if (dto.OrderByPostalCode.IsTrue()) q = q.OrderBy(o => o.PostalCode);
-		if (dto.OrderByReceiverFullName.IsTrue()) q = q.OrderBy(o => o.ReceiverFullName);
-		if (dto.OrderByReceiverPhoneNumber.IsTrue()) q = q.OrderBy(o => o.ReceiverPhoneNumber);
-		if (dto.OrderByUnit.IsTrue()) q = q.OrderBy(o => o.Unit);
 
 		int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
