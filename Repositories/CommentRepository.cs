@@ -38,8 +38,8 @@ public class CommentRepository : ICommentRepository {
 			.Include(x => x.Media)
 			.Where(x => x.ProductId == id && x.ParentId == null && x.DeletedAt == null)
 			.Include(x => x.User).ThenInclude(x => x!.Media)
-			.Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Media).Where(x => x.DeletedAt == null)
-			.Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.User).ThenInclude(x => x.Media)
+			.Include(x => x.Children!.Where(y => y.DeletedAt == null)).ThenInclude(x => x.Media).Where(x => x.DeletedAt == null)
+			.Include(x => x.Children!.Where(y => y.DeletedAt == null)).ThenInclude(x => x.User).ThenInclude(x => x!.Media)
 			.Where(x => x.DeletedAt == null)
 			.OrderByDescending(x => x.CreatedAt).AsNoTracking();
 		return new GenericResponse<IQueryable<CommentEntity>?>(comment);
@@ -51,7 +51,7 @@ public class CommentRepository : ICommentRepository {
 		q = q.Include(x => x.User).ThenInclude(x => x!.Media)
 			.Include(x => x.Media)
 			.Include(x => x.Product).ThenInclude(x => x.Media)
-			.Include(x => x.Children!.Where(x => x.DeletedAt == null))!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
+			.Include(x => x.Children!.Where(x => x.DeletedAt == null)).ThenInclude(x => x.User).ThenInclude(x => x!.Media)
 			.OrderByDescending(x => x.CreatedAt)
 			.AsNoTracking();
 
@@ -82,7 +82,7 @@ public class CommentRepository : ICommentRepository {
 		AppSettings appSettings = new();
 		_config.GetSection("AppSettings").Bind(appSettings);
 		Tuple<bool, UtilitiesStatusCodes>? overUsedCheck =
-			Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, CallerType.CreateComment, null, null, appSettings.UsageRules!);
+			Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, CallerType.CreateComment, null, null, appSettings.UsageRules);
 		if (overUsedCheck.Item1) return new GenericResponse<CommentEntity?>(null, overUsedCheck.Item2);
 
 		ProductEntity? prdct = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == dto.ProductId, ct);

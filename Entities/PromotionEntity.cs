@@ -41,22 +41,22 @@ public class CreateUpdatePromotionDto {
 
 public class PromotionDetail {
 	public int TotalSeen { get; set; }
-	public List<StatePerUser> StatePerUsers { get; set; }
-	public List<SkillPerUser> SkillPerUsers { get; set; }
-	public List<AgeCategoryPerUser> AgeCategoryPerUsers { get; set; }
+	public List<StatePerUser> StatePerUsers { get; set; } = null!;
+	public List<SkillPerUser> SkillPerUsers { get; set; } = null!;
+	public List<AgeCategoryPerUser> AgeCategoryPerUsers { get; set; } = null!;
 }
 
 public class StatePerUser {
-	public string State { get; set; }
+	public string State { get; set; } = null!;
 	public int UserCount { get; set; }
 }
 
 public class SkillPerUser {
-	public string Skill { get; set; }
+	public string Skill { get; set; } = null!;
 	public int UserCount { get; set; }
 }
 
 public class AgeCategoryPerUser {
-	public string AgeCategory { get; set; }
+	public string AgeCategory { get; set; } = null!;
 	public int UserCount { get; set; }
 }

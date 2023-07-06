@@ -176,9 +176,9 @@ public class ProductRepository : IProductRepository {
 			.Include(i => i.Forms)!.ThenInclude(x => x.FormField)
 			.Include(i => i.VisitProducts)!.ThenInclude(i => i.User)
 			.Include(i => i.ProductInsights)
-			.Include(i => i.Parent).ThenInclude(i => i.Categories)
-			.Include(i => i.Parent).ThenInclude(i => i.Media)
-			.Include(i => i.Parent).ThenInclude(i => i.User).ThenInclude(i => i.Media)
+			.Include(i => i.Parent).ThenInclude(i => i!.Categories)
+			.Include(i => i.Parent).ThenInclude(i => i!.Media)
+			.Include(i => i.Parent).ThenInclude(i => i!.User).ThenInclude(i => i.Media)
 			.FirstOrDefaultAsync(i => i.Id == id && i.DeletedAt == null, ct);
 		if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound);
 

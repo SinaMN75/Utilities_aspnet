@@ -21,7 +21,7 @@ public class PaymentRepository : IPaymentRepository {
 	public async Task<GenericResponse<string?>> IncreaseWalletBalance(int amount) {
 		try {
 			UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
-			Payment payment = new(_appSettings.PaymentSettings!.Id, amount);
+			Payment payment = new(_appSettings.PaymentSettings.Id, amount);
 			string callbackUrl = $"{Server.ServerAddress}/Payment/WalletCallBack/{user?.Id}/{amount}";
 			string desc = $"شارژ کیف پول به مبلغ {amount}";
 			PaymentRequestResponse? result = payment.PaymentRequest(desc, callbackUrl, "", user?.PhoneNumber).Result;
@@ -85,7 +85,7 @@ public class PaymentRepository : IPaymentRepository {
 		if (userId.IsNullOrEmpty()) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 
 		UserEntity user = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == userId))!;
-		Payment payment = new(_appSettings.PaymentSettings!.Id, amount);
+		Payment payment = new(_appSettings.PaymentSettings.Id, amount);
 		if (!status.Equals("OK")) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 		PaymentVerificationResponse? verify = payment.Verification(authority).Result;
 		TransactionEntity? pay = _dbContext.Set<TransactionEntity>().FirstOrDefault(x => x.Authority == authority);

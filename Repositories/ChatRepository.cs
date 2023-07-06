@@ -1,6 +1,4 @@
-﻿using Utilities_aspnet.Entities;
-
-namespace Utilities_aspnet.Repositories;
+﻿namespace Utilities_aspnet.Repositories;
 
 public interface IChatRepository {
 	Task<GenericResponse<ChatReadDto?>> Create(ChatCreateUpdateDto model);
@@ -43,17 +41,14 @@ public class ChatRepository : IChatRepository {
 		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == model.UserId);
 		if (user == null) return new GenericResponse<ChatReadDto?>(null, UtilitiesStatusCodes.BadRequest);
 
-		List<UserEntity?> users = new();
-		foreach (string id in model.Users ?? new List<string>()) users.Add(await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id));
-
 		List<ProductEntity?> products = new();
 		foreach (Guid id in model.Products ?? new List<Guid>()) products.Add(await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id));
 		ChatEntity conversation = new() {
 			CreatedAt = DateTime.Now,
 			UpdatedAt = DateTime.Now,
 			FromUserId = _userId!,
-			ToUserId = model.UserId,
-			MessageText = model.MessageText,
+			ToUserId = model.UserId!,
+			MessageText = model.MessageText!,
 			ReadMessage = false,
 			Products = products,
 			ParentId = model.ParentId
@@ -357,13 +352,13 @@ public class ChatRepository : IChatRepository {
 			.Include(x => x.Media)
 			.Include(x => x.Products)!.ThenInclude(x => x.Media)
 			.Include(x => x.Products)!.ThenInclude(x => x.User).ThenInclude(x => x.Media)
-			.Include(x => x.Parent)!.ThenInclude(x => x.Media)
-			.Include(x => x.Parent)!.ThenInclude(x => x.Products).ThenInclude(x => x.Media)
+			.Include(x => x.Parent).ThenInclude(x => x.Media)
+			.Include(x => x.Parent).ThenInclude(x => x.Products).ThenInclude(x => x.Media)
 			.Include(x => x.Parent).ThenInclude(x => x.User).ThenInclude(x => x.Media)
-			.Include(x => x.User)!.ThenInclude(x => x.Media)
-			.Include(x => x.ForwardedMessage)!.ThenInclude(x => x.Media)
+			.Include(x => x.User).ThenInclude(x => x.Media)
+			.Include(x => x.ForwardedMessage).ThenInclude(x => x.Media)
 			.Include(x => x.ForwardedMessage).ThenInclude(x => x.Products)!.ThenInclude(x => x.Media)
-			.Include(x => x.ForwardedMessage)!.ThenInclude(x => x.Parent)!.ThenInclude(x => x.Media)
+			.Include(x => x.ForwardedMessage).ThenInclude(x => x.Parent).ThenInclude(x => x.Media)
 			.Include(x => x.ForwardedMessage).ThenInclude(x => x.User).ThenInclude(x => x.Media)
 			.OrderBy(o => o.CreatedAt)
 			.Reverse()
@@ -402,7 +397,7 @@ public class ChatRepository : IChatRepository {
 			.Where(c => c.ToUserId == userId && c.FromUserId == id)
 			.Include(x => x.Media)
 			.Include(x => x.Parent)
-			.Include(x => x.Products)!.ThenInclude(x => x.Media)
+			.Include(x => x.Products)!.ThenInclude(x => x!.Media)
 			.OrderByDescending(x => x.CreatedAt).ToListAsync();
 
 		foreach (ChatEntity? item in conversation.Where(item => item.ReadMessage == false)) {
@@ -413,8 +408,8 @@ public class ChatRepository : IChatRepository {
 		IEnumerable<ChatEntity> conversationToUser = await _dbContext.Set<ChatEntity>()
 			.Where(x => x.FromUserId == userId && x.ToUserId == id)
 			.Include(x => x.Media)
-			.Include(x => x.Parent).ThenInclude(x => x.Media)
-			.Include(x => x.Products).ThenInclude(x => x.Media)
+			.Include(x => x.Parent).ThenInclude(x => x!.Media)
+			.Include(x => x.Products)!.ThenInclude(x => x!.Media)
 			.OrderByDescending(x => x.CreatedAt).ToListAsync();
 
 		conversation.AddRange(conversationToUser);
@@ -451,7 +446,7 @@ public class ChatRepository : IChatRepository {
 			.Where(x => x.DeletedAt == null)
 			.Where(x => x.ToUserId == userId)
 			.Include(x => x.Parent)
-			.Include(x => x.Products)!.ThenInclude(x => x.Media)
+			.Include(x => x.Products)!.ThenInclude(x => x!.Media)
 			.Include(x => x.Media).Select(x => x.FromUserId).ToListAsync();
 		toUserId.AddRange(fromUserId);
 		List<ChatReadDto> conversations = new();
@@ -463,8 +458,8 @@ public class ChatRepository : IChatRepository {
 				.Where(c => (c.FromUserId == item && c.ToUserId == userId) || (c.FromUserId == userId && c.ToUserId == item))
 				.OrderByDescending(c => c.CreatedAt)
 				.Include(y => y.Media)
-				.Include(x => x.Parent)!.ThenInclude(x => x.Media)
-				.Include(x => x.Products)!.ThenInclude(x => x.Media)
+				.Include(x => x.Parent).ThenInclude(x => x!.Media)
+				.Include(x => x.Products)!.ThenInclude(x => x!.Media)
 				.Take(1).FirstOrDefaultAsync();
 			int? countUnReadMessage = _dbContext.Set<ChatEntity>().Where(c => c.FromUserId == item && c.ToUserId == userId).Count(x => x.ReadMessage == false);
 

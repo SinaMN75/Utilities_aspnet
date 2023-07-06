@@ -46,7 +46,7 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 
 		GenericResponse<UserEntity?> userRespository = await _userRepository.ReadById(_userId);
 		UserEntity user = userRespository.Result!;
-		if (user.BookmarkedProducts.Contains(dto.ProductId.ToString()))
+		if (user.BookmarkedProducts.Contains(dto.ProductId.ToString()!))
 			await _userRepository.Update(new UserCreateUpdateDto {
 				Id = _userId,
 				BookmarkedProducts = user.BookmarkedProducts.Replace($",{dto.ProductId}", "")
@@ -63,9 +63,9 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 		string uId = userId ?? _userId;
 		IQueryable<BookmarkEntity> bookmark = _dbContext.Set<BookmarkEntity>().Include(x => x.Media)
 			.Where(x => x.UserId == uId)
-			.Include(x => x.Product).ThenInclude(x => x.Media)
-			.Include(x => x.Children).ThenInclude(x => x.Product)
-			.Include(x => x.Children).Include(x => x.Product).ThenInclude(x => x.Media);
+			.Include(x => x.Product).ThenInclude(x => x!.Media)
+			.Include(x => x.Children)!.ThenInclude(x => x.Product)
+			.Include(x => x.Children).Include(x => x.Product).ThenInclude(x => x!.Media);
 		return new GenericResponse<IQueryable<BookmarkEntity>?>(bookmark);
 	}
 
