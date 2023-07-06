@@ -113,7 +113,7 @@ public class ProductRepository : IProductRepository {
 		if (dto.ShowPostOfPrivateUser != null && !dto.ShowPostOfPrivateUser.Value) {
 			q = q.Include(i => i.User);
 			q = q.Where(w => w.User != null);
-			q = q.Where(w => w.User.IsPrivate == false);
+			q = q.Where(w => w.User!.IsPrivate == false);
 		}
 		if (dto.ShowChildren.IsTrue()) q = q.Include(i => i.Children);
 		if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories);
@@ -152,9 +152,9 @@ public class ProductRepository : IProductRepository {
 
 		if (dto.Boosted) q = q.OrderByDescending(o => o.Boosted);
 
-		q = q.Include(x => x.Parent).ThenInclude(x => x.Categories);
-		q = q.Include(x => x.Parent).ThenInclude(x => x.Media);
-		q = q.Include(x => x.Parent).ThenInclude(x => x.User).ThenInclude(x => x.Media);
+		q = q.Include(x => x.Parent).ThenInclude(x => x!.Categories);
+		q = q.Include(x => x.Parent).ThenInclude(x => x!.Media);
+		q = q.Include(x => x.Parent).ThenInclude(x => x!.User).ThenInclude(x => x!.Media);
 
 		int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
@@ -178,7 +178,7 @@ public class ProductRepository : IProductRepository {
 			.Include(i => i.ProductInsights)
 			.Include(i => i.Parent).ThenInclude(i => i!.Categories)
 			.Include(i => i.Parent).ThenInclude(i => i!.Media)
-			.Include(i => i.Parent).ThenInclude(i => i!.User).ThenInclude(i => i.Media)
+			.Include(i => i.Parent).ThenInclude(i => i!.User).ThenInclude(i => i!.Media)
 			.FirstOrDefaultAsync(i => i.Id == id && i.DeletedAt == null, ct);
 		if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound);
 
@@ -216,10 +216,10 @@ public class ProductRepository : IProductRepository {
 			i.ProductInsights = productInsights;
 		}
 
-		IQueryable<OrderEntity>? completeOrder = _dbContext.Set<OrderEntity>()
+		IQueryable<OrderEntity> completeOrder = _dbContext.Set<OrderEntity>()
 			.Where(c => c.OrderDetails != null && c.OrderDetails.Any(w => w.ProductId.HasValue && w.ProductId.Value == i.Id) &&
 			            c.Status == OrderStatuses.Complete);
-		string? displayOrderComplete = Utils.DisplayCountOfCompleteOrder(completeOrder.Count());
+		string displayOrderComplete = Utils.DisplayCountOfCompleteOrder(completeOrder.Count());
 		i.SuccessfulPurchase = displayOrderComplete;
 
 		bool isUserBuyIt = completeOrder.Any(a => a.UserId == _userId);

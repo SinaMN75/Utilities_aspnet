@@ -10,7 +10,7 @@ public class TemplateHttpController : BaseApiController {
 
 	[HttpPost]
 	public async Task<ActionResult<GenericResponse<AddressEntity>>> Create(AddressCreateUpdateDto dto) {
-		CustomHttpClient<AddressCreateUpdateDto, GenericResponse<AddressEntity>>? client = new();
+		CustomHttpClient<AddressCreateUpdateDto, GenericResponse<AddressEntity>> client = new();
 
 		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -23,7 +23,7 @@ public class TemplateHttpController : BaseApiController {
 
 	[HttpPut]
 	public async Task<ActionResult<GenericResponse<AddressEntity>>> Update(AddressCreateUpdateDto dto) {
-		CustomHttpClient<AddressCreateUpdateDto, GenericResponse<AddressEntity>>? client = new();
+		CustomHttpClient<AddressCreateUpdateDto, GenericResponse<AddressEntity>> client = new();
 
 		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -32,7 +32,7 @@ public class TemplateHttpController : BaseApiController {
 
 	[HttpGet]
 	public async Task<ActionResult<GenericResponse<ProductEntity>>> Get() {
-		CustomHttpClient<object, GenericResponse<ProductEntity>>? client = new();
+		CustomHttpClient<object, GenericResponse<ProductEntity>> client = new();
 
 		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -41,7 +41,7 @@ public class TemplateHttpController : BaseApiController {
 
 	[HttpDelete]
 	public async Task<ActionResult<GenericResponse>> Delete() {
-		CustomHttpClient<object, GenericResponse>? client = new();
+		CustomHttpClient<object, GenericResponse> client = new();
 
 		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 

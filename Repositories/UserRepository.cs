@@ -116,19 +116,17 @@ public class UserRepository : IUserRepository {
 
 		if (dto.ShowMyCustomers.IsTrue()) {
 			var orders = _dbContext.Set<OrderEntity>()
-				.Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p.Media)
-				.Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p.Categories)
+				.Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p!.Media)
+				.Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p!.Categories)
 				.Include(i => i.Address)
-				.Include(i => i.User).ThenInclude(i => i.Media)
-				.Include(i => i.ProductOwner).ThenInclude(i => i.Media)
+				.Include(i => i.User).ThenInclude(i => i!.Media)
+				.Include(i => i.ProductOwner).ThenInclude(i => i!.Media)
 				.AsNoTracking()
 				.Where(w => w.OrderDetails == null || w.OrderDetails.Any(a => a.Product == null || a.Product.UserId == _userId));
 			if (orders.Any()) {
 				var customers = orders.Select(s => s.UserId).ToList();
 				List<UserEntity> tempQ = q.ToList();
-				tempQ.Where(w => customers.Any(a => a == w.Id));
-				q = null;
-				q = tempQ.AsQueryable();
+				q = tempQ.Where(w => customers.Any(a => a == w.Id)).AsQueryable();
 			}
 		}
 
@@ -185,17 +183,17 @@ public class UserRepository : IUserRepository {
 			Suspend = false,
 			FirstName = dto.FirstName,
 			LastName = dto.LastName,
-			JsonDetail = dto.JsonDetail
+			JsonDetail = dto.JsonDetail ?? new UserJsonDetail()
 		};
 
-		IdentityResult? result = await _userManager.CreateAsync(user, dto.Password!);
+		IdentityResult result = await _userManager.CreateAsync(user, dto.Password!);
 		if (!result.Succeeded) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.Unhandled);
 
 		JwtSecurityToken token = await CreateToken(user);
 
 		if (dto.SendSms) {
 			if (dto.Email != null && dto.Email.IsEmail()) { }
-			else { await SendOtp(user.Id, 4); }
+			else { await SendOtp(user.Id); }
 		}
 
 		return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result);
@@ -218,7 +216,7 @@ public class UserRepository : IUserRepository {
 
 		if (existingUser != null)
 			if (dto.SendSms) {
-				if (!await SendOtp(existingUser.Id, 4)) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.MaximumLimitReached);
+				if (!await SendOtp(existingUser.Id)) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.MaximumLimitReached);
 				return new GenericResponse<UserEntity?>(existingUser);
 			}
 		UserEntity user = new() {
@@ -230,11 +228,11 @@ public class UserRepository : IUserRepository {
 			Suspend = false
 		};
 
-		IdentityResult? result = await _userManager.CreateAsync(user, "SinaMN75");
+		IdentityResult result = await _userManager.CreateAsync(user, "SinaMN75");
 		if (!result.Succeeded)
 			return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.BadRequest, result.Errors.First().Code + result.Errors.First().Description);
 
-		if (dto.SendSms) await SendOtp(user.Id, 4);
+		if (dto.SendSms) await SendOtp(user.Id);
 
 		return new GenericResponse<UserEntity?>(user);
 	}
@@ -266,7 +264,7 @@ public class UserRepository : IUserRepository {
 	public async Task<GenericResponse> ToggleBlock(string userId) {
 		UserEntity? user = await ReadByIdMinimal(_userId);
 
-		await Update(new UserCreateUpdateDto { Id = user.Id, BlockedUsers = user.BlockedUsers + "," + userId });
+		await Update(new UserCreateUpdateDto { Id = user!.Id, BlockedUsers = user.BlockedUsers + "," + userId });
 		if (user.BlockedUsers.Contains(userId))
 			await Update(new UserCreateUpdateDto { Id = user.Id, BlockedUsers = user.BlockedUsers.Replace($",{userId}", "") });
 		else await Update(new UserCreateUpdateDto { Id = user.Id, BlockedUsers = user.BlockedUsers + "," + userId });
@@ -390,15 +388,16 @@ public class UserRepository : IUserRepository {
 		}
 	}
 
-	private TransactionEntity MakeTransactionEntity(string userId, int amount, string description, string? shebaNumber, TransactionType transactionType) =>
+	private static TransactionEntity MakeTransactionEntity(string userId, int amount, string description, string? shebaNumber, TransactionType transactionType) =>
 		new() {
 			UserId = userId,
 			Amount = amount,
 			Descriptions = description,
-			TransactionType = transactionType
+			TransactionType = transactionType,
+			ShebaNumber = shebaNumber
 		};
 
-	private async Task<bool> SendOtp(string userId, int codeLength) {
+	private async Task<bool> SendOtp(string userId) {
 		if (_memoryCache.Get<string>(userId) != null) return false;
 
 		string newOtp = Random.Shared.Next(1000, 9999).ToString();

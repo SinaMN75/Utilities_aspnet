@@ -81,14 +81,14 @@ public class CommentRepository : ICommentRepository {
 	public async Task<GenericResponse<CommentEntity?>> Create(CommentCreateUpdateDto dto, CancellationToken ct) {
 		AppSettings appSettings = new();
 		_config.GetSection("AppSettings").Bind(appSettings);
-		Tuple<bool, UtilitiesStatusCodes>? overUsedCheck =
+		Tuple<bool, UtilitiesStatusCodes> overUsedCheck =
 			Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, CallerType.CreateComment, null, null, appSettings.UsageRules);
 		if (overUsedCheck.Item1) return new GenericResponse<CommentEntity?>(null, overUsedCheck.Item2);
 
 		ProductEntity? prdct = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == dto.ProductId, ct);
 		if (prdct is not null) {
-			Tuple<bool, UtilitiesStatusCodes>? blockedState = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == prdct.UserId),
-			                                                                      _dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == _userId));
+			Tuple<bool, UtilitiesStatusCodes> blockedState = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == prdct.UserId),
+			                                                                     _dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == _userId));
 			if (blockedState.Item1) return new GenericResponse<CommentEntity?>(null, blockedState.Item2);
 		}
 
