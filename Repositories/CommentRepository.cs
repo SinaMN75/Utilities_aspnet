@@ -50,8 +50,8 @@ public class CommentRepository : ICommentRepository {
 
 		q = q.Include(x => x.User).ThenInclude(x => x!.Media)
 			.Include(x => x.Media)
-			.Include(x => x.Product).ThenInclude(x => x.Media)
-			.Include(x => x.Children!.Where(x => x.DeletedAt == null)).ThenInclude(x => x.User).ThenInclude(x => x!.Media)
+			.Include(x => x.Product).ThenInclude(x => x!.Media)
+			.Include(x => x.Children!.Where(y => y.DeletedAt == null)).ThenInclude(x => x.User).ThenInclude(x => x!.Media)
 			.OrderByDescending(x => x.CreatedAt)
 			.AsNoTracking();
 
@@ -68,8 +68,8 @@ public class CommentRepository : ICommentRepository {
 		CommentEntity? comment = await _dbContext.Set<CommentEntity>()
 			.Include(x => x.User).ThenInclude(x => x!.Media)
 			.Include(x => x.Media)
-			.Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.User).ThenInclude(x => x.Media)
-			.Include(x => x.Children.Where(x => x.DeletedAt == null)).ThenInclude(x => x.Media)
+			.Include(x => x.Children!.Where(y => y.DeletedAt == null)).ThenInclude(x => x.User).ThenInclude(x => x!.Media)
+			.Include(x => x.Children!.Where(y => y.DeletedAt == null)).ThenInclude(x => x.Media)
 			.Where(x => x.Id == id && x.DeletedAt == null)
 			.OrderByDescending(x => x.CreatedAt)
 			.AsNoTracking()
@@ -143,8 +143,8 @@ public class CommentRepository : ICommentRepository {
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
 		CommentEntity? comment = await _dbContext.Set<CommentEntity>().Include(i => i.Media).Include(i => i.Children).FirstOrDefaultAsync(x => x.Id == id, ct);
 		if (comment == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
-		foreach (MediaEntity i in comment.Media) await _mediaRepository.Delete(i.Id);
-		foreach (CommentEntity i in comment.Children) await Delete(i.Id, ct);
+		foreach (MediaEntity i in comment.Media!) await _mediaRepository.Delete(i.Id);
+		foreach (CommentEntity i in comment.Children!) await Delete(i.Id, ct);
 		_dbContext.Set<CommentEntity>().Remove(comment);
 		await _dbContext.SaveChangesAsync(ct);
 		await _outputCache.EvictByTagAsync("comment", ct);

@@ -208,10 +208,10 @@ public class ProductRepository : IProductRepository {
 		if (i.ProductInsights?.Any() != null) {
 			List<IGrouping<ReactionEntity?, ProductInsight>> psGrouping = i.ProductInsights.GroupBy(g => g.Reaction).ToList();
 			i.ProductInsights = null;
-			List<ProductInsight?> productInsights = new();
+			List<ProductInsight> productInsights = new();
 			foreach (IGrouping<ReactionEntity?, ProductInsight> item in psGrouping) {
 				item.FirstOrDefault()!.Count = item.Count();
-				productInsights.Add(item.FirstOrDefault());
+				productInsights.Add(item.FirstOrDefault()!);
 			}
 			i.ProductInsights = productInsights;
 		}
@@ -221,10 +221,7 @@ public class ProductRepository : IProductRepository {
 			            c.Status == OrderStatuses.Complete);
 		string displayOrderComplete = Utils.DisplayCountOfCompleteOrder(completeOrder.Count());
 		i.SuccessfulPurchase = displayOrderComplete;
-
-		bool isUserBuyIt = completeOrder.Any(a => a.UserId == _userId);
-		if (isUserBuyIt) i.Media?.Select(s => s.JsonDetail.Link == "");
-
+		
 		await _promotionRepository.UserSeened(i.Id);
 
 		return new GenericResponse<ProductEntity?>(i);

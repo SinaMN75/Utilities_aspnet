@@ -4,7 +4,7 @@ public interface IChatRepository {
 	Task<GenericResponse<ChatReadDto?>> Create(ChatCreateUpdateDto model);
 	Task<GenericResponse<IEnumerable<ChatReadDto>?>> Read();
 	Task<GenericResponse<IEnumerable<ChatReadDto>?>> ReadByUserId(string id);
-	Task<GenericResponse<IEnumerable<ChatReadDto>>> FilterByUserId(ChatFilterDto dto);
+	Task<GenericResponse<IEnumerable<ChatReadDto>?>> FilterByUserId(ChatFilterDto dto);
 	Task<GenericResponse<ChatEntity?>> Update(ChatCreateUpdateDto dto);
 	Task<GenericResponse> Delete(Guid id);
 
@@ -69,12 +69,12 @@ public class ChatRepository : IChatRepository {
 		return new GenericResponse<ChatReadDto?>(conversations);
 	}
 
-	public async Task<GenericResponse<IEnumerable<ChatReadDto>>> FilterByUserId(ChatFilterDto dto) {
+	public async Task<GenericResponse<IEnumerable<ChatReadDto>?>> FilterByUserId(ChatFilterDto dto) {
 		string? userId = _userId;
 		UserEntity? user = await _dbContext.Set<UserEntity>()
 			.Include(x => x.Media)
 			.FirstOrDefaultAsync(x => x.Id == dto.UserId);
-		if (user == null) return new GenericResponse<IEnumerable<ChatReadDto>>(null, UtilitiesStatusCodes.BadRequest);
+		if (user == null) return new GenericResponse<IEnumerable<ChatReadDto>?>(null, UtilitiesStatusCodes.BadRequest);
 		List<ChatEntity> conversation = await _dbContext.Set<ChatEntity>()
 			.Where(c => c.ToUserId == userId && c.FromUserId == userId)
 			.Include(x => x.Media).OrderByDescending(x => x.CreatedAt).ToListAsync();
@@ -101,24 +101,24 @@ public class ChatRepository : IChatRepository {
 		int totalCount = conversation.Count;
 		conversations = conversations.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize).ToList();
 
-		return new GenericResponse<IEnumerable<ChatReadDto>>(conversations) {
+		return new GenericResponse<IEnumerable<ChatReadDto>?>(conversations) {
 			TotalCount = totalCount,
 			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
-			PageSize = dto?.PageSize
-		};
+			PageSize = dto.PageSize
+		}!;
 	}
 
 	public async Task<GenericResponse<ChatEntity?>> Update(ChatCreateUpdateDto dto) {
 		ChatEntity? e = await _dbContext.Set<ChatEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id);
 		if (e == null) return new GenericResponse<ChatEntity?>(null, UtilitiesStatusCodes.NotFound);
-		e.MessageText = dto.MessageText;
+		e.MessageText = dto.MessageText!;
 		_dbContext.Update(e);
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse<ChatEntity?>(e);
 	}
 
 	public async Task<GenericResponse> Delete(Guid id) {
-		ChatEntity? e = await _dbContext.Set<ChatEntity>().FirstOrDefaultAsync(x => x.Id == id);
+		ChatEntity e = (await _dbContext.Set<ChatEntity>().FirstOrDefaultAsync(x => x.Id == id))!;
 		e.DeletedAt = DateTime.Now;
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
@@ -265,8 +265,8 @@ public class ChatRepository : IChatRepository {
 	}
 
 	public async Task<GenericResponse<GroupChatMessageEntity?>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto) {
-		GroupChatMessageEntity? e = await _dbContext.Set<GroupChatMessageEntity>()
-			.FirstOrDefaultAsync(x => x.Id == dto.Id);
+		GroupChatMessageEntity e = (await _dbContext.Set<GroupChatMessageEntity>()
+			.FirstOrDefaultAsync(x => x.Id == dto.Id))!;
 
 		e.Message = dto.Message ?? e.Message;
 		e.Type = dto.Type ?? e.Type;
