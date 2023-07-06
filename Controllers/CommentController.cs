@@ -17,8 +17,9 @@ public class CommentController : BaseApiController {
 
 	[HttpPost]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse>> Create(CommentCreateUpdateDto parameter, CancellationToken ct) => Result(await _repository.Create(parameter, ct));
-	
+	public async Task<ActionResult<GenericResponse>> Create(CommentCreateUpdateDto parameter, CancellationToken ct) =>
+		Result(await _repository.Create(parameter, ct));
+
 	[HttpGet]
 	[OutputCache(PolicyName = "24h")]
 	public ActionResult<GenericResponse<CommentEntity>> Read(CommentFilterDto dto) => Result(_repository.Filter(dto));
@@ -33,7 +34,8 @@ public class CommentController : BaseApiController {
 
 	[HttpPut]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse>> Update(Guid id, CommentCreateUpdateDto parameter, CancellationToken ct) => Result(await _repository.Update(id, parameter, ct));
+	public async Task<ActionResult<GenericResponse>> Update(Guid id, CommentCreateUpdateDto parameter, CancellationToken ct) =>
+		Result(await _repository.Update(id, parameter, ct));
 
 	[HttpDelete]
 	[Authorize]

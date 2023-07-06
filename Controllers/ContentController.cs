@@ -18,7 +18,8 @@ public class ContentController : BaseApiController {
 
 	[HttpPut]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse<ContentEntity>>> Update(ContentCreateUpdateDto dto, CancellationToken ct) => Result(await _repository.Update(dto, ct));
+	public async Task<ActionResult<GenericResponse<ContentEntity>>> Update(ContentCreateUpdateDto dto, CancellationToken ct) =>
+		Result(await _repository.Update(dto, ct));
 
 	[HttpDelete("{id:guid}")]
 	[Authorize]

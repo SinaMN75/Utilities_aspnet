@@ -150,13 +150,11 @@ public enum Priority {
 //	All = 102
 //}
 
-public enum OrderType
-{
+public enum OrderType {
 	None = 100,
 	Physical = 101,
 	Digital = 102
 }
-
 
 public enum Reaction {
 	None = 100,
@@ -259,7 +257,7 @@ public enum TransactionType {
 	Recharge = 105
 }
 
-public enum ProductType { 
+public enum ProductType {
 	None = 100,
 	Digital = 101,
 	Physical = 102
@@ -290,6 +288,4 @@ public enum TagMedia {
 	Cover
 }
 
-public enum TagNotification {
-}
-
+public enum TagNotification { }

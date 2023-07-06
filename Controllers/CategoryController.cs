@@ -9,7 +9,8 @@ public class CategoryController : BaseApiController {
 
 	[HttpPost]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Create(CategoryCreateUpdateDto dto, CancellationToken ct) => Result(await _repository.Create(dto, ct));
+	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Create(CategoryCreateUpdateDto dto, CancellationToken ct) =>
+		Result(await _repository.Create(dto, ct));
 
 	[HttpPost("BulkCreate")]
 	[Authorize]
@@ -25,7 +26,8 @@ public class CategoryController : BaseApiController {
 
 	[HttpPut]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Update(CategoryCreateUpdateDto dto, CancellationToken ct) => Result(await _repository.Update(dto, ct));
+	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Update(CategoryCreateUpdateDto dto, CancellationToken ct) =>
+		Result(await _repository.Update(dto, ct));
 
 	[HttpDelete("{id:guid}")]
 	[Authorize]

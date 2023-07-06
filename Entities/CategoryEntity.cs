@@ -18,7 +18,7 @@ public class CategoryEntity : BaseEntity {
 	public string? Type { get; set; }
 
 	public int? Order { get; set; }
-	
+
 	[MaxLength(1000)]
 	public CategoryJsonDetail JsonDetail { get; set; } = new();
 

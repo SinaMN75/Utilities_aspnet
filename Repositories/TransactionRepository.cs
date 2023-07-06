@@ -40,7 +40,7 @@ public class TransactionRepository : ITransactionRepository {
 		if (dto.OrderId is not null) q = q.Where(x => x.OrderId == dto.OrderId);
 		if (dto.GatewayName is not null) q = q.Where(x => x.GatewayName == dto.GatewayName);
 		if (dto.PaymentId is not null) q = q.Where(x => x.PaymentId == dto.PaymentId);
-		
+
 		return new GenericResponse<IQueryable<TransactionEntity>>(q.AsNoTracking());
 	}
 

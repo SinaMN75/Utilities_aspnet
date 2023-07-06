@@ -146,18 +146,18 @@ public class ChatRepository : IChatRepository {
 			if (blockedState.Item1)
 				return new GenericResponse<GroupChatEntity?>(null, blockedState.Item2);
 
-            GroupChatEntity? e = await _dbContext.Set<GroupChatEntity>().AsNoTracking()
+			GroupChatEntity? e = await _dbContext.Set<GroupChatEntity>().AsNoTracking()
 				.Include(x => x.Users)!.ThenInclude(x => x.Media)
 				.Include(x => x.Products)!.ThenInclude(x => x.Media)
 				.Include(x => x.Products)!.ThenInclude(x => x.Categories)
 				.Include(x => x.Media)
-                .FirstOrDefaultAsync(x => x.Users.Count() == 2 &&
-                                          x.Users.Any(x => x.Id == firstUserId) &&
-                                          x.Users.Any(x => x.Id == secondUserId) &&
-                                          x.Type == ChatType.Private &&
-                                          x.DeletedAt == null);
+				.FirstOrDefaultAsync(x => x.Users.Count() == 2 &&
+				                          x.Users.Any(x => x.Id == firstUserId) &&
+				                          x.Users.Any(x => x.Id == secondUserId) &&
+				                          x.Type == ChatType.Private &&
+				                          x.DeletedAt == null);
 
-            if (e == null) return await CreateGroupChatLogic(dto);
+			if (e == null) return await CreateGroupChatLogic(dto);
 			return new GenericResponse<GroupChatEntity?>(e);
 		}
 		return await CreateGroupChatLogic(dto);

@@ -179,9 +179,7 @@ public class OrderRepository : IOrderRepository {
 		}
 
 		o.TotalPrice = 0;
-		foreach (OrderDetailEntity orderDetailEntity in o.OrderDetails) {
-			o.TotalPrice += orderDetailEntity.FinalPrice;
-		}
+		foreach (OrderDetailEntity orderDetailEntity in o.OrderDetails) { o.TotalPrice += orderDetailEntity.FinalPrice; }
 
 		_dbContext.Update(o);
 		await _dbContext.SaveChangesAsync();

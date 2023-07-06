@@ -55,7 +55,7 @@ public class AddressRepository : IAddressRepository {
 		await _outputCache.EvictByTagAsync("address", ct);
 		return new GenericResponse<AddressEntity?>(e);
 	}
-	
+
 	public async Task<GenericResponse> Delete(Guid addressId, CancellationToken ct) {
 		await _dbContext.Set<AddressEntity>().Where(f => f.Id == addressId).ExecuteUpdateAsync(x => x.SetProperty(y => y.DeletedAt, DateTime.Now), ct);
 		return new GenericResponse();
