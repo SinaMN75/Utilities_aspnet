@@ -51,7 +51,7 @@ public class ReportRepository : IReportRepository {
 	public async Task<GenericResponse<ReportEntity?>> ReadById(Guid id) {
 		ReportEntity? entity = await _dbContext.Set<ReportEntity>()
 			.Include(x => x.User)
-			.Include(x => x.Product).ThenInclude(x => x.Media)
+			.Include(x => x.Product).ThenInclude(x => x!.Media)
 			.Include(x => x.Comment)
 			.Include(x => x.GroupChat)
 			.Include(x => x.Chat)

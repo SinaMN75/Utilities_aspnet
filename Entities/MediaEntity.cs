@@ -9,10 +9,10 @@ public class MediaEntity : BaseEntity {
 	public string? UseCase { get; set; }
 
 	public int? Order { get; set; }
-	
+
 	[MaxLength(1000)]
 	public MediaJsonDetail JsonDetail { get; set; } = new();
-	
+
 	[MaxLength(100)]
 	public List<TagMedia>? Tags { get; set; } = new();
 

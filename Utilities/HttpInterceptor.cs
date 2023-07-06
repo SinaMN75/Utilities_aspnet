@@ -14,7 +14,7 @@ public class CustomHttpClient<TIn, TOut> : HttpClient where TIn : class where TO
 				request.Headers.Add(header.Key, header.Value);
 		HttpResponseMessage response = await SendAsync(request);
 		string responseString = await response.Content.ReadAsStringAsync();
-		return JsonConvert.DeserializeObject<TOut>(responseString);
+		return JsonConvert.DeserializeObject<TOut>(responseString)!;
 	}
 
 	public async Task<TOut> Post(string url, TIn body, HttpRequestHeaders? headers = null) => await SendRequest(HttpMethod.Post, url, body, headers);
@@ -34,6 +34,6 @@ public class CustomInterceptor : DelegatingHandler {
 			HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
 			return response;
 		}
-		catch (Exception ex) { throw new Exception(); }
+		catch (Exception) { throw new Exception(); }
 	}
 }

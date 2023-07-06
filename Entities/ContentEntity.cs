@@ -16,7 +16,7 @@ public class ContentEntity : BaseEntity {
 
 	[StringLength(5000)]
 	public string? Description { get; set; }
-	
+
 	[MaxLength(100)]
 	public List<TagContent>? Tags { get; set; } = new();
 

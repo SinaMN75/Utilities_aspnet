@@ -100,8 +100,10 @@ public class GroupChatMessageEntity : BaseEntity {
 [Table("SeenUsers")]
 public class SeenUsers : BaseEntity {
 	public Guid? FkGroupChat { get; set; }
+
 	[MaxLength(50)]
 	public string? FkUserId { get; set; }
+
 	public Guid? FkGroupChatMessage { get; set; }
 }
 

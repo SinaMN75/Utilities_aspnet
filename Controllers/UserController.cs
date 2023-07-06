@@ -43,12 +43,12 @@ public class UserController : BaseApiController {
 	[HttpPost("TransferWalletToWallet")]
 	[Authorize]
 	public async Task<ActionResult<GenericResponse>> TransferWalletToWallet(TransferFromWalletToWalletDto dto, CancellationToken ct) =>
-		Result(await _repository.TransferWalletToWallet(dto,ct));
+		Result(await _repository.TransferWalletToWallet(dto, ct));
 
 	[HttpPost("Authorize")]
 	[Authorize]
 	public async Task<ActionResult<GenericResponse>> Authorize(AuthorizeUserDto dto) => Result(await _repository.Authorize(dto));
-	
+
 	[HttpGet("ReadMyBlockList")]
 	public async Task<ActionResult<GenericResponse<IQueryable<UserEntity>>>> ReadMyBlockList() => Result(await _repository.ReadMyBlockList());
 

@@ -2,82 +2,68 @@
 
 public class ChatHub : Hub {
 	private readonly DbContext _context;
-	private readonly string uploadsFolder;
+	private readonly string _uploadsFolder;
 
 	public ChatHub(DbContext db, IWebHostEnvironment hostingEnvironment) {
 		_context = db;
-		uploadsFolder = Path.Combine(hostingEnvironment.ContentRootPath, "intranet");
+		_uploadsFolder = Path.Combine(hostingEnvironment.ContentRootPath, "intranet");
 	}
 
-	//string fileName2 = Path.Combine(uploadsFolder, $"LogFile {i} - {DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss")}");
-	//FileInfo log2 = new FileInfo(fileName2);
-	//                    using (StreamWriter sw = log2.CreateText())
-	//                    {
-	//                        sw.WriteLine("getted new info from post");
-	//                        sw.WriteLine($"{contentStreamFinal}");
-	//                    }
-	//
-
 	public override async Task OnConnectedAsync() {
-		string fileName = Path.Combine(uploadsFolder, $"OnConnected - {DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss")}");
+		string fileName = Path.Combine(_uploadsFolder, $"OnConnected - {DateTime.Now:yyyy-MM-dd-hh-mm-ss}");
 		FileInfo log = new(fileName);
-		using (StreamWriter sw = log.CreateText()) {
-			sw.WriteLine("onConnect Started");
-			string? userId = Context!.User.Identity!.Name;
-			sw.WriteLine($"user Id that get from context is : {userId}");
-			UserEntity? user = _context.Set<UserEntity>().FirstOrDefault(f => f.Id == userId);
-			if (user is not null) {
-				sw.WriteLine($"user finded - user id is : {user.Id}");
-				user.IsOnline = true;
-				_context.Update(user);
-				_context.SaveChanges();
-				sw.WriteLine("db updated");
-			}
-			await Clients.All.SendAsync("UserConnected", userId);
-			sw.WriteLine("sended to client");
+		await using StreamWriter sw = log.CreateText();
+		await sw.WriteLineAsync("onConnect Started");
+		string? userId = Context.User!.Identity!.Name;
+		await sw.WriteLineAsync($"user Id that get from context is : {userId}");
+		UserEntity? user = _context.Set<UserEntity>().FirstOrDefault(f => f.Id == userId);
+		if (user is not null) {
+			await sw.WriteLineAsync($"user finded - user id is : {user.Id}");
+			user.IsOnline = true;
+			_context.Update(user);
+			await _context.SaveChangesAsync();
+			await sw.WriteLineAsync("db updated");
 		}
+		await Clients.All.SendAsync("UserConnected", userId);
+		await sw.WriteLineAsync("sended to client");
 	}
 
 	public override async Task OnDisconnectedAsync(Exception? exception) {
-		string fileName = Path.Combine(uploadsFolder, $"OnConnected - {DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss")}");
+		string fileName = Path.Combine(_uploadsFolder, $"OnConnected - {DateTime.Now:yyyy-MM-dd-hh-mm-ss}");
 		FileInfo log = new(fileName);
-		using (StreamWriter sw = log.CreateText()) {
-			sw.WriteLine("disconnected Started");
-			string? userId = Context!.User.Identity!.Name;
-			sw.WriteLine($"user Id that get from context is : {userId}");
-			UserEntity? user = _context.Set<UserEntity>().FirstOrDefault(f => f.Id == userId);
-			if (user is not null) {
-				sw.WriteLine($"user finded - user id is : {user.Id}");
-				user.IsOnline = false;
-				_context.Update(user);
-				_context.SaveChanges();
-				sw.WriteLine("db updated");
-			}
-			await Clients.All.SendAsync("UserDisconnected", userId);
-			sw.WriteLine("sended to client");
+		await using StreamWriter sw = log.CreateText();
+		await sw.WriteLineAsync("disconnected Started");
+		string? userId = Context.User!.Identity!.Name;
+		await sw.WriteLineAsync($"user Id that get from context is : {userId}");
+		UserEntity? user = _context.Set<UserEntity>().FirstOrDefault(f => f.Id == userId);
+		if (user is not null) {
+			await sw.WriteLineAsync($"user finded - user id is : {user.Id}");
+			user.IsOnline = false;
+			_context.Update(user);
+			await _context.SaveChangesAsync();
+			await sw.WriteLineAsync("db updated");
 		}
+		await Clients.All.SendAsync("UserDisconnected", userId);
+		await sw.WriteLineAsync("sended to client");
 	}
 
 	public async Task SendMessageToReceiver(string sender, string receiver, string message) {
-		string fileName = Path.Combine(uploadsFolder, $"send message - {DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss")}");
+		string fileName = Path.Combine(_uploadsFolder, $"send message - {DateTime.Now:yyyy-MM-dd-hh-mm-ss}");
 		FileInfo log = new(fileName);
-		using (StreamWriter sw = log.CreateText()) {
-			sw.WriteLine($"sender : {sender}, reviever: {receiver} message :{message}");
-			UserEntity? user = await _context.Set<UserEntity>().FirstOrDefaultAsync(u => u.Id == receiver);
-			sw.WriteLine($"reciever id : {user.Id}");
-			if (user != null) {
-				if (user.IsOnline.IsTrue()) {
-					await Clients.User(user.Id).SendAsync("MessageReceived", sender, message);
-					sw.WriteLine("sended to client");
-				}
-				else {
-					message = message + "template";
-					await Clients.User(user.Id).SendAsync("MessageReceived", sender, message);
-					sw.WriteLine("sended to client");
-				}
-				//Todo: else => push notification for receiver
-			}
+		await using StreamWriter sw = log.CreateText();
+		await sw.WriteLineAsync($"sender : {sender}, reviever: {receiver} message :{message}");
+		UserEntity? user = await _context.Set<UserEntity>().FirstOrDefaultAsync(u => u.Id == receiver);
+		await sw.WriteLineAsync($"reciever id : {user!.Id}");
+		if (user.IsOnline.IsTrue()) {
+			await Clients.User(user.Id).SendAsync("MessageReceived", sender, message);
+			await sw.WriteLineAsync("sended to client");
 		}
+		else {
+			message += "template";
+			await Clients.User(user.Id).SendAsync("MessageReceived", sender, message);
+			await sw.WriteLineAsync("sended to client");
+		}
+		//Todo: else => push notification for receiver
 	}
 
 	/// <summary>
@@ -88,17 +74,15 @@ public class ChatHub : Hub {
 	///     4 = none
 	/// </summary
 	public async Task SendingState(string sender, string receiver, int type) {
-		string fileName = Path.Combine(uploadsFolder, $"sending state - {DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss")}");
+		string fileName = Path.Combine(_uploadsFolder, $"sending state - {DateTime.Now:yyyy-MM-dd-hh-mm-ss}");
 		FileInfo log = new(fileName);
-		using (StreamWriter sw = log.CreateText()) {
-			sw.WriteLine($"sender : {sender}, reviever: {receiver} type :{type}");
-			UserEntity? user = await _context.Set<UserEntity>().FirstOrDefaultAsync(u => u.Id == receiver);
-			sw.WriteLine($"reciever id : {user.Id}");
-			if (user != null)
-				if (user.IsOnline.IsTrue()) {
-					await Clients.User(user.Id).SendAsync("MessageState", sender, type);
-					sw.WriteLine("sended to client");
-				}
+		await using StreamWriter sw = log.CreateText();
+		await sw.WriteLineAsync($"sender : {sender}, reviever: {receiver} type :{type}");
+		UserEntity? user = await _context.Set<UserEntity>().FirstOrDefaultAsync(u => u.Id == receiver);
+		await sw.WriteLineAsync($"reciever id : {user!.Id}");
+		if (user.IsOnline.IsTrue()) {
+			await Clients.User(user.Id).SendAsync("MessageState", sender, type);
+			await sw.WriteLineAsync("sended to client");
 		}
 	}
 

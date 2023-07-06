@@ -43,11 +43,11 @@ public class OrderRepository : IOrderRepository {
 			.Include(x => x.Address);
 
 		if (dto.ShowProducts.IsTrue()) {
-			q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(x => x.Parent).ThenInclude(x => x.Media);
-			q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(x => x.Parent).ThenInclude(x => x.Categories);
-			q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(x => x.Parent).ThenInclude(x => x.User);
-			q = q.Include(x => x.OrderDetails).ThenInclude(x => x.Product).ThenInclude(x => x.Media);
-			q = q.Include(x => x.User).ThenInclude(x => x.Media);
+			q = q.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Parent).ThenInclude(x => x!.Media);
+			q = q.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Parent).ThenInclude(x => x!.Categories);
+			q = q.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Parent).ThenInclude(x => x!.User);
+			q = q.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Media);
+			q = q.Include(x => x.User).ThenInclude(x => x!.Media);
 		}
 		if (dto.Id.HasValue) q = q.Where(x => x.Id == dto.Id);
 		if (dto.Status.HasValue) q = q.Where(x => x.Status == dto.Status);
@@ -81,15 +81,15 @@ public class OrderRepository : IOrderRepository {
 
 	public async Task<GenericResponse<OrderEntity>> ReadById(Guid id) {
 		OrderEntity? i = await _dbContext.Set<OrderEntity>()
-			.Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p.Media)
-			.Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p.Categories)
+			.Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p!.Media)
+			.Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p!.Categories)
 			.Include(i => i.Address)
-			.Include(i => i.User).ThenInclude(i => i.Media)
-			.Include(i => i.ProductOwner).ThenInclude(i => i.Media)
+			.Include(i => i.User).ThenInclude(i => i!.Media)
+			.Include(i => i.ProductOwner).ThenInclude(i => i!.Media)
 			.AsNoTracking()
 			.FirstOrDefaultAsync(i => i.Id == id);
 
-		return new GenericResponse<OrderEntity>(i);
+		return new GenericResponse<OrderEntity>(i!);
 	}
 
 	public async Task<GenericResponse> Delete(Guid id) {
@@ -179,9 +179,7 @@ public class OrderRepository : IOrderRepository {
 		}
 
 		o.TotalPrice = 0;
-		foreach (OrderDetailEntity orderDetailEntity in o.OrderDetails) {
-			o.TotalPrice += orderDetailEntity.FinalPrice;
-		}
+		foreach (OrderDetailEntity orderDetailEntity in o.OrderDetails) { o.TotalPrice += orderDetailEntity.FinalPrice; }
 
 		_dbContext.Update(o);
 		await _dbContext.SaveChangesAsync();
@@ -201,6 +199,6 @@ public class OrderRepository : IOrderRepository {
 		orderDetail.Vote = dto.Vote < 1 ? null : dto.Vote;
 		_dbContext.Update(orderDetail);
 		await _dbContext.SaveChangesAsync();
-		return new GenericResponse(UtilitiesStatusCodes.Success);
+		return new GenericResponse();
 	}
 }

@@ -30,7 +30,7 @@ public class PromotionRepository : IPromotionRepository {
 			DisplayType = dto.DisplayType,
 			Gender = dto.Gender is not null ? string.Join(",", dto.Gender) : "",
 			States = dto.States is not null ? string.Join(",", dto.States) : "",
-			Skills = dto.Gender is not null ? string.Join(",", dto.Skills) : "",
+			Skills = dto.Skills is not null ? string.Join(",", dto.Skills) : "",
 			AgeCategories = dto.AgeCategories is not null ? string.Join(",", dto.AgeCategories) : ""
 		};
 		await _dbContext.Set<PromotionEntity>().AddAsync(promotion);
@@ -57,12 +57,12 @@ public class PromotionRepository : IPromotionRepository {
 		TimeSpan timeDifference = DateTime.Now - promotion.CreatedAt!.Value;
 		double hoursPassed = timeDifference.TotalHours;
 
-		string[]? usersId = promotion?.Users.IsNotNullOrEmpty() ?? false ? promotion.Users.Split(",") : null;
+		string[]? usersId = promotion.Users.IsNotNullOrEmpty() ? promotion.Users!.Split(",") : null;
 		if (usersId is null) return new GenericResponse<PromotionDetail?>(null, UtilitiesStatusCodes.BadRequest);
 		List<UserEntity> users = new();
 		foreach (string? item in usersId) {
 			UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == item);
-			if (item is null || user is null) continue;
+			if (user is null) continue;
 			users.Add(user);
 		}
 
@@ -70,18 +70,18 @@ public class PromotionRepository : IPromotionRepository {
 
 		List<StatePerUser> statePerUsers = users
 			.GroupBy(u => u.State)
-			.Select(g => new StatePerUser { State = g.Key, UserCount = g.Count() })
+			.Select(g => new StatePerUser { State = g.Key!, UserCount = g.Count() })
 			.ToList();
 
 		List<SkillPerUser> skillPerUsers = users
-			.SelectMany(u => u.Categories)
+			.SelectMany(u => u.Categories!)
 			.GroupBy(c => new { c.UseCase, c.Title })
-			.Select(g => new SkillPerUser { Skill = g?.Key.Title ?? "", UserCount = g?.Count() ?? 0 })
+			.Select(g => new SkillPerUser { Skill = g.Key.Title ?? "", UserCount = g.Count() })
 			.ToList();
 
 		List<AgeCategoryPerUser> ageCategoryPerUsers = users
 			.GroupBy(u => u.AgeCategory)
-			.Select(g => new AgeCategoryPerUser { AgeCategory = ((int) g.Key).ToString(), UserCount = g.Count() })
+			.Select(g => new AgeCategoryPerUser { AgeCategory = g.Key.ToString()!, UserCount = g.Count() })
 			.ToList();
 
 		return new GenericResponse<PromotionDetail?>(new PromotionDetail {

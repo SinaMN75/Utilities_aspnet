@@ -9,7 +9,8 @@ public class TransactionController : BaseApiController {
 	public TransactionController(ITransactionRepository repository) => _repository = repository;
 
 	[HttpPost]
-	public async Task<ActionResult<GenericResponse<TransactionEntity>>> Create(TransactionEntity dto, CancellationToken ct) => Result(await _repository.Create(dto, ct));
+	public async Task<ActionResult<GenericResponse<TransactionEntity>>> Create(TransactionEntity dto, CancellationToken ct) =>
+		Result(await _repository.Create(dto, ct));
 
 	[HttpGet]
 	[OutputCache(PolicyName = "24h")]
