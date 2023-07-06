@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore.Metadata;
-
 namespace Utilities_aspnet.Utilities;
 
 public static class Seeder {
@@ -8,12 +6,7 @@ public static class Seeder {
 
 	public const string SampleTitle = "لورم ایپسوم یا طرح‌نما (به انگلیسی: Lorem ipsum)";
 
-	public static void SetupModelConfigurationBuilder(this ModelConfigurationBuilder builder) {
-		builder.Properties<string>().AreFixedLength().HaveMaxLength(127);
-	}
-	
 	public static void SetupModelBuilder(this ModelBuilder builder) {
-		foreach (IMutableForeignKey fk in builder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys())) fk.DeleteBehavior = DeleteBehavior.NoAction;
 		builder.Entity<CategoryEntity>().OwnsOne(e => e.JsonDetail, b => b.ToJson());
 		builder.Entity<UserEntity>().OwnsOne(e => e.JsonDetail, b => b.ToJson());
 		builder.Entity<GroupChatEntity>().OwnsOne(e => e.JsonDetail, b => b.ToJson());
@@ -27,7 +20,7 @@ public static class Seeder {
 			b.OwnsMany(_ => _.Reacts);
 		});
 	}
-	
+
 	public static void SeedContent(this ModelBuilder builder) {
 		builder.Entity<ContentEntity>().HasData(
 			new ContentEntity {

@@ -11,20 +11,22 @@ public interface ICategoryRepository {
 public class CategoryRepository : ICategoryRepository {
 	private readonly DbContext _dbContext;
 	private readonly IOutputCacheStore _outputCache;
+	private readonly IMediaRepository _mediaRepository;
 
-	public CategoryRepository(DbContext context, IOutputCacheStore outputCache) {
+	public CategoryRepository(DbContext context, IOutputCacheStore outputCache, IMediaRepository mediaRepository) {
 		_dbContext = context;
 		_outputCache = outputCache;
+		_mediaRepository = mediaRepository;
 	}
 
 	public async Task<GenericResponse<CategoryEntity>> Create(CategoryCreateUpdateDto dto, CancellationToken ct) {
 		CategoryEntity entity = new();
 		if (dto.Id is not null) entity.Id = (Guid) dto.Id;
-			CategoryEntity i = entity.FillData(dto);
-			await _outputCache.EvictByTagAsync("category", ct);
-			if (dto.IsUnique) {
+		CategoryEntity i = entity.FillData(dto);
+		await _outputCache.EvictByTagAsync("category", ct);
+		if (dto.IsUnique) {
 			CategoryEntity? exists =
-				await _dbContext.Set<CategoryEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Title == dto.Title && x.DeletedAt != null, ct);
+				await _dbContext.Set<CategoryEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Title == dto.Title, ct);
 			if (exists == null) {
 				await _dbContext.AddAsync(i, ct);
 				await _dbContext.SaveChangesAsync(ct);
@@ -50,8 +52,7 @@ public class CategoryRepository : ICategoryRepository {
 
 	public GenericResponse<IEnumerable<CategoryEntity>> Filter(CategoryFilterDto dto) {
 		IQueryable<CategoryEntity> q = _dbContext.Set<CategoryEntity>().AsNoTracking()
-			.Where(x => x.DeletedAt == null && x.ParentId == null)
-			.Include(x => x.Children!.Where(y => y.DeletedAt == null));
+			.Where(x => x.ParentId == null).Include(x => x.Children);
 
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => x.Title!.Contains(dto.Title!));
 		if (dto.Type.IsNotNullOrEmpty()) q = q.Where(x => x.Type!.Contains(dto.Type!));
@@ -60,7 +61,7 @@ public class CategoryRepository : ICategoryRepository {
 		if (dto.TitleTr2.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr2!.Contains(dto.TitleTr2!));
 		if (dto.ParentId != null) q = q.Where(x => x.ParentId == dto.ParentId);
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => x.Tags!.Any(y => dto.Tags!.Contains(y)));
-		
+
 		if (dto.OrderByOrder.IsTrue()) q = q.OrderBy(x => x.Order);
 		if (dto.OrderByOrderDescending.IsTrue()) q = q.OrderByDescending(x => x.Order);
 		if (dto.OrderByCreatedAtDescending.IsTrue()) q = q.OrderByDescending(x => x.Order);
@@ -69,11 +70,20 @@ public class CategoryRepository : ICategoryRepository {
 
 		if (dto.ShowMedia.IsTrue()) q = q.Include(x => x.Media);
 
-		return new GenericResponse<IEnumerable<CategoryEntity>>(q.AsNoTracking());
+		return new GenericResponse<IEnumerable<CategoryEntity>>(q);
 	}
 
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
-		await _dbContext.Set<CategoryEntity>().Where(x => x.Id == id).ExecuteUpdateAsync(x => x.SetProperty(y => y.DeletedAt, DateTime.Now), ct);
+		CategoryEntity i = (await _dbContext.Set<CategoryEntity>().Include(x => x.Children)
+			.FirstOrDefaultAsync(x => x.Id == id, ct))!;
+		foreach (CategoryEntity c in i.Children ?? new List<CategoryEntity>()) {
+			_dbContext.Remove(c);
+			foreach (MediaEntity m in c.Media ?? new List<MediaEntity>()) await _mediaRepository.Delete(m.Id);
+		}
+		_dbContext.Remove(i);
+		foreach (MediaEntity m in i.Media ?? new List<MediaEntity>()) await _mediaRepository.Delete(m.Id);
+
+		await _dbContext.SaveChangesAsync(ct);
 		await _outputCache.EvictByTagAsync("category", ct);
 		return new GenericResponse();
 	}
