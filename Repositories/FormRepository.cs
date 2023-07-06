@@ -77,29 +77,17 @@ public class FormRepository : IFormRepository {
 
 	public GenericResponse<IQueryable<FormFieldEntity>> ReadFormFields(Guid categoryId) {
 		return new GenericResponse<IQueryable<FormFieldEntity>>(_dbContext.Set<FormFieldEntity>()
-			                                                        .Where(x => x.DeletedAt == null)
 			                                                        .Where(x => x.CategoryId == categoryId)
 			                                                        .AsNoTracking());
 	}
 
 	public async Task<GenericResponse> DeleteFormField(Guid id) {
-		FormFieldEntity? entity = await _dbContext.Set<FormFieldEntity>()
-			.Include(x => x.Forms)
-			.FirstOrDefaultAsync(i => i.Id == id);
-		if (entity == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
-		entity.DeletedAt = DateTime.Now;
-		await _dbContext.SaveChangesAsync();
+		await _dbContext.Set<FormFieldEntity>().Where(i => i.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
 	}
 
 	public async Task<GenericResponse> DeleteForm(Guid id) {
-		FormEntity? entity = await _dbContext.Set<FormEntity>()
-			.Include(x => x.Product)
-			.Include(x => x.User)
-			.FirstOrDefaultAsync(i => i.Id == id);
-		if (entity == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
-		entity.DeletedAt = DateTime.Now;
-		await _dbContext.SaveChangesAsync();
+		await _dbContext.Set<FormEntity>().Where(i => i.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
 	}
 }

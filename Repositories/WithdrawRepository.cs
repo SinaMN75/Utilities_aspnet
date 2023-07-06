@@ -41,9 +41,7 @@ public class WithdrawRepository : IWithdrawRepository {
 	}
 
 	public GenericResponse<IQueryable<WithdrawEntity>> Filter(WithdrawalFilterDto dto) {
-		IQueryable<WithdrawEntity> q = _dbContext.Set<WithdrawEntity>()
-			.Where(x => x.DeletedAt == null)
-			.OrderByDescending(o => o.CreatedAt);
+		IQueryable<WithdrawEntity> q = _dbContext.Set<WithdrawEntity>().OrderByDescending(o => o.CreatedAt);
 
 		if (dto.WithdrawState.HasValue) q = q.Where(w => w.WithdrawState == dto.WithdrawState);
 

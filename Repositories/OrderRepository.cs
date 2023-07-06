@@ -39,7 +39,7 @@ public class OrderRepository : IOrderRepository {
 		IQueryable<OrderEntity> q = _dbContext.Set<OrderEntity>()
 			.Include(x => x.Address)
 			.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product)
-			.Include(x => x.OrderDetails!.Where(y => y.DeletedAt == null))
+			.Include(x => x.OrderDetails)
 			.Include(x => x.Address);
 
 		if (dto.ShowProducts.IsTrue()) {
@@ -187,12 +187,12 @@ public class OrderRepository : IOrderRepository {
 	}
 
 	public async Task<GenericResponse> Vote(OrderVoteDto dto) {
-		var orderDetail = await _dbContext.Set<OrderDetailEntity>().FirstOrDefaultAsync(f => f.Id == dto.Id && f.DeletedAt == null);
+		var orderDetail = await _dbContext.Set<OrderDetailEntity>().FirstOrDefaultAsync(f => f.Id == dto.Id);
 		if (orderDetail is null)
 			return new GenericResponse(UtilitiesStatusCodes.NotFound);
 
 		var order = await _dbContext.Set<OrderEntity>()
-			.FirstOrDefaultAsync(f => f.Id == orderDetail.OrderId && f.Status == OrderStatuses.Complete && f.DeletedAt == null && f.UserId == _userId);
+			.FirstOrDefaultAsync(f => f.Id == orderDetail.OrderId && f.Status == OrderStatuses.Complete && f.UserId == _userId);
 		if (order is null)
 			return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 
