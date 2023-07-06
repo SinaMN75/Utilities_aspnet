@@ -255,7 +255,15 @@ public class ProductRepository : IProductRepository
 
     public async Task<GenericResponse> Delete(Guid id, CancellationToken ct)
     {
-        await _dbContext.Set<ProductEntity>().Where(x => x.Id == id || x.ParentId == id).ExecuteDeleteAsync(ct);
+        ProductEntity i = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id, ct))!;
+        foreach (ProductEntity c in i.Children!) {
+            _dbContext.Remove(c);
+            foreach (MediaEntity m in c.Media!) await _mediaRepository.Delete(m.Id);
+        }
+        _dbContext.Remove(i);
+        foreach (MediaEntity m in i.Media!) await _mediaRepository.Delete(m.Id);
+
+        await _dbContext.SaveChangesAsync(ct);
         return new GenericResponse();
     }
 

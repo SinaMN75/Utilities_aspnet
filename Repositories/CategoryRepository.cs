@@ -11,18 +11,20 @@ public interface ICategoryRepository {
 public class CategoryRepository : ICategoryRepository {
 	private readonly DbContext _dbContext;
 	private readonly IOutputCacheStore _outputCache;
+	private readonly IMediaRepository _mediaRepository;
 
-	public CategoryRepository(DbContext context, IOutputCacheStore outputCache) {
+	public CategoryRepository(DbContext context, IOutputCacheStore outputCache, IMediaRepository mediaRepository) {
 		_dbContext = context;
 		_outputCache = outputCache;
+		_mediaRepository = mediaRepository;
 	}
 
 	public async Task<GenericResponse<CategoryEntity>> Create(CategoryCreateUpdateDto dto, CancellationToken ct) {
 		CategoryEntity entity = new();
 		if (dto.Id is not null) entity.Id = (Guid) dto.Id;
-			CategoryEntity i = entity.FillData(dto);
-			await _outputCache.EvictByTagAsync("category", ct);
-			if (dto.IsUnique) {
+		CategoryEntity i = entity.FillData(dto);
+		await _outputCache.EvictByTagAsync("category", ct);
+		if (dto.IsUnique) {
 			CategoryEntity? exists =
 				await _dbContext.Set<CategoryEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Title == dto.Title, ct);
 			if (exists == null) {
@@ -59,7 +61,7 @@ public class CategoryRepository : ICategoryRepository {
 		if (dto.TitleTr2.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr2!.Contains(dto.TitleTr2!));
 		if (dto.ParentId != null) q = q.Where(x => x.ParentId == dto.ParentId);
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => x.Tags!.Any(y => dto.Tags!.Contains(y)));
-		
+
 		if (dto.OrderByOrder.IsTrue()) q = q.OrderBy(x => x.Order);
 		if (dto.OrderByCreatedAtDescending.IsTrue()) q = q.OrderByDescending(x => x.Order);
 		if (dto.OrderByCreatedAt.IsTrue()) q = q.OrderBy(x => x.CreatedAt);
@@ -71,7 +73,15 @@ public class CategoryRepository : ICategoryRepository {
 	}
 
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
-		await _dbContext.Set<CategoryEntity>().Where(x => x.Id == id).ExecuteDeleteAsync(ct);
+		CategoryEntity i = (await _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == id, ct))!;
+		foreach (CategoryEntity c in i.Children!) {
+			_dbContext.Remove(c);
+			foreach (MediaEntity m in c.Media!) await _mediaRepository.Delete(m.Id);
+		}
+		_dbContext.Remove(i);
+		foreach (MediaEntity m in i.Media!) await _mediaRepository.Delete(m.Id);
+
+		await _dbContext.SaveChangesAsync(ct);
 		await _outputCache.EvictByTagAsync("category", ct);
 		return new GenericResponse();
 	}
