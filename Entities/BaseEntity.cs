@@ -13,11 +13,3 @@ public class KeyValue {
 	public string? Key { get; set; }
 	public string? Value { get; set; }
 }
-
-public class ProductCategory {
-	public CategoryEntity? Category { get; set; }
-	public ProductEntity? Product { get; set; }
-
-	public Guid? ProductId { get; set; }
-	public Guid? CategoryId { get; set; }
-}
