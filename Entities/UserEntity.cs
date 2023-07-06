@@ -158,6 +158,7 @@ public class UserJsonDetail {
 	public string? ShebaNumber { get; set; }
 	public LegalAuthenticationType? LegalAuthenticationType { get; set; }
 	public NationalityType? NationalityType { get; set; }
+    public DateTime? Boosted { get; set; }
 }
 
 public class GetMobileVerificationCodeForLoginDto {

@@ -26,6 +26,10 @@ public class PromotionEntity : BaseEntity {
 	public string? UserId { get; set; }
 	public GroupChatEntity? GroupChat { get; set; }
 	public Guid? GroupChatId { get; set; }
+	public CategoryEntity? Category { get; set; }
+    public Guid? CategoryId { get; set; }
+    public UserEntity? UserPromoted { get; set; }
+    public string? UserPromotedId { get; set; }
 }
 
 public class CreateUpdatePromotionDto {
@@ -37,6 +41,8 @@ public class CreateUpdatePromotionDto {
 	public List<string>? States { get; set; }
 	public Guid? ProductId { get; set; }
 	public Guid? GroupChatId { get; set; }
+    public Guid? CategoryId { get; set; }
+    public string? UserId { get; set; }
 }
 
 public class PromotionDetail {

@@ -61,7 +61,8 @@ public class CategoryJsonDetail {
 	public int? Price { get; set; }
 	public int? Stock { get; set; }
 	public string? Color { get; set; }
-	public DateTime? Date1 { get; set; }
+    public DateTime? Boosted { get; set; }
+    public DateTime? Date1 { get; set; }
 	public DateTime? Date2 { get; set; }
 }
 
