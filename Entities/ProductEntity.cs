@@ -58,6 +58,10 @@ public class ProductEntity : BaseEntity {
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
 	public IEnumerable<ProductInsight>? ProductInsights { get; set; }
 	public IEnumerable<VisitProducts>? VisitProducts { get; set; }
+	
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public IEnumerable<ProductCategory>? ProductCategory { get; set; }
 
 	[NotMapped]
 	public string? SuccessfulPurchase { get; set; }
