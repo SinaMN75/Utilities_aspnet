@@ -187,11 +187,11 @@ public class OrderRepository : IOrderRepository {
 	}
 
 	public async Task<GenericResponse> Vote(OrderVoteDto dto) {
-		var orderDetail = await _dbContext.Set<OrderDetailEntity>().FirstOrDefaultAsync(f => f.Id == dto.Id);
+		OrderDetailEntity? orderDetail = await _dbContext.Set<OrderDetailEntity>().FirstOrDefaultAsync(f => f.Id == dto.Id);
 		if (orderDetail is null)
 			return new GenericResponse(UtilitiesStatusCodes.NotFound);
 
-		var order = await _dbContext.Set<OrderEntity>()
+		OrderEntity? order = await _dbContext.Set<OrderEntity>()
 			.FirstOrDefaultAsync(f => f.Id == orderDetail.OrderId && f.Status == OrderStatuses.Complete && f.UserId == _userId);
 		if (order is null)
 			return new GenericResponse(UtilitiesStatusCodes.BadRequest);

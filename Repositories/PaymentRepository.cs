@@ -141,7 +141,7 @@ public class PaymentRepository : IPaymentRepository {
 			if (address is not null) {
 				address.IsDefault = true;
 				_dbContext.Update(address);
-				foreach (var item in _dbContext.Set<AddressEntity>().Where(w => w.UserId == address.UserId && w.Id != address.Id)) {
+				foreach (AddressEntity? item in _dbContext.Set<AddressEntity>().Where(w => w.UserId == address.UserId && w.Id != address.Id)) {
 					item.IsDefault = false;
 					_dbContext.Update(item);
 				}

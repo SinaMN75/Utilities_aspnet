@@ -1,7 +1,6 @@
 ﻿namespace Utilities_aspnet.Entities;
 
 public class UserEntity {
-	
 	[Key]
 	[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 	public string Id { get; set; } = null!;
@@ -14,7 +13,7 @@ public class UserEntity {
 
 	[MaxLength(50)]
 	public string? FullName { get; set; }
-	
+
 	[MaxLength(50)]
 	public string? Password { get; set; }
 
@@ -29,7 +28,7 @@ public class UserEntity {
 
 	[MaxLength(20)]
 	public string? AppPhoneNumber { get; set; }
-	
+
 	[MaxLength(50)]
 	public string? UserName { get; set; }
 
@@ -38,7 +37,7 @@ public class UserEntity {
 
 	[MaxLength(50)]
 	public string? AppEmail { get; set; }
-	
+
 	[MaxLength(50)]
 	public string? Email { get; set; }
 
@@ -131,7 +130,7 @@ public class UserJsonDetail {
 	public string? ShebaNumber { get; set; }
 	public LegalAuthenticationType? LegalAuthenticationType { get; set; }
 	public NationalityType? NationalityType { get; set; }
-    public DateTime? Boosted { get; set; }
+	public DateTime? Boosted { get; set; }
 }
 
 public class GetMobileVerificationCodeForLoginDto {

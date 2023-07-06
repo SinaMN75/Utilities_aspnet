@@ -45,7 +45,7 @@ public class AddressRepository : IAddressRepository {
 		e.ReceiverFullName = addressDto.ReceiverFullName ?? e.ReceiverFullName;
 		e.ReceiverPhoneNumber = addressDto.ReceiverPhoneNumber ?? e.ReceiverPhoneNumber;
 		if (addressDto.IsDefault.IsTrue() && _dbContext.Set<AddressEntity>().Any(a => a.UserId == e.UserId && a.Id != e.Id && e.IsDefault))
-			foreach (var item in _dbContext.Set<AddressEntity>().Where(a => a.UserId == e.UserId && a.Id != e.Id && e.IsDefault)) {
+			foreach (AddressEntity? item in _dbContext.Set<AddressEntity>().Where(a => a.UserId == e.UserId && a.Id != e.Id && e.IsDefault)) {
 				item.IsDefault = false;
 				_dbContext.Update(item);
 			}
