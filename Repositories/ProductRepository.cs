@@ -320,6 +320,7 @@ public static class ProductEntityExtension
         {
             Details = dto.Details ?? entity.JsonDetail.Details,
             Author = dto.Author ?? entity.JsonDetail.Author,
+            Color = dto.Color ?? entity.JsonDetail.Color,
             PhoneNumber = dto.PhoneNumber ?? entity.JsonDetail.PhoneNumber,
             Link = dto.Link ?? entity.JsonDetail.Link,
             Website = dto.Website ?? entity.JsonDetail.Website,
