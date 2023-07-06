@@ -68,20 +68,20 @@ public class PromotionRepository : IPromotionRepository {
 
 		int userPerHour = (users.Count() / hoursPassed * 100).ToInt();
 
-		List<StatePerUser> statePerUsers = users
+		List<KeyValue> statePerUsers = users
 			.GroupBy(u => u.State)
-			.Select(g => new StatePerUser { State = g.Key!, UserCount = g.Count() })
+			.Select(g => new KeyValue { Key = g.Key!, Value = g.Count().ToString() })
 			.ToList();
 
-		List<SkillPerUser> skillPerUsers = users
+		List<KeyValue> skillPerUsers = users
 			.SelectMany(u => u.Categories!)
 			.GroupBy(c => new { c.UseCase, c.Title })
-			.Select(g => new SkillPerUser { Skill = g.Key.Title ?? "", UserCount = g.Count() })
+			.Select(g => new KeyValue { Key = g.Key.Title ?? "", Value = g.Count().ToString() })
 			.ToList();
 
-		List<AgeCategoryPerUser> ageCategoryPerUsers = users
+		List<KeyValue> ageCategoryPerUsers = users
 			.GroupBy(u => u.AgeCategory)
-			.Select(g => new AgeCategoryPerUser { AgeCategory = g.Key.ToString()!, UserCount = g.Count() })
+			.Select(g => new KeyValue { Key = g.Key.ToString()!, Value = g.Count().ToString() })
 			.ToList();
 
 		return new GenericResponse<PromotionDetail?>(new PromotionDetail {
