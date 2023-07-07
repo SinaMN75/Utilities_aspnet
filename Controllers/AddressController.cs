@@ -15,7 +15,7 @@ public class AddressController : BaseApiController {
 	[HttpGet]
 	[Authorize]
 	[OutputCache(PolicyName = "24h")]
-	public ActionResult<GenericResponse<IQueryable<AddressEntity>>> Read(AddressFilterDto dto) => Result(_repository.Filter(dto));
+	public ActionResult<GenericResponse<IQueryable<AddressEntity>>> Read([FromQuery] AddressFilterDto dto) => Result(_repository.Filter(dto));
 
 	[HttpPut]
 	[Authorize]
