@@ -10,10 +10,12 @@ public interface IContentRepository {
 public class ContentRepository : IContentRepository {
 	private readonly DbContext _dbContext;
 	private readonly IOutputCacheStore _outputCache;
+	private readonly IMediaRepository _mediaRepository;
 
-	public ContentRepository(DbContext dbContext, IOutputCacheStore cache) {
+	public ContentRepository(DbContext dbContext, IOutputCacheStore cache, IMediaRepository mediaRepository) {
 		_dbContext = dbContext;
 		_outputCache = cache;
+		_mediaRepository = mediaRepository;
 	}
 
 	public async Task<GenericResponse<ContentEntity>> Create(ContentCreateUpdateDto dto, CancellationToken ct) {
@@ -47,7 +49,10 @@ public class ContentRepository : IContentRepository {
 	}
 
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
-		await _dbContext.Set<ContentEntity>().Where(i => i.Id == id).ExecuteDeleteAsync(ct);
+		ContentEntity e = (await _dbContext.Set<ContentEntity>().FirstOrDefaultAsync(x => x.Id == id, ct))!;
+		await _mediaRepository.DeleteMedia(e.Media);
+		_dbContext.Set<ContentEntity>().Remove(e);
+		await _dbContext.SaveChangesAsync(ct);
 		await _outputCache.EvictByTagAsync("content", ct);
 		return new GenericResponse();
 	}

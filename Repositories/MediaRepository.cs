@@ -4,6 +4,7 @@ public interface IMediaRepository {
 	Task<GenericResponse<IEnumerable<MediaEntity>?>> Upload(UploadDto model);
 	Task<GenericResponse<MediaEntity?>> UpdateMedia(Guid id, UpdateMediaDto model);
 	Task<GenericResponse> Delete(Guid id);
+	Task DeleteMedia(IEnumerable<MediaEntity?>? media);
 }
 
 public class MediaRepository : IMediaRepository {
@@ -93,6 +94,16 @@ public class MediaRepository : IMediaRepository {
 		_dbContext.Set<MediaEntity>().Remove(media);
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
+	}
+
+	public async Task DeleteMedia(IEnumerable<MediaEntity?>? media) {
+		if (media is not null) {
+			IEnumerable<MediaEntity?> mediaEntities = media.ToList();
+			if (mediaEntities.IsNotNullOrEmpty())
+				foreach (MediaEntity? i in mediaEntities)
+					if (i is not null)
+						await Delete(i.Id);
+		}
 	}
 
 	public async Task<GenericResponse<MediaEntity?>> UpdateMedia(Guid id, UpdateMediaDto model) {
