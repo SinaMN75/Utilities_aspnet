@@ -9,8 +9,8 @@ public interface IContentRepository {
 
 public class ContentRepository : IContentRepository {
 	private readonly DbContext _dbContext;
-	private readonly IOutputCacheStore _outputCache;
 	private readonly IMediaRepository _mediaRepository;
+	private readonly IOutputCacheStore _outputCache;
 
 	public ContentRepository(DbContext dbContext, IOutputCacheStore cache, IMediaRepository mediaRepository) {
 		_dbContext = dbContext;

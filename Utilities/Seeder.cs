@@ -91,7 +91,39 @@ public static class Seeder {
 		);
 
 		#endregion
-		
-		
+
+		#region Category
+
+		builder.Entity<CategoryEntity>().HasData(
+			new CategoryEntity {
+				Id = Guid.Parse("860cfdad-1455-4ddd-bd6b-3e75798e3340"),
+				Title = "موبایل",
+				TitleTr1 = "Mobile",
+				Tags = new List<TagCategory> { TagCategory.Category },
+				JsonDetail = new CategoryJsonDetail()
+			}
+		);
+
+		builder.Entity<CategoryEntity>().HasData(
+			new CategoryEntity {
+				Id = Guid.Parse("860cfdad-1455-4ddd-bd6b-3e75798e3340"),
+				Title = "کتاب",
+				TitleTr1 = "Book",
+				Tags = new List<TagCategory> { TagCategory.Category },
+				JsonDetail = new CategoryJsonDetail()
+			}
+		);
+
+		builder.Entity<CategoryEntity>().HasData(
+			new CategoryEntity {
+				Id = Guid.Parse("860cfdad-1455-4ddd-bd6b-3e75798e3340"),
+				Title = "کیف",
+				TitleTr1 = "Bag",
+				Tags = new List<TagCategory> { TagCategory.Category },
+				JsonDetail = new CategoryJsonDetail()
+			}
+		);
+
+		#endregion
 	}
 }

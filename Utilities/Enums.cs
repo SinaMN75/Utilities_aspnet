@@ -274,8 +274,8 @@ public enum TagCategory {
 }
 
 public enum TagProduct {
-	PhysicalProduct,
-	DigitalProduct
+	PhysicalProduct = 100,
+	DigitalProduct = 101
 }
 
 public enum TagContent {

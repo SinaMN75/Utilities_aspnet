@@ -131,7 +131,7 @@ public class ProductRepository : IProductRepository {
 		if (dto.OrderByCreatedDate.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 		if (dto.OrderByCreatedDateDescending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 		if (dto.OrderByAgeCategory.IsTrue()) q = q.OrderBy(o => o.AgeCategory);
-		if (dto.OrderByMostUsedHashtag.IsTrue()) q = q.OrderBy(o => o.Categories!.Count(c => c.UseCase!.ToLower() == "tag"));
+		if (dto.OrderByMostUsedHashtag.IsTrue()) q = q.OrderBy(o => o.Categories!.Count(c => c.Tags.Contains(TagCategory.Hashtag)));
 		if (dto.OrderByCategory.IsTrue())
 			q = q.AsEnumerable().OrderBy(o => o.Categories != null && o.Categories.Any()
 				                             ? o.Categories.OrderBy(op => op.Title)

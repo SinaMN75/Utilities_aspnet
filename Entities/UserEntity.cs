@@ -66,7 +66,7 @@ public class UserEntity {
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
-	
+
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
 	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
@@ -74,7 +74,7 @@ public class UserEntity {
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
 	public IEnumerable<FormEntity>? FormBuilders { get; set; }
-	
+
 	[MaxLength(50)]
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]

@@ -97,7 +97,7 @@ public class PromotionRepository : IPromotionRepository {
 
 		List<KeyValue> skillPerUsers = users
 			.SelectMany(u => u.Categories!)
-			.GroupBy(c => new { c.UseCase, c.Title })
+			.GroupBy(c => new { c.Tags, c.Title })
 			.Select(g => new KeyValue { Key = g.Key.Title ?? "", Value = g.Count().ToString() })
 			.ToList();
 

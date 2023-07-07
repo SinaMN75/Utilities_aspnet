@@ -11,12 +11,6 @@ public class CategoryEntity : BaseEntity {
 	[MaxLength(100)]
 	public string? TitleTr2 { get; set; }
 
-	[MaxLength(20)]
-	public string? UseCase { get; set; }
-
-	[MaxLength(20)]
-	public string? Type { get; set; }
-
 	public int? Order { get; set; }
 
 	[MaxLength(1000)]
