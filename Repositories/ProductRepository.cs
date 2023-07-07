@@ -14,11 +14,11 @@ public interface IProductRepository {
 public class ProductRepository : IProductRepository {
 	private readonly IConfiguration _config;
 	private readonly DbContext _dbContext;
+	private readonly IFormRepository _formRepository;
 	private readonly IMediaRepository _mediaRepository;
 	private readonly IPromotionRepository _promotionRepository;
 	private readonly string? _userId;
 	private readonly IUserRepository _userRepository;
-	private readonly IFormRepository _formRepository;
 
 	public ProductRepository(
 		DbContext dbContext,
@@ -53,12 +53,11 @@ public class ProductRepository : IProductRepository {
 		EntityEntry<ProductEntity> i = await _dbContext.Set<ProductEntity>().AddAsync(e, ct);
 		await _dbContext.SaveChangesAsync(ct);
 
-		if (dto.Children is not null) {
+		if (dto.Children is not null)
 			foreach (ProductCreateUpdateDto childDto in dto.Children) {
 				childDto.ParentId = i.Entity.Id;
 				await Create(childDto, ct);
 			}
-		}
 
 		if (dto.Form is not null) await _formRepository.CreateForm(new FormCreateDto { ProductId = i.Entity.Id, Form = dto.Form });
 
@@ -90,7 +89,7 @@ public class ProductRepository : IProductRepository {
 
 	public async Task<GenericResponse<IQueryable<ProductEntity>>> Filter(ProductFilterDto dto) {
 		IQueryable<ProductEntity> q = _dbContext.Set<ProductEntity>().AsNoTracking();
-		if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.Now && w.ParentId == null);
+		if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || (w.ExpireDate >= DateTime.Now && w.ParentId == null));
 
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
 		if (dto.Subtitle.IsNotNullOrEmpty()) q = q.Where(x => (x.Subtitle ?? "").Contains(dto.Subtitle!));
@@ -329,7 +328,7 @@ public static class ProductEntityExtension {
 			KeyValue = dto.KeyValue ?? entity.JsonDetail.KeyValue,
 			Type1 = dto.Type1 ?? entity.JsonDetail.Type1,
 			Type2 = dto.Type2 ?? entity.JsonDetail.Type2,
-			KeyValues = dto.KeyValues ?? entity.JsonDetail.KeyValues,
+			KeyValues = dto.KeyValues ?? entity.JsonDetail.KeyValues
 		};
 
 		if (dto.ScorePlus.HasValue) {

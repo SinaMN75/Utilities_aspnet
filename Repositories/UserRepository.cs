@@ -18,10 +18,10 @@ public interface IUserRepository {
 
 public class UserRepository : IUserRepository {
 	private readonly DbContext _dbContext;
+	private readonly IMemoryCache _memoryCache;
 	private readonly ISmsNotificationRepository _sms;
 	private readonly ITransactionRepository _transactionRepository;
 	private readonly string? _userId;
-	private readonly IMemoryCache _memoryCache;
 
 	public UserRepository(
 		DbContext dbContext,
@@ -152,9 +152,9 @@ public class UserRepository : IUserRepository {
 	}
 
 	public async Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model) {
-		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => (x.Email == model.Email ||
-		                                                                                x.UserName == model.Email ||
-		                                                                                x.PhoneNumber == model.Email) ||
+		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Email == model.Email ||
+		                                                                               x.UserName == model.Email ||
+		                                                                               x.PhoneNumber == model.Email ||
 		                                                                               x.Password == model.Password);
 
 		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
@@ -217,7 +217,7 @@ public class UserRepository : IUserRepository {
 		}
 		UserEntity user = new() {
 			PhoneNumber = mobile,
-			UserName = mobile,
+			UserName = mobile
 		};
 
 		await _dbContext.AddAsync(user);

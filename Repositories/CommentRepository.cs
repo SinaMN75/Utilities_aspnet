@@ -13,9 +13,9 @@ public interface ICommentRepository {
 public class CommentRepository : ICommentRepository {
 	private readonly IConfiguration _config;
 	private readonly DbContext _dbContext;
-	private readonly IOutputCacheStore _outputCache;
 	private readonly IMediaRepository _mediaRepository;
 	private readonly INotificationRepository _notificationRepository;
+	private readonly IOutputCacheStore _outputCache;
 	private readonly string? _userId;
 
 	public CommentRepository(
@@ -158,8 +158,10 @@ public class CommentRepository : ICommentRepository {
 
 		CommentReacts? oldReaction = comment.JsonDetail.Reacts.FirstOrDefault(w => w.UserId == _userId);
 		if (oldReaction is null) comment.JsonDetail.Reacts.Add(new CommentReacts { Reaction = reaction, UserId = user.Id });
-		else if (oldReaction.Reaction != reaction) { oldReaction.Reaction = reaction; }
-		else { comment.JsonDetail.Reacts.Remove(oldReaction); }
+		else if (oldReaction.Reaction != reaction)
+			oldReaction.Reaction = reaction;
+		else
+			comment.JsonDetail.Reacts.Remove(oldReaction);
 		await _dbContext.SaveChangesAsync(ct);
 		await _outputCache.EvictByTagAsync("comment", ct);
 		return new GenericResponse();

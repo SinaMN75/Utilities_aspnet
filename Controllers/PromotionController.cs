@@ -7,7 +7,7 @@ public class PromotionController : BaseApiController {
 
 	public PromotionController(IPromotionRepository repository) => _repository = repository;
 
-	[HttpPost()]
+	[HttpPost]
 	[Authorize]
 	public async Task<ActionResult<GenericResponse>> CreatePromotion(CreateUpdatePromotionDto dto) => Result(await _repository.CreatePromotion(dto));
 

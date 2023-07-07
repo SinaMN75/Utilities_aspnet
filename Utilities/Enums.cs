@@ -265,7 +265,7 @@ public enum ProductType {
 
 public enum ProductTag {
 	Product = 100,
-	Post = 101,
+	Post = 101
 }
 
 public enum TagCategory {

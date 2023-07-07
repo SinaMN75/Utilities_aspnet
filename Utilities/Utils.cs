@@ -157,8 +157,8 @@ public static class StartupExtension {
 }
 
 internal class OutputCachePolicy : IOutputCachePolicy {
-	private readonly TimeSpan _timeSpan;
 	private readonly List<string> _tags;
+	private readonly TimeSpan _timeSpan;
 
 	public OutputCachePolicy(TimeSpan seconds, List<string> tags) {
 		_timeSpan = seconds;

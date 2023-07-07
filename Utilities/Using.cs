@@ -1,4 +1,6 @@
-﻿global using System;
+﻿#region
+
+global using System;
 global using System.Collections.Generic;
 global using System.Linq;
 global using System.Text;
@@ -22,7 +24,6 @@ global using Microsoft.AspNetCore.Http.Features;
 global using Microsoft.OpenApi.Models;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.EntityFrameworkCore.ChangeTracking;
-global using Microsoft.AspNetCore.Identity;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.IdentityModel.Tokens;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -44,3 +45,5 @@ global using Swashbuckle.AspNetCore.SwaggerUI;
 global using Zarinpal;
 global using Zarinpal.Models;
 global using Ghasedak.Core;
+
+#endregion

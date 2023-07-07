@@ -120,7 +120,7 @@ public class PaymentRepository : IPaymentRepository {
 		}
 		order.Status = OrderStatuses.Paid;
 
-		if (order.OrderDetails != null) {
+		if (order.OrderDetails != null)
 			foreach (OrderDetailEntity? item in order.OrderDetails) {
 				ProductEntity? prdct = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == item.ProductId);
 				if (prdct is not null) {
@@ -134,7 +134,6 @@ public class PaymentRepository : IPaymentRepository {
 				item.FinalPrice = item.Product != null ? item.Product.Price : item.FinalPrice;
 				_dbContext.Update(item);
 			}
-		}
 
 		if (order.AddressId is not null) {
 			AddressEntity? address = await _dbContext.Set<AddressEntity>().FirstOrDefaultAsync(f => f.Id == order.AddressId);

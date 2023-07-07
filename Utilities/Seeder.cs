@@ -29,7 +29,7 @@ public static class Seeder {
 				SubTitle = SampleTitle,
 				UseCase = "terms",
 				Type = "terms",
-				Description = SampleDescription,
+				Description = SampleDescription
 			}
 		);
 		builder.Entity<ContentEntity>().HasData(
@@ -39,7 +39,7 @@ public static class Seeder {
 				SubTitle = SampleTitle,
 				UseCase = "aboutUs",
 				Type = "aboutUs",
-				Description = SampleDescription,
+				Description = SampleDescription
 			}
 		);
 		builder.Entity<ContentEntity>().HasData(
@@ -49,7 +49,7 @@ public static class Seeder {
 				SubTitle = SampleTitle,
 				UseCase = "homeBanner1",
 				Type = "homeBanner1",
-				Description = SampleDescription,
+				Description = SampleDescription
 			}
 		);
 		builder.Entity<ContentEntity>().HasData(
@@ -59,7 +59,7 @@ public static class Seeder {
 				SubTitle = SampleTitle,
 				UseCase = "homeBanner2",
 				Type = "homeBanner2",
-				Description = SampleDescription,
+				Description = SampleDescription
 			}
 		);
 	}

@@ -65,9 +65,9 @@ public class OrderRepository : IOrderRepository {
 		if (dto.StartDate.HasValue) q = q.Where(x => x.CreatedAt >= dto.StartDate);
 		if (dto.EndDate.HasValue) q = q.Where(x => x.CreatedAt <= dto.EndDate);
 
-		if (dto.OrderType.HasValue) {
-			if (dto.OrderType.Value != OrderType.None) { q = q.Where(w => w.OrderType == dto.OrderType.Value); }
-		}
+		if (dto.OrderType.HasValue)
+			if (dto.OrderType.Value != OrderType.None)
+				q = q.Where(w => w.OrderType == dto.OrderType.Value);
 		int totalCount = q.Count();
 
 		//q = q.AsNoTracking().Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
@@ -179,7 +179,7 @@ public class OrderRepository : IOrderRepository {
 		}
 
 		o.TotalPrice = 0;
-		foreach (OrderDetailEntity orderDetailEntity in o.OrderDetails) { o.TotalPrice += orderDetailEntity.FinalPrice; }
+		foreach (OrderDetailEntity orderDetailEntity in o.OrderDetails) o.TotalPrice += orderDetailEntity.FinalPrice;
 
 		_dbContext.Update(o);
 		await _dbContext.SaveChangesAsync();
