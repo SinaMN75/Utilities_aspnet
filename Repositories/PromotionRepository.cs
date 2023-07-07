@@ -76,7 +76,7 @@ public class PromotionRepository : IPromotionRepository {
 			.FirstOrDefaultAsync(f => f.ProductId == id || f.GroupChatId == id || f.CategoryId == id || f.UserPromotedId == id.ToString());
 		if (promotion is null) return new GenericResponse<PromotionDetail?>(null, UtilitiesStatusCodes.NotFound);
 
-		TimeSpan timeDifference = DateTime.Now - promotion.CreatedAt!.Value;
+		TimeSpan timeDifference = DateTime.Now - promotion.CreatedAt;
 		double hoursPassed = timeDifference.TotalHours;
 
 		string[]? usersId = promotion.Users.IsNotNullOrEmpty() ? promotion.Users!.Split(",") : null;

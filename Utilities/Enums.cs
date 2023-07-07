@@ -279,8 +279,10 @@ public enum TagProduct {
 }
 
 public enum TagContent {
-	Terms,
-	AboutUs
+	Terms = 101,
+	AboutUs = 102,
+	HomeBanner1 = 103,
+	HomeBanner2 = 104
 }
 
 public enum TagMedia {

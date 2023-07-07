@@ -118,18 +118,18 @@ public class Utils {
 				case CallerType.CreateProduct:
 					if (useCaseProduct == "product") {
 						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
-							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.CreatedAt!.Value.Date == DateTime.Today) >
+							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.CreatedAt.Date == DateTime.Today) >
 							           usageRules.MaxProductPerDay;
 						else
-							overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt!.Value.Date == DateTime.Today) >
+							overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt.Date == DateTime.Today) >
 							           usageRules.MaxProductPerDay;
 					}
 					else {
 						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
-							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.CreatedAt!.Value.Date == DateTime.Today) >
+							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.CreatedAt.Date == DateTime.Today) >
 							           usageRules.MaxProductPerDay;
 						else
-							overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt!.Value.Date == DateTime.Today) >
+							overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt.Date == DateTime.Today) >
 							           usageRules.MaxProductPerDay;
 					}
 					break;

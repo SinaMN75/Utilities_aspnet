@@ -8,12 +8,6 @@ public class ContentEntity : BaseEntity {
 	[MaxLength(100)]
 	public string? SubTitle { get; set; }
 
-	[MaxLength(20)]
-	public string? UseCase { get; set; }
-
-	[MaxLength(20)]
-	public string? Type { get; set; }
-
 	[StringLength(5000)]
 	public string? Description { get; set; }
 

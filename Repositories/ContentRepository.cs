@@ -20,12 +20,8 @@ public class ContentRepository : IContentRepository {
 		ContentEntity entity = new() {
 			Description = dto.Description,
 			Title = dto.Title,
-			Type = dto.Type,
 			SubTitle = dto.SubTitle,
-			UseCase = dto.UseCase,
-			Tags = dto.Tags,
-			CreatedAt = DateTime.Now,
-			UpdatedAt = DateTime.Now
+			Tags = dto.Tags
 		};
 		EntityEntry<ContentEntity> e = await _dbContext.Set<ContentEntity>().AddAsync(entity, ct);
 		await _dbContext.SaveChangesAsync(ct);
@@ -39,11 +35,10 @@ public class ContentRepository : IContentRepository {
 
 	public async Task<GenericResponse<ContentEntity>> Update(ContentCreateUpdateDto dto, CancellationToken ct) {
 		ContentEntity e = (await _dbContext.Set<ContentEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id, ct))!;
-		e.UseCase = dto.UseCase ?? e.UseCase;
 		e.Title = dto.Title ?? e.Title;
-		e.Type = dto.Type ?? e.Type;
 		e.SubTitle = dto.SubTitle ?? e.SubTitle;
 		e.Description = dto.Description ?? e.Description;
+		e.UpdatedAt = DateTime.Now;
 		e.Tags = dto.Tags ?? e.Tags;
 		_dbContext.Update(e);
 		await _dbContext.SaveChangesAsync(ct);

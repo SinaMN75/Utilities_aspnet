@@ -27,9 +27,8 @@ public static class Seeder {
 				Id = Guid.Parse("61b5a1b3-e6d3-49a7-8bf0-e9d5ba585c18"),
 				Title = SampleTitle,
 				SubTitle = SampleTitle,
-				UseCase = "terms",
-				Type = "terms",
-				Description = SampleDescription
+				Description = SampleDescription,
+				Tags = new List<TagContent> { TagContent.Terms }
 			}
 		);
 		builder.Entity<ContentEntity>().HasData(
@@ -37,9 +36,8 @@ public static class Seeder {
 				Id = Guid.Parse("61f54f5d-5076-4449-9e06-1749ae675dea"),
 				Title = SampleTitle,
 				SubTitle = SampleTitle,
-				UseCase = "aboutUs",
-				Type = "aboutUs",
-				Description = SampleDescription
+				Description = SampleDescription,
+				Tags = new List<TagContent> { TagContent.AboutUs }
 			}
 		);
 		builder.Entity<ContentEntity>().HasData(
@@ -47,9 +45,8 @@ public static class Seeder {
 				Id = Guid.Parse("af233cad-d72c-4823-a7eb-b9c942aa9609"),
 				Title = SampleTitle,
 				SubTitle = SampleTitle,
-				UseCase = "homeBanner1",
-				Type = "homeBanner1",
-				Description = SampleDescription
+				Description = SampleDescription,
+				Tags = new List<TagContent> { TagContent.HomeBanner1 }
 			}
 		);
 		builder.Entity<ContentEntity>().HasData(
@@ -57,9 +54,8 @@ public static class Seeder {
 				Id = Guid.Parse("d1827b50-ec7c-40bc-9f39-a87e96a45264"),
 				Title = SampleTitle,
 				SubTitle = SampleTitle,
-				UseCase = "homeBanner2",
-				Type = "homeBanner2",
-				Description = SampleDescription
+				Description = SampleDescription,
+				Tags = new List<TagContent> { TagContent.HomeBanner2 }
 			}
 		);
 	}
