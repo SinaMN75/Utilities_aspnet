@@ -14,9 +14,6 @@ public class UserEntity {
 	[MaxLength(50)]
 	public string? FullName { get; set; }
 
-	[MaxLength(50)]
-	public string? Password { get; set; }
-
 	[MaxLength(100)]
 	public string? Headline { get; set; }
 
@@ -40,9 +37,6 @@ public class UserEntity {
 
 	[MaxLength(50)]
 	public string? Email { get; set; }
-
-	[MaxLength(100)]
-	public string? AccessLevel { get; set; }
 
 	[MaxLength(100)]
 	public string? Region { get; set; }
@@ -72,11 +66,19 @@ public class UserEntity {
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
+	
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
 	public IEnumerable<FormEntity>? FormBuilders { get; set; }
+	
+	[MaxLength(50)]
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public string? Password { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
@@ -105,10 +107,10 @@ public class UserEntity {
 	public int? CountProducts { get; set; }
 
 	[NotMapped]
-	public int? CountFollowers { get; set; } = 0;
+	public int? CountFollowers { get; set; }
 
 	[NotMapped]
-	public int? CountFollowing { get; set; } = 0;
+	public int? CountFollowing { get; set; }
 
 	[NotMapped]
 	public string? Token { get; set; }

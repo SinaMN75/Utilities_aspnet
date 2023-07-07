@@ -82,7 +82,6 @@ public class UserRepository : IUserRepository {
 		if (dto.JobStatus != null) q = q.Where(x => x.Headline!.Contains(dto.JobStatus));
 		if (dto.Region != null) q = q.Where(x => x.Region!.Contains(dto.Region));
 		if (dto.State != null) q = q.Where(x => x.State!.Contains(dto.State));
-		if (dto.AccessLevel != null) q = q.Where(x => x.AccessLevel!.Contains(dto.AccessLevel));
 		if (dto.AppEmail != null) q = q.Where(x => x.AppEmail!.Contains(dto.AppEmail));
 		if (dto.FirstName != null) q = q.Where(x => x.FirstName!.Contains(dto.FirstName));
 		if (dto.LastName != null) q = q.Where(x => x.LastName!.Contains(dto.LastName));
@@ -266,9 +265,9 @@ public class UserRepository : IUserRepository {
 
 		if (fromUser.Wallet <= dto.Amount) return new GenericResponse(UtilitiesStatusCodes.NotEnoughMoney);
 		await Update(new UserCreateUpdateDto { Id = fromUser.Id, Wallet = fromUser.Wallet - dto.Amount });
-		await _transactionRepository.Create(MakeTransactionEntity(fromUser.Id, dto.Amount, "کسر", null, TransactionType.WithdrawFromTheWallet), ct);
+		await _transactionRepository.Create(MakeTransaction(fromUser.Id, dto.Amount, "کسر", null, TransactionType.WithdrawFromTheWallet), ct);
 		await Update(new UserCreateUpdateDto { Id = toUser.Id, Wallet = toUser.Wallet + dto.Amount });
-		await _transactionRepository.Create(MakeTransactionEntity(toUser.Id, dto.Amount, "واریز", null, TransactionType.DepositToWallet), ct);
+		await _transactionRepository.Create(MakeTransaction(toUser.Id, dto.Amount, "واریز", null, TransactionType.DepositToWallet), ct);
 		return new GenericResponse();
 	}
 
@@ -328,7 +327,6 @@ public class UserRepository : IUserRepository {
 		entity.Email = dto.Email ?? entity.Email;
 		entity.State = dto.State ?? entity.State;
 		entity.Point = dto.Point ?? entity.Point;
-		entity.AccessLevel = dto.AccessLevel ?? entity.AccessLevel;
 		entity.VisitedProducts = dto.VisitedProducts ?? entity.VisitedProducts;
 		entity.BookmarkedProducts = dto.BookmarkedProducts ?? entity.BookmarkedProducts;
 		entity.FollowingUsers = dto.FollowingUsers ?? entity.FollowingUsers;
@@ -369,14 +367,13 @@ public class UserRepository : IUserRepository {
 		}
 	}
 
-	private TransactionEntity MakeTransactionEntity(string userId, int amount, string description, string? shebaNumber, TransactionType transactionType) =>
-		new() {
-			UserId = userId,
-			Amount = amount,
-			Descriptions = description,
-			TransactionType = transactionType,
-			ShebaNumber = shebaNumber
-		};
+	private static TransactionEntity MakeTransaction(string userId, int amount, string description, string? shebaNumber, TransactionType type) => new() {
+		UserId = userId,
+		Amount = amount,
+		Descriptions = description,
+		TransactionType = type,
+		ShebaNumber = shebaNumber
+	};
 
 	private async Task<bool> SendOtp(string userId) {
 		if (_memoryCache.Get<string>(userId) != null) return false;

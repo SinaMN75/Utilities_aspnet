@@ -22,6 +22,8 @@ public static class Seeder {
 	}
 
 	public static void SeedContent(this ModelBuilder builder) {
+		#region Content
+
 		builder.Entity<ContentEntity>().HasData(
 			new ContentEntity {
 				Id = Guid.Parse("61b5a1b3-e6d3-49a7-8bf0-e9d5ba585c18"),
@@ -58,5 +60,38 @@ public static class Seeder {
 				Tags = new List<TagContent> { TagContent.HomeBanner2 }
 			}
 		);
+
+		#endregion
+
+		#region User
+
+		builder.Entity<UserEntity>().HasData(
+			new UserEntity {
+				Id = "80757645-2f73-47bf-9693-b28290e98ce7",
+				FullName = "Sina MohammadZadeh",
+				FirstName = "Sina",
+				LastName = "MohammadZadeh",
+				UserName = "09351902721",
+				PhoneNumber = "09351902721",
+				Email = "sinamnouri@yahoo.com",
+				AppUserName = "SinaMN75",
+				AppPhoneNumber = "09351902721",
+				Birthdate = new DateTime(1996, 07, 21),
+				Bio = "Software Developer",
+				Gender = GenderType.Male,
+				State = "Iran",
+				Region = "Tehran",
+				Password = "123456789",
+				CreatedAt = DateTime.Now,
+				Headline = "Software Developer",
+				Wallet = 1000000,
+				AppEmail = "sinamnouri@yahoo.com",
+				JsonDetail = new UserJsonDetail()
+			}
+		);
+
+		#endregion
+		
+		
 	}
 }
