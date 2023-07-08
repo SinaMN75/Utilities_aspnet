@@ -41,10 +41,22 @@ public class WithdrawRepository : IWithdrawRepository {
 			ShebaNumber = dto.ShebaNumber,
 			WithdrawState = WithdrawState.Requested
 		};
-
 		await _dbContext.Set<WithdrawEntity>().AddAsync(withdraw);
-		await _dbContext.SaveChangesAsync();
 
+
+
+		var transaction = new TransactionEntity
+		{
+			UserId = _userId,
+			ShebaNumber = dto.ShebaNumber,
+			Amount = dto.Amount,
+			CreatedAt = DateTime.Now,
+			TransactionType = TransactionType.WithdrawFromTheWallet,
+			UpdatedAt = DateTime.Now
+		};
+		await _dbContext.Set<TransactionEntity>().AddAsync(transaction);
+
+		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}
 
