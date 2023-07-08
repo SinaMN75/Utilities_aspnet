@@ -50,6 +50,25 @@ public class PaymentRepository : IPaymentRepository {
 	public async Task<GenericResponse<string?>> PayOrderZarinPal(Guid orderId) {
 		try {
 			OrderEntity order = (await _dbContext.Set<OrderEntity>().FirstOrDefaultAsync(x => x.Id == orderId))!;
+
+			var orderHasPhisycalProduct = order.OrderDetails.Any(a=>a.ProductId.HasValue);
+			if(orderHasPhisycalProduct)
+			{
+				foreach(var orderDetail in order.OrderDetails)
+				{
+					ProductEntity? product = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f=>f.Id == orderDetail.ProductId);
+					if(product != null)
+					{
+						if(product.Stock < orderDetail.Count)
+						{
+							//need to handle with sina
+							// deleted at removed 
+							//how can delete product
+						}
+					}
+				}
+			}
+
 			UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
 			Payment payment = new(_appSettings.PaymentSettings.Id, order.TotalPrice!.Value);
 			string callbackUrl = $"{Server.ServerAddress}/Payment/CallBack/{orderId}";
