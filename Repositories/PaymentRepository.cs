@@ -63,7 +63,7 @@ public class PaymentRepository : IPaymentRepository {
 						{
 							//need to handle with sina
 							// deleted at removed 
-							//how can delete product
+							//how can delete product	
 						}
 					}
 				}
