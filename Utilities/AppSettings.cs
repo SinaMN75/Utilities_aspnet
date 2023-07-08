@@ -5,7 +5,9 @@ public class AppSettings {
 	public PaymentSettings PaymentSettings { get; set; } = null!;
 	public PushNotificationSetting PushNotificationSetting { get; set; } = null!;
 	public UsageRules UsageRules { get; set; } = null!;
-	public string? AndroidMinimumVersion { get; set; }
+    public double WithdrawalLimit { get; set; }
+    public int WithdrawalTimeLimit { get; set; }
+    public string? AndroidMinimumVersion { get; set; }
 	public string? AndroidLatestVersion { get; set; }
 	public string? IosMinimumVersion { get; set; }
 	public string? IosLatestVersion { get; set; }
