@@ -156,6 +156,13 @@ public enum OrderType {
 	Digital = 102
 }
 
+public enum SubscriptionType
+{
+    None = 100,
+    Promotion = 101,
+    UpgradeAccount = 102
+}
+
 public enum Reaction {
 	None = 100,
 	Like = 101,
