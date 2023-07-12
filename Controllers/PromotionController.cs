@@ -9,9 +9,13 @@ public class PromotionController : BaseApiController {
 
 	[HttpPost]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse>> CreatePromotion(CreateUpdatePromotionDto dto) => Result(await _repository.CreatePromotion(dto));
+	public async Task<ActionResult<GenericResponse<PromotionEntity?>>> CreatePromotion(CreateUpdatePromotionDto dto) => Result(await _repository.CreatePromotion(dto));
 
-	[HttpGet("ReadPromotion/{id:guid}")]
+	[HttpGet("GetPromotionTrackingInformation/{id:guid}")]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse<PromotionDetail?>>> ReadPromotion(Guid id) => Result(await _repository.ReadPromotion(id));
+	public async Task<ActionResult<GenericResponse<PromotionDetail?>>> GetPromotionTrackingInformation(Guid id) => Result(await _repository.GetPromotionTrackingInformation(id));
+
+	[HttpGet("ReadById/{id:guid}")]
+	[Authorize]
+	public async Task<ActionResult<GenericResponse<PromotionEntity?>>> ReadById(Guid id) => Result(await _repository.ReadById(id));
 }

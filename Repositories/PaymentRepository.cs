@@ -6,6 +6,7 @@ public interface IPaymentRepository {
 	Task<GenericResponse<string?>> PaySubscriptionZarinPal(Guid subscriptionId);
 	Task<GenericResponse> WalletCallBack(int amount, string authority, string status, string userId);
 	Task<GenericResponse> CallBack(Guid orderId, string authority, string status);
+	Task<GenericResponse> CallBackSubscription(Guid subscriptionId, string authority, string status);
 }
 
 public class PaymentRepository : IPaymentRepository {
@@ -23,7 +24,7 @@ public class PaymentRepository : IPaymentRepository {
 		try {
 			UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
 			Payment payment = new(_appSettings.PaymentSettings.Id, amount);
-			string callbackUrl = $"{Server.ServerAddress}/Payment/WalletCallBack/{user?.Id}/{amount}";
+			string callbackUrl = $"{Server.ServerAddress}/WalletCallBack/{user?.Id}/{amount}";
 			string desc = $"شارژ کیف پول به مبلغ {amount}";
 			PaymentRequestResponse? result = payment.PaymentRequest(desc, callbackUrl, "", user?.PhoneNumber).Result;
 
@@ -72,7 +73,7 @@ public class PaymentRepository : IPaymentRepository {
 
 			UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
 			Payment payment = new(_appSettings.PaymentSettings.Id, order.TotalPrice!.Value);
-			string callbackUrl = $"{Server.ServerAddress}/Payment/CallBack/{orderId}";
+			string callbackUrl = $"{Server.ServerAddress}/CallBack/{orderId}";
 			string desc = $"خرید محصول {order.Description}";
 			PaymentRequestResponse? result = payment.PaymentRequest(desc, callbackUrl, "", user?.PhoneNumber).Result;
 			await _dbContext.Set<TransactionEntity>().AddAsync(new TransactionEntity {
@@ -180,7 +181,7 @@ public class PaymentRepository : IPaymentRepository {
 
             UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
             Payment payment = new(_appSettings.PaymentSettings.Id, (int)spe.Amount!.Value);
-            string callbackUrl = $"{Server.ServerAddress}/Payment/CallBackSubscription/{spe.Id}";
+            string callbackUrl = $"{Server.ServerAddress}/CallBackSubscription/{spe.Id}";
 			string desc = spe.PromotionId != null ? $"پروموشن {spe.Description}" : $"ارتقا اکانت {spe.Description}";
             PaymentRequestResponse? result = payment.PaymentRequest(desc, callbackUrl, "", user?.PhoneNumber).Result;
             await _dbContext.Set<TransactionEntity>().AddAsync(new TransactionEntity
@@ -188,11 +189,11 @@ public class PaymentRepository : IPaymentRepository {
                 Amount = (int)spe.Amount,
                 Authority = result.Authority,
                 CreatedAt = DateTime.Now,
-                TransactionType = TransactionType.Buy,
+                TransactionType = TransactionType.Recharge,
                 Descriptions = desc,
                 GatewayName = "ZarinPal",
                 UserId = _userId,
-                OrderId = spe.Id,
+                SubscriptionId = spe.Id,
                 StatusId = TransactionStatus.Pending
             });
             await _dbContext.SaveChangesAsync();

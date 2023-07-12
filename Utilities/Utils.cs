@@ -85,6 +85,7 @@ public static class StartupExtension {
 		builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 		builder.Services.AddScoped<IWithdrawRepository, WithdrawRepository>();
 		builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
+		builder.Services.AddScoped<ISubscriptionPaymentRepository, SubscriptionPaymentRepository>();
 	}
 
 	private static void AddUtilitiesSwagger(this WebApplicationBuilder builder, IServiceProvider? serviceProvider) {

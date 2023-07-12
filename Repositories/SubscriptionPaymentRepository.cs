@@ -29,7 +29,7 @@ namespace Utilities_aspnet.Repositories
             UserEntity? userUpgraded = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == dto.UserId);
             PromotionEntity? promotionEntity = await _dbContext.Set<PromotionEntity>().FirstOrDefaultAsync(f => f.Id == dto.PromotionId);
             if (userUpgraded == null && promotionEntity == null) return new GenericResponse<SubscriptionPaymentEntity?>(null, UtilitiesStatusCodes.Unhandled);
-            if (userUpgraded.Id != _userId) return new GenericResponse<SubscriptionPaymentEntity?>(null, UtilitiesStatusCodes.UserNotFound); // Is It Ok?
+            if (userUpgraded != null && userUpgraded?.Id != _userId) return new GenericResponse<SubscriptionPaymentEntity?>(null, UtilitiesStatusCodes.UserNotFound); // Is It Ok?
 
             SubscriptionPaymentEntity? e = new()
             {
@@ -62,7 +62,7 @@ namespace Utilities_aspnet.Repositories
             if (dto.ShowPromotion.IsTrue()) q = q.Include(x => x.Promotion);
             if (dto.ShowUser.IsTrue()) q = q.Include(x => x.User);
             if (dto.OrderByAmount.IsTrue()) q = q.OrderBy(x => x.Amount);
-            if (dto.OrderBySubscriptionType.IsTrue()) q = q.OrderBy(x => x.SubscriptionType)`;
+            if (dto.OrderBySubscriptionType.IsTrue()) q = q.OrderBy(x => x.SubscriptionType);
             if (dto.OrderByStatus.IsTrue()) q = q.OrderBy(x => x.Status);
 
             return new GenericResponse<IEnumerable<SubscriptionPaymentEntity>>(q);

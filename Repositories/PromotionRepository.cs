@@ -1,12 +1,14 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
 public interface IPromotionRepository {
-	Task<GenericResponse> CreatePromotion(CreateUpdatePromotionDto dto);
+	Task<GenericResponse<PromotionEntity?>> CreatePromotion(CreateUpdatePromotionDto dto);
 	Task<GenericResponse> UserSeened(Guid id);
-	Task<GenericResponse<PromotionDetail?>> ReadPromotion(Guid id);
+	Task<GenericResponse<PromotionDetail?>> GetPromotionTrackingInformation(Guid id);
+	Task<GenericResponse<PromotionEntity?>> ReadById(Guid id);
 }
 
-public class PromotionRepository : IPromotionRepository {
+public class PromotionRepository : IPromotionRepository
+{
 	private readonly DbContext _dbContext;
 	private readonly string? _userId;
 
@@ -19,12 +21,12 @@ public class PromotionRepository : IPromotionRepository {
 
 	// noktei ke vojod dare dar in dto zamani ke dare az front ersal mishe faqat yeki az in property haye category ,userId, groupChatId , product bayad por bashe
 	//2 ta por nabayad bashe
-	public async Task<GenericResponse> CreatePromotion(CreateUpdatePromotionDto dto) {
+	public async Task<GenericResponse<PromotionEntity?>> CreatePromotion(CreateUpdatePromotionDto dto) {
 		PromotionEntity? promotion = await _dbContext.Set<PromotionEntity>()
 			.FirstOrDefaultAsync(f => f.ProductId == dto.ProductId || f.GroupChatId == dto.GroupChatId || f.UserPromotedId == dto.UserId ||
 			                          f.CategoryId == dto.CategoryId);
 		if (promotion is not null)
-			return new GenericResponse(UtilitiesStatusCodes.BadRequest);
+			return new GenericResponse<PromotionEntity?>(null,UtilitiesStatusCodes.BadRequest);
 
 		promotion = new PromotionEntity {
 			CreatedAt = DateTime.Now,
@@ -66,10 +68,10 @@ public class PromotionRepository : IPromotionRepository {
 		}
 
 		await _dbContext.SaveChangesAsync();
-		return new GenericResponse();
+		return new GenericResponse<PromotionEntity?>(promotion);
 	}
 
-	public async Task<GenericResponse<PromotionDetail?>> ReadPromotion(Guid id) {
+	public async Task<GenericResponse<PromotionDetail?>> GetPromotionTrackingInformation(Guid id) {
 		//user Id ro ham guid gereftam vase inke dast nabaram to structure clean proje faqat kafie front az code payin estefade kone va userId ro tabdil be Guid kone befreste vasam
 		//Uuid.parse('79700043-11eb-1101-80d6-510900000d10'); flutter
 		PromotionEntity? promotion = await _dbContext.Set<PromotionEntity>()
@@ -114,7 +116,14 @@ public class PromotionRepository : IPromotionRepository {
 		});
 	}
 
-	public async Task<GenericResponse> UserSeened(Guid id) {
+    public async Task<GenericResponse<PromotionEntity?>> ReadById(Guid id)
+    {
+        var p = await _dbContext.Set<PromotionEntity>().FirstOrDefaultAsync(f=>f.Id == id);
+		if (p is null) return new GenericResponse<PromotionEntity?>(null, UtilitiesStatusCodes.NotFound);
+		return new GenericResponse<PromotionEntity?>(p);
+    }
+
+    public async Task<GenericResponse> UserSeened(Guid id) {
 		PromotionEntity? promotion = await _dbContext.Set<PromotionEntity>().FirstOrDefaultAsync(f => f.ProductId == id || f.GroupChatId == id);
 		if (promotion is null)
 			return new GenericResponse(UtilitiesStatusCodes.NotFound);
