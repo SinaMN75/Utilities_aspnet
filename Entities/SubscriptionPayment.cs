@@ -13,6 +13,7 @@ namespace Utilities_aspnet.Entities
         public OrderStatuses Status { get; set; } = OrderStatuses.Pending;
         public double? Amount { get; set; }
         public DateTime? PayDateTime { get; set; }
+        public string? Description { get; set; }
         public UserEntity? User { get; set; }
         public string? UserId { get; set; }
         public PromotionEntity? Promotion { get; set; }
@@ -27,6 +28,7 @@ namespace Utilities_aspnet.Entities
         public Guid? PromotionId { get; set; }
         public string? UserId { get; set; }
         public double? Amount { get; set; }
+        public string? Description { get; set; }
     }
     public class SubscriptionPaymentFilter
     {

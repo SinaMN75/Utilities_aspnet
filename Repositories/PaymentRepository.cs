@@ -3,6 +3,7 @@
 public interface IPaymentRepository {
 	Task<GenericResponse<string?>> IncreaseWalletBalance(int amount);
 	Task<GenericResponse<string?>> PayOrderZarinPal(Guid orderId);
+	Task<GenericResponse<string?>> PaySubscriptionZarinPal(Guid subscriptionId);
 	Task<GenericResponse> WalletCallBack(int amount, string authority, string status, string userId);
 	Task<GenericResponse> CallBack(Guid orderId, string authority, string status);
 }
@@ -170,4 +171,63 @@ public class PaymentRepository : IPaymentRepository {
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}
+
+    public async Task<GenericResponse<string?>> PaySubscriptionZarinPal(Guid subscriptionId)
+    {
+        try
+        {
+            SubscriptionPaymentEntity spe = (await _dbContext.Set<SubscriptionPaymentEntity>().FirstOrDefaultAsync(x => x.Id == subscriptionId))!;
+
+            UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
+            Payment payment = new(_appSettings.PaymentSettings.Id, (int)spe.Amount!.Value);
+            string callbackUrl = $"{Server.ServerAddress}/Payment/CallBackSubscription/{spe.Id}";
+			string desc = spe.PromotionId != null ? $"پروموشن {spe.Description}" : $"ارتقا اکانت {spe.Description}";
+            PaymentRequestResponse? result = payment.PaymentRequest(desc, callbackUrl, "", user?.PhoneNumber).Result;
+            await _dbContext.Set<TransactionEntity>().AddAsync(new TransactionEntity
+            {
+                Amount = (int)spe.Amount,
+                Authority = result.Authority,
+                CreatedAt = DateTime.Now,
+                TransactionType = TransactionType.Buy,
+                Descriptions = desc,
+                GatewayName = "ZarinPal",
+                UserId = _userId,
+                OrderId = spe.Id,
+                StatusId = TransactionStatus.Pending
+            });
+            await _dbContext.SaveChangesAsync();
+
+            if (result.Status == 100 && result.Authority.Length == 36)
+            {
+                string url = $"https://www.zarinpal.com/pg/StartPay/{result.Authority}";
+                return new GenericResponse<string?>(url);
+            }
+            return new GenericResponse<string?>("", UtilitiesStatusCodes.BadRequest);
+        }
+        catch (Exception ex) { return new GenericResponse<string?>(ex.Message, UtilitiesStatusCodes.BadRequest); }
+    }
+
+    public async Task<GenericResponse> CallBackSubscription(
+    Guid subscriptionId,
+    string authority,
+    string status)
+    {
+        SubscriptionPaymentEntity spe = (await _dbContext.Set<SubscriptionPaymentEntity>().Include(i => i.Promotion).FirstOrDefaultAsync(x => x.Id == subscriptionId))!;
+        Payment payment = new(_appSettings.PaymentSettings.Id, (int)spe.Amount!.Value);
+        if (!status.Equals("OK")) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
+        PaymentVerificationResponse? verify = payment.Verification(authority).Result;
+        TransactionEntity? pay = await _dbContext.Set<TransactionEntity>().FirstOrDefaultAsync(x => x.Authority == authority);
+        if (pay != null)
+        {
+            pay.StatusId = (TransactionStatus?)Math.Abs(verify.Status);
+            pay.RefId = verify.RefId;
+            pay.UpdatedAt = DateTime.Now;
+            _dbContext.Set<TransactionEntity>().Update(pay);
+        }
+        spe.Status = OrderStatuses.Complete;
+
+        _dbContext.Update(spe);
+        await _dbContext.SaveChangesAsync();
+        return new GenericResponse();
+    }
 }

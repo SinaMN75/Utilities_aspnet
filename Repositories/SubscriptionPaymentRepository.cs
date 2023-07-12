@@ -33,14 +33,13 @@ namespace Utilities_aspnet.Repositories
 
             SubscriptionPaymentEntity? e = new()
             {
-                Amount = dto.Amount,
                 PromotionId = dto.PromotionId,
                 UserId = _userId,
                 CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now,
                 SubscriptionType = promotionEntity != null ? SubscriptionType.Promotion : SubscriptionType.UpgradeAccount,
                 Status = OrderStatuses.Pending,
             };
+            e.FillData(dto);
 
             await _dbContext.AddAsync(e);
             await _dbContext.SaveChangesAsync();
@@ -63,7 +62,7 @@ namespace Utilities_aspnet.Repositories
             if (dto.ShowPromotion.IsTrue()) q = q.Include(x => x.Promotion);
             if (dto.ShowUser.IsTrue()) q = q.Include(x => x.User);
             if (dto.OrderByAmount.IsTrue()) q = q.OrderBy(x => x.Amount);
-            if (dto.OrderBySubscriptionType.IsTrue()) q = q.OrderBy(x => x.SubscriptionType);
+            if (dto.OrderBySubscriptionType.IsTrue()) q = q.OrderBy(x => x.SubscriptionType)`;
             if (dto.OrderByStatus.IsTrue()) q = q.OrderBy(x => x.Status);
 
             return new GenericResponse<IEnumerable<SubscriptionPaymentEntity>>(q);
@@ -89,6 +88,7 @@ public static class SubscriptionPaymentEntityExtension
         entity.SubscriptionType = dto.SubscriptionType ?? entity.SubscriptionType;
         entity.Amount = dto.Amount ?? entity.Amount;
         entity.UpdatedAt = DateTime.Now;
+        entity.Description = dto.Description ?? entity.Description;
         return entity;
     }
 }
