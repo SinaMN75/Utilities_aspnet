@@ -75,13 +75,12 @@ public class CategoryRepository : ICategoryRepository {
 
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
 		CategoryEntity i = (await _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == id, ct))!;
-		foreach (CategoryEntity c in i.Children!) {
+		foreach (CategoryEntity c in i.Children ?? new List<CategoryEntity>()) {
 			_dbContext.Remove(c);
-			foreach (MediaEntity m in c.Media!) await _mediaRepository.Delete(m.Id);
+			await _mediaRepository.DeleteMedia(c.Media);
 		}
 		_dbContext.Remove(i);
-		foreach (MediaEntity m in i.Media!) await _mediaRepository.Delete(m.Id);
-
+		await _mediaRepository.DeleteMedia(i.Media);
 		await _dbContext.SaveChangesAsync(ct);
 		await _outputCache.EvictByTagAsync("category", ct);
 		return new GenericResponse();
