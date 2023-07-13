@@ -241,12 +241,6 @@ public enum TransactionType {
 	Recharge = 105
 }
 
-public enum ProductType {
-	None = 100,
-	Digital = 101,
-	Physical = 102
-}
-
 public enum ProductTag {
 	Product = 100,
 	Post = 101
@@ -254,12 +248,30 @@ public enum ProductTag {
 
 public enum TagCategory {
 	Category = 100,
-	Hashtag = 101
-}
-
-public enum TagProduct {
-	PhysicalProduct = 100,
-	DigitalProduct = 101
+	YooNote = 101,
+	Specialty = 102,
+	SpecializedArt = 103,
+	Colors = 104,
+	Brand = 105,
+	Tag = 106,
+	User = 107,
+	Target = 108,
+	Tutorial = 109,
+	Attribute = 110,
+	ShopCategory = 111,
+	Magazine = 112,
+	Insurance = 113,
+	Learn = 114,
+	Company = 115,
+	Consultant = 116,
+	Ad = 117,
+	DailyPrice = 118,
+	Tender = 119,
+	Chanel = 120,
+	Group = 121,
+	Auction = 122,
+	Service = 123,
+	Amnbekhar = 124,
 }
 
 public enum TagContent {
@@ -270,8 +282,53 @@ public enum TagContent {
 }
 
 public enum TagMedia {
-	Profile,
-	Cover
+	All = 100,
+	Image = 101,
+	Video = 102,
+	Audio = 103,
+	Pdf = 104,
+	Apk = 105,
+	Profile = 106,
+	Document = 107,
+	License = 108,
+	Zip = 109,
+	Bio = 110,
+	Cover = 111,
+	Media = 112,
+	Text = 113,
+	Chat = 114,
+	Post = 115,
+}
+
+public enum TagProduct {
+	Product = 100,
+	YooNote = 101,
+	SubProduct = 102,
+	Image = 103,
+	Video = 104,
+	Audio = 105,
+	Pdf = 106,
+	Apk = 107,
+	Game = 108,
+	Goods = 109,
+	Job = 110,
+	Attribute = 111,
+	Physical = 112,
+	Digital = 113,
+	UserStatus = 114,
+	JobType = 115,
+	JobPlace = 116,
+	Chanel = 117,
+	Story = 118,
+	Ad = 119,
+	Company = 120,
+	DailyPrice = 121,
+	Tender = 122,
+	Tutorial = 123,
+	Magazine = 124,
+	New = 201,
+	KindOfNew = 202,
+	Used = 203
 }
 
 public enum TagOrder {

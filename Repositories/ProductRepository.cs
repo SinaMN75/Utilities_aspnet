@@ -115,7 +115,7 @@ public class ProductRepository : IProductRepository {
 			q = q.Where(w => w.User != null);
 			q = q.Where(w => w.User!.IsPrivate == false);
 		}
-		if (dto.ShowChildren.IsTrue()) q = q.Include(i => i.Children);
+		if (dto.ShowChildren.IsTrue()) q = q.Include(i => i.Children)!.ThenInclude(x => x.Media);
 		if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories);
 		if (dto.ShowCategoriesFormFields.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.FormFields);
 		if (dto.ShowCategoryMedia.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.Media);
