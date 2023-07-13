@@ -13,13 +13,10 @@ public class OrderEntity : BaseEntity {
 	[MaxLength(20)]
 	public string? PayNumber { get; set; }
 
-	public OrderStatuses? Status { get; set; }
 	public int? TotalPrice { get; set; }
 	public int? DiscountPrice { get; set; }
 	public int? DiscountPercent { get; set; }
 	public int? SendPrice { get; set; }
-	public SendType? SendType { get; set; }
-	public PayType? PayType { get; set; }
 	public DateTime? PayDateTime { get; set; }
 	public DateTime? ReceivedDate { get; set; }
 	public DateTime? DeliverDate { get; set; }
@@ -35,6 +32,8 @@ public class OrderEntity : BaseEntity {
 
 	[ForeignKey(nameof(ProductOwner))]
 	public string? ProductOwnerId { get; set; }
+	
+	public List<TagOrder> Tags { get; set; } = new();
 
 	public IEnumerable<OrderDetailEntity>? OrderDetails { get; set; }
 }
@@ -64,6 +63,7 @@ public class OrderCreateUpdateDto {
 	public PayType? PayType { get; set; } = Utilities.PayType.Online;
 	public SendType? SendType { get; set; } = Utilities.SendType.Custom;
 	public OrderType OrderType { get; set; } = OrderType.None;
+	public List<TagOrder>? Tags { get; set; }
 }
 
 public class OrderDetailCreateUpdateDto {

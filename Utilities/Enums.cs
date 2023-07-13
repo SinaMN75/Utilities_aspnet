@@ -156,11 +156,10 @@ public enum OrderType {
 	Digital = 102
 }
 
-public enum SubscriptionType
-{
-    None = 100,
-    Promotion = 101,
-    UpgradeAccount = 102
+public enum SubscriptionType {
+	None = 100,
+	Promotion = 101,
+	UpgradeAccount = 102
 }
 
 public enum Reaction {
@@ -295,6 +294,33 @@ public enum TagContent {
 public enum TagMedia {
 	Profile,
 	Cover
+}
+
+public enum TagOrder {
+	Physical = 100,
+	Digital = 101,
+	Donate = 102,
+	PishtazDelivery = 201,
+	SendTipaxDelivery = 202,
+	CustomDelivery = 203,
+	OnlinePay = 301,
+	OnSitePay = 302,
+	CashPay = 303,
+	StripePay = 304,
+	CoinPay = 305,
+	PaypalPay = 306,
+	Pending = 400,
+	Canceled = 401,
+	Paid = 402,
+	Accept = 403,
+	Reject = 404,
+	InProgress = 405,
+	InProcess = 406,
+	Shipping = 407,
+	Refund = 408,
+	RefundComplete = 409,
+	Complete = 410,
+	PaidFail = 412
 }
 
 public enum TagNotification { }

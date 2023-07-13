@@ -139,7 +139,7 @@ public class PaymentRepository : IPaymentRepository {
 			pay.UpdatedAt = DateTime.Now;
 			_dbContext.Set<TransactionEntity>().Update(pay);
 		}
-		order.Status = OrderStatuses.Paid;
+		order.Tags.Contains(TagOrder.Paid);
 
 		if (order.OrderDetails != null)
 			foreach (OrderDetailEntity? item in order.OrderDetails) {

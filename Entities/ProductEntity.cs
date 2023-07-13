@@ -60,6 +60,9 @@ public class ProductEntity : BaseEntity {
 	public IEnumerable<VisitProducts>? VisitProducts { get; set; }
 
 	[NotMapped]
+	public List<OrderEntity> Orders { get; set; } = new();
+
+	[NotMapped]
 	public string? SuccessfulPurchase { get; set; }
 }
 

@@ -218,7 +218,7 @@ public class ProductRepository : IProductRepository {
 
 		IQueryable<OrderEntity> completeOrder = _dbContext.Set<OrderEntity>()
 			.Where(c => c.OrderDetails != null && c.OrderDetails.Any(w => w.ProductId.HasValue && w.ProductId.Value == i.Id) &&
-			            c.Status == OrderStatuses.Complete);
+			            c.Tags.Contains(TagOrder.Complete));
 		string displayOrderComplete = Utils.DisplayCountOfCompleteOrder(completeOrder.Count());
 		i.SuccessfulPurchase = displayOrderComplete;
 

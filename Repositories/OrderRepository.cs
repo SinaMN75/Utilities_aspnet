@@ -24,9 +24,7 @@ public class OrderRepository : IOrderRepository {
 
 		oldOrder.Description = dto.Description ?? oldOrder.Description;
 		oldOrder.ReceivedDate = dto.ReceivedDate ?? oldOrder.ReceivedDate;
-		oldOrder.Status = dto.Status ?? oldOrder.Status;
-		oldOrder.PayType = dto.PayType ?? oldOrder.PayType;
-		oldOrder.SendType = dto.SendType ?? oldOrder.SendType;
+		oldOrder.Tags = dto.Tags ?? oldOrder.Tags;
 		oldOrder.DiscountCode = dto.DiscountCode ?? oldOrder.DiscountCode;
 		oldOrder.AddressId = dto.AddressId ?? oldOrder.AddressId;
 		oldOrder.UpdatedAt = DateTime.Now;
@@ -50,9 +48,6 @@ public class OrderRepository : IOrderRepository {
 			q = q.Include(x => x.User).ThenInclude(x => x!.Media);
 		}
 		if (dto.Id.HasValue) q = q.Where(x => x.Id == dto.Id);
-		if (dto.Status.HasValue) q = q.Where(x => x.Status == dto.Status);
-		if (dto.SendType.HasValue) q = q.Where(x => x.SendType == dto.SendType);
-		if (dto.PayType.HasValue) q = q.Where(x => x.PayType == dto.PayType);
 		if (dto.PayNumber.IsNotNullOrEmpty()) q = q.Where(x => (x.PayNumber ?? "").Contains(dto.PayNumber!));
 
 		if (dto.UserId.IsNotNullOrEmpty() && dto.ProductOwnerId.IsNotNullOrEmpty()) {
@@ -101,14 +96,14 @@ public class OrderRepository : IOrderRepository {
 	public async Task<GenericResponse<OrderEntity?>> CreateUpdateOrderDetail(OrderDetailCreateUpdateDto dto) {
 		ProductEntity p = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
 		OrderEntity? o = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails)
-			.FirstOrDefaultAsync(x => x.UserId == _userId && x.Status == OrderStatuses.Pending);
+			.FirstOrDefaultAsync(x => x.UserId == _userId && x.Tags.Contains(TagOrder.Pending));
 		OrderDetailEntity? od = await _dbContext.Set<OrderDetailEntity>().FirstOrDefaultAsync(x => x.ProductId == dto.ProductId);
 
 		if (dto.Count >= p.Stock) return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.OutOfStock);
 
 		if (o is null) {
 			EntityEntry<OrderEntity> orderEntity = await _dbContext.Set<OrderEntity>().AddAsync(new OrderEntity {
-				Status = OrderStatuses.Pending,
+				Tags = new System.Collections.Generic.List<TagOrder> { TagOrder.Pending },
 				UserId = _userId,
 				CreatedAt = DateTime.Now,
 				UpdatedAt = DateTime.Now
@@ -157,7 +152,7 @@ public class OrderRepository : IOrderRepository {
 		}
 		else {
 			EntityEntry<OrderEntity> orderEntity = await _dbContext.Set<OrderEntity>().AddAsync(new OrderEntity {
-				Status = OrderStatuses.Pending,
+				Tags = new System.Collections.Generic.List<TagOrder> { TagOrder.Pending },
 				UserId = _userId,
 				CreatedAt = DateTime.Now,
 				UpdatedAt = DateTime.Now
@@ -192,7 +187,7 @@ public class OrderRepository : IOrderRepository {
 			return new GenericResponse(UtilitiesStatusCodes.NotFound);
 
 		OrderEntity? order = await _dbContext.Set<OrderEntity>()
-			.FirstOrDefaultAsync(f => f.Id == orderDetail.OrderId && f.Status == OrderStatuses.Complete && f.UserId == _userId);
+			.FirstOrDefaultAsync(f => f.Id == orderDetail.OrderId && f.Tags.Contains(TagOrder.Complete) && f.UserId == _userId);
 		if (order is null)
 			return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 
