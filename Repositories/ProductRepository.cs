@@ -243,8 +243,17 @@ public class ProductRepository : IProductRepository {
 	}
 
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
-		await _dbContext.Set<ProductEntity>().Where(x => x.Id == id || x.ParentId == id)
-			.ExecuteDeleteAsync(ct);
+		ProductEntity i = (await _dbContext.Set<ProductEntity>()
+			.Include(x => x.Media)
+			.Include(x => x.Children)!.ThenInclude(x => x.Media)
+			.FirstOrDefaultAsync(x => x.Id == id, ct))!;
+		await _mediaRepository.DeleteMedia(i.Media);
+		foreach (ProductEntity product in i.Children ?? new List<ProductEntity>()) {
+			await _mediaRepository.DeleteMedia(product.Media);
+			_dbContext.Remove(product);
+		}
+		_dbContext.Remove(i);
+		await _dbContext.SaveChangesAsync(ct);
 		return new GenericResponse();
 	}
 
