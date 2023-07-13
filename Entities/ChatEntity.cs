@@ -1,30 +1,5 @@
 ﻿namespace Utilities_aspnet.Entities;
 
-[Table("Chats")]
-public class ChatEntity : BaseEntity {
-	public bool ReadMessage { get; set; }
-
-	[StringLength(2000)]
-	public string MessageText { get; set; } = null!;
-
-	[ForeignKey(nameof(FromUser))]
-	public string FromUserId { get; set; } = null!;
-
-	public UserEntity FromUser { get; set; } = null!;
-
-	[ForeignKey(nameof(ToUser))]
-	public string ToUserId { get; set; } = null!;
-
-	public UserEntity ToUser { get; set; } = null!;
-
-	public Guid? ParentId { get; set; }
-	public ChatEntity? Parent { get; set; }
-
-	public IEnumerable<ReactionEntity>? ChatReacts { get; set; }
-	public IEnumerable<MediaEntity>? Media { get; set; }
-	public IEnumerable<ProductEntity?>? Products { get; set; }
-}
-
 [Table("GroupChat")]
 public class GroupChatEntity : BaseEntity {
 	[MaxLength(100)]

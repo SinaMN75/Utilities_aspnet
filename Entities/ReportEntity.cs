@@ -20,9 +20,6 @@ public class ReportEntity : BaseEntity {
 	public CommentEntity? Comment { get; set; }
 	public Guid? CommentId { get; set; }
 
-	public ChatEntity? Chat { get; set; }
-	public Guid? ChatId { get; set; }
-
 	public GroupChatMessageEntity? GroupChatMessage { get; set; }
 	public Guid? GroupChatMessageId { get; set; }
 

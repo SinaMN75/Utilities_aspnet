@@ -8,24 +8,6 @@ public class ChatController : BaseApiController {
 
 	public ChatController(IChatRepository repository) => _repository = repository;
 
-	[HttpGet]
-	public async Task<ActionResult<GenericResponse<IEnumerable<ChatEntity>?>>> Read() => Result(await _repository.Read());
-
-	[HttpGet("{userId}")]
-	public async Task<ActionResult<GenericResponse<IEnumerable<ChatEntity>?>>> ReadById(string userId) => Result(await _repository.ReadByUserId(userId));
-
-	[HttpPost]
-	public async Task<ActionResult<GenericResponse<ChatEntity?>>> Create(ChatCreateUpdateDto model) => Result(await _repository.Create(model));
-
-	[HttpPost("Filter")]
-	public async Task<ActionResult<GenericResponse<ChatEntity?>>> Filter(ChatFilterDto dto) => Result(await _repository.FilterByUserId(dto));
-
-	[HttpPut]
-	public async Task<ActionResult<GenericResponse<ChatEntity?>>> Update(ChatCreateUpdateDto model) => Result(await _repository.Update(model));
-
-	[HttpDelete]
-	public async Task<ActionResult<GenericResponse>> Delete(Guid id) => Result(await _repository.Delete(id));
-
 	[HttpPost("CreateGroupChat")]
 	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> CreateGroupChat(GroupChatCreateUpdateDto dto) =>
 		Result(await _repository.CreateGroupChat(dto));
@@ -58,10 +40,6 @@ public class ChatController : BaseApiController {
 
 	[HttpGet("ReadGroupChatById/{id:guid}")]
 	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> ReadGroupChatById(Guid id) => Result(await _repository.ReadGroupChatById(id));
-
-	[HttpPost("AddReactionToMessage/{emoji}/{messageId:guid}")]
-	public async Task<ActionResult<GenericResponse>> AddReactionToMessage(Reaction emoji, Guid messageId) =>
-		Result(await _repository.AddReactionToMessage(emoji, messageId));
 
 	[HttpPut("UpdateGroupChatMessage")]
 	public async Task<ActionResult<GenericResponse<GroupChatMessageEntity?>>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto) =>

@@ -24,7 +24,6 @@ public class ReportRepository : IReportRepository {
 		};
 		if (dto.ProductId.HasValue) entity.ProductId = dto.ProductId;
 		if (dto.CommentId.HasValue) entity.CommentId = dto.CommentId;
-		if (dto.ChatId.HasValue) entity.ChatId = dto.ChatId;
 		if (dto.GroupChatId.HasValue) entity.GroupChatId = dto.GroupChatId;
 		if (dto.GroupChatMessageId.HasValue) entity.GroupChatMessageId = dto.GroupChatMessageId;
 		if (!dto.UserId.IsNotNullOrEmpty()) entity.UserId = dto.UserId;
@@ -37,7 +36,6 @@ public class ReportRepository : IReportRepository {
 		IQueryable<ReportEntity> e = _dbContext.Set<ReportEntity>().AsNoTracking();
 		if (dto.User == true) e = e.Include(x => x.User).ThenInclude(x => x!.Media);
 		if (dto.Product == true) e = e.Include(x => x.Product).ThenInclude(x => x!.Media);
-		if (dto.Chat == true) e = e.Include(x => x.Chat);
 		if (dto.GroupChat == true) e = e.Include(x => x.GroupChat);
 		if (dto.GroupChatMessage == true) e = e.Include(x => x.GroupChatMessage);
 		return new GenericResponse<IQueryable<ReportEntity>>(e);
@@ -54,7 +52,6 @@ public class ReportRepository : IReportRepository {
 			.Include(x => x.Product).ThenInclude(x => x!.Media)
 			.Include(x => x.Comment)
 			.Include(x => x.GroupChat)
-			.Include(x => x.Chat)
 			.Include(x => x.GroupChatMessage)
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.Id == id);

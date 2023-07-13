@@ -53,10 +53,6 @@ public class MediaEntity : BaseEntity {
 
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
-	public ChatEntity? Chat { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
 	public Guid? ChatId { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
