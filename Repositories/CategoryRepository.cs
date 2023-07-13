@@ -10,8 +10,8 @@ public interface ICategoryRepository {
 
 public class CategoryRepository : ICategoryRepository {
 	private readonly DbContext _dbContext;
-	private readonly IOutputCacheStore _outputCache;
 	private readonly IMediaRepository _mediaRepository;
+	private readonly IOutputCacheStore _outputCache;
 
 	public CategoryRepository(DbContext context, IOutputCacheStore outputCache, IMediaRepository mediaRepository) {
 		_dbContext = context;

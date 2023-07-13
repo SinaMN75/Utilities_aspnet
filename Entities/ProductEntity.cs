@@ -28,9 +28,7 @@ public class ProductEntity : BaseEntity {
 	public int? DiscountPrice { get; set; }
 	public int? Price { get; set; }
 	public Currency? Currency { get; set; }
-	public ProductStatus? Status { get; set; }
 	public AgeCategory? AgeCategory { get; set; }
-	public ProductState? ProductState { get; set; }
 	public DateTime? ExpireDate { get; set; }
 
 	public string? SeenUsers { get; set; } = "";
@@ -160,10 +158,8 @@ public class ProductCreateUpdateDto {
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
 	public DateTime? ExpireDate { get; set; }
-	public ProductStatus? Status { get; set; }
 	public Currency? Currency { get; set; }
 	public AgeCategory? AgeCategory { get; set; }
-	public ProductState? ProductState { get; set; }
 	public int? ShippingTime { get; set; }
 	public int? ShippingCost { get; set; }
 	public DateTime? Boosted { get; set; }
@@ -217,7 +213,6 @@ public class ProductFilterDto {
 	public bool? OrderByCategory { get; set; }
 	public int PageSize { get; set; } = 100;
 	public int PageNumber { get; set; } = 1;
-	public ProductStatus? Status { get; set; }
 	public Currency? Currency { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 	public List<TagProduct>? Tags { get; set; }

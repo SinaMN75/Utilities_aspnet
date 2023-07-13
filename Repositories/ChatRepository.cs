@@ -105,7 +105,7 @@ public class ChatRepository : IChatRepository {
 			TotalCount = totalCount,
 			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
 			PageSize = dto.PageSize
-		}!;
+		};
 	}
 
 	public async Task<GenericResponse<ChatEntity?>> Update(ChatCreateUpdateDto dto) {
@@ -285,8 +285,8 @@ public class ChatRepository : IChatRepository {
 		IQueryable<GroupChatEntity> q = _dbContext.Set<GroupChatEntity>()
 			.Where(x => x.Users!.Any(y => y.Id == _userId));
 
-		if (dto.UsersIds.IsNotNullOrEmpty()) q = q.Where(x => x.Users!.Any(x => x.Id == dto.UsersIds!.FirstOrDefault()));
-		if (dto.ProductsIds.IsNotNullOrEmpty()) q = q.Where(x => x.Products!.Any(x => x.Id == dto.ProductsIds!.FirstOrDefault()));
+		if (dto.UsersIds.IsNotNullOrEmpty()) q = q.Where(x => x.Users!.Any(y => y.Id == dto.UsersIds!.FirstOrDefault()));
+		if (dto.ProductsIds.IsNotNullOrEmpty()) q = q.Where(x => x.Products!.Any(y => y.Id == dto.ProductsIds!.FirstOrDefault()));
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => x.Title == dto.Title);
 		if (dto.Description.IsNotNullOrEmpty()) q = q.Where(x => x.JsonDetail.Description == dto.Description);
 		if (dto.Type.HasValue) q = q.Where(x => x.Type == dto.Type);
@@ -549,8 +549,7 @@ public class ChatRepository : IChatRepository {
 
 		UserEntity? user = await _dbContext.Set<UserEntity>().Where(w => w.Id == _userId).FirstOrDefaultAsync();
 
-		GroupChatEntity tempGroup = groupChat;
-		List<UserEntity> tempUsers = tempGroup.Users!.ToList();
+		List<UserEntity> tempUsers = groupChat.Users!.ToList();
 		bool result = tempUsers.Remove(user!);
 
 		if (result) {

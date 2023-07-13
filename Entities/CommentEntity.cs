@@ -42,7 +42,6 @@ public class CommentReacts {
 }
 
 public class CommentCreateUpdateDto {
-	public Guid? Id { get; set; }
 	public Guid? ParentId { get; set; }
 	public double? Score { get; set; }
 	public string? Comment { get; set; }
@@ -54,7 +53,5 @@ public class CommentFilterDto {
 	public string? UserId { get; set; }
 	public string? ProductOwnerId { get; set; }
 	public Guid? ProductId { get; set; }
-	public bool? ShowProducts { get; set; }
 	public ChatStatus? Status { get; set; }
-	public bool ShowDeleted { get; set; } = false;
 }

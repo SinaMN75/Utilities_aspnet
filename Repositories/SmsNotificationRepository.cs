@@ -6,12 +6,13 @@ public interface ISmsNotificationRepository {
 }
 
 public class SmsNotificationRepository : ISmsNotificationRepository {
+	private static readonly char[] trimChars = { '9' };
+	private static readonly char[] trimCharsArray = { '+' };
+	private static readonly char[] trimCharsArray0 = { '8' };
+	private static readonly char[] trimCharsArray1 = { '0' };
 	private readonly IConfiguration _config;
-    private static readonly char[] trimChars = new[] { '9' };
-    private static readonly char[] trimCharsArray = new[] { '+' };
-    private static readonly char[] trimCharsArray0 = new[] { '8' };
 
-    public SmsNotificationRepository(IConfiguration config) => _config = config;
+	public SmsNotificationRepository(IConfiguration config) => _config = config;
 
 	public void SendSms(string mobileNumber, string message) {
 		AppSettings appSettings = new();
@@ -36,7 +37,7 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 					op = "pattern",
 					user = smsSetting.UserName,
 					pass = smsSetting.SmsSecret,
-					fromNum = "03000505".TrimStart(new[] { '0' }),
+					fromNum = "03000505".TrimStart(trimCharsArray1),
 					toNum = mobileNumber,
 					patternCode = smsSetting.PatternCode,
 					inputData = "[{\"verification-code\":" + message + "}]}"

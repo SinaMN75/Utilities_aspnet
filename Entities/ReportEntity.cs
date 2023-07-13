@@ -28,21 +28,17 @@ public class ReportEntity : BaseEntity {
 
 	public GroupChatEntity? GroupChat { get; set; }
 	public Guid? GroupChatId { get; set; }
-
-	public ReportType ReportType { get; set; } = ReportType.All;
 }
 
 public class ReportCreateUpdateDto {
 	public string? Title { get; set; }
 	public string? Description { get; set; }
-	public string? CreatorUserId { get; set; }
 	public string? UserId { get; set; }
 	public Guid? ProductId { get; set; }
 	public Guid? CommentId { get; set; }
 	public Guid? ChatId { get; set; }
 	public Guid? GroupChatMessageId { get; set; }
 	public Guid? GroupChatId { get; set; }
-	public ReportType ReportType { get; set; } = ReportType.All;
 }
 
 public class ReportFilterDto {
@@ -51,7 +47,4 @@ public class ReportFilterDto {
 	public bool? Chat { get; set; }
 	public bool? GroupChatMessage { get; set; }
 	public bool? GroupChat { get; set; }
-	public ReportType ReportType { get; set; }
-	public string? UserId { get; set; }
-	public int? Count { get; set; }
 }

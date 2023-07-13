@@ -32,28 +32,7 @@ public enum UtilitiesStatusCodes {
 	WrongPassword = 617
 }
 
-public enum OtpResult {
-	Ok = 1,
-	Incorrect = 2,
-	TimeOut = 3
-}
-
-public enum OrderStatuses {
-	Pending = 100,
-	Canceled = 101,
-	Paid = 102,
-	Accept = 103,
-	Reject = 104,
-	InProgress = 105,
-	InProcess = 106,
-	Shipping = 107, //not used yet
-	Refund = 108, //not used yet
-	RefundComplete = 109, //not used yet	
-	Complete = 110,
-	PaidFail = 112
-}
-
-public enum FormFieldType {
+public enum TagFormField {
 	SingleLineText,
 	MultiLineText,
 	MultiSelect,
@@ -74,13 +53,6 @@ public enum TransactionStatus {
 	Pending = 100,
 	Fail = 101,
 	Success = 102
-}
-
-public enum ProductStatus {
-	Released = 1,
-	Expired = 2,
-	InQueue = 3,
-	Deleted = 4
 }
 
 public enum Currency {
@@ -121,12 +93,6 @@ public enum Priority {
 	Normal = 102,
 	Low = 103
 }
-
-//public enum OrderType {
-//	Sale = 100,
-//	Purchase = 101,
-//	All = 102
-//}
 
 public enum OrderType {
 	None = 100,
@@ -184,35 +150,6 @@ public enum AgeCategory {
 	Adult = 104
 }
 
-public enum ProductState {
-	None = 100,
-	New = 101,
-	KindOfNew = 102,
-	UsedGoods = 103
-}
-
-public enum OrderReportType {
-	OrderDate = 100,
-	OrderDateProductUseCase = 101,
-	OrderProductUseCase = 102,
-	OrderState = 103,
-	OrderStuse = 104,
-	All = 105
-}
-
-public enum ReportType {
-	Insight = 100,
-	TopKeyword = 101,
-	PercentUsecase = 102,
-	All = 105
-}
-
-public enum ReferenceIdType {
-	Product = 100,
-	Category = 101,
-	User = 102
-}
-
 public enum CallerType {
 	CreateGroupChat = 100,
 	CreateComment = 101,
@@ -241,11 +178,6 @@ public enum TransactionType {
 	Recharge = 105
 }
 
-public enum ProductTag {
-	Product = 100,
-	Post = 101
-}
-
 public enum TagCategory {
 	Category = 100,
 	YooNote = 101,
@@ -267,11 +199,10 @@ public enum TagCategory {
 	Ad = 117,
 	DailyPrice = 118,
 	Tender = 119,
-	Chanel = 120,
+	Channel = 120,
 	Group = 121,
 	Auction = 122,
-	Service = 123,
-	Amnbekhar = 124,
+	Service = 123
 }
 
 public enum TagContent {
@@ -297,7 +228,7 @@ public enum TagMedia {
 	Media = 112,
 	Text = 113,
 	Chat = 114,
-	Post = 115,
+	Post = 115
 }
 
 public enum TagProduct {
@@ -328,7 +259,11 @@ public enum TagProduct {
 	Magazine = 124,
 	New = 201,
 	KindOfNew = 202,
-	Used = 203
+	Used = 203,
+	Released = 301,
+	Expired = 302,
+	InQueue = 303,
+	Deleted = 304
 }
 
 public enum TagOrder {

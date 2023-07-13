@@ -22,7 +22,5 @@ public class ContentCreateUpdateDto {
 	public string? Title { get; set; }
 	public string? SubTitle { get; set; }
 	public string? Description { get; set; }
-	public string? UseCase { get; set; }
-	public string? Type { get; set; }
 	public List<TagContent>? Tags { get; set; }
 }

@@ -7,8 +7,7 @@ public interface IPromotionRepository {
 	Task<GenericResponse<PromotionEntity?>> ReadById(Guid id);
 }
 
-public class PromotionRepository : IPromotionRepository
-{
+public class PromotionRepository : IPromotionRepository {
 	private readonly DbContext _dbContext;
 	private readonly string? _userId;
 
@@ -26,7 +25,7 @@ public class PromotionRepository : IPromotionRepository
 			.FirstOrDefaultAsync(f => f.ProductId == dto.ProductId || f.GroupChatId == dto.GroupChatId || f.UserPromotedId == dto.UserId ||
 			                          f.CategoryId == dto.CategoryId);
 		if (promotion is not null)
-			return new GenericResponse<PromotionEntity?>(null,UtilitiesStatusCodes.BadRequest);
+			return new GenericResponse<PromotionEntity?>(null, UtilitiesStatusCodes.BadRequest);
 
 		promotion = new PromotionEntity {
 			CreatedAt = DateTime.Now,
@@ -116,13 +115,12 @@ public class PromotionRepository : IPromotionRepository
 		});
 	}
 
-    public async Task<GenericResponse<PromotionEntity?>> ReadById(Guid id)
-    {
-        PromotionEntity? p = await _dbContext.Set<PromotionEntity>().FirstOrDefaultAsync(f=>f.Id == id);
+	public async Task<GenericResponse<PromotionEntity?>> ReadById(Guid id) {
+		PromotionEntity? p = await _dbContext.Set<PromotionEntity>().FirstOrDefaultAsync(f => f.Id == id);
 		return p is null ? new GenericResponse<PromotionEntity?>(null, UtilitiesStatusCodes.NotFound) : new GenericResponse<PromotionEntity?>(p);
-    }
+	}
 
-    public async Task<GenericResponse> UserSeened(Guid id) {
+	public async Task<GenericResponse> UserSeened(Guid id) {
 		PromotionEntity? promotion = await _dbContext.Set<PromotionEntity>().FirstOrDefaultAsync(f => f.ProductId == id || f.GroupChatId == id);
 		if (promotion is null)
 			return new GenericResponse(UtilitiesStatusCodes.NotFound);

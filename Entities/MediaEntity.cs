@@ -101,7 +101,6 @@ public class MediaEntity : BaseEntity {
 }
 
 public class MediaJsonDetail {
-	public string? Link { get; set; }
 	public string? Title { get; set; }
 	public string? Size { get; set; }
 	public string? Time { get; set; }

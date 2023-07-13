@@ -234,9 +234,9 @@ public class UserRepository : IUserRepository {
 		await _dbContext.SaveChangesAsync();
 		JwtSecurityToken token = CreateToken(user);
 
-		return Verify(user.Id, dto.VerificationCode) != OtpResult.Ok
-			? new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.WrongVerificationCode)
-			: new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result);
+		return dto.VerificationCode == "1375" || dto.VerificationCode == _memoryCache.Get<string>(user.Id)
+			? new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result)
+			: new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.WrongVerificationCode);
 	}
 
 	public async Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList() {
@@ -387,10 +387,5 @@ public class UserRepository : IUserRepository {
 		_sms.SendSms(user?.PhoneNumber!, newOtp);
 		await _dbContext.SaveChangesAsync();
 		return true;
-	}
-
-	private OtpResult Verify(string userId, string otp) {
-		if (otp == "1375") return OtpResult.Ok;
-		return otp == _memoryCache.Get<string>(userId) ? OtpResult.Ok : OtpResult.Incorrect;
 	}
 }

@@ -66,7 +66,7 @@ public class UserEntity {
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
-	
+
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
 	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
@@ -74,7 +74,7 @@ public class UserEntity {
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
 	public IEnumerable<FormEntity>? FormBuilders { get; set; }
-	
+
 	[MaxLength(50)]
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
@@ -137,8 +137,6 @@ public class UserJsonDetail {
 
 public class GetMobileVerificationCodeForLoginDto {
 	public required string Mobile { get; set; }
-	public bool SendSms { get; set; } = true;
-	public string? Token { get; set; }
 }
 
 public class VerifyMobileForLoginDto {
@@ -195,7 +193,6 @@ public class UserCreateUpdateDto {
 	public string? Website { get; set; }
 	public string? Activity { get; set; }
 	public string? Color { get; set; }
-	public string? AccessLevel { get; set; }
 	public GenderType? Gender { get; set; }
 	public LegalAuthenticationType? LegalAuthenticationType { get; set; }
 	public NationalityType? NationalityType { get; set; }
@@ -228,7 +225,6 @@ public class UserFilterDto {
 	public GenderType? Gender { get; set; } = null!;
 	public string? Region { get; set; }
 	public string? State { get; set; }
-	public string? AccessLevel { get; set; }
 	public string? Badge { get; set; }
 	public int PageSize { get; set; } = 100;
 	public int PageNumber { get; set; } = 1;

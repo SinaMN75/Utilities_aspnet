@@ -155,7 +155,6 @@ public class ChatCreateUpdateDto {
 	public string? UserId { get; set; }
 	public string? MessageText { get; set; }
 	public IEnumerable<Guid>? Products { get; set; }
-	public IEnumerable<string>? Users { get; set; }
 	public Guid? ParentId { get; set; }
 }
 

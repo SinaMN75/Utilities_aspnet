@@ -13,6 +13,5 @@ public class ReactionEntity : BaseEntity {
 
 public class ReactionCreateUpdateDto {
 	public Reaction? Reaction { get; set; }
-	public Guid? ChatsId { get; set; }
 	public Guid? ProductId { get; set; }
 }

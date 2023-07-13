@@ -6,18 +6,17 @@ public interface IWithdrawRepository {
 }
 
 public class WithdrawRepository : IWithdrawRepository {
+	private readonly AppSettings _appSettings = new();
 	private readonly DbContext _dbContext;
 	private readonly string? _userId;
-    private readonly AppSettings _appSettings = new();
 
-
-    public WithdrawRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IConfiguration config) {
+	public WithdrawRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IConfiguration config) {
 		_dbContext = dbContext;
 		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
-        config.GetSection("AppSettings").Bind(_appSettings);
-    }
+		config.GetSection("AppSettings").Bind(_appSettings);
+	}
 
-    public async Task<GenericResponse> WalletWithdrawal(WalletWithdrawalDto dto) {
+	public async Task<GenericResponse> WalletWithdrawal(WalletWithdrawalDto dto) {
 		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId && f.Suspend != true);
 		if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound);
 
@@ -29,9 +28,10 @@ public class WithdrawRepository : IWithdrawRepository {
 
 		double limit = _appSettings.WithdrawalLimit;
 		int dateLimit = _appSettings.WithdrawalTimeLimit;
-		IQueryable<WithdrawEntity>? listOfWithdrawalInIntervalDate = _dbContext.Set<WithdrawEntity>().Where(a=>a.CreatedAt > DateTime.Now.AddDays(-dateLimit) && a.CreatedAt < DateTime.Now && a.WithdrawState == WithdrawState.Accepted);
+		IQueryable<WithdrawEntity> listOfWithdrawalInIntervalDate = _dbContext.Set<WithdrawEntity>()
+			.Where(a => a.CreatedAt > DateTime.Now.AddDays(-dateLimit) && a.CreatedAt < DateTime.Now && a.WithdrawState == WithdrawState.Accepted);
 		int sumOfWithDrawal = listOfWithdrawalInIntervalDate.Sum(s => s.Amount) ?? 0;
-        if (dto.Amount + sumOfWithDrawal > limit) return new GenericResponse(UtilitiesStatusCodes.MoreThanAllowedMoney);
+		if (dto.Amount + sumOfWithDrawal > limit) return new GenericResponse(UtilitiesStatusCodes.MoreThanAllowedMoney);
 		if (sheba is null) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 
 		WithdrawEntity withdraw = new() {
@@ -43,10 +43,7 @@ public class WithdrawRepository : IWithdrawRepository {
 		};
 		await _dbContext.Set<WithdrawEntity>().AddAsync(withdraw);
 
-
-
-		TransactionEntity transaction = new TransactionEntity
-		{
+		TransactionEntity transaction = new() {
 			UserId = _userId,
 			ShebaNumber = dto.ShebaNumber,
 			Amount = dto.Amount,

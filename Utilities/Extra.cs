@@ -57,8 +57,8 @@ public static partial class StringExtension {
 		return baseString + "," + userId;
 	}
 
-    [GeneratedRegex(@"^[^@\s]+@[^@\s]+\.(com|net|org|gov)$", RegexOptions.IgnoreCase, "en-US")]
-    private static partial Regex MyRegex();
+	[GeneratedRegex(@"^[^@\s]+@[^@\s]+\.(com|net|org|gov)$", RegexOptions.IgnoreCase, "en-US")]
+	private static partial Regex MyRegex();
 }
 
 public class Utils {

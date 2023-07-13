@@ -32,7 +32,7 @@ public class OrderEntity : BaseEntity {
 
 	[ForeignKey(nameof(ProductOwner))]
 	public string? ProductOwnerId { get; set; }
-	
+
 	public List<TagOrder> Tags { get; set; } = new();
 
 	public IEnumerable<OrderDetailEntity>? OrderDetails { get; set; }
@@ -59,13 +59,11 @@ public class OrderCreateUpdateDto {
 	public string? DiscountCode { get; set; }
 	public DateTime? ReceivedDate { get; set; }
 	public Guid? AddressId { get; set; }
-	public OrderType OrderType { get; set; } = OrderType.None;
 	public List<TagOrder>? Tags { get; set; }
 }
 
 public class OrderDetailCreateUpdateDto {
 	public Guid? ProductId { get; set; }
-	public OrderType OrderType { get; set; } = OrderType.None;
 	public int? Count { get; set; }
 }
 
@@ -79,7 +77,6 @@ public class OrderFilterDto {
 	public string? UserId { get; set; }
 	public string? ProductOwnerId { get; set; }
 	public int PageSize { get; set; } = 100;
-	public int PageNumber { get; set; } = 1;
 }
 
 public class OrderVoteDto {

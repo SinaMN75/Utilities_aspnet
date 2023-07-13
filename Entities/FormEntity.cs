@@ -38,7 +38,7 @@ public class FormFieldEntity : BaseEntity {
 	[StringLength(2000)]
 	public string? OptionList { get; set; }
 
-	public FormFieldType? Type { get; set; }
+	public TagFormField? Type { get; set; }
 
 	public Guid? CategoryId { get; set; }
 

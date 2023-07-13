@@ -5,9 +5,9 @@ public class AppSettings {
 	public PaymentSettings PaymentSettings { get; set; } = null!;
 	public PushNotificationSetting PushNotificationSetting { get; set; } = null!;
 	public UsageRules UsageRules { get; set; } = null!;
-    public double WithdrawalLimit { get; set; }
-    public int WithdrawalTimeLimit { get; set; }
-    public string? AndroidMinimumVersion { get; set; }
+	public double WithdrawalLimit { get; set; }
+	public int WithdrawalTimeLimit { get; set; }
+	public string? AndroidMinimumVersion { get; set; }
 	public string? AndroidLatestVersion { get; set; }
 	public string? IosMinimumVersion { get; set; }
 	public string? IosLatestVersion { get; set; }
@@ -56,8 +56,6 @@ public class EnumDto {
 	public IEnumerable<IdTitleDto>? UtilitiesStatusCodes { get; set; }
 	public IEnumerable<IdTitleDto>? OtpResult { get; set; }
 	public IEnumerable<IdTitleDto>? OrderStatuses { get; set; }
-	public IEnumerable<IdTitleDto>? PayType { get; set; }
-	public IEnumerable<IdTitleDto>? SendType { get; set; }
 	public IEnumerable<IdTitleDto>? ProductStatus { get; set; }
 	public IEnumerable<IdTitleDto>? Currency { get; set; }
 	public IEnumerable<IdTitleDto>? SeenStatus { get; set; }
@@ -71,5 +69,11 @@ public class EnumDto {
 	public IEnumerable<IdTitleDto>? PrivacyType { get; set; }
 	public IEnumerable<IdTitleDto>? Nationality { get; set; }
 	public IEnumerable<IdTitleDto>? LegalAuthenticationType { get; set; }
+	public IEnumerable<IdTitleDto>? TagProduct { get; set; }
+	public IEnumerable<IdTitleDto>? TagCategory { get; set; }
+	public IEnumerable<IdTitleDto>? TagOrder { get; set; }
+	public IEnumerable<IdTitleDto>? TagContent { get; set; }
+	public IEnumerable<IdTitleDto>? TagNotification { get; set; }
+	public IEnumerable<IdTitleDto>? TagMedia { get; set; }
 	public AppSettings? AppSettings { get; set; }
 }

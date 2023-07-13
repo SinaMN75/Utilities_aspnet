@@ -16,12 +16,9 @@ public class AppSettingsController : BaseApiController {
 		return Result(new GenericResponse<EnumDto?>(new EnumDto {
 			DateTime = DateTime.Now,
 			HashedDateTime = hashedDateTime,
-			FormFieldType = EnumExtension.GetValues<FormFieldType>(),
+			FormFieldType = EnumExtension.GetValues<TagFormField>(),
 			TransactionStatuses = EnumExtension.GetValues<TransactionStatus>(),
 			UtilitiesStatusCodes = EnumExtension.GetValues<UtilitiesStatusCodes>(),
-			OtpResult = EnumExtension.GetValues<OtpResult>(),
-			OrderStatuses = EnumExtension.GetValues<OrderStatuses>(),
-			ProductStatus = EnumExtension.GetValues<ProductStatus>(),
 			Currency = EnumExtension.GetValues<Currency>(),
 			SeenStatus = EnumExtension.GetValues<SeenStatus>(),
 			Priority = EnumExtension.GetValues<Priority>(),
@@ -29,11 +26,16 @@ public class AppSettingsController : BaseApiController {
 			Reaction = EnumExtension.GetValues<Reaction>(),
 			GenderType = EnumExtension.GetValues<GenderType>(),
 			AgeCategory = EnumExtension.GetValues<AgeCategory>(),
-			ReferenceIdType = EnumExtension.GetValues<ReferenceIdType>(),
 			ChatTypes = EnumExtension.GetValues<ChatType>(),
 			PrivacyType = EnumExtension.GetValues<PrivacyType>(),
 			Nationality = EnumExtension.GetValues<NationalityType>(),
 			LegalAuthenticationType = EnumExtension.GetValues<LegalAuthenticationType>(),
+			TagMedia = EnumExtension.GetValues<TagMedia>(),
+			TagContent = EnumExtension.GetValues<TagContent>(),
+			TagProduct = EnumExtension.GetValues<TagProduct>(),
+			TagNotification = EnumExtension.GetValues<TagNotification>(),
+			TagOrder = EnumExtension.GetValues<TagOrder>(),
+			TagCategory = EnumExtension.GetValues<TagCategory>(),
 			AppSettings = appSettings
 		}));
 	}
