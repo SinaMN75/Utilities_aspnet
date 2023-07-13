@@ -7,8 +7,11 @@ public interface ISmsNotificationRepository {
 
 public class SmsNotificationRepository : ISmsNotificationRepository {
 	private readonly IConfiguration _config;
+    private static readonly char[] trimChars = new[] { '9' };
+    private static readonly char[] trimCharsArray = new[] { '+' };
+    private static readonly char[] trimCharsArray0 = new[] { '8' };
 
-	public SmsNotificationRepository(IConfiguration config) => _config = config;
+    public SmsNotificationRepository(IConfiguration config) => _config = config;
 
 	public void SendSms(string mobileNumber, string message) {
 		AppSettings appSettings = new();
@@ -16,9 +19,9 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 		SmsPanelSettings smsSetting = appSettings.SmsPanelSettings;
 
 		if (mobileNumber.Contains("+98")) {
-			mobileNumber = mobileNumber.TrimStart(new[] { '+' });
-			mobileNumber = mobileNumber.TrimStart(new[] { '9' });
-			mobileNumber = mobileNumber.TrimStart(new[] { '8' });
+			mobileNumber = mobileNumber.TrimStart(trimCharsArray);
+			mobileNumber = mobileNumber.TrimStart(trimChars);
+			mobileNumber = mobileNumber.TrimStart(trimCharsArray0);
 		}
 		else { mobileNumber = mobileNumber.TrimStart(new[] { '0' }); }
 

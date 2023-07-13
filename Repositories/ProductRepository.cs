@@ -217,7 +217,7 @@ public class ProductRepository : IProductRepository {
 		}
 
 		IQueryable<OrderEntity> completeOrder = _dbContext.Set<OrderEntity>()
-			.Include(x => x.User).ThenInclude(x => x.Media)
+			.Include(x => x.User).ThenInclude(x => x!.Media)
 			.Where(c => c.OrderDetails!.Any(w => w.ProductId == i.Id) && c.Tags.Contains(TagOrder.Complete)).AsNoTracking();
 		i.SuccessfulPurchase = completeOrder.Count();
 
@@ -329,7 +329,7 @@ public static class ProductEntityExtension {
 			KeyValue = dto.KeyValue ?? entity.JsonDetail.KeyValue,
 			Type1 = dto.Type1 ?? entity.JsonDetail.Type1,
 			Type2 = dto.Type2 ?? entity.JsonDetail.Type2,
-			KeyValues = dto.KeyValues ?? entity.JsonDetail.KeyValues,
+			KeyValues = dto.KeyValues ?? entity.JsonDetail.KeyValues
 		};
 
 		if (dto.ScorePlus.HasValue) {

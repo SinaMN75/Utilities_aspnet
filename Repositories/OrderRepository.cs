@@ -103,7 +103,7 @@ public class OrderRepository : IOrderRepository {
 
 		if (o is null) {
 			EntityEntry<OrderEntity> orderEntity = await _dbContext.Set<OrderEntity>().AddAsync(new OrderEntity {
-				Tags = new System.Collections.Generic.List<TagOrder> { TagOrder.Pending },
+				Tags = new List<TagOrder> { TagOrder.Pending },
 				UserId = _userId,
 				CreatedAt = DateTime.Now,
 				UpdatedAt = DateTime.Now
@@ -152,7 +152,7 @@ public class OrderRepository : IOrderRepository {
 		}
 		else {
 			EntityEntry<OrderEntity> orderEntity = await _dbContext.Set<OrderEntity>().AddAsync(new OrderEntity {
-				Tags = new System.Collections.Generic.List<TagOrder> { TagOrder.Pending },
+				Tags = new List<TagOrder> { TagOrder.Pending },
 				UserId = _userId,
 				CreatedAt = DateTime.Now,
 				UpdatedAt = DateTime.Now

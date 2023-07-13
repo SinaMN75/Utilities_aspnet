@@ -13,7 +13,7 @@ public class NotificationController : BaseApiController {
 	public ActionResult<GenericResponse<IQueryable<NotificationEntity>>> Read() => Result(_repository.Read());
 
 	[Authorize]
-	[HttpGet("{id}")]
+	[HttpGet("{id:guid}")]
 	public async Task<ActionResult<GenericResponse<IQueryable<NotificationEntity>>>> ReadById(Guid id) => Result(await _repository.ReadById(id));
 
 	[Authorize]

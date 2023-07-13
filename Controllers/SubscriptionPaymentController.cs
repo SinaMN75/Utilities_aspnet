@@ -12,7 +12,7 @@ public class SubscriptionPaymentController : BaseApiController
     [HttpPost]
     [Authorize]
     public async Task<ActionResult<GenericResponse<SubscriptionPaymentEntity>>> Create(SubscriptionPaymentCreateUpdateDto dto, CancellationToken ct) =>
-        Result(await _repository.Create(dto));
+        Result(await _repository.Create(dto, ct));
 
     [HttpPost("Filter")]
     [Authorize]

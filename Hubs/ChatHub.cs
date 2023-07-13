@@ -72,7 +72,7 @@ public class ChatHub : Hub {
 	///     2 = recording voice
 	///     3 = sending file
 	///     4 = none
-	/// </summary
+	/// </summary>
 	public async Task SendingState(string sender, string receiver, int type) {
 		string fileName = Path.Combine(_uploadsFolder, $"sending state - {DateTime.Now:yyyy-MM-dd-hh-mm-ss}");
 		FileInfo log = new(fileName);

@@ -30,7 +30,7 @@ public class WithdrawRepository : IWithdrawRepository {
 		double limit = _appSettings.WithdrawalLimit;
 		int dateLimit = _appSettings.WithdrawalTimeLimit;
 		IQueryable<WithdrawEntity>? listOfWithdrawalInIntervalDate = _dbContext.Set<WithdrawEntity>().Where(a=>a.CreatedAt > DateTime.Now.AddDays(-dateLimit) && a.CreatedAt < DateTime.Now && a.WithdrawState == WithdrawState.Accepted);
-		var sumOfWithDrawal = listOfWithdrawalInIntervalDate?.Sum(s => s.Amount) ?? 0;
+		int sumOfWithDrawal = listOfWithdrawalInIntervalDate.Sum(s => s.Amount) ?? 0;
         if (dto.Amount + sumOfWithDrawal > limit) return new GenericResponse(UtilitiesStatusCodes.MoreThanAllowedMoney);
 		if (sheba is null) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 
@@ -45,7 +45,7 @@ public class WithdrawRepository : IWithdrawRepository {
 
 
 
-		var transaction = new TransactionEntity
+		TransactionEntity transaction = new TransactionEntity
 		{
 			UserId = _userId,
 			ShebaNumber = dto.ShebaNumber,

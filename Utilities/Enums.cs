@@ -29,13 +29,7 @@ public enum UtilitiesStatusCodes {
 	MoreThan2UserIsInPrivateChat = 614,
 	Overused = 615,
 	MoreThanAllowedMoney = 616,
-	WrongPassword = 617,
-	OrderCantHaveBothTypeOfOrderCategory = 618
-}
-
-public enum NotoficationType {
-	WalletMoneyGain = 100,
-	WalletMoneyLost = 101
+	WrongPassword = 617
 }
 
 public enum OtpResult {
@@ -57,22 +51,6 @@ public enum OrderStatuses {
 	RefundComplete = 109, //not used yet	
 	Complete = 110,
 	PaidFail = 112
-}
-
-public enum PayType {
-	Online,
-	PayAtHome,
-	Cash = 101,
-	Stripe = 102,
-	Coin = 103,
-	Paypal = 104,
-	Visa = 105
-}
-
-public enum SendType {
-	Pishtaz,
-	Custom,
-	Tipax
 }
 
 public enum FormFieldType {

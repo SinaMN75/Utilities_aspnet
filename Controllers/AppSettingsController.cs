@@ -21,8 +21,6 @@ public class AppSettingsController : BaseApiController {
 			UtilitiesStatusCodes = EnumExtension.GetValues<UtilitiesStatusCodes>(),
 			OtpResult = EnumExtension.GetValues<OtpResult>(),
 			OrderStatuses = EnumExtension.GetValues<OrderStatuses>(),
-			PayType = EnumExtension.GetValues<PayType>(),
-			SendType = EnumExtension.GetValues<SendType>(),
 			ProductStatus = EnumExtension.GetValues<ProductStatus>(),
 			Currency = EnumExtension.GetValues<Currency>(),
 			SeenStatus = EnumExtension.GetValues<SeenStatus>(),

@@ -234,10 +234,9 @@ public class UserRepository : IUserRepository {
 		await _dbContext.SaveChangesAsync();
 		JwtSecurityToken token = CreateToken(user);
 
-		if (Verify(user.Id, dto.VerificationCode) != OtpResult.Ok)
-			return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.WrongVerificationCode);
-
-		return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result);
+		return Verify(user.Id, dto.VerificationCode) != OtpResult.Ok
+			? new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.WrongVerificationCode)
+			: new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result);
 	}
 
 	public async Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList() {

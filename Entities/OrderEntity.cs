@@ -59,9 +59,6 @@ public class OrderCreateUpdateDto {
 	public string? DiscountCode { get; set; }
 	public DateTime? ReceivedDate { get; set; }
 	public Guid? AddressId { get; set; }
-	public OrderStatuses? Status { get; set; } = OrderStatuses.Pending;
-	public PayType? PayType { get; set; } = Utilities.PayType.Online;
-	public SendType? SendType { get; set; } = Utilities.SendType.Custom;
 	public OrderType OrderType { get; set; } = OrderType.None;
 	public List<TagOrder>? Tags { get; set; }
 }
@@ -75,9 +72,6 @@ public class OrderDetailCreateUpdateDto {
 public class OrderFilterDto {
 	public Guid? Id { get; set; }
 	public bool? ShowProducts { get; set; } = false;
-	public OrderStatuses? Status { get; set; }
-	public SendType? SendType { get; set; }
-	public PayType? PayType { get; set; }
 	public OrderType? OrderType { get; set; }
 	public string? PayNumber { get; set; }
 	public DateTime? StartDate { get; set; }

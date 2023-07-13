@@ -53,10 +53,10 @@ public class PaymentRepository : IPaymentRepository {
 		try {
 			OrderEntity order = (await _dbContext.Set<OrderEntity>().FirstOrDefaultAsync(x => x.Id == orderId))!;
 
-			var orderHasPhisycalProduct = order.OrderDetails.Any(a=>a.ProductId.HasValue);
+			bool orderHasPhisycalProduct = order.OrderDetails!.Any(a=>a.ProductId.HasValue);
 			if(orderHasPhisycalProduct)
 			{
-				foreach(var orderDetail in order.OrderDetails)
+				foreach(OrderDetailEntity orderDetail in order.OrderDetails!)
 				{
 					ProductEntity? product = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f=>f.Id == orderDetail.ProductId);
 					if(product != null)

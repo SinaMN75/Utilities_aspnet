@@ -1,7 +1,6 @@
 namespace Utilities_aspnet.Repositories;
 
 public interface ITransactionRepository {
-	GenericResponse<IQueryable<TransactionEntity>> Read();
 	GenericResponse<IQueryable<TransactionEntity>> Filter(TransactionFilterDto dto);
 	GenericResponse<IQueryable<TransactionEntity>> ReadMine();
 	Task<GenericResponse<TransactionEntity>> Create(TransactionEntity dto, CancellationToken ct);
@@ -25,9 +24,7 @@ public class TransactionRepository : ITransactionRepository {
 		await _outputCache.EvictByTagAsync("transaction", ct);
 		return new GenericResponse<TransactionEntity>(entity);
 	}
-
-	public GenericResponse<IQueryable<TransactionEntity>> Read() => new(_dbContext.Set<TransactionEntity>().AsNoTracking());
-
+	
 	public GenericResponse<IQueryable<TransactionEntity>> Filter(TransactionFilterDto dto) {
 		IQueryable<TransactionEntity> q = _dbContext.Set<TransactionEntity>().Include(x => x.User).Include(x => x.Order).AsNoTracking();
 		if (dto.RefId is not null) q = q.Where(x => x.RefId == dto.RefId);

@@ -57,7 +57,7 @@ public class MediaRepository : IMediaRepository {
 				SaveMedia(file, name);
 			}
 		if (model.Links != null)
-			foreach (MediaEntity media in model.Links.Select(link => new MediaEntity {
+			foreach (MediaEntity media in model.Links.Select(_ => new MediaEntity {
 				         UserId = model.UserId,
 				         ProductId = model.ProductId,
 				         ContentId = model.ContentId,

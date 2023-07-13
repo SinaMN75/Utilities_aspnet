@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Utilities_aspnet.Utilities;
-
-namespace Utilities_aspnet.Repositories
+﻿namespace Utilities_aspnet.Repositories
 {
     public interface ISubscriptionPaymentRepository
     {
-        Task<GenericResponse<SubscriptionPaymentEntity?>> Create(SubscriptionPaymentCreateUpdateDto dto);
+        Task<GenericResponse<SubscriptionPaymentEntity?>> Create(SubscriptionPaymentCreateUpdateDto dto, CancellationToken ct);
         GenericResponse<IEnumerable<SubscriptionPaymentEntity>> Filter(SubscriptionPaymentFilter dto);
         Task<GenericResponse<SubscriptionPaymentEntity?>> Update(SubscriptionPaymentCreateUpdateDto dto, CancellationToken ct);
         Task<GenericResponse> Delete(Guid id, CancellationToken ct);
@@ -24,14 +17,14 @@ namespace Utilities_aspnet.Repositories
             _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
         }
 
-        public async Task<GenericResponse<SubscriptionPaymentEntity?>> Create(SubscriptionPaymentCreateUpdateDto dto)
+        public async Task<GenericResponse<SubscriptionPaymentEntity?>> Create(SubscriptionPaymentCreateUpdateDto dto, CancellationToken ct)
         {
-            UserEntity? userUpgraded = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == dto.UserId);
-            PromotionEntity? promotionEntity = await _dbContext.Set<PromotionEntity>().FirstOrDefaultAsync(f => f.Id == dto.PromotionId);
+            UserEntity? userUpgraded = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == dto.UserId, ct);
+            PromotionEntity? promotionEntity = await _dbContext.Set<PromotionEntity>().FirstOrDefaultAsync(f => f.Id == dto.PromotionId, ct);
             if (userUpgraded == null && promotionEntity == null) return new GenericResponse<SubscriptionPaymentEntity?>(null, UtilitiesStatusCodes.Unhandled);
-            if (userUpgraded != null && userUpgraded?.Id != _userId) return new GenericResponse<SubscriptionPaymentEntity?>(null, UtilitiesStatusCodes.UserNotFound); // Is It Ok?
+            if (userUpgraded != null && userUpgraded.Id != _userId) return new GenericResponse<SubscriptionPaymentEntity?>(null, UtilitiesStatusCodes.UserNotFound); // Is It Ok?
 
-            SubscriptionPaymentEntity? e = new()
+            SubscriptionPaymentEntity e = new()
             {
                 PromotionId = dto.PromotionId,
                 UserId = _userId,
@@ -41,17 +34,17 @@ namespace Utilities_aspnet.Repositories
             };
             e.FillData(dto);
 
-            await _dbContext.AddAsync(e);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.AddAsync(e, ct);
+            await _dbContext.SaveChangesAsync(ct);
             return new GenericResponse<SubscriptionPaymentEntity?>(e);
         }
 
         public async Task<GenericResponse> Delete(Guid id, CancellationToken ct)
         {
-            var subscription = await _dbContext.Set<SubscriptionPaymentEntity>().FirstOrDefaultAsync(f => f.Id == id, ct);
+            SubscriptionPaymentEntity? subscription = await _dbContext.Set<SubscriptionPaymentEntity>().FirstOrDefaultAsync(f => f.Id == id, ct);
             if (subscription == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
             _dbContext.Remove(subscription);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(ct);
             return new GenericResponse();
         }
 
@@ -70,11 +63,11 @@ namespace Utilities_aspnet.Repositories
 
         public async Task<GenericResponse<SubscriptionPaymentEntity?>> Update(SubscriptionPaymentCreateUpdateDto dto, CancellationToken ct)
         {
-            var subscription = await _dbContext.Set<SubscriptionPaymentEntity>().FirstOrDefaultAsync(f => f.Id == dto.Id, ct);
+            SubscriptionPaymentEntity? subscription = await _dbContext.Set<SubscriptionPaymentEntity>().FirstOrDefaultAsync(f => f.Id == dto.Id, ct);
             if (subscription == null) return new GenericResponse<SubscriptionPaymentEntity?>(null, UtilitiesStatusCodes.NotFound);
             subscription.FillData(dto);
             _dbContext.Update(subscription);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(ct);
             return new GenericResponse<SubscriptionPaymentEntity?>(subscription);
         }
     }

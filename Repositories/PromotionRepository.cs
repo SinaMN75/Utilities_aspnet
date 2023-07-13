@@ -90,7 +90,7 @@ public class PromotionRepository : IPromotionRepository
 			users.Add(user);
 		}
 
-		int userPerHour = (users.Count() / hoursPassed * 100).ToInt();
+		int userPerHour = (users.Count / hoursPassed * 100).ToInt();
 
 		List<KeyValue> statePerUsers = users
 			.GroupBy(u => u.State)
@@ -118,9 +118,8 @@ public class PromotionRepository : IPromotionRepository
 
     public async Task<GenericResponse<PromotionEntity?>> ReadById(Guid id)
     {
-        var p = await _dbContext.Set<PromotionEntity>().FirstOrDefaultAsync(f=>f.Id == id);
-		if (p is null) return new GenericResponse<PromotionEntity?>(null, UtilitiesStatusCodes.NotFound);
-		return new GenericResponse<PromotionEntity?>(p);
+        PromotionEntity? p = await _dbContext.Set<PromotionEntity>().FirstOrDefaultAsync(f=>f.Id == id);
+		return p is null ? new GenericResponse<PromotionEntity?>(null, UtilitiesStatusCodes.NotFound) : new GenericResponse<PromotionEntity?>(p);
     }
 
     public async Task<GenericResponse> UserSeened(Guid id) {

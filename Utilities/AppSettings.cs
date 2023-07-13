@@ -55,7 +55,6 @@ public class EnumDto {
 	public IEnumerable<IdTitleDto>? TransactionStatuses { get; set; }
 	public IEnumerable<IdTitleDto>? UtilitiesStatusCodes { get; set; }
 	public IEnumerable<IdTitleDto>? OtpResult { get; set; }
-	public IEnumerable<IdTitleDto>? DatabaseType { get; set; }
 	public IEnumerable<IdTitleDto>? OrderStatuses { get; set; }
 	public IEnumerable<IdTitleDto>? PayType { get; set; }
 	public IEnumerable<IdTitleDto>? SendType { get; set; }
