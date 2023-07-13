@@ -217,13 +217,13 @@ public class ProductRepository : IProductRepository {
 		}
 
 		IQueryable<OrderEntity> completeOrder = _dbContext.Set<OrderEntity>()
-			.Where(c => c.OrderDetails != null && c.OrderDetails.Any(w => w.ProductId.HasValue && w.ProductId.Value == i.Id) &&
-			            c.Tags.Contains(TagOrder.Complete));
-		string displayOrderComplete = Utils.DisplayCountOfCompleteOrder(completeOrder.Count());
-		i.SuccessfulPurchase = displayOrderComplete;
+			.Include(x => x.User).ThenInclude(x => x.Media)
+			.Where(c => c.OrderDetails!.Any(w => w.ProductId == i.Id) && c.Tags.Contains(TagOrder.Complete)).AsNoTracking();
+		i.SuccessfulPurchase = completeOrder.Count();
+
+		i.Orders = completeOrder.OrderByDescending(x => x.TotalPrice);
 
 		await _promotionRepository.UserSeened(i.Id);
-
 		return new GenericResponse<ProductEntity?>(i);
 	}
 
