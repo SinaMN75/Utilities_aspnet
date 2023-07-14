@@ -1,4 +1,6 @@
-﻿namespace Utilities_aspnet.Repositories;
+﻿using System;
+
+namespace Utilities_aspnet.Repositories;
 
 public interface ISmsNotificationRepository {
 	void SendSms(string mobileNumber, string message);
@@ -14,7 +16,7 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 
 	public SmsNotificationRepository(IConfiguration config) => _config = config;
 
-	public void SendSms(string mobileNumber, string message) {
+	public async void SendSms(string mobileNumber, string message) {
 		AppSettings appSettings = new();
 		_config.GetSection("AppSettings").Bind(appSettings);
 		SmsPanelSettings smsSetting = appSettings.SmsPanelSettings;
@@ -32,29 +34,16 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 				sms.VerifyAsync(1, smsSetting.PatternCode, new[] { mobileNumber }, message);
 				break;
 			}
-			case "faraz": {
-				var body = new {
-					op = "pattern",
-					user = smsSetting.UserName,
-					pass = smsSetting.SmsSecret,
-					fromNum = "03000505".TrimStart(trimCharsArray1),
-					toNum = mobileNumber,
-					patternCode = smsSetting.PatternCode,
-					inputData = "[{\"verification-code\":" + message + "}]}"
-				};
-
-				RestClient client = new("http://ippanel.com/api/select");
-				RestRequest request = new(Method.POST);
-				request.AddHeader("cache-control", "no-cache");
-				request.AddHeader("Content-Type", "application/json");
-				request.AddHeader("Authorization", "AccessKey " + smsSetting.SmsApiKey);
-				request.AddParameter("undefined",
-				                     "{\"op\" : \"pattern\"" + ",\"user\" : \"" + smsSetting.UserName + "\"" + ",\"pass\": \"" + smsSetting.SmsSecret + "\"" +
-				                     ",\"fromNum\" : " + "03000505".TrimStart(new[] { '0' }) + "" + ",\"toNum\": " + mobileNumber + "" +
-				                     ",\"patternCode\": \" " +
-				                     smsSetting.PatternCode + "\"" + ",\"inputData\" : [{\"verification-code\":" + message + "}]}", ParameterType.RequestBody);
-
-				client.Execute(request);
+			case "faraz":
+			{
+				CustomHttpClient<object, string> client = new();
+				object result = await client.Post("http://ippanel.com/api/select", "{\"op\" : \"pattern\"" +
+                ",\"user\" : \"" + smsSetting.UserName + "\"" +
+                ",\"pass\":  \"" + smsSetting.SmsSecret + "\"" +
+                ",\"fromNum\" : \"03000505\"" +
+                ",\"toNum\": \"" + mobileNumber + "\"" +
+                ",\"patternCode\": \"" + smsSetting.PatternCode + "\"" +
+                ",\"inputData\" : [{\"verification-code\": \"" + message + "\"}]}");
 				break;
 			}
 		}
@@ -80,16 +69,13 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 				};
 
 				CustomHttpClient<object, object> client = new();
-				client.DefaultRequestHeaders.Add("Content-Type", "application/json");
-				client.DefaultRequestHeaders.Add("Authorization", "Token " + setting.Token);
-				client.DefaultRequestHeaders.Add("Content-Type", "application/json");
-				client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "Token " + setting.Token);
-
-				object result = await client.Post("https://api.pushe.co/v2/messaging/notifications/", body);
+                HttpRequestMessage request = new HttpRequestMessage();
+				request.Headers.Add("Authorization", "Token " + setting.Token);
+                object result = await client.Post("https://api.pushe.co/v2/messaging/notifications/", JsonConvert.SerializeObject(body), request.Headers);
 				break;
 
 				//RestRequest request = new(Method.POST);
-				//request.AddHeader("Content-Type", "application/json");
+				//request.AddHeader("Content-Type", "application/json");`
 				//request.AddHeader("Authorization", "Token " + setting.Token);
 				//var body = new {
 				//	app_ids = setting.AppId,
@@ -103,7 +89,6 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 				//	filter = new {custom_id = dto.UserIds}
 				//};
 				//request.AddJsonBody(body);
-
 				//IRestResponse i = await new RestClient("https://api.pushe.co/v2/messaging/notifications/").ExecuteAsync(request);
 			}
 		}
