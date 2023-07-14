@@ -249,7 +249,6 @@ public class ProductRepository : IProductRepository {
 			.Include(x => x.Children)!.ThenInclude(x => x.Media)
 			.FirstOrDefaultAsync(x => x.Id == id, ct))!;
 		foreach (VisitProducts visitProduct in i.VisitProducts ?? new List<VisitProducts>()) _dbContext.Remove(visitProduct);
-		_dbContext.Remove(i.VisitProducts);
 		await _mediaRepository.DeleteMedia(i.Media);
 		foreach (ProductEntity product in i.Children ?? new List<ProductEntity>()) {
 			await _mediaRepository.DeleteMedia(product.Media);
