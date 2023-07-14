@@ -102,6 +102,7 @@ public class UserRepository : IUserRepository {
 		if (dto.Categories.IsNotNullOrEmpty()) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
 
 		if (dto.UserIds != null) q = q.Where(x => dto.UserIds.Contains(x.Id));
+		if (dto.PhoneNumbers != null) q = q.Where(x => dto.PhoneNumbers.Contains(x.PhoneNumber));
 		if (dto.UserName != null) q = q.Where(x => (x.AppUserName ?? "").ToLower().Contains(dto.UserName.ToLower()));
 		if (dto.ShowSuspend.IsTrue()) q = q.Where(x => x.Suspend == true);
 

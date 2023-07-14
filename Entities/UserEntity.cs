@@ -234,6 +234,7 @@ public class UserFilterDto {
 	public bool? ShowMyCustomers { get; set; }
 	public bool? OrderByUserName { get; set; }
 	public IEnumerable<string>? UserIds { get; set; }
+	public IEnumerable<string>? PhoneNumbers { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 }
 
