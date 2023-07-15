@@ -167,7 +167,7 @@ public class ProductRepository : IProductRepository {
 	public async Task<GenericResponse<ProductEntity?>> ReadById(Guid id, CancellationToken ct) {
 		ProductEntity? i = await _dbContext.Set<ProductEntity>()
 			.Include(i => i.Media)
-			.Include(i => i.Children)
+			.Include(i => i.Children)!.ThenInclude(x => x.Media)
 			.Include(i => i.Categories)!.ThenInclude(x => x.Media)
 			.Include(i => i.User).ThenInclude(x => x!.Media)
 			.Include(i => i.User).ThenInclude(x => x!.Categories)
