@@ -51,7 +51,7 @@ public class PaymentRepository : IPaymentRepository {
 
 	public async Task<GenericResponse<string?>> PayOrderZarinPal(Guid orderId) {
 		try {
-			OrderEntity order = (await _dbContext.Set<OrderEntity>().FirstOrDefaultAsync(x => x.Id == orderId))!;
+			OrderEntity order = (await _dbContext.Set<OrderEntity>().Include(x=>x.OrderDetails).FirstOrDefaultAsync(x => x.Id == orderId))!;
 
 			bool orderHasPhisycalProduct = order.OrderDetails!.Any(a => a.ProductId.HasValue);
 			if (orderHasPhisycalProduct) {
