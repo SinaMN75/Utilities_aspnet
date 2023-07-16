@@ -9,6 +9,7 @@ public interface IProductRepository {
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 	Task<GenericResponse> CreateReaction(ReactionCreateUpdateDto dto);
 	GenericResponse<IQueryable<ReactionEntity>> ReadReactionsById(Guid id);
+	Task<GenericResponse<IQueryable<CustomersPaymentPerProduct>?>> GetMyCustomersPerProduct(Guid Id);
 }
 
 public class ProductRepository : IProductRepository {
@@ -286,6 +287,32 @@ public class ProductRepository : IProductRepository {
 			.OrderBy(o => o.Reaction);
 		return new GenericResponse<IQueryable<ReactionEntity>>(reactions);
 	}
+
+    public async Task<GenericResponse<IQueryable<CustomersPaymentPerProduct>?>> GetMyCustomersPerProduct(Guid id)
+    {
+		var user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
+		if (user is null) return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.UserNotFound);
+
+		var product = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == id);
+		if (product is null) return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.NotFound);
+
+		if (product.UserId != user.Id)	return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.BadRequest, "This is not your product");
+
+		var listOfOrders = _dbContext.Set<OrderEntity>().Include(w => w.OrderDetails).Where(w => w.ProductOwnerId == user.Id && w.PayDateTime != null && w.OrderDetails != null);
+		if (!listOfOrders.Any()) return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.Unhandled, "product owner hasn't any order yet");
+
+        var result = listOfOrders
+						.Where(x => x.OrderDetails.Any(y => y.ProductId == product.Id))
+						.GroupBy(x => x.User)
+						.Select(g => new CustomersPaymentPerProduct 
+						{
+							Customer = g.Key,
+							Payment = g.Sum(s=>s.OrderDetails.Where(w=>w.ProductId == product.Id).Sum(so => so.FinalPrice))
+						})
+						.ToList();
+
+		return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(result.AsQueryable());
+    }
 }
 
 public static class ProductEntityExtension {

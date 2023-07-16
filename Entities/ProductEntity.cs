@@ -226,3 +226,9 @@ public class ProductInsightDto {
 	public ReactionEntity? Reaction { get; set; }
 	public string? UserId { get; set; }
 }
+
+public class CustomersPaymentPerProduct
+{
+    public UserEntity? Customer { get; set; }
+	public double? Payment { get; set; }
+}

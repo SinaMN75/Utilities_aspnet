@@ -48,4 +48,8 @@ public class ProductV2Controller : BaseApiController {
 	[HttpGet("ReadReactions/{id:guid}")]
 	[Authorize]
 	public ActionResult<GenericResponse<IQueryable<ReactionEntity>>> ReadReactionsById(Guid id) => Result(_repository.ReadReactionsById(id));
+
+	[HttpGet("GetMyCustomersPerProduct/{id:guid}")]
+	[Authorize]
+	public async Task<ActionResult<GenericResponse<IQueryable<CustomersPaymentPerProduct>?>>> GetMyCustomersPerProduct(Guid id) => Result(await _repository.GetMyCustomersPerProduct(id));
 }
