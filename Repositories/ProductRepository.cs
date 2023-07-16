@@ -9,7 +9,7 @@ public interface IProductRepository {
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 	Task<GenericResponse> CreateReaction(ReactionCreateUpdateDto dto);
 	GenericResponse<IQueryable<ReactionEntity>> ReadReactionsById(Guid id);
-	Task<GenericResponse<IQueryable<CustomersPaymentPerProduct>?>> GetMyCustomersPerProduct(Guid Id);
+	Task<GenericResponse<IQueryable<CustomersPaymentPerProduct>?>> GetMyCustomersPerProduct(Guid id);
 }
 
 public class ProductRepository : IProductRepository {
@@ -247,9 +247,11 @@ public class ProductRepository : IProductRepository {
 		ProductEntity i = (await _dbContext.Set<ProductEntity>()
 			.Include(x => x.Media)
 			.Include(x => x.VisitProducts)
+			.Include(x => x.OrderDetail)
 			.Include(x => x.Children)!.ThenInclude(x => x.Media)
 			.FirstOrDefaultAsync(x => x.Id == id, ct))!;
 		foreach (VisitProducts visitProduct in i.VisitProducts ?? new List<VisitProducts>()) _dbContext.Remove(visitProduct);
+		foreach (OrderDetailEntity orderDetail in i.OrderDetail ?? new List<OrderDetailEntity>()) _dbContext.Remove(orderDetail);
 		await _mediaRepository.DeleteMedia(i.Media);
 		foreach (ProductEntity product in i.Children ?? new List<ProductEntity>()) {
 			await _mediaRepository.DeleteMedia(product.Media);

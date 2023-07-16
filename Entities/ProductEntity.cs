@@ -56,6 +56,7 @@ public class ProductEntity : BaseEntity {
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
 	public IEnumerable<ProductInsight>? ProductInsights { get; set; }
 	public IEnumerable<VisitProducts>? VisitProducts { get; set; }
+	public IEnumerable<OrderDetailEntity>? OrderDetail { get; set; }
 
 	[NotMapped]
 	public IEnumerable<OrderEntity>? Orders { get; set; }
