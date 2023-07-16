@@ -353,7 +353,10 @@ public class UserRepository : IUserRepository {
 			ShebaNumber = dto.ShebaNumber,
 			LegalAuthenticationType = dto.LegalAuthenticationType ?? entity.JsonDetail.LegalAuthenticationType,
 			NationalityType = dto.NationalityType ?? entity.JsonDetail.NationalityType,
-			Code = dto.Code ?? entity.JsonDetail.Code
+			Code = dto.Code ?? entity.JsonDetail.Code,
+			DeliveryPrice1 = dto.DeliveryPrice1 ?? entity.JsonDetail.DeliveryPrice1,
+			DeliveryPrice2 = dto.DeliveryPrice2 ?? entity.JsonDetail.DeliveryPrice2,
+			DeliveryPrice3 = dto.DeliveryPrice3 ?? entity.JsonDetail.DeliveryPrice3,
 		};
 
 		if (dto.Categories.IsNotNullOrEmpty()) {
