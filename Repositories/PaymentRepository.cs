@@ -1,7 +1,7 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
 public interface IPaymentRepository {
-	Task<GenericResponse<string>> SimpleBuyProduct(Guid productId);
+	Task<GenericResponse<string>> PayProduct(Guid productId);
 	Task<GenericResponse<string?>> IncreaseWalletBalance(int amount);
 	Task<GenericResponse<string?>> PayOrder(Guid orderId);
 	Task<GenericResponse<string?>> PaySubscription(Guid subscriptionId);
@@ -21,7 +21,7 @@ public class PaymentRepository : IPaymentRepository {
 		_userId = httpContextAccessor.HttpContext?.User.Identity?.Name;
 	}
 
-	public async Task<GenericResponse<string>> SimpleBuyProduct(Guid productId) {
+	public async Task<GenericResponse<string>> PayProduct(Guid productId) {
 		try {
 			ProductEntity p = (await _dbContext.Set<ProductEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == productId))!;
 			UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
