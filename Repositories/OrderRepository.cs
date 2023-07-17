@@ -1,7 +1,7 @@
 namespace Utilities_aspnet.Repositories;
 
 public interface IOrderRepository {
-	GenericResponse<IQueryable<OrderEntity>> Filter(OrderFilterDto dto);
+	Task<GenericResponse<IQueryable<OrderEntity>>> Filter(OrderFilterDto dto);
 	Task<GenericResponse> Vote(OrderVoteDto dto);
 	Task<GenericResponse<OrderEntity>> ReadById(Guid id);
 	Task<GenericResponse<OrderEntity?>> Update(OrderCreateUpdateDto dto);
@@ -33,7 +33,7 @@ public class OrderRepository : IOrderRepository {
 		return new GenericResponse<OrderEntity?>(oldOrder);
 	}
 
-	public GenericResponse<IQueryable<OrderEntity>> Filter(OrderFilterDto dto) {
+	public async Task<GenericResponse<IQueryable<OrderEntity>>> Filter(OrderFilterDto dto) {
 		IQueryable<OrderEntity> q = _dbContext.Set<OrderEntity>()
 			.Include(x => x.Address)
 			.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product)
@@ -65,6 +65,20 @@ public class OrderRepository : IOrderRepository {
 				q = q.Where(w => w.OrderType == dto.OrderType.Value);
 		int totalCount = q.Count();
 
+		/*
+		var tempQ = q.Where(w => w.PayDateTime == null).Include(x => x.ProductOwner).ToList();
+		List<OrderEntity> finalQ = new();
+		foreach (var item in tempQ)
+		{
+			var order = await UpdateOrderPrice(item, item.OrderDetails);
+			_dbContext.Update(order);
+			await _dbContext.SaveChangesAsync();
+			finalQ.Add(order);
+		}
+		q = null;
+		q = finalQ.AsQueryable();
+		*/
+
 		//q = q.AsNoTracking().Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
 		return new GenericResponse<IQueryable<OrderEntity>>(q.AsSingleQuery()) {
@@ -74,7 +88,21 @@ public class OrderRepository : IOrderRepository {
 		};
 	}
 
-	public async Task<GenericResponse<OrderEntity>> ReadById(Guid id) {
+    private async Task<OrderEntity> UpdateOrderPrice(OrderEntity order, IEnumerable<OrderDetailEntity>? orderDetails)
+    {
+		if(orderDetails != null)
+		{
+            foreach (var item in orderDetails.ToList())
+			{
+				if (item.Product == null) continue;
+				if (order.ProductOwner != null) item.FinalPrice = item.Product.Price + order.ProductOwner.JsonDetail.DeliveryPrice1;  
+            }
+			order.TotalPrice = orderDetails.Sum(s => s.FinalPrice);
+        }
+		return order;
+    }
+
+    public async Task<GenericResponse<OrderEntity>> ReadById(Guid id) {
 		OrderEntity? i = await _dbContext.Set<OrderEntity>()
 			.Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p!.Media)
 			.Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p!.Categories)
@@ -83,8 +111,16 @@ public class OrderRepository : IOrderRepository {
 			.Include(i => i.ProductOwner).ThenInclude(i => i!.Media)
 			.AsNoTracking()
 			.FirstOrDefaultAsync(i => i.Id == id);
+		/*
+        if(i != null)
+		{
+            i = await UpdateOrderPrice(i, i.OrderDetails);
+            _dbContext.Update(i);
+			await _dbContext.SaveChangesAsync();
+        }
+		*/
 
-		return new GenericResponse<OrderEntity>(i!);
+        return new GenericResponse<OrderEntity>(i!);
 	}
 
 	public async Task<GenericResponse> Delete(Guid id) {
