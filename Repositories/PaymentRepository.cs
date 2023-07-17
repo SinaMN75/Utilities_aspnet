@@ -1,9 +1,10 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
 public interface IPaymentRepository {
+	Task<GenericResponse<string>> SimpleBuyProduct(Guid productId);
 	Task<GenericResponse<string?>> IncreaseWalletBalance(int amount);
-	Task<GenericResponse<string?>> PayOrderZarinPal(Guid orderId);
-	Task<GenericResponse<string?>> PaySubscriptionZarinPal(Guid subscriptionId);
+	Task<GenericResponse<string?>> PayOrder(Guid orderId);
+	Task<GenericResponse<string?>> PaySubscription(Guid subscriptionId);
 	Task<GenericResponse> WalletCallBack(int amount, string authority, string status, string userId);
 	Task<GenericResponse> CallBack(Guid orderId, string authority, string status);
 	Task<GenericResponse> CallBackSubscription(Guid subscriptionId, string authority, string status);
@@ -18,6 +19,35 @@ public class PaymentRepository : IPaymentRepository {
 		_dbContext = dbContext;
 		config.GetSection("AppSettings").Bind(_appSettings);
 		_userId = httpContextAccessor.HttpContext?.User.Identity?.Name;
+	}
+
+	public async Task<GenericResponse<string>> SimpleBuyProduct(Guid productId) {
+		try {
+			ProductEntity p = (await _dbContext.Set<ProductEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == productId))!;
+			UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
+			Payment payment = new(_appSettings.PaymentSettings.Id, p.Price!.Value);
+			string callbackUrl = $"{Server.ServerAddress}/CallBack/{productId}";
+			string desc = $"خرید محصول {p.Title}";
+			PaymentRequestResponse? result = payment.PaymentRequest(desc, callbackUrl, "", user?.PhoneNumber).Result;
+			await _dbContext.Set<TransactionEntity>().AddAsync(new TransactionEntity {
+				Amount = p.Price,
+				Authority = result.Authority,
+				CreatedAt = DateTime.Now,
+				TransactionType = TransactionType.Buy,
+				Descriptions = desc,
+				GatewayName = "ZarinPal",
+				UserId = _userId,
+				StatusId = TransactionStatus.Pending
+			});
+			await _dbContext.SaveChangesAsync();
+
+			if (result.Status == 100 && result.Authority.Length == 36) {
+				string url = $"https://www.zarinpal.com/pg/StartPay/{result.Authority}";
+				return new GenericResponse<string>(url);
+			}
+			return new GenericResponse<string>("", UtilitiesStatusCodes.BadRequest);
+		}
+		catch (Exception ex) { return new GenericResponse<string>(ex.Message, UtilitiesStatusCodes.BadRequest); }
 	}
 
 	public async Task<GenericResponse<string?>> IncreaseWalletBalance(int amount) {
@@ -49,7 +79,7 @@ public class PaymentRepository : IPaymentRepository {
 		catch (Exception ex) { return new GenericResponse<string?>(ex.Message, UtilitiesStatusCodes.BadRequest); }
 	}
 
-	public async Task<GenericResponse<string?>> PayOrderZarinPal(Guid orderId) {
+	public async Task<GenericResponse<string?>> PayOrder(Guid orderId) {
 		try {
 			OrderEntity order = (await _dbContext.Set<OrderEntity>().Include(x=>x.OrderDetails).FirstOrDefaultAsync(x => x.Id == orderId))!;
 
@@ -169,7 +199,7 @@ public class PaymentRepository : IPaymentRepository {
 		return new GenericResponse();
 	}
 
-	public async Task<GenericResponse<string?>> PaySubscriptionZarinPal(Guid subscriptionId) {
+	public async Task<GenericResponse<string?>> PaySubscription(Guid subscriptionId) {
 		try {
 			SubscriptionPaymentEntity spe = (await _dbContext.Set<SubscriptionPaymentEntity>().FirstOrDefaultAsync(x => x.Id == subscriptionId))!;
 
