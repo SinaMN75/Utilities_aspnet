@@ -350,7 +350,7 @@ public class UserRepository : IUserRepository {
 			Activity = dto.Activity ?? entity.JsonDetail.Activity,
 			Color = dto.Color ?? entity.JsonDetail.Color,
 			PrivacyType = dto.PrivacyType ?? entity.JsonDetail.PrivacyType,
-			ShebaNumber = dto.ShebaNumber,
+			ShebaNumber = dto.ShebaNumber ?? entity.JsonDetail.ShebaNumber,
 			LegalAuthenticationType = dto.LegalAuthenticationType ?? entity.JsonDetail.LegalAuthenticationType,
 			NationalityType = dto.NationalityType ?? entity.JsonDetail.NationalityType,
 			Code = dto.Code ?? entity.JsonDetail.Code,

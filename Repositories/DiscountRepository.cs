@@ -26,9 +26,8 @@ public class DiscountRepository : IDiscountRepository {
 	public GenericResponse<IQueryable<DiscountEntity>> Filter(DiscountFilterDto dto) {
 		IQueryable<DiscountEntity> q = _dbContext.Set<DiscountEntity>();
 
-		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
-		if (dto.Code.IsNotNullOrEmpty()) q = q.Where(x => (x.Code ?? "").Contains(dto.Code!));
-		if (dto.DiscountPercent != null) q = q.Where(x => x.DiscountPercent == dto.DiscountPercent);
+		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title).Contains(dto.Title!));
+		if (dto.Code.IsNotNullOrEmpty()) q = q.Where(x => (x.Code).Contains(dto.Code!));
 		if (dto.NumberUses != null) q = q.Where(x => x.NumberUses == dto.NumberUses);
 		if (dto.StartDate != null) q = q.Where(x => x.StartDate <= dto.StartDate);
 		if (dto.EndDate != null) q = q.Where(x => x.EndDate >= dto.EndDate);
@@ -48,12 +47,11 @@ public class DiscountRepository : IDiscountRepository {
 		DiscountEntity? e = await _dbContext.Set<DiscountEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id);
 
 		if (e == null) return new GenericResponse<DiscountEntity?>(null, UtilitiesStatusCodes.NotFound);
-		e.Title = dto.Title ?? e.Title;
-		e.DiscountPercent = dto.DiscountPercent ?? e.DiscountPercent;
-		e.NumberUses = dto.NumberUses ?? e.NumberUses;
-		e.Code = dto.Code ?? e.Code;
-		e.StartDate = dto.StartDate ?? e.StartDate;
-		e.EndDate = dto.EndDate ?? e.EndDate;
+		e.Title = dto.Title;
+		e.NumberUses = dto.NumberUses;
+		e.Code = dto.Code;
+		e.StartDate = dto.StartDate;
+		e.EndDate = dto.EndDate;
 		e.UpdatedAt = DateTime.Now;
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse<DiscountEntity?>(e);

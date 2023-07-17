@@ -7,6 +7,7 @@ public interface IOrderRepository {
 	Task<GenericResponse<OrderEntity?>> Update(OrderCreateUpdateDto dto);
 	Task<GenericResponse> Delete(Guid id);
 	Task<GenericResponse<OrderEntity?>> CreateUpdateOrderDetail(OrderDetailCreateUpdateDto dto);
+	Task<GenericResponse<OrderEntity?>> ApplyDiscountCode(ApplyDiscountCodeOnOrderDto dto);
 }
 
 public class OrderRepository : IOrderRepository {
@@ -213,6 +214,24 @@ public class OrderRepository : IOrderRepository {
 		foreach (OrderDetailEntity orderDetailEntity in o.OrderDetails) o.TotalPrice += orderDetailEntity.FinalPrice;
 
 		_dbContext.Update(o);
+		await _dbContext.SaveChangesAsync();
+		return new GenericResponse<OrderEntity?>(o);
+	}
+
+	public async Task<GenericResponse<OrderEntity?>> ApplyDiscountCode(ApplyDiscountCodeOnOrderDto dto) {
+		OrderEntity o = (await _dbContext.Set<OrderEntity>()
+			.Include(x => x.ProductOwner).FirstOrDefaultAsync(x => x.Id == dto.OrderId))!;
+		DiscountEntity? d = await _dbContext.Set<DiscountEntity>().FirstOrDefaultAsync(x => x.Code == dto.Code && x.UserId == o.UserId);
+		if (d is null) return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.InvalidDiscountCode);
+		if (d.StartDate >= DateTime.Now || d.EndDate <= DateTime.Now || d.NumberUses <= 0)
+			return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.InvalidDiscountCode);
+
+		o.DiscountCode = d.Code;
+		o.DiscountPrice = d.DiscountPrice;
+		o.TotalPrice -= d.DiscountPrice;
+		d.NumberUses -= 1;
+		_dbContext.Update(o);
+		_dbContext.Update(d);
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse<OrderEntity?>(o);
 	}

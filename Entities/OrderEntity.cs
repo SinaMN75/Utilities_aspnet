@@ -67,6 +67,11 @@ public class OrderDetailCreateUpdateDto {
 	public int? Count { get; set; }
 }
 
+public class ApplyDiscountCodeOnOrderDto {
+	public Guid? OrderId { get; set; }
+	public string? Code { get; set; }
+}
+
 public class OrderFilterDto {
 	public Guid? Id { get; set; }
 	public bool? ShowProducts { get; set; } = false;
