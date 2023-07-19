@@ -145,6 +145,8 @@ public class GetMobileVerificationCodeForLoginDto {
 public class VerifyMobileForLoginDto {
 	public required string Mobile { get; set; }
 	public required string VerificationCode { get; set; }
+	public string? FirstName { get; set; }
+	public string? LastName { get; set; }
 }
 
 public class RegisterDto {

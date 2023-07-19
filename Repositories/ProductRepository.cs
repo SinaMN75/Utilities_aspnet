@@ -89,8 +89,8 @@ public class ProductRepository : IProductRepository {
 	}
 
 	public async Task<GenericResponse<IQueryable<ProductEntity>>> Filter(ProductFilterDto dto) {
-		IQueryable<ProductEntity> q = _dbContext.Set<ProductEntity>().AsNoTracking();
-		if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || (w.ExpireDate >= DateTime.Now && w.ParentId == null));
+		IQueryable<ProductEntity> q = _dbContext.Set<ProductEntity>().AsNoTracking().Where(x => x.ParentId == null);
+		if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.Now);
 
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
 		if (dto.Subtitle.IsNotNullOrEmpty()) q = q.Where(x => (x.Subtitle ?? "").Contains(dto.Subtitle!));

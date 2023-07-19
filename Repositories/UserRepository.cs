@@ -217,7 +217,8 @@ public class UserRepository : IUserRepository {
 		}
 		UserEntity user = new() {
 			PhoneNumber = mobile,
-			UserName = mobile
+			UserName = mobile,
+			CreatedAt = DateTime.Now
 		};
 
 		await _dbContext.AddAsync(user);
@@ -231,6 +232,11 @@ public class UserRepository : IUserRepository {
 		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == mobile || x.Email == mobile);
 		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.UserNotFound);
 		if (user.Suspend ?? false) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.UserSuspended);
+
+		user.FirstName = dto.FirstName ?? user.FirstName;
+		user.LastName = dto.LastName ?? user.LastName;
+
+		_dbContext.Update(user);
 
 		await _dbContext.SaveChangesAsync();
 		JwtSecurityToken token = CreateToken(user);
