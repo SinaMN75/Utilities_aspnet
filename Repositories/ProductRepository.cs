@@ -241,11 +241,13 @@ public class ProductRepository : IProductRepository {
 
 		ProductEntity e = await entity.FillData(dto, _dbContext);
 		_dbContext.Update(e);
-
+		
 		if (dto.Children is not null)
-			foreach (ProductCreateUpdateDto childDto in dto.Children)
+			foreach (ProductCreateUpdateDto childDto in dto.Children) {
+				childDto.ParentId = dto.ParentId;
 				await Update(childDto, ct);
-
+			}
+		
 		await _dbContext.SaveChangesAsync(ct);
 
 		return new GenericResponse<ProductEntity>(e);
@@ -300,32 +302,31 @@ public class ProductRepository : IProductRepository {
 		return new GenericResponse<IQueryable<ReactionEntity>>(reactions);
 	}
 
-	public async Task<GenericResponse<IQueryable<CustomersPaymentPerProduct>?>> GetMyCustomersPerProduct(Guid id) {
+    public async Task<GenericResponse<IQueryable<CustomersPaymentPerProduct>?>> GetMyCustomersPerProduct(Guid id)
+    {
 		var user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
 		if (user is null) return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.UserNotFound);
 
 		var product = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == id);
 		if (product is null) return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.NotFound);
 
-		if (product.UserId != user.Id)
-			return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.BadRequest, "This is not your product");
+		if (product.UserId != user.Id)	return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.BadRequest, "This is not your product");
 
-		var listOfOrders = _dbContext.Set<OrderEntity>().Include(w => w.OrderDetails)
-			.Where(w => w.ProductOwnerId == user.Id && w.PayDateTime != null && w.OrderDetails != null);
-		if (!listOfOrders.Any())
-			return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.Unhandled, "product owner hasn't any order yet");
+		var listOfOrders = _dbContext.Set<OrderEntity>().Include(w => w.OrderDetails).Where(w => w.ProductOwnerId == user.Id && w.PayDateTime != null && w.OrderDetails != null);
+		if (!listOfOrders.Any()) return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.Unhandled, "product owner hasn't any order yet");
 
-		var result = listOfOrders
-			.Where(x => x.OrderDetails.Any(y => y.ProductId == product.Id))
-			.GroupBy(x => x.User)
-			.Select(g => new CustomersPaymentPerProduct {
-				Customer = g.Key,
-				Payment = g.Sum(s => s.OrderDetails.Where(w => w.ProductId == product.Id).Sum(so => so.FinalPrice))
-			})
-			.ToList();
+        var result = listOfOrders
+						.Where(x => x.OrderDetails.Any(y => y.ProductId == product.Id))
+						.GroupBy(x => x.User)
+						.Select(g => new CustomersPaymentPerProduct 
+						{
+							Customer = g.Key,
+							Payment = g.Sum(s=>s.OrderDetails.Where(w=>w.ProductId == product.Id).Sum(so => so.FinalPrice))
+						})
+						.ToList();
 
 		return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(result.AsQueryable());
-	}
+    }
 }
 
 public static class ProductEntityExtension {
