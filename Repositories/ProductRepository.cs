@@ -187,18 +187,11 @@ public class ProductRepository : IProductRepository {
 		if (_userId.IsNotNullOrEmpty()) {
 			UserEntity? user = await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == _userId, ct);
 			if (!user!.VisitedProducts.Contains(i.Id.ToString()))
-				await _userRepository.Update(new UserCreateUpdateDto {
-					Id = _userId,
-					VisitedProducts = user.VisitedProducts + "," + i.Id
-				});
+				await _userRepository.Update(new UserCreateUpdateDto { Id = _userId, VisitedProducts = user.VisitedProducts + "," + i.Id });
 
 			VisitProducts? vp = await _dbContext.Set<VisitProducts>().FirstOrDefaultAsync(a => a.UserId == user.Id && a.ProductId == i.Id, ct);
 			if (vp is null) {
-				VisitProducts visitProduct = new() {
-					CreatedAt = DateTime.Now,
-					ProductId = i.Id,
-					UserId = user.Id
-				};
+				VisitProducts visitProduct = new() { CreatedAt = DateTime.Now, ProductId = i.Id, UserId = user.Id };
 				await _dbContext.Set<VisitProducts>().AddAsync(visitProduct, ct);
 				if (string.IsNullOrEmpty(i.SeenUsers)) i.SeenUsers = user.Id;
 				else i.SeenUsers = i.SeenUsers + "," + user.Id;
