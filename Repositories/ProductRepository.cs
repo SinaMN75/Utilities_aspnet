@@ -20,6 +20,7 @@ public class ProductRepository : IProductRepository {
 	private readonly IPromotionRepository _promotionRepository;
 	private readonly string? _userId;
 	private readonly IUserRepository _userRepository;
+	private readonly ICommentRepository _commentRepository;
 
 	public ProductRepository(
 		DbContext dbContext,
@@ -28,6 +29,7 @@ public class ProductRepository : IProductRepository {
 		IUserRepository userRepository,
 		IConfiguration config,
 		IPromotionRepository promotionRepository,
+		ICommentRepository commentRepository,
 		IFormRepository formRepository) {
 		_dbContext = dbContext;
 		_mediaRepository = mediaRepository;
@@ -36,6 +38,7 @@ public class ProductRepository : IProductRepository {
 		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 		_promotionRepository = promotionRepository;
 		_formRepository = formRepository;
+		_commentRepository = commentRepository;
 	}
 
 	public async Task<GenericResponse<ProductEntity?>> Create(ProductCreateUpdateDto dto, CancellationToken ct) {
@@ -238,6 +241,11 @@ public class ProductRepository : IProductRepository {
 
 		ProductEntity e = await entity.FillData(dto, _dbContext);
 		_dbContext.Update(e);
+
+		if (dto.Children is not null)
+			foreach (ProductCreateUpdateDto childDto in dto.Children)
+				await Update(childDto, ct);
+
 		await _dbContext.SaveChangesAsync(ct);
 
 		return new GenericResponse<ProductEntity>(e);
@@ -248,8 +256,10 @@ public class ProductRepository : IProductRepository {
 			.Include(x => x.Media)
 			.Include(x => x.VisitProducts)
 			.Include(x => x.OrderDetail)
+			.Include(x => x.Comments)
 			.Include(x => x.Children)!.ThenInclude(x => x.Media)
 			.FirstOrDefaultAsync(x => x.Id == id, ct))!;
+		foreach (CommentEntity comment in i.Comments ?? new List<CommentEntity>()) await _commentRepository.Delete(comment.Id, ct);
 		foreach (VisitProducts visitProduct in i.VisitProducts ?? new List<VisitProducts>()) _dbContext.Remove(visitProduct);
 		foreach (OrderDetailEntity orderDetail in i.OrderDetail ?? new List<OrderDetailEntity>()) _dbContext.Remove(orderDetail);
 		await _mediaRepository.DeleteMedia(i.Media);
@@ -290,31 +300,32 @@ public class ProductRepository : IProductRepository {
 		return new GenericResponse<IQueryable<ReactionEntity>>(reactions);
 	}
 
-    public async Task<GenericResponse<IQueryable<CustomersPaymentPerProduct>?>> GetMyCustomersPerProduct(Guid id)
-    {
+	public async Task<GenericResponse<IQueryable<CustomersPaymentPerProduct>?>> GetMyCustomersPerProduct(Guid id) {
 		var user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
 		if (user is null) return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.UserNotFound);
 
 		var product = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == id);
 		if (product is null) return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.NotFound);
 
-		if (product.UserId != user.Id)	return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.BadRequest, "This is not your product");
+		if (product.UserId != user.Id)
+			return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.BadRequest, "This is not your product");
 
-		var listOfOrders = _dbContext.Set<OrderEntity>().Include(w => w.OrderDetails).Where(w => w.ProductOwnerId == user.Id && w.PayDateTime != null && w.OrderDetails != null);
-		if (!listOfOrders.Any()) return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.Unhandled, "product owner hasn't any order yet");
+		var listOfOrders = _dbContext.Set<OrderEntity>().Include(w => w.OrderDetails)
+			.Where(w => w.ProductOwnerId == user.Id && w.PayDateTime != null && w.OrderDetails != null);
+		if (!listOfOrders.Any())
+			return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.Unhandled, "product owner hasn't any order yet");
 
-        var result = listOfOrders
-						.Where(x => x.OrderDetails.Any(y => y.ProductId == product.Id))
-						.GroupBy(x => x.User)
-						.Select(g => new CustomersPaymentPerProduct 
-						{
-							Customer = g.Key,
-							Payment = g.Sum(s=>s.OrderDetails.Where(w=>w.ProductId == product.Id).Sum(so => so.FinalPrice))
-						})
-						.ToList();
+		var result = listOfOrders
+			.Where(x => x.OrderDetails.Any(y => y.ProductId == product.Id))
+			.GroupBy(x => x.User)
+			.Select(g => new CustomersPaymentPerProduct {
+				Customer = g.Key,
+				Payment = g.Sum(s => s.OrderDetails.Where(w => w.ProductId == product.Id).Sum(so => so.FinalPrice))
+			})
+			.ToList();
 
 		return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(result.AsQueryable());
-    }
+	}
 }
 
 public static class ProductEntityExtension {
