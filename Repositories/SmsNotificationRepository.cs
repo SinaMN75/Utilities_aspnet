@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Utilities_aspnet.Repositories;
+﻿namespace Utilities_aspnet.Repositories;
 
 public interface ISmsNotificationRepository {
 	void SendSms(string mobileNumber, string message);
@@ -8,10 +6,6 @@ public interface ISmsNotificationRepository {
 }
 
 public class SmsNotificationRepository : ISmsNotificationRepository {
-	private static readonly char[] trimChars = { '9' };
-	private static readonly char[] trimCharsArray = { '+' };
-	private static readonly char[] trimCharsArray0 = { '8' };
-	private static readonly char[] trimCharsArray1 = { '0' };
 	private readonly IConfiguration _config;
 
 	public SmsNotificationRepository(IConfiguration config) => _config = config;
@@ -20,30 +14,27 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 		AppSettings appSettings = new();
 		_config.GetSection("AppSettings").Bind(appSettings);
 		SmsPanelSettings smsSetting = appSettings.SmsPanelSettings;
-
-		if (mobileNumber.Contains("+98")) {
-			mobileNumber = mobileNumber.TrimStart(trimCharsArray);
-			mobileNumber = mobileNumber.TrimStart(trimChars);
-			mobileNumber = mobileNumber.TrimStart(trimCharsArray0);
-		}
-		else { mobileNumber = mobileNumber.TrimStart(new[] { '0' }); }
-
+		
 		switch (smsSetting.Provider) {
 			case "ghasedak": {
-				Api sms = new(smsSetting.SmsApiKey);
-				sms.VerifyAsync(1, smsSetting.PatternCode, new[] { mobileNumber }, message);
+				RestRequest request = new(Method.POST);
+				request.AddHeader("apikey", smsSetting.SmsApiKey!);
+				request.AddParameter("receptor", mobileNumber);
+				request.AddParameter("type", 1);
+				request.AddParameter("template", smsSetting.PatternCode!);
+				request.AddParameter("param1", message);
+				await new RestClient("https://api.ghasedak.me/v2/verification/send/simple").ExecuteAsync(request);
 				break;
 			}
-			case "faraz":
-			{
+			case "faraz": {
 				CustomHttpClient<object, string> client = new();
-				object result = await client.Post("http://ippanel.com/api/select", "{\"op\" : \"pattern\"" +
-                ",\"user\" : \"" + smsSetting.UserName + "\"" +
-                ",\"pass\":  \"" + smsSetting.SmsSecret + "\"" +
-                ",\"fromNum\" : \"03000505\"" +
-                ",\"toNum\": \"" + mobileNumber + "\"" +
-                ",\"patternCode\": \"" + smsSetting.PatternCode + "\"" +
-                ",\"inputData\" : [{\"verification-code\": \"" + message + "\"}]}");
+				await client.Post("http://ippanel.com/api/select", "{\"op\" : \"pattern\"" +
+				                                                   ",\"user\" : \"" + smsSetting.UserName + "\"" +
+				                                                   ",\"pass\":  \"" + smsSetting.SmsSecret + "\"" +
+				                                                   ",\"fromNum\" : \"03000505\"" +
+				                                                   ",\"toNum\": \"" + mobileNumber + "\"" +
+				                                                   ",\"patternCode\": \"" + smsSetting.PatternCode + "\"" +
+				                                                   ",\"inputData\" : [{\"verification-code\": \"" + message + "\"}]}");
 				break;
 			}
 		}
@@ -67,11 +58,11 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 					is_draft = false,
 					filter = new { custom_id = dto.UserIds }
 				};
-
+				
 				CustomHttpClient<object, object> client = new();
-                HttpRequestMessage request = new HttpRequestMessage();
+				HttpRequestMessage request = new();
 				request.Headers.Add("Authorization", "Token " + setting.Token);
-                object result = await client.Post("https://api.pushe.co/v2/messaging/notifications/", JsonConvert.SerializeObject(body), request.Headers);
+				await client.Post("https://api.pushe.co/v2/messaging/notifications/", JsonConvert.SerializeObject(body), request.Headers);
 				break;
 
 				//RestRequest request = new(Method.POST);
