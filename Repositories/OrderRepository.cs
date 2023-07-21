@@ -35,17 +35,11 @@ public class OrderRepository : IOrderRepository {
 	}
 
 	public async Task<GenericResponse<IQueryable<OrderEntity>>> Filter(OrderFilterDto dto) {
-		IQueryable<OrderEntity> q = _dbContext.Set<OrderEntity>()
-			.Include(x => x.Address)
-			.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product)
-			.Include(x => x.OrderDetails)
-			.Include(x => x.Address);
+		IQueryable<OrderEntity> q = _dbContext.Set<OrderEntity>().Include(x => x.Address);
 
 		if (dto.ShowProducts.IsTrue()) {
-			q = q.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Parent).ThenInclude(x => x!.Media);
-			q = q.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Parent).ThenInclude(x => x!.Categories);
-			q = q.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Parent).ThenInclude(x => x!.User).ThenInclude(x => x!.Media);
 			q = q.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Media);
+			q = q.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Parent).ThenInclude(x => x!.Media);
 			q = q.Include(x => x.User).ThenInclude(x => x!.Media);
 			q = q.Include(x => x.ProductOwner).ThenInclude(x => x!.Media);
 		}
@@ -122,7 +116,7 @@ public class OrderRepository : IOrderRepository {
         }
 		*/
 
-        return new GenericResponse<OrderEntity>(i!);
+		return new GenericResponse<OrderEntity>(i!);
 	}
 
 	public async Task<GenericResponse> Delete(Guid id) {
@@ -132,14 +126,13 @@ public class OrderRepository : IOrderRepository {
 	}
 
 	public async Task<GenericResponse<OrderEntity?>> CreateUpdateOrderDetail(OrderDetailCreateUpdateDto dto) {
-		ProductEntity p = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
-		OrderEntity? o = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails)
-			.FirstOrDefaultAsync(x => x.UserId == _userId && x.Tags.Contains(TagOrder.Pending));
-		OrderDetailEntity? od = await _dbContext.Set<OrderDetailEntity>().FirstOrDefaultAsync(x => x.ProductId == dto.ProductId);
+		ProductEntity p = (await _dbContext.Set<ProductEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
+		List<OrderEntity> o = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails)
+			.Where(x => x.UserId == _userId && x.Tags.Contains(TagOrder.Pending)).ToListAsync();
 
-		if (dto.Count >= p.Stock) return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.OutOfStock);
+		if (dto.Count > p.Stock) return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.OutOfStock);
 
-		if (o is null) {
+		if (o.IsNullOrEmpty()) {
 			EntityEntry<OrderEntity> orderEntity = await _dbContext.Set<OrderEntity>().AddAsync(new OrderEntity {
 				Tags = new List<TagOrder> { TagOrder.Pending },
 				UserId = _userId,
@@ -161,43 +154,25 @@ public class OrderRepository : IOrderRepository {
 			await _dbContext.SaveChangesAsync();
 			return new GenericResponse<OrderEntity?>(orderEntity.Entity);
 		}
-		if (o.OrderDetails != null && o.OrderDetails.Any(x => p.UserId == x.Product?.UserId)) {
-			if (od is null) {
-				if (dto.Count != 0) {
-					EntityEntry<OrderDetailEntity> orderDetailEntity = await _dbContext.Set<OrderDetailEntity>().AddAsync(new OrderDetailEntity {
-						OrderId = o.Id,
-						Count = dto.Count,
-						ProductId = dto.ProductId,
-						UnitPrice = p.Price,
-						FinalPrice = dto.Count * p.Price,
-						CreatedAt = DateTime.Now,
-						UpdatedAt = DateTime.Now
-					});
-					await _dbContext.Set<OrderDetailEntity>().AddAsync(orderDetailEntity.Entity);
-				}
-			}
-			else {
-				if (dto.Count == 0) {
-					_dbContext.Remove(od);
+
+		foreach (OrderEntity orderEntity in o) {
+			foreach (OrderDetailEntity orderDetail in orderEntity.OrderDetails ?? new List<OrderDetailEntity>()) {
+				if (orderDetail.ProductId == dto.ProductId) {
+					if (dto.Count == 0) {
+						_dbContext.Remove(orderDetail);
+						await _dbContext.SaveChangesAsync();
+					}
+					else {
+						orderDetail.Count = dto.Count;
+						orderDetail.FinalPrice = dto.Count * p.Price;
+						_dbContext.Update(orderDetail);
+					}
 					await _dbContext.SaveChangesAsync();
-				}
-				else {
-					od.Count = dto.Count;
-					od.FinalPrice = dto.Count * p.Price;
-					_dbContext.Update(od);
+					return new GenericResponse<OrderEntity?>(orderEntity);
 				}
 			}
-		}
-		else {
-			EntityEntry<OrderEntity> orderEntity = await _dbContext.Set<OrderEntity>().AddAsync(new OrderEntity {
-				Tags = new List<TagOrder> { TagOrder.Pending },
-				UserId = _userId,
-				CreatedAt = DateTime.Now,
-				UpdatedAt = DateTime.Now
-			});
-
-			EntityEntry<OrderDetailEntity> orderDetailEntity = await _dbContext.Set<OrderDetailEntity>().AddAsync(new OrderDetailEntity {
-				OrderId = orderEntity.Entity.Id,
+			await _dbContext.Set<OrderDetailEntity>().AddAsync(new OrderDetailEntity {
+				OrderId = orderEntity.Id,
 				Count = dto.Count,
 				ProductId = dto.ProductId,
 				UnitPrice = p.Price,
@@ -205,18 +180,16 @@ public class OrderRepository : IOrderRepository {
 				CreatedAt = DateTime.Now,
 				UpdatedAt = DateTime.Now
 			});
-			orderEntity.Entity.TotalPrice = orderDetailEntity.Entity.FinalPrice;
+			orderEntity.TotalPrice = 0;
+			foreach (OrderDetailEntity orderEntityOrderDetail in orderEntity.OrderDetails ?? new List<OrderDetailEntity>())
+				orderEntity.TotalPrice += orderEntityOrderDetail.FinalPrice;
 
+			_dbContext.Update(o);
 			await _dbContext.SaveChangesAsync();
-			return new GenericResponse<OrderEntity?>(orderEntity.Entity);
+			return new GenericResponse<OrderEntity?>(orderEntity);
 		}
 
-		o.TotalPrice = 0;
-		foreach (OrderDetailEntity orderDetailEntity in o.OrderDetails) o.TotalPrice += orderDetailEntity.FinalPrice;
-
-		_dbContext.Update(o);
-		await _dbContext.SaveChangesAsync();
-		return new GenericResponse<OrderEntity?>(o);
+		return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.Unhandled);
 	}
 
 	public async Task<GenericResponse<OrderEntity?>> ApplyDiscountCode(ApplyDiscountCodeOnOrderDto dto) {
