@@ -44,9 +44,10 @@ public class OrderRepository : IOrderRepository {
 		if (dto.ShowProducts.IsTrue()) {
 			q = q.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Parent).ThenInclude(x => x!.Media);
 			q = q.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Parent).ThenInclude(x => x!.Categories);
-			q = q.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Parent).ThenInclude(x => x!.User);
+			q = q.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Parent).ThenInclude(x => x!.User).ThenInclude(x => x!.Media);
 			q = q.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Media);
 			q = q.Include(x => x.User).ThenInclude(x => x!.Media);
+			q = q.Include(x => x.ProductOwner).ThenInclude(x => x!.Media);
 		}
 		if (dto.Id.HasValue) q = q.Where(x => x.Id == dto.Id);
 		if (dto.PayNumber.IsNotNullOrEmpty()) q = q.Where(x => (x.PayNumber ?? "").Contains(dto.PayNumber!));

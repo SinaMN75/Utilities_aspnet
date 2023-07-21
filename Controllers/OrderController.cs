@@ -3,7 +3,6 @@ namespace Utilities_aspnet.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-[AllowAnonymous]
 public class OrderController : BaseApiController {
 	private readonly IOrderRepository _repository;
 
