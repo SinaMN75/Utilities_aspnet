@@ -202,6 +202,7 @@ public class ProductFilterDto {
 	public bool? ShowCategoryMedia { get; set; } = false;
 	public bool? ShowChildren { get; set; } = false;
 	public bool? ShowPostOfPrivateUser { get; set; }
+	public bool? ShowComments { get; set; }
 	public bool? OrderByVotes { get; set; } = false;
 	public bool? OrderByVotesDescending { get; set; } = false;
 	public bool? OrderByAtoZ { get; set; } = false;
