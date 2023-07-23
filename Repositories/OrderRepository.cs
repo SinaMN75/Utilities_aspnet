@@ -126,7 +126,7 @@ public class OrderRepository : IOrderRepository {
 	}
 	
 		public async Task<GenericResponse<OrderEntity?>> CreateUpdateOrderDetail(OrderDetailCreateUpdateDto dto) {
-		ProductEntity p = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
+		ProductEntity p = (await _dbContext.Set<ProductEntity>().Include(x => x.User).FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
 		OrderEntity? o = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails)
 			.FirstOrDefaultAsync(x => x.UserId == _userId && x.Tags.Contains(TagOrder.Pending) && x.OrderDetails!.Any(y => y.ProductId == p.Id));
 
@@ -136,7 +136,9 @@ public class OrderRepository : IOrderRepository {
 			EntityEntry<OrderEntity> orderEntity = await _dbContext.Set<OrderEntity>().AddAsync(new OrderEntity {
 				Tags = new List<TagOrder> { TagOrder.Pending },
 				UserId = _userId,
+				SendPrice = p.User!.JsonDetail.DeliveryPrice1,
 				CreatedAt = DateTime.Now,
+				ProductOwnerId = p.UserId,
 				UpdatedAt = DateTime.Now
 			});
 
@@ -187,6 +189,8 @@ public class OrderRepository : IOrderRepository {
 				Tags = new List<TagOrder> { TagOrder.Pending },
 				UserId = _userId,
 				CreatedAt = DateTime.Now,
+				ProductOwnerId = p.UserId,
+				SendPrice = p.User!.JsonDetail.DeliveryPrice1,
 				UpdatedAt = DateTime.Now
 			});
 

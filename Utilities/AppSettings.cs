@@ -54,16 +54,12 @@ public class EnumDto {
 	public IEnumerable<IdTitleDto>? FormFieldType { get; set; }
 	public IEnumerable<IdTitleDto>? TransactionStatuses { get; set; }
 	public IEnumerable<IdTitleDto>? UtilitiesStatusCodes { get; set; }
-	public IEnumerable<IdTitleDto>? OtpResult { get; set; }
-	public IEnumerable<IdTitleDto>? OrderStatuses { get; set; }
-	public IEnumerable<IdTitleDto>? ProductStatus { get; set; }
 	public IEnumerable<IdTitleDto>? Currency { get; set; }
 	public IEnumerable<IdTitleDto>? SeenStatus { get; set; }
 	public IEnumerable<IdTitleDto>? Priority { get; set; }
 	public IEnumerable<IdTitleDto>? ChatStatus { get; set; }
 	public IEnumerable<IdTitleDto>? Reaction { get; set; }
 	public IEnumerable<IdTitleDto>? AgeCategory { get; set; }
-	public IEnumerable<IdTitleDto>? ReferenceIdType { get; set; }
 	public IEnumerable<IdTitleDto>? ChatTypes { get; set; }
 	public IEnumerable<IdTitleDto>? GenderType { get; set; }
 	public IEnumerable<IdTitleDto>? PrivacyType { get; set; }
@@ -75,5 +71,6 @@ public class EnumDto {
 	public IEnumerable<IdTitleDto>? TagContent { get; set; }
 	public IEnumerable<IdTitleDto>? TagNotification { get; set; }
 	public IEnumerable<IdTitleDto>? TagMedia { get; set; }
+	public IEnumerable<IdTitleDto>? TransactionType { get; set; }
 	public AppSettings? AppSettings { get; set; }
 }

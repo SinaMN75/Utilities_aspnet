@@ -23,7 +23,24 @@ public class ContentRepository : IContentRepository {
 			Description = dto.Description,
 			Title = dto.Title,
 			SubTitle = dto.SubTitle,
-			Tags = dto.Tags
+			Tags = dto.Tags,
+			JsonDetail = new ContentJsonDetail {
+				Instagram = dto.Instagram,
+				Telegram = dto.Telegram,
+				WhatsApp = dto.WhatsApp,
+				LinkedIn = dto.LinkedIn,
+				Dribble = dto.Dribble,
+				SoundCloud = dto.SoundCloud,
+				Pinterest = dto.Pinterest,
+				Website = dto.Website,
+				PhoneNumber1 = dto.PhoneNumber1,
+				PhoneNumber2 = dto.PhoneNumber2,
+				Address1 = dto.Address1,
+				Address2 = dto.Address2,
+				Address3 = dto.Address3,
+				Email1 = dto.Email1,
+				Email2 = dto.Email2
+			}
 		};
 		EntityEntry<ContentEntity> e = await _dbContext.Set<ContentEntity>().AddAsync(entity, ct);
 		await _dbContext.SaveChangesAsync(ct);

@@ -18,6 +18,7 @@ public class AppSettingsController : BaseApiController {
 			HashedDateTime = hashedDateTime,
 			FormFieldType = EnumExtension.GetValues<TagFormField>(),
 			TransactionStatuses = EnumExtension.GetValues<TransactionStatus>(),
+			TransactionType = EnumExtension.GetValues<TransactionType>(),
 			UtilitiesStatusCodes = EnumExtension.GetValues<UtilitiesStatusCodes>(),
 			Currency = EnumExtension.GetValues<Currency>(),
 			SeenStatus = EnumExtension.GetValues<SeenStatus>(),
