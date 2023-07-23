@@ -155,6 +155,7 @@ public class PaymentRepository : IPaymentRepository {
 		string authority,
 		string status) {
 		OrderEntity order = (await _dbContext.Set<OrderEntity>().Include(i => i.OrderDetails).FirstOrDefaultAsync(x => x.Id == orderId))!;
+		UserEntity productOwner = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == order.ProductOwnerId))!;
 		Payment payment = new(_appSettings.PaymentSettings.Id, order.TotalPrice!.Value);
 		if (!status.Equals("OK")) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 		PaymentVerificationResponse? verify = payment.Verification(authority).Result;
@@ -194,6 +195,8 @@ public class PaymentRepository : IPaymentRepository {
 			}
 		}
 
+		productOwner.Wallet += order.TotalPrice;
+		_dbContext.Update(productOwner);
 		_dbContext.Update(order);
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
