@@ -155,7 +155,7 @@ public class OrderRepository : IOrderRepository {
 			return new GenericResponse<OrderEntity?>(orderEntity.Entity);
 		}
 		if (o.OrderDetails != null && o.OrderDetails.Any(x => p.UserId == x.Product?.UserId)) {
-			OrderDetailEntity? od = await _dbContext.Set<OrderDetailEntity>().FirstOrDefaultAsync(x => x.ProductId == dto.ProductId);
+			OrderDetailEntity? od = await _dbContext.Set<OrderDetailEntity>().FirstOrDefaultAsync(x => x.ProductId == dto.ProductId && x.OrderId == o.Id);
 			if (od is null) {
 				if (dto.Count != 0) {
 					EntityEntry<OrderDetailEntity> orderDetailEntity = await _dbContext.Set<OrderDetailEntity>().AddAsync(new OrderDetailEntity {
