@@ -84,21 +84,18 @@ public class OrderRepository : IOrderRepository {
 		};
 	}
 
-    private async Task<OrderEntity> UpdateOrderPrice(OrderEntity order, IEnumerable<OrderDetailEntity>? orderDetails)
-    {
-		if(orderDetails != null)
-		{
-            foreach (var item in orderDetails.ToList())
-			{
+	private async Task<OrderEntity> UpdateOrderPrice(OrderEntity order, IEnumerable<OrderDetailEntity>? orderDetails) {
+		if (orderDetails != null) {
+			foreach (var item in orderDetails.ToList()) {
 				if (item.Product == null) continue;
-				if (order.ProductOwner != null) item.FinalPrice = item.Product.Price + order.ProductOwner.JsonDetail.DeliveryPrice1;  
-            }
+				if (order.ProductOwner != null) item.FinalPrice = item.Product.Price + order.ProductOwner.JsonDetail.DeliveryPrice1;
+			}
 			order.TotalPrice = orderDetails.Sum(s => s.FinalPrice);
-        }
+		}
 		return order;
-    }
+	}
 
-    public async Task<GenericResponse<OrderEntity>> ReadById(Guid id) {
+	public async Task<GenericResponse<OrderEntity>> ReadById(Guid id) {
 		OrderEntity? i = await _dbContext.Set<OrderEntity>()
 			.Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p!.Media)
 			.Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p!.Categories)
@@ -124,8 +121,8 @@ public class OrderRepository : IOrderRepository {
 		await _dbContext.Set<OrderEntity>().Where(i => i.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
 	}
-	
-		public async Task<GenericResponse<OrderEntity?>> CreateUpdateOrderDetail(OrderDetailCreateUpdateDto dto) {
+
+	public async Task<GenericResponse<OrderEntity?>> CreateUpdateOrderDetail(OrderDetailCreateUpdateDto dto) {
 		ProductEntity p = (await _dbContext.Set<ProductEntity>().Include(x => x.User).FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
 		OrderEntity? o = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails)
 			.FirstOrDefaultAsync(x => x.UserId == _userId && x.Tags.Contains(TagOrder.Pending) && x.OrderDetails!.Any(y => y.ProductId == p.Id));
@@ -209,10 +206,14 @@ public class OrderRepository : IOrderRepository {
 			return new GenericResponse<OrderEntity?>(orderEntity.Entity);
 		}
 
-		o.TotalPrice = 0;
-		foreach (OrderDetailEntity orderDetailEntity in o.OrderDetails) o.TotalPrice += orderDetailEntity.FinalPrice;
+		if (o.OrderDetails.IsNotNullOrEmpty())
+			_dbContext.Remove(o);
+		else {
+			o.TotalPrice = 0;
+			foreach (OrderDetailEntity orderDetailEntity in o.OrderDetails) o.TotalPrice += orderDetailEntity.FinalPrice;
+			_dbContext.Update(o);
+		}
 
-		_dbContext.Update(o);
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse<OrderEntity?>(o);
 	}
