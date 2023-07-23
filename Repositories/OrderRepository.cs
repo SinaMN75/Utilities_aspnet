@@ -206,8 +206,9 @@ public class OrderRepository : IOrderRepository {
 			return new GenericResponse<OrderEntity?>(orderEntity.Entity);
 		}
 
-		if (o.OrderDetails.IsNotNullOrEmpty())
+		if (o.OrderDetails.IsNullOrEmpty()) {
 			_dbContext.Remove(o);
+		}
 		else {
 			o.TotalPrice = 0;
 			foreach (OrderDetailEntity orderDetailEntity in o.OrderDetails) o.TotalPrice += orderDetailEntity.FinalPrice;
