@@ -118,7 +118,8 @@ public class ProductRepository : IProductRepository {
 			q = q.Where(w => w.User!.IsPrivate == false);
 		}
 		if (dto.ShowChildren.IsTrue()) q = q.Include(i => i.Children)!.ThenInclude(x => x.Media);
-		if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories);
+		if (dto.ShowChildrenParent.IsTrue()) q = q.Include(x => x.Parent).ThenInclude(x => x!.Children);
+        if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories);
 		if (dto.ShowComments.IsTrue()) q = q.Include(i => i.Comments!.Where(x => x.Parent == null));
 		if (dto.ShowCategoriesFormFields.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.FormFields);
 		if (dto.ShowCategoryMedia.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.Media);
@@ -157,10 +158,9 @@ public class ProductRepository : IProductRepository {
 
 		q = q.Include(x => x.Parent).ThenInclude(x => x!.Categories);
 		q = q.Include(x => x.Parent).ThenInclude(x => x!.Media);
-		q = q.Include(x => x.Parent).ThenInclude(x => x!.Children);
 		q = q.Include(x => x.Parent).ThenInclude(x => x!.User).ThenInclude(x => x!.Media);
 
-		int totalCount = q.Count();
+        int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
         if (dto.ShowCountOfComment.IsTrue())
