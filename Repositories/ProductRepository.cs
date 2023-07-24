@@ -157,6 +157,7 @@ public class ProductRepository : IProductRepository {
 
 		q = q.Include(x => x.Parent).ThenInclude(x => x!.Categories);
 		q = q.Include(x => x.Parent).ThenInclude(x => x!.Media);
+		q = q.Include(x => x.Parent).ThenInclude(x => x!.Children);
 		q = q.Include(x => x.Parent).ThenInclude(x => x!.User).ThenInclude(x => x!.Media);
 
 		int totalCount = q.Count();
@@ -196,6 +197,8 @@ public class ProductRepository : IProductRepository {
 			.Include(i => i.ProductInsights)
 			.Include(i => i.Parent).ThenInclude(i => i!.Categories)
 			.Include(i => i.Parent).ThenInclude(i => i!.Media)
+			.Include(i => i.Parent).ThenInclude(i => i!.Children)
+			.Include(i => i.Comments)
 			.Include(i => i.Parent).ThenInclude(i => i!.User).ThenInclude(i => i!.Media)
 			.FirstOrDefaultAsync(i => i.Id == id, ct);
 		if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound);
