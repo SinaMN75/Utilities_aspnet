@@ -109,7 +109,7 @@ public class ProductRepository : IProductRepository {
 			q = q.Where(x => (x.Title ?? "").Contains(dto.Query!) || (x.Subtitle ?? "").Contains(dto.Query!) || (x.Description ?? "").Contains(dto.Query!));
 
 		if (dto.Categories.IsNotNullOrEmpty()) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
-		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => x.Tags!.All(y => dto.Tags!.Contains(y)));
+		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags.IsNotNullOrEmpty() && dto.Tags!.All(a=> x.Tags!.Contains(a)));
 		if (dto.UserIds.IsNotNullOrEmpty()) q = q.Where(x => dto.UserIds!.Contains(x.UserId));
 
 		if (dto.ShowPostOfPrivateUser != null && !dto.ShowPostOfPrivateUser.Value) {
@@ -162,7 +162,22 @@ public class ProductRepository : IProductRepository {
 		int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
-		return new GenericResponse<IQueryable<ProductEntity>>(q) {
+        if (dto.ShowCountOfComment.IsTrue())
+        {
+            var tempQ = q.ToList();
+            foreach (var item in tempQ)
+			{
+				var comments = _commentRepository.ReadByProductId(item.Id);
+				if(comments.Result != null)
+				{
+					item.CommentsCount = comments.Result.Where(w => w.ParentId == null).Count();
+				}
+			}
+            q = null;
+            q = tempQ.AsQueryable();
+        }
+
+        return new GenericResponse<IQueryable<ProductEntity>>(q) {
 			TotalCount = totalCount,
 			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
 			PageSize = dto.PageSize
