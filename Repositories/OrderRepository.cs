@@ -61,7 +61,7 @@ public class OrderRepository : IOrderRepository {
 				q = q.Where(w => w.OrderType == dto.OrderType.Value);
 		int totalCount = q.Count();
 
-		/*
+
 		var tempQ = q.Where(w => w.PayDateTime == null).Include(x => x.ProductOwner).ToList();
 		List<OrderEntity> finalQ = new();
 		foreach (var item in tempQ)
@@ -73,7 +73,7 @@ public class OrderRepository : IOrderRepository {
 		}
 		q = null;
 		q = finalQ.AsQueryable();
-		*/
+
 
 		//q = q.AsNoTracking().Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
@@ -104,14 +104,14 @@ public class OrderRepository : IOrderRepository {
 			.Include(i => i.ProductOwner).ThenInclude(i => i!.Media)
 			.AsNoTracking()
 			.FirstOrDefaultAsync(i => i.Id == id);
-		/*
-        if(i != null)
+
+		if (i != null)
 		{
-            i = await UpdateOrderPrice(i, i.OrderDetails);
-            _dbContext.Update(i);
+			i = await UpdateOrderPrice(i, i.OrderDetails);
+			_dbContext.Update(i);
 			await _dbContext.SaveChangesAsync();
-        }
-		*/
+		}
+
 
 		return new GenericResponse<OrderEntity>(i!);
 	}
