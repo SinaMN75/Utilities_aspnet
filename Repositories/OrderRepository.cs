@@ -124,8 +124,8 @@ public class OrderRepository : IOrderRepository {
 
 	public async Task<GenericResponse<OrderEntity?>> CreateUpdateOrderDetail(OrderDetailCreateUpdateDto dto) {
 		ProductEntity p = (await _dbContext.Set<ProductEntity>().Include(x => x.User).FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
-		OrderEntity? o = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails)
-			.FirstOrDefaultAsync(x => x.UserId == _userId && x.Tags.Contains(TagOrder.Pending) && x.OrderDetails!.Any(y => y.ProductId == p.Id));
+		OrderEntity? o = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails).ThenInclude(x=> x.Product)
+			.FirstOrDefaultAsync(x => x.UserId == _userId && x.Tags.Contains(TagOrder.Pending) && x.OrderDetails!.Any(y => y.Product!.UserId == p.UserId));
 
 		if (dto.Count >= p.Stock) return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.OutOfStock);
 
@@ -153,58 +153,66 @@ public class OrderRepository : IOrderRepository {
 			await _dbContext.SaveChangesAsync();
 			return new GenericResponse<OrderEntity?>(orderEntity.Entity);
 		}
-		if (o.OrderDetails != null && o.OrderDetails.Any(x => p.UserId == x.Product?.UserId)) {
-			OrderDetailEntity? od = await _dbContext.Set<OrderDetailEntity>().FirstOrDefaultAsync(x => x.ProductId == dto.ProductId && x.OrderId == o.Id);
-			if (od is null) {
-				if (dto.Count != 0) {
-					EntityEntry<OrderDetailEntity> orderDetailEntity = await _dbContext.Set<OrderDetailEntity>().AddAsync(new OrderDetailEntity {
-						OrderId = o.Id,
-						Count = dto.Count,
-						ProductId = dto.ProductId,
-						UnitPrice = p.Price,
-						FinalPrice = dto.Count * p.Price,
-						CreatedAt = DateTime.Now,
-						UpdatedAt = DateTime.Now
-					});
-					await _dbContext.Set<OrderDetailEntity>().AddAsync(orderDetailEntity.Entity);
-				}
-			}
-			else {
-				if (dto.Count == 0) {
-					_dbContext.Remove(od);
-					await _dbContext.SaveChangesAsync();
-				}
-				else {
-					od.Count = dto.Count;
-					od.FinalPrice = dto.Count * p.Price;
-					_dbContext.Update(od);
-				}
-			}
-		}
+		if (o.OrderDetails != null && o.OrderDetails.Any(x => p.UserId != x.Product?.UserId)) {
+            EntityEntry<OrderEntity> orderEntity = await _dbContext.Set<OrderEntity>().AddAsync(new OrderEntity
+            {
+                Tags = new List<TagOrder> { TagOrder.Pending },
+                UserId = _userId,
+                CreatedAt = DateTime.Now,
+                ProductOwnerId = p.UserId,
+                SendPrice = p.User!.JsonDetail.DeliveryPrice1,
+                UpdatedAt = DateTime.Now
+            });
+
+            EntityEntry<OrderDetailEntity> orderDetailEntity = await _dbContext.Set<OrderDetailEntity>().AddAsync(new OrderDetailEntity
+            {
+                OrderId = orderEntity.Entity.Id,
+                Count = dto.Count,
+                ProductId = dto.ProductId,
+                UnitPrice = p.Price,
+                FinalPrice = dto.Count * p.Price,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            });
+            orderEntity.Entity.TotalPrice = orderDetailEntity.Entity.FinalPrice;
+
+            await _dbContext.SaveChangesAsync();
+            return new GenericResponse<OrderEntity?>(orderEntity.Entity);
+        }
 		else {
-			EntityEntry<OrderEntity> orderEntity = await _dbContext.Set<OrderEntity>().AddAsync(new OrderEntity {
-				Tags = new List<TagOrder> { TagOrder.Pending },
-				UserId = _userId,
-				CreatedAt = DateTime.Now,
-				ProductOwnerId = p.UserId,
-				SendPrice = p.User!.JsonDetail.DeliveryPrice1,
-				UpdatedAt = DateTime.Now
-			});
-
-			EntityEntry<OrderDetailEntity> orderDetailEntity = await _dbContext.Set<OrderDetailEntity>().AddAsync(new OrderDetailEntity {
-				OrderId = orderEntity.Entity.Id,
-				Count = dto.Count,
-				ProductId = dto.ProductId,
-				UnitPrice = p.Price,
-				FinalPrice = dto.Count * p.Price,
-				CreatedAt = DateTime.Now,
-				UpdatedAt = DateTime.Now
-			});
-			orderEntity.Entity.TotalPrice = orderDetailEntity.Entity.FinalPrice;
-
-			await _dbContext.SaveChangesAsync();
-			return new GenericResponse<OrderEntity?>(orderEntity.Entity);
-		}
+            OrderDetailEntity? od = await _dbContext.Set<OrderDetailEntity>().FirstOrDefaultAsync(x => x.ProductId == dto.ProductId && x.OrderId == o.Id);
+            if (od is null)
+            {
+                if (dto.Count != 0)
+                {
+                    EntityEntry<OrderDetailEntity> orderDetailEntity = await _dbContext.Set<OrderDetailEntity>().AddAsync(new OrderDetailEntity
+                    {
+                        OrderId = o.Id,
+                        Count = dto.Count,
+                        ProductId = dto.ProductId,
+                        UnitPrice = p.Price,
+                        FinalPrice = dto.Count * p.Price,
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now
+                    });
+                    await _dbContext.Set<OrderDetailEntity>().AddAsync(orderDetailEntity.Entity);
+                }
+            }
+            else
+            {
+                if (dto.Count == 0)
+                {
+                    _dbContext.Remove(od);
+                    await _dbContext.SaveChangesAsync();
+                }
+                else
+                {
+                    od.Count = dto.Count;
+                    od.FinalPrice = dto.Count * p.Price;
+                    _dbContext.Update(od);
+                }
+            }
+        }
 
 		if (o.OrderDetails.IsNullOrEmpty()) {
 			_dbContext.Remove(o);
