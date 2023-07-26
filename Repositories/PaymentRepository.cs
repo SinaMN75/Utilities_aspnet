@@ -154,7 +154,7 @@ public class PaymentRepository : IPaymentRepository {
 		Guid orderId,
 		string authority,
 		string status) {
-		OrderEntity order = (await _dbContext.Set<OrderEntity>().Include(i => i.OrderDetails).FirstOrDefaultAsync(x => x.Id == orderId))!;
+		OrderEntity order = (await _dbContext.Set<OrderEntity>().Include(i => i.OrderDetails).ThenInclude(x=>x.Product).FirstOrDefaultAsync(x => x.Id == orderId))!;
 		UserEntity productOwner = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == order.ProductOwnerId))!;
 		Payment payment = new(_appSettings.PaymentSettings.Id, order.TotalPrice!.Value);
 		if (!status.Equals("OK")) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
@@ -196,8 +196,22 @@ public class PaymentRepository : IPaymentRepository {
 		}
 
 		productOwner.Wallet += order.TotalPrice;
+
 		_dbContext.Update(productOwner);
 		_dbContext.Update(order);
+		TransactionEntity prOwnerTransaction = new()
+		{
+			Amount = order.TotalPrice,
+			Authority = authority,
+			CreatedAt = DateTime.Now,
+			UpdatedAt = DateTime.Now,
+			Descriptions = $"پرداختی بابت سفارش محصول {order.OrderDetails.Select(s => s.Product.Title).ToList()}",
+			GatewayName = pay?.GatewayName ?? "",
+			OrderId = order.Id,
+			TransactionType = TransactionType.Sell,
+			UserId = productOwner.Id
+		};
+		await _dbContext.AddAsync(prOwnerTransaction);
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}

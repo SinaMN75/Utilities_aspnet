@@ -51,13 +51,9 @@ public class UserRepository : IUserRepository {
 			if (myUser.FollowingUsers.Contains(entity.Id)) entity.IsFollowing = true;
 		}
 
-		foreach (string i in entity.FollowingUsers.Split(","))
-			if (i.Length >= 10)
-				entity.CountFollowing += 1;
-		foreach (string i in entity.FollowedUsers.Split(","))
-			if (i.Length >= 10)
-				entity.CountFollowers += 1;
-
+		entity.CountFollowing = entity.FollowingUsers.Split(",").ToList().Where(w => w.Length >= 10).Count();
+		entity.CountFollowers = entity.FollowedUsers.Split(",").ToList().Where(w => w.Length >= 10).Count();
+		
 		return new GenericResponse<UserEntity?>(entity);
 	}
 
