@@ -60,8 +60,8 @@ public class CategoryRepository : ICategoryRepository {
 		if (dto.TitleTr1.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr1!.Contains(dto.TitleTr1!));
 		if (dto.TitleTr2.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr2!.Contains(dto.TitleTr2!));
 		if (dto.ParentId != null) q = q.Where(x => x.ParentId == dto.ParentId);
-		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => x.Tags! == dto.Tags);
-
+		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => x.Tags!.Count != 0 && x.Tags.Any(y => dto.Tags!.Contains(y)));
+		
 		if (dto.OrderByOrder.IsTrue()) q = q.OrderBy(x => x.Order);
 		if (dto.OrderByOrderDescending.IsTrue()) q = q.OrderByDescending(x => x.Order);
 		if (dto.OrderByCreatedAtDescending.IsTrue()) q = q.OrderByDescending(x => x.Order);

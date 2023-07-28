@@ -44,7 +44,7 @@ public class NotificationRepository : INotificationRepository {
 		if (dto.CreatorUserId.IsNotNullOrEmpty()) q = q.Where(x => (x.CreatorUserId ?? "").Contains(dto.CreatorUserId!));
 		if (dto.UseCase.IsNotNullOrEmpty()) q = q.Where(x => (x.UseCase ?? "").Contains(dto.UseCase!));
 		if (dto.Message.IsNotNullOrEmpty()) q = q.Where(x => (x.Message ?? "").Contains(dto.Message!));
-		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => x.Tags! == dto.Tags);
+		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => x.Tags!.Count != 0 && x.Tags.Any(y => dto.Tags!.Contains(y)));
 
 		int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize).AsNoTracking();
