@@ -60,9 +60,9 @@ public class CategoryRepository : ICategoryRepository {
 		if (dto.TitleTr1.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr1!.Contains(dto.TitleTr1!));
 		if (dto.TitleTr2.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr2!.Contains(dto.TitleTr2!));
 		if (dto.ParentId != null) q = q.Where(x => x.ParentId == dto.ParentId);
-		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => x.Tags!.All(y => dto.Tags!.Contains(y)));
+        if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(a => x.Tags!.Contains(a)));
 
-		if (dto.OrderByOrder.IsTrue()) q = q.OrderBy(x => x.Order);
+        if (dto.OrderByOrder.IsTrue()) q = q.OrderBy(x => x.Order);
 		if (dto.OrderByOrderDescending.IsTrue()) q = q.OrderByDescending(x => x.Order);
 		if (dto.OrderByCreatedAtDescending.IsTrue()) q = q.OrderByDescending(x => x.Order);
 		if (dto.OrderByCreatedAt.IsTrue()) q = q.OrderBy(x => x.CreatedAt);
@@ -74,7 +74,7 @@ public class CategoryRepository : ICategoryRepository {
 	}
 
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
-		CategoryEntity i = (await _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == id, ct))!;
+		CategoryEntity i = (await _dbContext.Set<CategoryEntity>().Include(x=>x.Children).Include(x=>x.Media).FirstOrDefaultAsync(x => x.Id == id, ct))!;
 		foreach (CategoryEntity c in i.Children ?? new List<CategoryEntity>()) {
 			_dbContext.Remove(c);
 			await _mediaRepository.DeleteMedia(c.Media);
