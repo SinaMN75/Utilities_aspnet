@@ -62,7 +62,7 @@ public class CategoryRepository : ICategoryRepository {
 		if (dto.ParentId != null) q = q.Where(x => x.ParentId == dto.ParentId);
         if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(a => x.Tags!.Contains(a)));
 
-        if (dto.OrderByOrder.IsTrue()) q = q.OrderBy(x => x.Order);
+		if (dto.OrderByOrder.IsTrue()) q = q.OrderBy(x => x.Order);
 		if (dto.OrderByOrderDescending.IsTrue()) q = q.OrderByDescending(x => x.Order);
 		if (dto.OrderByCreatedAtDescending.IsTrue()) q = q.OrderByDescending(x => x.Order);
 		if (dto.OrderByCreatedAt.IsTrue()) q = q.OrderBy(x => x.CreatedAt);
