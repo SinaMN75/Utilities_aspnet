@@ -20,8 +20,7 @@ public class OrderRepository : IOrderRepository {
 	}
 
 	public async Task<GenericResponse<OrderEntity?>> Update(OrderCreateUpdateDto dto) {
-		OrderEntity? oldOrder = await _dbContext.Set<OrderEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id);
-		if (oldOrder == null) return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.NotFound);
+		OrderEntity oldOrder = (await _dbContext.Set<OrderEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id))!;
 
 		oldOrder.Description = dto.Description ?? oldOrder.Description;
 		oldOrder.ReceivedDate = dto.ReceivedDate ?? oldOrder.ReceivedDate;
@@ -127,7 +126,7 @@ public class OrderRepository : IOrderRepository {
 		OrderEntity? o = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails).ThenInclude(x=> x.Product)
 			.FirstOrDefaultAsync(x => x.UserId == _userId && x.Tags.Contains(TagOrder.Pending) && x.OrderDetails!.Any(y => y.Product!.UserId == p.UserId));
 
-		if (dto.Count >= p.Stock) return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.OutOfStock);
+		if (dto.Count > (p.Stock ?? 0)) return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.OutOfStock);
 
 		if (o is null) {
 			EntityEntry<OrderEntity> orderEntity = await _dbContext.Set<OrderEntity>().AddAsync(new OrderEntity {

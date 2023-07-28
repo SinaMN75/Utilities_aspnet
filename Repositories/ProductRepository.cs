@@ -109,7 +109,7 @@ public class ProductRepository : IProductRepository {
 			q = q.Where(x => (x.Title ?? "").Contains(dto.Query!) || (x.Subtitle ?? "").Contains(dto.Query!) || (x.Description ?? "").Contains(dto.Query!));
 
 		if (dto.Categories.IsNotNullOrEmpty()) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
-		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(a=> x.Tags!.Contains(a)));
+		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => x.Tags!.All(y => x.Tags!.Contains(y)));
 		if (dto.UserIds.IsNotNullOrEmpty()) q = q.Where(x => dto.UserIds!.Contains(x.UserId));
 
 		if (dto.ShowPostOfPrivateUser != null && !dto.ShowPostOfPrivateUser.Value) {
