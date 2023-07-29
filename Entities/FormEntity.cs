@@ -36,7 +36,7 @@ public class FormFieldEntity : BaseEntity {
 	public bool? IsRequired { get; set; } = false;
 
 	[StringLength(2000)]
-	public string? OptionList { get; set; }
+	public List<string>? OptionList { get; set; } = new();
 
 	public TagFormField? Type { get; set; }
 
@@ -47,6 +47,8 @@ public class FormFieldEntity : BaseEntity {
 	public CategoryEntity? Category { get; set; }
 
 	[InverseProperty(nameof(FormEntity.FormField))]
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public IEnumerable<FormEntity>? Forms { get; set; }
 }
 
