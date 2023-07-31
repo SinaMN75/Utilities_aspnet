@@ -60,19 +60,15 @@ public class OrderRepository : IOrderRepository {
 				q = q.Where(w => w.OrderType == dto.OrderType.Value);
 		int totalCount = q.Count();
 
-
-		var tempQ = q.Where(w => w.PayDateTime == null).Include(x => x.ProductOwner).ToList();
+		List<OrderEntity> tempQ = q.Where(w => w.PayDateTime == null).Include(x => x.ProductOwner).ToList();
 		List<OrderEntity> finalQ = new();
-		foreach (var item in tempQ)
-		{
-			var order = await UpdateOrderPrice(item, item.OrderDetails);
+		foreach (OrderEntity item in tempQ) {
+			OrderEntity order = UpdateOrderPrice(item, item.OrderDetails);
 			_dbContext.Update(order);
 			await _dbContext.SaveChangesAsync();
 			finalQ.Add(order);
 		}
-		q = null;
 		q = finalQ.AsQueryable();
-
 
 		//q = q.AsNoTracking().Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
@@ -81,17 +77,6 @@ public class OrderRepository : IOrderRepository {
 			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
 			PageSize = dto.PageSize
 		};
-	}
-
-	private async Task<OrderEntity> UpdateOrderPrice(OrderEntity order, IEnumerable<OrderDetailEntity>? orderDetails) {
-		if (orderDetails != null) {
-			foreach (var item in orderDetails.ToList()) {
-				if (item.Product == null) continue;
-				if (order.ProductOwner != null) item.FinalPrice = item.Product.Price + order.ProductOwner.JsonDetail.DeliveryPrice1;
-			}
-			order.TotalPrice = orderDetails.Sum(s => s.FinalPrice);
-		}
-		return order;
 	}
 
 	public async Task<GenericResponse<OrderEntity>> ReadById(Guid id) {
@@ -104,13 +89,11 @@ public class OrderRepository : IOrderRepository {
 			.AsNoTracking()
 			.FirstOrDefaultAsync(i => i.Id == id);
 
-		if (i != null)
-		{
-			i = await UpdateOrderPrice(i, i.OrderDetails);
+		if (i != null) {
+			i = UpdateOrderPrice(i, i.OrderDetails);
 			_dbContext.Update(i);
 			await _dbContext.SaveChangesAsync();
 		}
-
 
 		return new GenericResponse<OrderEntity>(i!);
 	}
@@ -123,7 +106,7 @@ public class OrderRepository : IOrderRepository {
 
 	public async Task<GenericResponse<OrderEntity?>> CreateUpdateOrderDetail(OrderDetailCreateUpdateDto dto) {
 		ProductEntity p = (await _dbContext.Set<ProductEntity>().Include(x => x.User).FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
-		OrderEntity? o = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails).ThenInclude(x=> x.Product)
+		OrderEntity? o = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails).ThenInclude(x => x.Product)
 			.FirstOrDefaultAsync(x => x.UserId == _userId && x.Tags.Contains(TagOrder.Pending) && x.OrderDetails!.Any(y => y.Product!.UserId == p.UserId));
 
 		if (dto.Count > (p.Stock ?? 0)) return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.OutOfStock);
@@ -153,69 +136,57 @@ public class OrderRepository : IOrderRepository {
 			return new GenericResponse<OrderEntity?>(orderEntity.Entity);
 		}
 		if (o.OrderDetails != null && o.OrderDetails.Any(x => p.UserId != x.Product?.UserId)) {
-            EntityEntry<OrderEntity> orderEntity = await _dbContext.Set<OrderEntity>().AddAsync(new OrderEntity
-            {
-                Tags = new List<TagOrder> { TagOrder.Pending },
-                UserId = _userId,
-                CreatedAt = DateTime.Now,
-                ProductOwnerId = p.UserId,
-                SendPrice = p.User!.JsonDetail.DeliveryPrice1,
-                UpdatedAt = DateTime.Now
-            });
+			EntityEntry<OrderEntity> orderEntity = await _dbContext.Set<OrderEntity>().AddAsync(new OrderEntity {
+				Tags = new List<TagOrder> { TagOrder.Pending },
+				UserId = _userId,
+				CreatedAt = DateTime.Now,
+				ProductOwnerId = p.UserId,
+				SendPrice = p.User!.JsonDetail.DeliveryPrice1,
+				UpdatedAt = DateTime.Now
+			});
 
-            EntityEntry<OrderDetailEntity> orderDetailEntity = await _dbContext.Set<OrderDetailEntity>().AddAsync(new OrderDetailEntity
-            {
-                OrderId = orderEntity.Entity.Id,
-                Count = dto.Count,
-                ProductId = dto.ProductId,
-                UnitPrice = p.Price,
-                FinalPrice = dto.Count * p.Price,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
-            });
-            orderEntity.Entity.TotalPrice = orderDetailEntity.Entity.FinalPrice;
+			EntityEntry<OrderDetailEntity> orderDetailEntity = await _dbContext.Set<OrderDetailEntity>().AddAsync(new OrderDetailEntity {
+				OrderId = orderEntity.Entity.Id,
+				Count = dto.Count,
+				ProductId = dto.ProductId,
+				UnitPrice = p.Price,
+				FinalPrice = dto.Count * p.Price,
+				CreatedAt = DateTime.Now,
+				UpdatedAt = DateTime.Now
+			});
+			orderEntity.Entity.TotalPrice = orderDetailEntity.Entity.FinalPrice;
 
-            await _dbContext.SaveChangesAsync();
-            return new GenericResponse<OrderEntity?>(orderEntity.Entity);
-        }
-		else {
-            OrderDetailEntity? od = await _dbContext.Set<OrderDetailEntity>().FirstOrDefaultAsync(x => x.ProductId == dto.ProductId && x.OrderId == o.Id);
-            if (od is null)
-            {
-                if (dto.Count != 0)
-                {
-                    EntityEntry<OrderDetailEntity> orderDetailEntity = await _dbContext.Set<OrderDetailEntity>().AddAsync(new OrderDetailEntity
-                    {
-                        OrderId = o.Id,
-                        Count = dto.Count,
-                        ProductId = dto.ProductId,
-                        UnitPrice = p.Price,
-                        FinalPrice = dto.Count * p.Price,
-                        CreatedAt = DateTime.Now,
-                        UpdatedAt = DateTime.Now
-                    });
-                    await _dbContext.Set<OrderDetailEntity>().AddAsync(orderDetailEntity.Entity);
-                }
-            }
-            else
-            {
-                if (dto.Count == 0)
-                {
-                    _dbContext.Remove(od);
-                    await _dbContext.SaveChangesAsync();
-                }
-                else
-                {
-                    od.Count = dto.Count;
-                    od.FinalPrice = dto.Count * p.Price;
-                    _dbContext.Update(od);
-                }
-            }
-        }
-
-		if (o.OrderDetails.IsNullOrEmpty()) {
-			_dbContext.Remove(o);
+			await _dbContext.SaveChangesAsync();
+			return new GenericResponse<OrderEntity?>(orderEntity.Entity);
 		}
+		OrderDetailEntity? od = await _dbContext.Set<OrderDetailEntity>().FirstOrDefaultAsync(x => x.ProductId == dto.ProductId && x.OrderId == o.Id);
+		if (od is null) {
+			if (dto.Count != 0) {
+				EntityEntry<OrderDetailEntity> orderDetailEntity = await _dbContext.Set<OrderDetailEntity>().AddAsync(new OrderDetailEntity {
+					OrderId = o.Id,
+					Count = dto.Count,
+					ProductId = dto.ProductId,
+					UnitPrice = p.Price,
+					FinalPrice = dto.Count * p.Price,
+					CreatedAt = DateTime.Now,
+					UpdatedAt = DateTime.Now
+				});
+				await _dbContext.Set<OrderDetailEntity>().AddAsync(orderDetailEntity.Entity);
+			}
+		}
+		else {
+			if (dto.Count == 0) {
+				_dbContext.Remove(od);
+				await _dbContext.SaveChangesAsync();
+			}
+			else {
+				od.Count = dto.Count;
+				od.FinalPrice = dto.Count * p.Price;
+				_dbContext.Update(od);
+			}
+		}
+
+		if (o.OrderDetails.IsNullOrEmpty()) { _dbContext.Remove(o); }
 		else {
 			o.TotalPrice = 0;
 			foreach (OrderDetailEntity orderDetailEntity in o.OrderDetails) o.TotalPrice += orderDetailEntity.FinalPrice;
@@ -325,5 +296,17 @@ public class OrderRepository : IOrderRepository {
 		_dbContext.Update(orderDetail);
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
+	}
+
+	private static OrderEntity UpdateOrderPrice(OrderEntity order, IEnumerable<OrderDetailEntity>? orderDetails) {
+		if (orderDetails != null) {
+			List<OrderDetailEntity> orderDetailEntities = orderDetails.ToList();
+			foreach (OrderDetailEntity item in orderDetailEntities) {
+				if (item.Product == null) continue;
+				if (order.ProductOwner != null) item.FinalPrice = item.Product.Price + order.ProductOwner.JsonDetail.DeliveryPrice1;
+			}
+			order.TotalPrice = orderDetailEntities.Sum(s => s.FinalPrice);
+		}
+		return order;
 	}
 }

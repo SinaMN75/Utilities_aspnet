@@ -13,7 +13,6 @@ global using System.Security.Claims;
 global using System.IO.Compression;
 global using System.Security.Cryptography;
 global using System.Threading.RateLimiting;
-global using System.Net.Http.Headers;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.AspNetCore.Http;
 global using Microsoft.AspNetCore.Builder;

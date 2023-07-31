@@ -20,10 +20,8 @@ public class AppSettings {
 public class SmsPanelSettings {
 	public string? Provider { get; set; }
 	public string? UserName { get; set; }
-	public string? LineNumber { get; set; }
 	public string? SmsApiKey { get; set; }
 	public string? SmsSecret { get; set; }
-	public int? OtpId { get; set; }
 	public string? PatternCode { get; set; }
 }
 
@@ -50,7 +48,6 @@ public class IdTitleDto {
 
 public class EnumDto {
 	public DateTime? DateTime { get; set; }
-	public string? HashedDateTime { get; set; }
 	public IEnumerable<IdTitleDto>? FormFieldType { get; set; }
 	public IEnumerable<IdTitleDto>? TransactionStatuses { get; set; }
 	public IEnumerable<IdTitleDto>? UtilitiesStatusCodes { get; set; }

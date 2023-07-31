@@ -51,16 +51,16 @@ public class UserRepository : IUserRepository {
 			if (myUser.FollowingUsers.Contains(entity.Id)) entity.IsFollowing = true;
 		}
 
-		entity.CountFollowing = entity.FollowingUsers.Split(",").ToList().Where(w => w.Length >= 10).Count();
-		entity.CountFollowers = entity.FollowedUsers.Split(",").ToList().Where(w => w.Length >= 10).Count();
-		
+		entity.CountFollowing = entity.FollowingUsers.Split(",").Count(w => w.Length >= 10);
+		entity.CountFollowers = entity.FollowedUsers.Split(",").Count(w => w.Length >= 10);
+
 		return new GenericResponse<UserEntity?>(entity);
 	}
 
 	public async Task<GenericResponse<UserEntity?>> Update(UserCreateUpdateDto dto) {
 		UserEntity? entity = await _dbContext.Set<UserEntity>().Include(x => x.Categories).FirstOrDefaultAsync(x => x.Id == dto.Id);
 		if (entity == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
-		FillUserData(dto, entity);
+		await FillUserData(dto, entity);
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse<UserEntity?>(entity);
 	}
@@ -312,7 +312,7 @@ public class UserRepository : IUserRepository {
 		return token;
 	}
 
-	private void FillUserData(UserCreateUpdateDto dto, UserEntity entity) {
+	private async Task FillUserData(UserCreateUpdateDto dto, UserEntity entity) {
 		entity.FirstName = dto.FirstName ?? entity.FirstName;
 		entity.LastName = dto.LastName ?? entity.LastName;
 		entity.FullName = dto.FullName ?? entity.FullName;
@@ -358,13 +358,13 @@ public class UserRepository : IUserRepository {
 			Code = dto.Code ?? entity.JsonDetail.Code,
 			DeliveryPrice1 = dto.DeliveryPrice1 ?? entity.JsonDetail.DeliveryPrice1,
 			DeliveryPrice2 = dto.DeliveryPrice2 ?? entity.JsonDetail.DeliveryPrice2,
-			DeliveryPrice3 = dto.DeliveryPrice3 ?? entity.JsonDetail.DeliveryPrice3,
+			DeliveryPrice3 = dto.DeliveryPrice3 ?? entity.JsonDetail.DeliveryPrice3
 		};
 
 		if (dto.Categories.IsNotNullOrEmpty()) {
 			List<CategoryEntity> list = new();
 			foreach (Guid item in dto.Categories!) {
-				CategoryEntity? e = _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item).Result;
+				CategoryEntity? e = await _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item);
 				if (e != null) list.Add(e);
 			}
 

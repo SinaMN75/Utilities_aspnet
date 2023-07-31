@@ -12,7 +12,7 @@ public class DiscountEntity : BaseEntity {
 	public int NumberUses { get; set; } = 1000;
 	public DateTime StartDate { get; set; } = new(2020);
 	public DateTime EndDate { get; set; } = new(2040);
-	
+
 	public UserEntity? User { get; set; }
 	public string? UserId { get; set; }
 }

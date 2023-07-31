@@ -13,6 +13,7 @@ public interface IProductRepository {
 }
 
 public class ProductRepository : IProductRepository {
+	private readonly ICommentRepository _commentRepository;
 	private readonly IConfiguration _config;
 	private readonly DbContext _dbContext;
 	private readonly IFormRepository _formRepository;
@@ -20,7 +21,6 @@ public class ProductRepository : IProductRepository {
 	private readonly IPromotionRepository _promotionRepository;
 	private readonly string? _userId;
 	private readonly IUserRepository _userRepository;
-	private readonly ICommentRepository _commentRepository;
 
 	public ProductRepository(
 		DbContext dbContext,
@@ -119,9 +119,8 @@ public class ProductRepository : IProductRepository {
 		}
 		if (dto.ShowChildren.IsTrue()) q = q.Include(i => i.Children)!.ThenInclude(x => x.Media);
 		if (dto.ShowChildrenParent.IsTrue()) q = q.Include(x => x.Parent).ThenInclude(x => x!.Children);
-        if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories);
+		if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories);
 		if (dto.ShowComments.IsTrue()) q = q.Include(i => i.Comments!.Where(x => x.Parent == null));
-		if (dto.ShowCategoriesFormFields.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.FormFields);
 		if (dto.ShowCategoryMedia.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.Media);
 		if (dto.ShowForms.IsTrue()) q = q.Include(i => i.Forms);
 		if (dto.ShowFormFields.IsTrue()) q = q.Include(i => i.Forms)!.ThenInclude(i => i.FormField);
@@ -160,25 +159,19 @@ public class ProductRepository : IProductRepository {
 		q = q.Include(x => x.Parent).ThenInclude(x => x!.Media);
 		q = q.Include(x => x.Parent).ThenInclude(x => x!.User).ThenInclude(x => x!.Media);
 
-        int totalCount = q.Count();
+		int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
-        if (dto.ShowCountOfComment.IsTrue())
-        {
-            var tempQ = q.ToList();
-            foreach (var item in tempQ)
-			{
-				var comments = _commentRepository.ReadByProductId(item.Id);
-				if(comments.Result != null)
-				{
-					item.CommentsCount = comments.Result.Where(w => w.ParentId == null).Count();
-				}
+		if (dto.ShowCountOfComment.IsTrue()) {
+			List<ProductEntity> tempQ = q.ToList();
+			foreach (ProductEntity item in tempQ) {
+				GenericResponse<IQueryable<CommentEntity>?> comments = _commentRepository.ReadByProductId(item.Id);
+				if (comments.Result != null) item.CommentsCount = comments.Result.Count(w => w.ParentId == null);
 			}
-            q = null;
-            q = tempQ.AsQueryable();
-        }
+			q = tempQ.AsQueryable();
+		}
 
-        return new GenericResponse<IQueryable<ProductEntity>>(q) {
+		return new GenericResponse<IQueryable<ProductEntity>>(q) {
 			TotalCount = totalCount,
 			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
 			PageSize = dto.PageSize
@@ -253,13 +246,13 @@ public class ProductRepository : IProductRepository {
 
 		ProductEntity e = await entity.FillData(dto, _dbContext);
 		_dbContext.Update(e);
-		
+
 		if (dto.Children is not null)
 			foreach (ProductCreateUpdateDto childDto in dto.Children) {
 				childDto.ParentId = dto.ParentId;
 				await Update(childDto, ct);
 			}
-		
+
 		await _dbContext.SaveChangesAsync(ct);
 
 		return new GenericResponse<ProductEntity>(e);
@@ -314,31 +307,32 @@ public class ProductRepository : IProductRepository {
 		return new GenericResponse<IQueryable<ReactionEntity>>(reactions);
 	}
 
-    public async Task<GenericResponse<IQueryable<CustomersPaymentPerProduct>?>> GetMyCustomersPerProduct(Guid id)
-    {
-		var user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
+	public async Task<GenericResponse<IQueryable<CustomersPaymentPerProduct>?>> GetMyCustomersPerProduct(Guid id) {
+		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
 		if (user is null) return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.UserNotFound);
 
-		var product = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == id);
+		ProductEntity? product = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == id);
 		if (product is null) return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.NotFound);
 
-		if (product.UserId != user.Id)	return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.BadRequest, "This is not your product");
+		if (product.UserId != user.Id)
+			return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.BadRequest, "This is not your product");
 
-		var listOfOrders = _dbContext.Set<OrderEntity>().Include(w => w.OrderDetails).Where(w => w.ProductOwnerId == user.Id && w.PayDateTime != null && w.OrderDetails != null);
-		if (!listOfOrders.Any()) return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.Unhandled, "product owner hasn't any order yet");
+		IQueryable<OrderEntity> listOfOrders = _dbContext.Set<OrderEntity>().Include(w => w.OrderDetails)
+			.Where(w => w.ProductOwnerId == user.Id && w.PayDateTime != null && w.OrderDetails != null);
+		if (!listOfOrders.Any())
+			return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.Unhandled, "product owner hasn't any order yet");
 
-        var result = listOfOrders
-						.Where(x => x.OrderDetails.Any(y => y.ProductId == product.Id))
-						.GroupBy(x => x.User)
-						.Select(g => new CustomersPaymentPerProduct 
-						{
-							Customer = g.Key,
-							Payment = g.Sum(s=>s.OrderDetails.Where(w=>w.ProductId == product.Id).Sum(so => so.FinalPrice))
-						})
-						.ToList();
+		List<CustomersPaymentPerProduct> result = listOfOrders
+			.Where(x => x.OrderDetails!.Any(y => y.ProductId == product.Id))
+			.GroupBy(x => x.User)
+			.Select(g => new CustomersPaymentPerProduct {
+				Customer = g.Key,
+				Payment = g.Sum(s => s.OrderDetails!.Where(w => w.ProductId == product.Id).Sum(so => so.FinalPrice))
+			})
+			.ToList();
 
 		return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(result.AsQueryable());
-    }
+	}
 }
 
 public static class ProductEntityExtension {
@@ -412,8 +406,7 @@ public static class ProductEntityExtension {
 		}
 
 		if (dto.Teams.IsNotNull()) {
-			string temp = "";
-			foreach (string userId in dto.Teams!) temp += userId + ",";
+			string temp = dto.Teams!.Aggregate("", (current, userId) => current + userId + ",");
 			entity.Teams = temp;
 		}
 

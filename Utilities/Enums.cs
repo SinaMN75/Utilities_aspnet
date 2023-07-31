@@ -265,7 +265,7 @@ public enum TagProduct {
 	Expired = 302,
 	InQueue = 303,
 	Deleted = 304,
-	NotAccepted = 305,
+	NotAccepted = 305
 }
 
 public enum TagOrder {

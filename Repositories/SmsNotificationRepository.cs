@@ -14,7 +14,7 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 		AppSettings appSettings = new();
 		_config.GetSection("AppSettings").Bind(appSettings);
 		SmsPanelSettings smsSetting = appSettings.SmsPanelSettings;
-		
+
 		switch (smsSetting.Provider) {
 			case "ghasedak": {
 				RestRequest request = new(Method.POST);
@@ -27,14 +27,15 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 				break;
 			}
 			case "faraz": {
-				CustomHttpClient<object, string> client = new();
-				await client.Post("http://ippanel.com/api/select", "{\"op\" : \"pattern\"" +
-				                                                   ",\"user\" : \"" + smsSetting.UserName + "\"" +
-				                                                   ",\"pass\":  \"" + smsSetting.SmsSecret + "\"" +
-				                                                   ",\"fromNum\" : \"03000505\"" +
-				                                                   ",\"toNum\": \"" + mobileNumber + "\"" +
-				                                                   ",\"patternCode\": \"" + smsSetting.PatternCode + "\"" +
-				                                                   ",\"inputData\" : [{\"verification-code\": \"" + message + "\"}]}");
+				RestRequest request = new(Method.POST);
+				request.AddJsonBody("{\"op\" : \"pattern\"" +
+				                    ",\"user\" : \"" + smsSetting.UserName + "\"" +
+				                    ",\"pass\":  \"" + smsSetting.SmsSecret + "\"" +
+				                    ",\"fromNum\" : \"03000505\"" +
+				                    ",\"toNum\": \"" + mobileNumber + "\"" +
+				                    ",\"patternCode\": \"" + smsSetting.PatternCode + "\"" +
+				                    ",\"inputData\" : [{\"verification-code\": \"" + message + "\"}]}");
+				await new RestClient("http://ippanel.com/api/select").ExecuteAsync(request);
 				break;
 			}
 		}
@@ -47,6 +48,9 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 
 		switch (setting.Provider) {
 			case "pushe": {
+				RestRequest request = new(Method.POST);
+				request.AddHeader("Content-Type", "application/json");
+				request.AddHeader("Authorization", "Token " + setting.Token);
 				var body = new {
 					app_ids = setting.AppId,
 					data = new {
@@ -58,29 +62,9 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 					is_draft = false,
 					filter = new { custom_id = dto.UserIds }
 				};
-				
-				CustomHttpClient<object, object> client = new();
-				HttpRequestMessage request = new();
-				request.Headers.Add("Authorization", "Token " + setting.Token);
-				await client.Post("https://api.pushe.co/v2/messaging/notifications/", JsonConvert.SerializeObject(body), request.Headers);
+				request.AddJsonBody(body);
+				await new RestClient("https://api.pushe.co/v2/messaging/notifications/").ExecuteAsync(request);
 				break;
-
-				//RestRequest request = new(Method.POST);
-				//request.AddHeader("Content-Type", "application/json");`
-				//request.AddHeader("Authorization", "Token " + setting.Token);
-				//var body = new {
-				//	app_ids = setting.AppId,
-				//	data = new {
-				//		title = dto.Title,
-				//		content = dto.Content,
-				//		bigContent = dto.BigContent,
-				//		action = new {action_type = dto.ActionType, url = dto.Url}
-				//	},
-				//	is_draft = false,
-				//	filter = new {custom_id = dto.UserIds}
-				//};
-				//request.AddJsonBody(body);
-				//IRestResponse i = await new RestClient("https://api.pushe.co/v2/messaging/notifications/").ExecuteAsync(request);
 			}
 		}
 		return new GenericResponse();

@@ -13,7 +13,7 @@ public class ContentEntity : BaseEntity {
 
 	[MaxLength(100)]
 	public List<TagContent>? Tags { get; set; } = new();
-	
+
 	[MaxLength(1000)]
 	public ContentJsonDetail JsonDetail { get; set; } = new();
 
@@ -36,7 +36,6 @@ public class ContentJsonDetail {
 	public string? Address1 { get; set; }
 	public string? Address2 { get; set; }
 	public string? Address3 { get; set; }
-
 }
 
 public class ContentCreateUpdateDto {

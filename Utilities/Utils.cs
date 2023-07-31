@@ -52,8 +52,6 @@ public static class StartupExtension {
 		builder.Services.AddMemoryCache();
 		builder.Services.AddHttpContextAccessor();
 		builder.Services.AddSignalR();
-		builder.Services.AddScoped<CustomInterceptor>();
-		builder.Services.AddHttpClient("my-client").AddHttpMessageHandler<CustomInterceptor>();
 		builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 		builder.Services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")));
 		builder.Services.AddControllersWithViews(option => option.EnableEndpointRouting = false).AddNewtonsoftJson(options => {

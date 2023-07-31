@@ -61,7 +61,7 @@ public class CategoryRepository : ICategoryRepository {
 		if (dto.TitleTr2.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr2!.Contains(dto.TitleTr2!));
 		if (dto.ParentId != null) q = q.Where(x => x.ParentId == dto.ParentId);
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => x.Tags!.Count != 0 && x.Tags.Any(y => dto.Tags!.Contains(y)));
-		
+
 		if (dto.OrderByOrder.IsTrue()) q = q.OrderBy(x => x.Order);
 		if (dto.OrderByOrderDescending.IsTrue()) q = q.OrderByDescending(x => x.Order);
 		if (dto.OrderByCreatedAtDescending.IsTrue()) q = q.OrderByDescending(x => x.Order);
@@ -74,7 +74,7 @@ public class CategoryRepository : ICategoryRepository {
 	}
 
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
-		CategoryEntity i = (await _dbContext.Set<CategoryEntity>().Include(x=>x.Children).Include(x=>x.Media).FirstOrDefaultAsync(x => x.Id == id, ct))!;
+		CategoryEntity i = (await _dbContext.Set<CategoryEntity>().Include(x => x.Children).Include(x => x.Media).FirstOrDefaultAsync(x => x.Id == id, ct))!;
 		foreach (CategoryEntity c in i.Children ?? new List<CategoryEntity>()) {
 			_dbContext.Remove(c);
 			await _mediaRepository.DeleteMedia(c.Media);

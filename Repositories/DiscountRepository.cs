@@ -26,8 +26,8 @@ public class DiscountRepository : IDiscountRepository {
 	public GenericResponse<IQueryable<DiscountEntity>> Filter(DiscountFilterDto dto) {
 		IQueryable<DiscountEntity> q = _dbContext.Set<DiscountEntity>();
 
-		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title).Contains(dto.Title!));
-		if (dto.Code.IsNotNullOrEmpty()) q = q.Where(x => (x.Code).Contains(dto.Code!));
+		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => x.Title.Contains(dto.Title!));
+		if (dto.Code.IsNotNullOrEmpty()) q = q.Where(x => x.Code.Contains(dto.Code!));
 		if (dto.NumberUses != null) q = q.Where(x => x.NumberUses == dto.NumberUses);
 		if (dto.StartDate != null) q = q.Where(x => x.StartDate <= dto.StartDate);
 		if (dto.EndDate != null) q = q.Where(x => x.EndDate >= dto.EndDate);
