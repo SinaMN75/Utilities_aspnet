@@ -17,7 +17,7 @@ public class UserEntity {
 	[MaxLength(100)]
 	public string? Headline { get; set; }
 
-	[StringLength(2000)]
+	[MaxLength(2000)]
 	public string? Bio { get; set; }
 
 	[MaxLength(50)]

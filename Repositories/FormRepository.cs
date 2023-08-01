@@ -2,9 +2,9 @@ namespace Utilities_aspnet.Repositories;
 
 public interface IFormRepository {
 	GenericResponse<IQueryable<FormFieldEntity>> ReadFormFields(Guid categoryId);
-	Task<GenericResponse<IQueryable<FormFieldEntity>?>> CreateFormField(FormFieldEntity dto);
+	Task<GenericResponse> CreateFormField(FormFieldEntity dto);
 	Task<GenericResponse<IQueryable<FormEntity>>> CreateForm(FormCreateDto model);
-	Task<GenericResponse<IQueryable<FormFieldEntity>?>> UpdateFormField(FormFieldEntity dto);
+	Task<GenericResponse> UpdateFormField(FormFieldEntity dto);
 	Task<GenericResponse> DeleteFormField(Guid id);
 	Task<GenericResponse> DeleteForm(Guid id);
 }
@@ -44,35 +44,23 @@ public class FormRepository : IFormRepository {
 		return new GenericResponse<IQueryable<FormEntity>>(entity);
 	}
 
-	public async Task<GenericResponse<IQueryable<FormFieldEntity>?>> CreateFormField(FormFieldEntity dto) {
-		Guid? categoryId = dto.CategoryId;
-		try {
-			await _dbContext.Set<FormFieldEntity>().AddAsync(dto);
-			await _dbContext.SaveChangesAsync();
-		}
-		catch { }
-		return categoryId != null
-			? new GenericResponse<IQueryable<FormFieldEntity>?>(ReadFormFields((Guid) categoryId).Result)
-			: new GenericResponse<IQueryable<FormFieldEntity>?>(null);
+	public async Task<GenericResponse> CreateFormField(FormFieldEntity dto) {
+		await _dbContext.Set<FormFieldEntity>().AddAsync(dto);
+		await _dbContext.SaveChangesAsync();
+		return new GenericResponse();
 	}
 
-	public async Task<GenericResponse<IQueryable<FormFieldEntity>?>> UpdateFormField(FormFieldEntity dto) {
-		Guid? categoryId = dto.CategoryId;
-		FormFieldEntity? entity = await _dbContext.Set<FormFieldEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id);
-		if (entity == null) return new GenericResponse<IQueryable<FormFieldEntity>?>(null, UtilitiesStatusCodes.NotFound);
-		try {
-			entity.Label = dto.Label;
-			entity.OptionList = dto.OptionList;
-			entity.CategoryId = categoryId;
-			entity.IsRequired = dto.IsRequired;
-			entity.Type = dto.Type;
-			entity.UpdatedAt = DateTime.Now;
-			await _dbContext.SaveChangesAsync();
-		}
-		catch { }
-		return categoryId != null
-			? new GenericResponse<IQueryable<FormFieldEntity>?>(ReadFormFields((Guid) categoryId).Result)
-			: new GenericResponse<IQueryable<FormFieldEntity>?>(null);
+	public async Task<GenericResponse> UpdateFormField(FormFieldEntity dto) {
+		FormFieldEntity entity = (await _dbContext.Set<FormFieldEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id))!;
+		entity.Label = dto.Label;
+		entity.OptionList = dto.OptionList;
+		entity.CategoryId = dto.CategoryId;
+		entity.IsRequired = dto.IsRequired;
+		entity.Type = dto.Type;
+		entity.UpdatedAt = DateTime.Now;
+		_dbContext.Update(entity);
+		await _dbContext.SaveChangesAsync();
+		return new GenericResponse();
 	}
 
 	public GenericResponse<IQueryable<FormFieldEntity>> ReadFormFields(Guid categoryId) {

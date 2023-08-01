@@ -35,7 +35,7 @@ public class FormFieldEntity : BaseEntity {
 
 	public bool? IsRequired { get; set; } = false;
 
-	[StringLength(2000)]
+	[MaxLength(2000)]
 	public List<string>? OptionList { get; set; } = new();
 
 	public TagFormField? Type { get; set; }

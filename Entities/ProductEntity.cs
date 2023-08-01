@@ -8,7 +8,7 @@ public class ProductEntity : BaseEntity {
 	[MaxLength(100)]
 	public string? Subtitle { get; set; }
 
-	[StringLength(2000)]
+	[MaxLength(2000)]
 	public string? Description { get; set; }
 
 	[MaxLength(20)]

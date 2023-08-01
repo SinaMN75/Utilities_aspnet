@@ -7,7 +7,7 @@ public class CommentEntity : BaseEntity {
 	[MaxLength(1000)]
 	public CommentJsonDetail JsonDetail { get; set; } = new();
 
-	[StringLength(2000)]
+	[MaxLength(2000)]
 	public string? Comment { get; set; }
 
 	public ChatStatus? Status { get; set; }

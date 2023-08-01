@@ -34,7 +34,7 @@ public class GroupChatJsonDetail {
 
 [Table("GroupChatMessage")]
 public class GroupChatMessageEntity : BaseEntity {
-	[StringLength(2000)]
+	[MaxLength(2000)]
 	public string? Message { get; set; }
 
 	[MaxLength(50)]

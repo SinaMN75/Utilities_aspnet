@@ -8,7 +8,7 @@ public class ContentEntity : BaseEntity {
 	[MaxLength(100)]
 	public string? SubTitle { get; set; }
 
-	[StringLength(5000)]
+	[MaxLength(5000)]
 	public string? Description { get; set; }
 
 	[MaxLength(100)]
