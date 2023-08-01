@@ -265,6 +265,9 @@ public class ProductRepository : IProductRepository {
 			.Include(x => x.OrderDetail)
 			.Include(x => x.Comments)
 			.Include(x => x.Children)!.ThenInclude(x => x.Media)
+			.Include(x => x.Children)!.ThenInclude(x => x.VisitProducts)
+			.Include(x => x.Children)!.ThenInclude(x => x.OrderDetail)
+			.Include(x => x.Children)!.ThenInclude(x => x.Comments)
 			.FirstOrDefaultAsync(x => x.Id == id, ct))!;
 		foreach (CommentEntity comment in i.Comments ?? new List<CommentEntity>()) await _commentRepository.Delete(comment.Id, ct);
 		foreach (VisitProducts visitProduct in i.VisitProducts ?? new List<VisitProducts>()) _dbContext.Remove(visitProduct);
@@ -272,6 +275,9 @@ public class ProductRepository : IProductRepository {
 		await _mediaRepository.DeleteMedia(i.Media);
 		foreach (ProductEntity product in i.Children ?? new List<ProductEntity>()) {
 			await _mediaRepository.DeleteMedia(product.Media);
+			foreach (CommentEntity comment in product.Comments ?? new List<CommentEntity>()) await _commentRepository.Delete(comment.Id, ct);
+			foreach (VisitProducts visitProduct in product.VisitProducts ?? new List<VisitProducts>()) _dbContext.Remove(visitProduct);
+			foreach (OrderDetailEntity orderDetail in product.OrderDetail ?? new List<OrderDetailEntity>()) _dbContext.Remove(orderDetail);
 			_dbContext.Remove(product);
 		}
 		_dbContext.Remove(i);
