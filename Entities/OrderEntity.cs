@@ -80,6 +80,7 @@ public class OrderFilterDto {
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
 	public string? UserId { get; set; }
+	public List<TagOrder>? Tags { get; set; }
 	public string? ProductOwnerId { get; set; }
 	public int PageSize { get; set; } = 100;
 }

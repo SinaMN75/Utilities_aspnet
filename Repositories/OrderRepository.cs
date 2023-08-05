@@ -35,6 +35,8 @@ public class OrderRepository : IOrderRepository {
 
 	public async Task<GenericResponse<IQueryable<OrderEntity>>> Filter(OrderFilterDto dto) {
 		IQueryable<OrderEntity> q = _dbContext.Set<OrderEntity>().Include(x => x.Address);
+		
+		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
 
 		if (dto.ShowProducts.IsTrue()) {
 			q = q.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Media);
