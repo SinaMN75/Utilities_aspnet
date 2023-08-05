@@ -63,6 +63,8 @@ public class UserEntity {
 	public DateTime? ExpireUpgradeAccount { get; set; }
 	public AgeCategory? AgeCategory { get; set; }
 	public UserJsonDetail JsonDetail { get; set; } = new();
+	
+	public List<TagUser> Tags { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
@@ -212,6 +214,7 @@ public class UserCreateUpdateDto {
 	public IEnumerable<Guid>? Categories { get; set; }
 	public string? Code { get; set; }
 	public string? ShebaNumber { get; set; }
+	public List<TagUser>? Tags { get; set; }
 }
 
 public class UserFilterDto {
@@ -244,6 +247,7 @@ public class UserFilterDto {
 	public IEnumerable<string>? UserIds { get; set; }
 	public IEnumerable<string>? PhoneNumbers { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
+	public List<TagUser>? Tags { get; set; }
 }
 
 public class TransferFromWalletToWalletDto {

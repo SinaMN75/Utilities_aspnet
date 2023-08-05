@@ -295,4 +295,10 @@ public enum TagOrder {
 	PaidFail = 412
 }
 
+public enum TagUser {
+	Authorized = 100,
+	Private = 101,
+	Public = 102
+}
+
 public enum TagNotification { }

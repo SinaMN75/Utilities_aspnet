@@ -85,6 +85,8 @@ public class UserRepository : IUserRepository {
 		if (dto.PhoneNumber != null) q = q.Where(x => x.PhoneNumber!.Contains(dto.PhoneNumber));
 		if (dto.AppUserName != null) q = q.Where(x => x.AppUserName!.Contains(dto.AppUserName));
 		if (dto.AppPhoneNumber != null) q = q.Where(x => x.AppPhoneNumber!.Contains(dto.AppPhoneNumber));
+		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
+
 
 		if (dto.Query != null)
 			q = q.Where(x => x.FirstName!.Contains(dto.Query) ||
@@ -176,7 +178,7 @@ public class UserRepository : IUserRepository {
 			Password = dto.Password,
 			FirstName = dto.FirstName,
 			LastName = dto.LastName,
-			JsonDetail = dto.JsonDetail = new UserJsonDetail()
+			JsonDetail = dto.JsonDetail = new UserJsonDetail(),
 		};
 
 		await _dbContext.AddAsync(user);
@@ -340,6 +342,7 @@ public class UserRepository : IUserRepository {
 		entity.IsOnline = dto.IsOnline ?? entity.IsOnline;
 		entity.ExpireUpgradeAccount = dto.ExpireUpgradeAccount ?? entity.ExpireUpgradeAccount;
 		entity.AgeCategory = dto.AgeCategory ?? entity.AgeCategory;
+		entity.Tags = dto.Tags ?? entity.Tags;
 		entity.JsonDetail = new UserJsonDetail {
 			Instagram = dto.Instagram ?? entity.JsonDetail.Instagram,
 			Telegram = dto.Telegram ?? entity.JsonDetail.Telegram,
