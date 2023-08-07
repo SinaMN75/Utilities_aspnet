@@ -69,5 +69,6 @@ public class EnumDto {
 	public IEnumerable<IdTitleDto>? TagNotification { get; set; }
 	public IEnumerable<IdTitleDto>? TagMedia { get; set; }
 	public IEnumerable<IdTitleDto>? TransactionType { get; set; }
+	public IEnumerable<IdTitleDto>? TagComments { get; set; }
 	public AppSettings? AppSettings { get; set; }
 }

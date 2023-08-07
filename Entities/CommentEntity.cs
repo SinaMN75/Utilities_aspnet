@@ -18,6 +18,9 @@ public class CommentEntity : BaseEntity {
 	public UserEntity? User { get; set; }
 	public string? UserId { get; set; }
 
+	[MaxLength(100)]
+	public List<TagComment>? Tags { get; set; } = new();
+
 	[InverseProperty("Parent")]
 	public IEnumerable<CommentEntity>? Children { get; set; }
 
@@ -47,6 +50,7 @@ public class CommentCreateUpdateDto {
 	public string? Comment { get; set; }
 	public Guid? ProductId { get; set; }
 	public ChatStatus? Status { get; set; }
+	public List<TagComment>? Tags { get; set; }
 }
 
 public class CommentFilterDto {
@@ -54,4 +58,5 @@ public class CommentFilterDto {
 	public string? ProductOwnerId { get; set; }
 	public Guid? ProductId { get; set; }
 	public ChatStatus? Status { get; set; }
+	public List<TagCategory>? Tags { get; set; }
 }

@@ -34,6 +34,7 @@ public class AppSettingsController : BaseApiController {
 			TagNotification = EnumExtension.GetValues<TagNotification>(),
 			TagOrder = EnumExtension.GetValues<TagOrder>(),
 			TagCategory = EnumExtension.GetValues<TagCategory>(),
+			TagComments = EnumExtension.GetValues<TagComment>(),
 			AppSettings = appSettings
 		}));
 	}

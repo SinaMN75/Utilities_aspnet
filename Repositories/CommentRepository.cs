@@ -98,7 +98,8 @@ public class CommentRepository : ICommentRepository {
 			Score = dto.Score,
 			ParentId = dto.ParentId,
 			UserId = _userId,
-			Status = dto.Status
+			Status = dto.Status,
+			Tags = dto.Tags
 		};
 		await _dbContext.AddAsync(comment, ct);
 		try {
@@ -130,6 +131,7 @@ public class CommentRepository : ICommentRepository {
 		if (dto.Score.HasValue) comment.Score = dto.Score;
 		if (dto.ProductId.HasValue) comment.ProductId = dto.ProductId;
 		if (dto.Status.HasValue) comment.Status = dto.Status;
+		if (dto.Tags.IsNotNullOrEmpty()) comment.Tags = dto.Tags;
 
 		comment.UpdatedAt = DateTime.Now;
 		_dbContext.Set<CommentEntity>().Update(comment);

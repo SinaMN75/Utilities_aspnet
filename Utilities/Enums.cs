@@ -213,6 +213,12 @@ public enum TagContent {
 	HomeBanner2 = 104
 }
 
+public enum TagComment {
+	Released = 100,
+	InQueue = 101,
+	Rejected = 102
+}
+
 public enum TagMedia {
 	All = 100,
 	Image = 101,
