@@ -233,6 +233,7 @@ public class UserRepository : IUserRepository {
 
 		user.FirstName = dto.FirstName ?? user.FirstName;
 		user.LastName = dto.LastName ?? user.LastName;
+		user.AppUserName = dto.UserName ?? user.AppUserName;
 
 		_dbContext.Update(user);
 
