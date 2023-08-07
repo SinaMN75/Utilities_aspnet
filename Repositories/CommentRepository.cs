@@ -58,6 +58,7 @@ public class CommentRepository : ICommentRepository {
 		if (dto.Status is not null) q = q.Where(x => x.Status == dto.Status);
 		if (dto.UserId is not null) q = q.Where(x => x.UserId == dto.UserId);
 		if (dto.ProductOwnerId is not null) q = q.Where(x => x.Product!.UserId == dto.ProductOwnerId);
+		if (dto.Tags is not null) q = q.Where(x => dto.Tags!.All(y => x.Tags!.Contains(y)));
 
 		return new GenericResponse<IQueryable<CommentEntity>?>(q);
 	}

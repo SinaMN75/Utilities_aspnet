@@ -58,5 +58,5 @@ public class CommentFilterDto {
 	public string? ProductOwnerId { get; set; }
 	public Guid? ProductId { get; set; }
 	public ChatStatus? Status { get; set; }
-	public List<TagCategory>? Tags { get; set; }
+	public List<TagComment>? Tags { get; set; }
 }
