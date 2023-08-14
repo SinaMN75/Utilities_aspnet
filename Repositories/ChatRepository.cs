@@ -109,7 +109,7 @@ public class ChatRepository : IChatRepository {
 	}
 
 	public async Task<GenericResponse> DeleteGroupChat(Guid id) {
-		await _dbContext.Set<GroupChatEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
+		await _dbContext.Set<GroupChatEntity>().Include(w=>w.GroupChatMessage).Where(x => x.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
 	}
 
@@ -138,6 +138,7 @@ public class ChatRepository : IChatRepository {
 		List<GroupChatEntity> e = await _dbContext.Set<GroupChatEntity>().AsNoTracking()
 			.Where(x => x.Users!.Any(y => y.Id == _userId))
 			.Include(x => x.Users)!.ThenInclude(x => x.Media)
+			.Include(x=>x.Media)
 			.Include(x => x.GroupChatMessage!.OrderByDescending(y => y.CreatedAt).Take(1)).ThenInclude(x => x.Media)
 			.ToListAsync();
 
