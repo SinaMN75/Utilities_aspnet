@@ -140,6 +140,11 @@ public static class StartupExtension {
 		app.UseDeveloperExceptionPage();
 		app.UseUtilitiesSwagger();
 		app.UseStaticFiles();
+		app.Use(async (context, next) => {
+			await next();
+			if (context.Response.StatusCode == 401)
+				await context.Response.WriteAsJsonAsync(new GenericResponse(UtilitiesStatusCodes.UnAuthorized));
+		});
 		app.UseAuthentication();
 		app.UseAuthorization();
 
