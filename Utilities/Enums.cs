@@ -408,7 +408,11 @@ public enum TagOrder {
 public enum TagUser {
 	Authorized = 100,
 	Private = 101,
-	Public = 102
+	Public = 102,
+	Male = 201,
+	Female = 202,
+	Unkhown = 203,
+	Legal = 204
 }
 
 public enum TagNotification { }
