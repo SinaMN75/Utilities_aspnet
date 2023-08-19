@@ -409,10 +409,10 @@ public enum TagUser {
 	Authorized = 100,
 	Private = 101,
 	Public = 102,
-	Male = 201,
-	Female = 202,
-	Unkhown = 203,
-	Legal = 204
+	Male = 200,
+	Female = 201,
+	Unkhown = 202,
+	Legal = 203
 }
 
 public enum TagNotification { }
