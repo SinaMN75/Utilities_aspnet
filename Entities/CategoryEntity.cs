@@ -23,7 +23,7 @@ public class CategoryEntity : BaseEntity {
 	public CategoryJsonDetail JsonDetail { get; set; } = new();
 
 	[MaxLength(100)]
-	public List<TagCategory>? Tags { get; set; } = new();
+	public List<TagCategory> Tags { get; set; } = new();
 
 	public Guid? ParentId { get; set; }
 	public CategoryEntity? Parent { get; set; }
