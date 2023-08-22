@@ -1,7 +1,7 @@
 namespace Utilities_aspnet.Repositories;
 
 public interface IOrderRepository {
-	Task<GenericResponse<IQueryable<OrderEntity>>> Filter(OrderFilterDto dto);
+	Task<GenericResponse<IEnumerable<OrderEntity>>> Filter(OrderFilterDto dto);
 	Task<GenericResponse> Vote(OrderVoteDto dto);
 	Task<GenericResponse<OrderEntity>> ReadById(Guid id);
 	Task<GenericResponse<OrderEntity?>> Update(OrderCreateUpdateDto dto);
@@ -33,23 +33,22 @@ public class OrderRepository : IOrderRepository {
 		return new GenericResponse<OrderEntity?>(oldOrder);
 	}
 
-	public async Task<GenericResponse<IQueryable<OrderEntity>>> Filter(OrderFilterDto dto) {
-		IQueryable<OrderEntity> q = _dbContext.Set<OrderEntity>().Include(x => x.Address);
-		
+	public async Task<GenericResponse<IEnumerable<OrderEntity>>> Filter(OrderFilterDto dto) {
+		IQueryable<OrderEntity> q = _dbContext.Set<OrderEntity>()
+			.Include(x => x.Address)
+			.Include(x => x.Transactions)
+			.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Media)
+			.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Parent).ThenInclude(x => x!.Media)
+			.Include(x => x.User).ThenInclude(x => x!.Media)
+			.Include(x => x.ProductOwner).ThenInclude(x => x!.Media);
+
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
 
-		if (dto.ShowProducts.IsTrue()) {
-			q = q.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Media);
-			q = q.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Parent).ThenInclude(x => x!.Media);
-			q = q.Include(x => x.User).ThenInclude(x => x!.Media);
-			q = q.Include(x => x.ProductOwner).ThenInclude(x => x!.Media);
-		}
 		if (dto.Id.HasValue) q = q.Where(x => x.Id == dto.Id);
 		if (dto.PayNumber.IsNotNullOrEmpty()) q = q.Where(x => (x.PayNumber ?? "").Contains(dto.PayNumber!));
 
-		if (dto.UserId.IsNotNullOrEmpty() && dto.ProductOwnerId.IsNotNullOrEmpty()) {
+		if (dto.UserId.IsNotNullOrEmpty() && dto.ProductOwnerId.IsNotNullOrEmpty())
 			q = q.Where(x => x.ProductOwnerId == dto.ProductOwnerId || x.UserId == dto.UserId);
-		}
 		else {
 			if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => x.UserId == dto.UserId);
 			if (dto.ProductOwnerId.IsNotNullOrEmpty()) q = q.Where(x => x.ProductOwnerId == dto.ProductOwnerId);
@@ -60,21 +59,30 @@ public class OrderRepository : IOrderRepository {
 		if (dto.OrderType.HasValue)
 			if (dto.OrderType.Value != OrderType.None)
 				q = q.Where(w => w.OrderType == dto.OrderType.Value);
-		int totalCount = q.Count();
+		int totalCount = await q.CountAsync();
 
-		List<OrderEntity> tempQ = q.Where(w => w.PayDateTime == null).Include(x => x.ProductOwner).ToList();
-		List<OrderEntity> finalQ = new();
-		foreach (OrderEntity item in tempQ) {
-			OrderEntity order = UpdateOrderPrice(item, item.OrderDetails);
-			_dbContext.Update(order);
+		foreach (OrderEntity orderEntity in q) {
+			if (orderEntity.OrderDetails.IsNullOrEmpty()) {
+				foreach (TransactionEntity orderEntityTransaction in orderEntity.Transactions ?? new List<TransactionEntity>())
+					_dbContext.Remove(orderEntityTransaction);
+				_dbContext.Remove(orderEntity);
+			}
 			await _dbContext.SaveChangesAsync();
-			finalQ.Add(order);
 		}
-		q = finalQ.AsQueryable();
 
-		//q = q.AsNoTracking().Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
+		List<OrderEntity> list = await q.Where(x => x.Tags.Contains(TagOrder.Pending)).ToListAsync();
+		foreach (OrderEntity orderEntity in list) {
+			foreach (OrderDetailEntity orderEntityOrderDetail in orderEntity.OrderDetails!) {
+				orderEntityOrderDetail.FinalPrice = orderEntityOrderDetail.Product!.Price * orderEntityOrderDetail.Count;
+				_dbContext.Update(orderEntityOrderDetail);
+				await _dbContext.SaveChangesAsync();
+			}
+			orderEntity.TotalPrice = orderEntity.OrderDetails.Select(x => x.FinalPrice!).Sum() + orderEntity.ProductOwner!.JsonDetail.DeliveryPrice1;
+			_dbContext.Update(orderEntity);
+			await _dbContext.SaveChangesAsync();
+		}
 
-		return new GenericResponse<IQueryable<OrderEntity>>(q.AsSingleQuery()) {
+		return new GenericResponse<IEnumerable<OrderEntity>>(list) {
 			TotalCount = totalCount,
 			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
 			PageSize = dto.PageSize
@@ -90,12 +98,6 @@ public class OrderRepository : IOrderRepository {
 			.Include(i => i.ProductOwner).ThenInclude(i => i!.Media)
 			.AsNoTracking()
 			.FirstOrDefaultAsync(i => i.Id == id);
-
-		if (i != null) {
-			i = UpdateOrderPrice(i, i.OrderDetails);
-			_dbContext.Update(i);
-			await _dbContext.SaveChangesAsync();
-		}
 
 		return new GenericResponse<OrderEntity>(i!);
 	}
@@ -200,73 +202,6 @@ public class OrderRepository : IOrderRepository {
 		return new GenericResponse<OrderEntity?>(o);
 	}
 
-	// public async Task<GenericResponse<OrderEntity?>> CreateUpdateOrderDetail(OrderDetailCreateUpdateDto dto) {
-	// 	ProductEntity p = (await _dbContext.Set<ProductEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
-	// 	List<OrderEntity> o = await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails)
-	// 		.Where(x => x.UserId == _userId && x.Tags.Contains(TagOrder.Pending)).ToListAsync();
-	//
-	// 	if (dto.Count > p.Stock) return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.OutOfStock);
-	//
-	// 	if (o.IsNullOrEmpty()) {
-	// 		EntityEntry<OrderEntity> orderEntity = await _dbContext.Set<OrderEntity>().AddAsync(new OrderEntity {
-	// 			Tags = new List<TagOrder> { TagOrder.Pending },
-	// 			UserId = _userId,
-	// 			CreatedAt = DateTime.Now,
-	// 			UpdatedAt = DateTime.Now
-	// 		});
-	//
-	// 		EntityEntry<OrderDetailEntity> orderDetailEntity = await _dbContext.Set<OrderDetailEntity>().AddAsync(new OrderDetailEntity {
-	// 			OrderId = orderEntity.Entity.Id,
-	// 			Count = dto.Count,
-	// 			ProductId = dto.ProductId,
-	// 			UnitPrice = p.Price,
-	// 			FinalPrice = dto.Count * p.Price,
-	// 			CreatedAt = DateTime.Now,
-	// 			UpdatedAt = DateTime.Now
-	// 		});
-	// 		orderEntity.Entity.TotalPrice = orderDetailEntity.Entity.FinalPrice;
-	//
-	// 		await _dbContext.SaveChangesAsync();
-	// 		return new GenericResponse<OrderEntity?>(orderEntity.Entity);
-	// 	}
-	//
-	// 	foreach (OrderEntity orderEntity in o) {
-	// 		foreach (OrderDetailEntity orderDetail in orderEntity.OrderDetails ?? new List<OrderDetailEntity>()) {
-	// 			if (orderDetail.ProductId == dto.ProductId) {
-	// 				if (dto.Count == 0) {
-	// 					_dbContext.Remove(orderDetail);
-	// 					await _dbContext.SaveChangesAsync();
-	// 				}
-	// 				else {
-	// 					orderDetail.Count = dto.Count;
-	// 					orderDetail.FinalPrice = dto.Count * p.Price;
-	// 					_dbContext.Update(orderDetail);
-	// 				}
-	// 				await _dbContext.SaveChangesAsync();
-	// 				return new GenericResponse<OrderEntity?>(orderEntity);
-	// 			}
-	// 		}
-	// 		await _dbContext.Set<OrderDetailEntity>().AddAsync(new OrderDetailEntity {
-	// 			OrderId = orderEntity.Id,
-	// 			Count = dto.Count,
-	// 			ProductId = dto.ProductId,
-	// 			UnitPrice = p.Price,
-	// 			FinalPrice = dto.Count * p.Price,
-	// 			CreatedAt = DateTime.Now,
-	// 			UpdatedAt = DateTime.Now
-	// 		});
-	// 		orderEntity.TotalPrice = 0;
-	// 		foreach (OrderDetailEntity orderEntityOrderDetail in orderEntity.OrderDetails ?? new List<OrderDetailEntity>())
-	// 			orderEntity.TotalPrice += orderEntityOrderDetail.FinalPrice;
-	//
-	// 		_dbContext.Update(o);
-	// 		await _dbContext.SaveChangesAsync();
-	// 		return new GenericResponse<OrderEntity?>(orderEntity);
-	// 	}
-	//
-	// 	return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.Unhandled);
-	// }
-
 	public async Task<GenericResponse<OrderEntity?>> ApplyDiscountCode(ApplyDiscountCodeOnOrderDto dto) {
 		OrderEntity o = (await _dbContext.Set<OrderEntity>()
 			.Include(x => x.ProductOwner).FirstOrDefaultAsync(x => x.Id == dto.OrderId))!;
@@ -299,17 +234,5 @@ public class OrderRepository : IOrderRepository {
 		_dbContext.Update(orderDetail);
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
-	}
-
-	private static OrderEntity UpdateOrderPrice(OrderEntity order, IEnumerable<OrderDetailEntity>? orderDetails) {
-		if (orderDetails != null) {
-			List<OrderDetailEntity> orderDetailEntities = orderDetails.ToList();
-			foreach (OrderDetailEntity item in orderDetailEntities) {
-				if (item.Product == null) continue;
-				if (order.ProductOwner != null) item.FinalPrice = item.Product.Price + order.ProductOwner.JsonDetail.DeliveryPrice1;
-			}
-			order.TotalPrice = orderDetailEntities.Sum(s => s.FinalPrice);
-		}
-		return order;
 	}
 }
