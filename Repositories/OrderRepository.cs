@@ -42,9 +42,9 @@ public class OrderRepository : IOrderRepository {
 			.Include(x => x.User).ThenInclude(x => x!.Media)
 			.Include(x => x.ProductOwner).ThenInclude(x => x!.Media);
 
-		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
+		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags!.Contains(y)));        
 
-		if (dto.Id.HasValue) q = q.Where(x => x.Id == dto.Id);
+        if (dto.Id.HasValue) q = q.Where(x => x.Id == dto.Id);
 		if (dto.PayNumber.IsNotNullOrEmpty()) q = q.Where(x => (x.PayNumber ?? "").Contains(dto.PayNumber!));
 
 		if (dto.UserId.IsNotNullOrEmpty() && dto.ProductOwnerId.IsNotNullOrEmpty())
@@ -82,7 +82,7 @@ public class OrderRepository : IOrderRepository {
 			await _dbContext.SaveChangesAsync();
 		}
 
-		return new GenericResponse<IEnumerable<OrderEntity>>(list) {
+		return new GenericResponse<IEnumerable<OrderEntity>>(q) {
 			TotalCount = totalCount,
 			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
 			PageSize = dto.PageSize
