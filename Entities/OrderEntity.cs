@@ -35,7 +35,6 @@ public class OrderEntity : BaseEntity {
 
 	public List<TagOrder> Tags { get; set; } = new();
 
-	public IEnumerable<TransactionEntity>? Transactions { get; set; }
 	public IEnumerable<OrderDetailEntity>? OrderDetails { get; set; }
 }
 
@@ -75,6 +74,7 @@ public class ApplyDiscountCodeOnOrderDto {
 
 public class OrderFilterDto {
 	public Guid? Id { get; set; }
+	public bool? ShowProducts { get; set; } = false;
 	public OrderType? OrderType { get; set; }
 	public string? PayNumber { get; set; }
 	public DateTime? StartDate { get; set; }
