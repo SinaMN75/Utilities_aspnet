@@ -82,12 +82,13 @@ public class OrderRepository : IOrderRepository {
 			await _dbContext.SaveChangesAsync();
 		}
 
-		return new GenericResponse<IEnumerable<OrderEntity>>(q) {
-			TotalCount = totalCount,
-			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
-			PageSize = dto.PageSize
-		};
-	}
+        return new GenericResponse<IEnumerable<OrderEntity>>(dto.GetListWithUpdatePrice.HasValue && dto.GetListWithUpdatePrice.Value ? list : q)
+        {
+            TotalCount = totalCount,
+            PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
+            PageSize = dto.PageSize
+        };
+    }
 
 	public async Task<GenericResponse<OrderEntity>> ReadById(Guid id) {
 		OrderEntity? i = await _dbContext.Set<OrderEntity>()
@@ -131,13 +132,13 @@ public class OrderRepository : IOrderRepository {
 				Count = dto.Count,
 				ProductId = dto.ProductId,
 				UnitPrice = p.Price,
-				FinalPrice = dto.Count * p.Price,
+				FinalPrice = dto.Count * Utils.CalculatePriceWithDiscount(p.Price , p.DiscountPercent , p.DiscountPrice),
 				CreatedAt = DateTime.Now,
 				UpdatedAt = DateTime.Now
 			});
 			orderEntity.Entity.TotalPrice = orderDetailEntity.Entity.FinalPrice;
 
-			await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
 			return new GenericResponse<OrderEntity?>(orderEntity.Entity);
 		}
 		if (o.OrderDetails != null && o.OrderDetails.Any(x => p.UserId != x.Product?.UserId)) {
@@ -155,7 +156,7 @@ public class OrderRepository : IOrderRepository {
 				Count = dto.Count,
 				ProductId = dto.ProductId,
 				UnitPrice = p.Price,
-				FinalPrice = dto.Count * p.Price,
+				FinalPrice = dto.Count * Utils.CalculatePriceWithDiscount(p.Price, p.DiscountPercent, p.DiscountPrice),
 				CreatedAt = DateTime.Now,
 				UpdatedAt = DateTime.Now
 			});
@@ -172,7 +173,7 @@ public class OrderRepository : IOrderRepository {
 					Count = dto.Count,
 					ProductId = dto.ProductId,
 					UnitPrice = p.Price,
-					FinalPrice = dto.Count * p.Price,
+					FinalPrice = dto.Count * Utils.CalculatePriceWithDiscount(p.Price, p.DiscountPercent, p.DiscountPrice),
 					CreatedAt = DateTime.Now,
 					UpdatedAt = DateTime.Now
 				});
@@ -186,7 +187,7 @@ public class OrderRepository : IOrderRepository {
 			}
 			else {
 				od.Count = dto.Count;
-				od.FinalPrice = dto.Count * p.Price;
+				od.FinalPrice = dto.Count * Utils.CalculatePriceWithDiscount(p.Price, p.DiscountPercent, p.DiscountPrice);
 				_dbContext.Update(od);
 			}
 		}

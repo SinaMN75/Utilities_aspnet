@@ -130,8 +130,6 @@ public class ProductRepository : IProductRepository {
 		if (dto.OrderByVotesDescending.IsTrue()) q = q.OrderByDescending(x => x.VoteCount);
 		if (dto.OrderByAtoZ.IsTrue()) q = q.OrderBy(x => x.Title);
 		if (dto.OrderByZtoA.IsTrue()) q = q.OrderByDescending(x => x.Title);
-		if (dto.OrderByCreatedDate.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
-		if (dto.OrderByCreatedDateDescending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 		if (dto.OrderByAgeCategory.IsTrue()) q = q.OrderBy(o => o.AgeCategory);
 		if (dto.OrderByMostUsedHashtag.IsTrue()) q = q.OrderBy(o => o.Categories!.Count(c => c.UseCase!.ToLower() == "tag"));
 		if (dto.OrderByCategory.IsTrue())
@@ -159,8 +157,10 @@ public class ProductRepository : IProductRepository {
 
 		if (dto.OrderByPriceAscending.IsTrue()) q = q.Where(w=>w.Price.HasValue).OrderBy(o => o.Price.Value); 
         if (dto.OrderByPriceDescending.IsTrue()) q = q.Where(x => x.Price.HasValue).OrderByDescending(x => x.Price.Value);
+        if (dto.OrderByCreatedDate.IsTrue()) q = q.OrderBy(x => x.CreatedAt);
+        if (dto.OrderByCreatedDateDescending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 
-		int totalCount = q.Count();
+        int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
 		if (dto.ShowCountOfComment.IsTrue()) {

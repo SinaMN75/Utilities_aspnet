@@ -144,4 +144,22 @@ public class Utils {
 		}
 		catch (Exception) { return new Tuple<bool, UtilitiesStatusCodes>(true, UtilitiesStatusCodes.BadRequest); }
 	}
+
+	public static int CalculatePriceWithDiscount(int? price , int? discountPercent , int? discountPrice)
+	{
+		if(!price.HasValue) return 0;
+		
+		if(discountPrice.HasValue && discountPercent.HasValue) return price.Value;
+
+		if (discountPercent.HasValue)
+		{
+			var result = (price.Value * discountPercent.Value) / 100;
+			return price.Value - result;
+		}
+
+		if(discountPrice.HasValue)
+			return price.Value - discountPrice.Value;
+
+		return -99999;
+	}
 }
