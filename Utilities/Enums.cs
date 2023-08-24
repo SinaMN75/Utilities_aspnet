@@ -264,13 +264,16 @@ public enum TagCategory {
 	Free = 180,
 	Payment = 181,
 	Favorites = 182,
+	Special = 183,
+	Recommended
 }
 
 public enum TagContent {
 	Terms = 101,
 	AboutUs = 102,
 	HomeBanner1 = 103,
-	HomeBanner2 = 104
+	HomeBanner2 = 104,
+	Info1 = 105
 }
 
 public enum TagComment {
