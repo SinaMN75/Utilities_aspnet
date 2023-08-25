@@ -33,6 +33,7 @@ public class OrderEntity : BaseEntity {
 	[ForeignKey(nameof(ProductOwner))]
 	public string? ProductOwnerId { get; set; }
 
+	public IEnumerable<TransactionEntity>? Transactions { get; set; }
 	public List<TagOrder> Tags { get; set; } = new();
 
 	public IEnumerable<OrderDetailEntity>? OrderDetails { get; set; }
