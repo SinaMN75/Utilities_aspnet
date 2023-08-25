@@ -36,7 +36,7 @@ public class OrderRepository : IOrderRepository {
 	public async Task<GenericResponse<IEnumerable<OrderEntity>>> Filter(OrderFilterDto dto) {
 		IQueryable<OrderEntity> q = _dbContext.Set<OrderEntity>()
 			.Include(x => x.Address)
-			.Include(x => x.Transactions)
+			//.Include(x => x.Transactions)
 			.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Media)
 			.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Parent).ThenInclude(x => x!.Media)
 			.Include(x => x.User).ThenInclude(x => x!.Media)
@@ -61,14 +61,14 @@ public class OrderRepository : IOrderRepository {
 				q = q.Where(w => w.OrderType == dto.OrderType.Value);
 		int totalCount = await q.CountAsync();
 
-		foreach (OrderEntity orderEntity in q) {
-			if (orderEntity.OrderDetails.IsNullOrEmpty()) {
-				foreach (TransactionEntity orderEntityTransaction in orderEntity.Transactions ?? new List<TransactionEntity>())
-					_dbContext.Remove(orderEntityTransaction);
-				_dbContext.Remove(orderEntity);
-			}
-			await _dbContext.SaveChangesAsync();
-		}
+		//foreach (OrderEntity orderEntity in q) {
+		//	if (orderEntity.OrderDetails.IsNullOrEmpty()) {
+		//		foreach (TransactionEntity orderEntityTransaction in orderEntity.Transactions ?? new List<TransactionEntity>())
+		//			_dbContext.Remove(orderEntityTransaction);
+		//		_dbContext.Remove(orderEntity);
+		//	}
+		//	await _dbContext.SaveChangesAsync();
+		//}
 
 		List<OrderEntity> list = await q.Where(x => x.Tags.Contains(TagOrder.Pending)).ToListAsync();
 		foreach (OrderEntity orderEntity in list) {
