@@ -200,7 +200,6 @@ public class ProductFilterDto {
 	public bool? ShowCreator { get; set; } = false;
 	public bool? ShowCategoryMedia { get; set; } = false;
 	public bool? ShowChildren { get; set; } = false;
-	public bool? ShowChildrenParent { get; set; } = false;
 	public bool? ShowPostOfPrivateUser { get; set; }
 	public bool? ShowComments { get; set; }
 	public bool? OrderByVotes { get; set; } = false;
@@ -224,6 +223,7 @@ public class ProductFilterDto {
 	public string? Query { get; set; }
 	public bool ShowExpired { get; set; } = false;
 	public bool Boosted { get; set; }
+	public bool ShowWithChildren { get; set; } = false;
 }
 
 public class ProductInsightDto {

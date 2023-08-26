@@ -92,8 +92,9 @@ public class ProductRepository : IProductRepository {
 	}
 
 	public async Task<GenericResponse<IQueryable<ProductEntity>>> Filter(ProductFilterDto dto) {
-		IQueryable<ProductEntity> q = _dbContext.Set<ProductEntity>().AsNoTracking().Where(x => x.ParentId == null);
+		IQueryable<ProductEntity> q = _dbContext.Set<ProductEntity>().AsNoTracking();
 		if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.Now);
+		q = !dto.ShowWithChildren ? q.Where(x => x.ParentId == null) : q.Include(x => x.Parent);
 
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
 		if (dto.Subtitle.IsNotNullOrEmpty()) q = q.Where(x => (x.Subtitle ?? "").Contains(dto.Subtitle!));
@@ -118,7 +119,6 @@ public class ProductRepository : IProductRepository {
 			q = q.Where(w => w.User!.IsPrivate == false);
 		}
 		if (dto.ShowChildren.IsTrue()) q = q.Include(i => i.Children)!.ThenInclude(x => x.Media);
-		if (dto.ShowChildrenParent.IsTrue()) q = q.Include(x => x.Parent).ThenInclude(x => x!.Children);
 		if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories);
 		if (dto.ShowComments.IsTrue()) q = q.Include(i => i.Comments!.Where(x => x.Parent == null));
 		if (dto.ShowCategoryMedia.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.Media);
