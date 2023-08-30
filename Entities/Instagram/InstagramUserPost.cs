@@ -39,7 +39,7 @@ namespace Utilities_aspnet.Entities.Instagram
     public partial class DataEdge
     {
         [JsonProperty("node", NullValueHandling = NullValueHandling.Ignore)]
-        public PurpleNode Node { get; set; }
+        public PurpleNode? Node { get; set; }
     }
 
     public partial class PurpleNode
@@ -72,7 +72,7 @@ namespace Utilities_aspnet.Entities.Instagram
         public Dimensions Dimensions { get; set; }
 
         [JsonProperty("display_url", NullValueHandling = NullValueHandling.Ignore)]
-        public Uri DisplayUrl { get; set; }
+        public string? DisplayUrl { get; set; }
 
         [JsonProperty("display_resources", NullValueHandling = NullValueHandling.Ignore)]
         public List<Resource> DisplayResources { get; set; }
@@ -159,7 +159,7 @@ namespace Utilities_aspnet.Entities.Instagram
         public List<object> PinnedForUsers { get; set; }
 
         [JsonProperty("edge_sidecar_to_children", NullValueHandling = NullValueHandling.Ignore)]
-        public EdgeSidecarToChildren EdgeSidecarToChildren { get; set; }
+        public EdgeSidecarToChildren? EdgeSidecarToChildren { get; set; }
 
         [JsonProperty("dash_info", NullValueHandling = NullValueHandling.Ignore)]
         public DashInfo DashInfo { get; set; }
@@ -309,13 +309,13 @@ namespace Utilities_aspnet.Entities.Instagram
     public partial class EdgeSidecarToChildren
     {
         [JsonProperty("edges", NullValueHandling = NullValueHandling.Ignore)]
-        public List<EdgeSidecarToChildrenEdge> Edges { get; set; }
+        public List<EdgeSidecarToChildrenEdge>? Edges { get; set; }
     }
 
     public partial class EdgeSidecarToChildrenEdge
     {
         [JsonProperty("node", NullValueHandling = NullValueHandling.Ignore)]
-        public StickyNode Node { get; set; }
+        public StickyNode? Node { get; set; }
     }
 
     public partial class StickyNode
@@ -348,7 +348,7 @@ namespace Utilities_aspnet.Entities.Instagram
         public Dimensions Dimensions { get; set; }
 
         [JsonProperty("display_url", NullValueHandling = NullValueHandling.Ignore)]
-        public Uri DisplayUrl { get; set; }
+        public string DisplayUrl { get; set; } = "";
 
         [JsonProperty("display_resources", NullValueHandling = NullValueHandling.Ignore)]
         public List<Resource> DisplayResources { get; set; }
