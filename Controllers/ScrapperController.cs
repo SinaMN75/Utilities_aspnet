@@ -35,7 +35,8 @@ public class ScrapperController : ControllerBase {
 	private async Task<InstagramUserId> GetUserIdFromUserName(string username) {
 		RestClient client = new($"https://instagram-scraper-20231.p.rapidapi.com/userid/{username}");
 		RestRequest request = new(Method.GET);
-		request.AddHeader("X-RapidAPI-Key", "4a662212fcmshde9feeba3060587p10036ajsn69df0dd047df");
+		// request.AddHeader("X-RapidAPI-Key", "4a662212fcmshde9feeba3060587p10036ajsn69df0dd047df");
+		request.AddHeader("X-RapidAPI-Key", "8f4f179ebdmsh8bed1c00980c329p1de1b7jsne0fc17eb5e0c");
 		request.AddHeader("X-RapidAPI-Host", "instagram-scraper-20231.p.rapidapi.com");
 		IRestResponse response = await client.ExecuteAsync(request);
 		InstagramUserId instagramUserInfo = InstagramUserId.FromJson(response.Content)!;
