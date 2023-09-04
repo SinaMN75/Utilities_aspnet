@@ -162,7 +162,8 @@ public enum CallerType {
 public enum WithdrawState {
 	None = 100,
 	Requested = 101,
-	Accepted = 102
+	Accepted = 102,
+	Rejected = 103,
 }
 
 public enum DisplayType {
