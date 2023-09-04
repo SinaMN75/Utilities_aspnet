@@ -1,4 +1,4 @@
-namespace Utilities_aspnet.Entities.Instagram; 
+namespace Utilities_aspnet.Entities.Instagram;
 
 public class InstagramUserPostDto {
 	public required List<InstagramPost> InstagramPosts { get; set; }

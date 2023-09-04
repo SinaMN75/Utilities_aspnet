@@ -273,7 +273,10 @@ public enum TagContent {
 	AboutUs = 102,
 	HomeBanner1 = 103,
 	HomeBanner2 = 104,
-	Info1 = 105
+	Info1 = 105,
+	Qa = 106,
+	HomeBannerSmall1 = 105,
+	HomeBannerSmall2 = 106
 }
 
 public enum TagComment {
