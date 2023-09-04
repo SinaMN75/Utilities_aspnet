@@ -64,8 +64,11 @@ public class FollowBookmarkRepository : IFollowBookmarkRepository {
 		IQueryable<BookmarkEntity> bookmark = _dbContext.Set<BookmarkEntity>().Include(x => x.Media)
 			.Where(x => x.UserId == uId)
 			.Include(x => x.Product).ThenInclude(x => x!.Media)
+			.Include(x => x.Product).ThenInclude(x => x!.Parent)
 			.Include(x => x.Children)!.ThenInclude(x => x.Product)
-			.Include(x => x.Children).Include(x => x.Product).ThenInclude(x => x!.Media);
+			.Include(x => x.Children).Include(x => x.Product).ThenInclude(x => x!.Media)
+			.Include(x => x.Children).Include(x => x.Product).ThenInclude(x => x!.Parent)
+			.Include(x => x.Parent);
 		return new GenericResponse<IQueryable<BookmarkEntity>?>(bookmark);
 	}
 
