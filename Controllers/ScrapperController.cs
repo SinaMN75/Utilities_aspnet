@@ -8,7 +8,7 @@ public class ScrapperController : ControllerBase {
 	
 	[HttpGet("GetInstaPostRapidApi/{username}")]
 	public string GetInstaPostRapidApi(string username) {
-		RestClient client = new($"http://193.36.85.225/api/Scrapper/GetInstaPostRapidApi/{username}");
+		RestClient client = new($"https://193.36.85.225/api/Scrapper/GetInstaPostRapidApi/{username}");
 		RestRequest request = new(Method.GET);
 		IRestResponse response = client.Execute(request);
 		Console.WriteLine(response.Content);
