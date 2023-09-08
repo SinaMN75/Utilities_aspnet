@@ -89,11 +89,9 @@ public class PaymentRepository : IPaymentRepository {
 					ProductEntity? product = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == orderDetail.ProductId);
 					if (product != null) {
 						if (product.Stock < orderDetail.Count) {
-							//need to handle with sina
-							// deleted at removed 
-							//how can delete product	
-						}
-					}
+                            await _dbContext.Set<OrderDetailEntity>().Where(i => i.Id == orderDetail.Id).ExecuteDeleteAsync();
+                        }
+                    }
 				}
 			}
 
