@@ -37,6 +37,7 @@ public class MediaRepository : IMediaRepository {
 					CommentId = model.CommentId,
 					BookmarkId = model.BookmarkId,
 					CreatedAt = DateTime.Now,
+					Order = model.Order,
 					UseCase = model.UseCase,
 					NotificationId = model.NotificationId,
 					GroupChatId = model.GroupChatId,
