@@ -54,9 +54,7 @@ public class OrderRepository : IOrderRepository {
 		}
 		if (dto.StartDate.HasValue) q = q.Where(x => x.CreatedAt >= dto.StartDate);
 		if (dto.EndDate.HasValue) q = q.Where(x => x.CreatedAt <= dto.EndDate);
-
-		if (dto.ProductIds.IsNotNullOrEmpty()) q = q.Where(x => x.OrderDetails!.Any(y => y.ProductId == dto.ProductIds!.First()));
-
+		
 		if (dto.OrderType.HasValue)
 			if (dto.OrderType.Value != OrderType.None)
 				q = q.Where(w => w.OrderType == dto.OrderType.Value);
