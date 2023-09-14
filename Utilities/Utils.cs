@@ -33,6 +33,10 @@ public static class StartupExtension {
 				y.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
 				y.QueueLimit = 10;
 			});
+			x.AddFixedWindowLimiter("follow", y => {
+				y.PermitLimit = 30;
+				y.Window = TimeSpan.FromHours(24);
+			});
 		});
 
 		builder.Services.AddCors(c => c.AddPolicy("AllowOrigin", option => option.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));

@@ -195,10 +195,6 @@ public class UserRepository : IUserRepository {
 	}
 
 	public async Task<GenericResponse<UserEntity?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto) {
-		//string salt = $"{DateTime.Now.Year}{DateTime.Now.Month}{DateTime.Now.Day}{DateTime.Now.Hour}{DateTime.Now.Minute}SinaMN75";
-		//bool isOk = dto.token == Encryption.GetMd5HashData(salt).ToLower();
-		//if (!isOk) return new GenericResponse<string?>("Unauthorized", UtilitiesStatusCodes.Unhandled);
-
 		string mobile = dto.Mobile.DeleteAdditionsInsteadNumber();
 		mobile = mobile.GetLast(10);
 		mobile = mobile.Insert(0, "0");
@@ -362,7 +358,8 @@ public class UserRepository : IUserRepository {
 			Code = dto.Code ?? entity.JsonDetail.Code,
 			DeliveryPrice1 = dto.DeliveryPrice1 ?? entity.JsonDetail.DeliveryPrice1,
 			DeliveryPrice2 = dto.DeliveryPrice2 ?? entity.JsonDetail.DeliveryPrice2,
-			DeliveryPrice3 = dto.DeliveryPrice3 ?? entity.JsonDetail.DeliveryPrice3
+			DeliveryPrice3 = dto.DeliveryPrice3 ?? entity.JsonDetail.DeliveryPrice3,
+			AccessLevel = dto.AccessLevel ?? entity.JsonDetail.AccessLevel
 		};
 
 		if (dto.Categories.IsNotNullOrEmpty()) {

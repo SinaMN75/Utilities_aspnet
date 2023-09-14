@@ -16,6 +16,7 @@ public class FollowBookmarkController : BaseApiController {
 	public async Task<ActionResult<GenericResponse<IEnumerable<UserEntity>>>> ReadFollowings(string userId) => Result(await _repository.GetFollowing(userId));
 
 	[HttpPost("ToggleFolllow")]
+	[EnableRateLimiting("follow")]
 	[Authorize]
 	public async Task<ActionResult<GenericResponse>> ToggleFollow(FollowCreateDto dto) => Result(await _repository.ToggleFollow(dto));
 
