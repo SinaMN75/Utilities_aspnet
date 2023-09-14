@@ -131,6 +131,7 @@ public class UserJsonDetail {
 	public string? Color { get; set; }
 	public string? Code { get; set; }
 	public string? ShebaNumber { get; set; }
+	public List<string>? AccessLevel { get; set; }
 	public DateTime? Boosted { get; set; }
 	public int? DeliveryPrice1 { get; set; }
 	public int? DeliveryPrice2 { get; set; }
@@ -191,6 +192,7 @@ public class UserCreateUpdateDto {
 	public int? DeliveryPrice1 { get; set; }
 	public int? DeliveryPrice2 { get; set; }
 	public int? DeliveryPrice3 { get; set; }
+	public List<string>? AccessLevel { get; set; }
 	public double? Point { get; set; } = 0;
 	public bool? Suspend { get; set; }
 	public string? Instagram { get; set; }
