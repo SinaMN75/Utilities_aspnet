@@ -36,15 +36,14 @@ public class OrderRepository : IOrderRepository {
 	public async Task<GenericResponse<IEnumerable<OrderEntity>>> Filter(OrderFilterDto dto) {
 		IQueryable<OrderEntity> q = _dbContext.Set<OrderEntity>()
 			.Include(x => x.Address)
-			//.Include(x => x.Transactions)
 			.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Media)
 			.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Parent).ThenInclude(x => x!.Media)
 			.Include(x => x.User).ThenInclude(x => x!.Media)
 			.Include(x => x.ProductOwner).ThenInclude(x => x!.Media);
 
-		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags!.Contains(y)));        
+		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags!.Contains(y)));
 
-        if (dto.Id.HasValue) q = q.Where(x => x.Id == dto.Id);
+		if (dto.Id.HasValue) q = q.Where(x => x.Id == dto.Id);
 		if (dto.PayNumber.IsNotNullOrEmpty()) q = q.Where(x => (x.PayNumber ?? "").Contains(dto.PayNumber!));
 
 		if (dto.UserId.IsNotNullOrEmpty() && dto.ProductOwnerId.IsNotNullOrEmpty())
@@ -56,19 +55,21 @@ public class OrderRepository : IOrderRepository {
 		if (dto.StartDate.HasValue) q = q.Where(x => x.CreatedAt >= dto.StartDate);
 		if (dto.EndDate.HasValue) q = q.Where(x => x.CreatedAt <= dto.EndDate);
 
+		if (dto.ProductIds.IsNotNullOrEmpty()) q = q.Where(x => x.OrderDetails!.Any(y => y.ProductId == dto.ProductIds!.First()));
+
 		if (dto.OrderType.HasValue)
 			if (dto.OrderType.Value != OrderType.None)
 				q = q.Where(w => w.OrderType == dto.OrderType.Value);
 		int totalCount = await q.CountAsync();
 
-		//foreach (OrderEntity orderEntity in q) {
-		//	if (orderEntity.OrderDetails.IsNullOrEmpty()) {
-		//		foreach (TransactionEntity orderEntityTransaction in orderEntity.Transactions ?? new List<TransactionEntity>())
-		//			_dbContext.Remove(orderEntityTransaction);
-		//		_dbContext.Remove(orderEntity);
-		//	}
-		//	await _dbContext.SaveChangesAsync();
-		//}
+		foreach (OrderEntity orderEntity in q) {
+			if (orderEntity.OrderDetails.IsNullOrEmpty()) {
+				foreach (TransactionEntity orderEntityTransaction in orderEntity.Transactions ?? new List<TransactionEntity>())
+					_dbContext.Remove(orderEntityTransaction);
+				_dbContext.Remove(orderEntity);
+			}
+			await _dbContext.SaveChangesAsync();
+		}
 
 		List<OrderEntity> list = await q.Where(x => x.Tags.Contains(TagOrder.Pending)).ToListAsync();
 		foreach (OrderEntity orderEntity in list) {
@@ -82,13 +83,12 @@ public class OrderRepository : IOrderRepository {
 			await _dbContext.SaveChangesAsync();
 		}
 
-        return new GenericResponse<IEnumerable<OrderEntity>>(dto.GetListWithUpdatePrice.HasValue && dto.GetListWithUpdatePrice.Value ? list : q)
-        {
-            TotalCount = totalCount,
-            PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
-            PageSize = dto.PageSize
-        };
-    }
+		return new GenericResponse<IEnumerable<OrderEntity>>(dto.GetListWithUpdatePrice.HasValue && dto.GetListWithUpdatePrice.Value ? list : q) {
+			TotalCount = totalCount,
+			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
+			PageSize = dto.PageSize
+		};
+	}
 
 	public async Task<GenericResponse<OrderEntity>> ReadById(Guid id) {
 		OrderEntity? i = await _dbContext.Set<OrderEntity>()
@@ -132,13 +132,13 @@ public class OrderRepository : IOrderRepository {
 				Count = dto.Count,
 				ProductId = dto.ProductId,
 				UnitPrice = p.Price,
-				FinalPrice = dto.Count * Utils.CalculatePriceWithDiscount(p.Price , p.DiscountPercent , p.DiscountPrice),
+				FinalPrice = dto.Count * Utils.CalculatePriceWithDiscount(p.Price, p.DiscountPercent, p.DiscountPrice),
 				CreatedAt = DateTime.Now,
 				UpdatedAt = DateTime.Now
 			});
 			orderEntity.Entity.TotalPrice = orderDetailEntity.Entity.FinalPrice;
 
-            await _dbContext.SaveChangesAsync();
+			await _dbContext.SaveChangesAsync();
 			return new GenericResponse<OrderEntity?>(orderEntity.Entity);
 		}
 		if (o.OrderDetails != null && o.OrderDetails.Any(x => p.UserId != x.Product?.UserId)) {
