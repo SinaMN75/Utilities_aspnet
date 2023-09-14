@@ -84,7 +84,6 @@ public class OrderFilterDto {
 	public List<Guid>? ProductIds { get; set; }
 	public string? ProductOwnerId { get; set; }
 	public int PageSize { get; set; } = 100;
-    public bool? GetListWithUpdatePrice { get; set; }
 }
 
 public class OrderVoteDto {

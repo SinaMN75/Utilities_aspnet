@@ -83,7 +83,7 @@ public class OrderRepository : IOrderRepository {
 			await _dbContext.SaveChangesAsync();
 		}
 
-		return new GenericResponse<IEnumerable<OrderEntity>>(dto.GetListWithUpdatePrice.HasValue && dto.GetListWithUpdatePrice.Value ? list : q) {
+		return new GenericResponse<IEnumerable<OrderEntity>>(list) {
 			TotalCount = totalCount,
 			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
 			PageSize = dto.PageSize
