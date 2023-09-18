@@ -1,4 +1,6 @@
-﻿namespace Utilities_aspnet.Repositories;
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace Utilities_aspnet.Repositories;
 
 public interface IChatRepository {
 	Task<GenericResponse<GroupChatEntity?>> CreateGroupChat(GroupChatCreateUpdateDto dto);
@@ -185,7 +187,10 @@ public class ChatRepository : IChatRepository {
 	}
 
 	public async Task<GenericResponse> DeleteGroupChatMessage(Guid id) {
-		await _dbContext.Set<GroupChatMessageEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
+		var medias = _dbContext.Set<MediaEntity>().Where(w => w.GroupChatMessageId == id);
+		if(medias is not null && medias.Any()) _dbContext.RemoveRange(medias);
+        await _dbContext.Set<GroupChatMessageEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
+		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}
 
