@@ -96,7 +96,8 @@ public class ProductJsonDetail {
 	public int? ShippingTime { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
-	public List<KeyValue>? KeyValues { get; set; }
+    public Reaction? UserReaction { get; set; }
+    public List<KeyValue>? KeyValues { get; set; }
 }
 
 [Table("ProductsInsight")]

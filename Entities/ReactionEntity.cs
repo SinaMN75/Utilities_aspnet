@@ -14,3 +14,9 @@ public class ReactionCreateUpdateDto {
 	public Reaction? Reaction { get; set; }
 	public Guid? ProductId { get; set; }
 }
+public class ReactionFilterDto {
+	public Guid? ProductId { get; set; }
+	public Reaction? Reaction { get; set; }
+    public int PageSize { get; set; } = 100;
+    public int PageNumber { get; set; } = 1;
+}

@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Routing.Constraints;
+
 namespace Utilities_aspnet.Repositories;
 
 public interface IProductRepository {
@@ -9,6 +11,7 @@ public interface IProductRepository {
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 	Task<GenericResponse> CreateReaction(ReactionCreateUpdateDto dto);
 	GenericResponse<IQueryable<ReactionEntity>> ReadReactionsById(Guid id);
+	GenericResponse<IQueryable<ReactionEntity>> FilterReaction(ReactionFilterDto dto);
 	Task<GenericResponse<IQueryable<CustomersPaymentPerProduct>?>> GetMyCustomersPerProduct(Guid id);
 }
 
@@ -231,7 +234,10 @@ public class ProductRepository : IProductRepository {
 
 		i.Orders = completeOrder.OrderByDescending(x => x.TotalPrice);
 
-		await _promotionRepository.UserSeened(i.Id);
+		var reaction = await _dbContext.Set<ReactionEntity>().FirstOrDefaultAsync(f => f.ProductId == i.Id);
+		if (reaction is not null) i.JsonDetail.UserReaction = reaction.Reaction.HasValue ? reaction.Reaction.Value : null;
+
+        await _promotionRepository.UserSeened(i.Id);
 		return new GenericResponse<ProductEntity?>(i);
 	}
 
@@ -312,6 +318,23 @@ public class ProductRepository : IProductRepository {
 			.Where(w => w.ProductId == id)
 			.OrderBy(o => o.Reaction);
 		return new GenericResponse<IQueryable<ReactionEntity>>(reactions);
+	}
+
+	public GenericResponse<IQueryable<ReactionEntity>> FilterReaction(ReactionFilterDto dto) {
+		IQueryable<ReactionEntity> reactions = _dbContext.Set<ReactionEntity>()
+			.Include(i => i.User)
+			.Where(w => w.ProductId == dto.ProductId);
+
+		if (dto.Reaction.HasValue) reactions = reactions.Where(w => w.Reaction.Value.HasFlag(dto.Reaction.Value));
+
+        int totalCount = reactions.Count();
+        reactions = reactions.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
+        return new GenericResponse<IQueryable<ReactionEntity>>(reactions.AsSingleQuery())
+        {
+            TotalCount = totalCount,
+            PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
+            PageSize = dto.PageSize
+        };
 	}
 
 	public async Task<GenericResponse<IQueryable<CustomersPaymentPerProduct>?>> GetMyCustomersPerProduct(Guid id) {
