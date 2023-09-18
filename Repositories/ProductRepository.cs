@@ -288,7 +288,7 @@ public class ProductRepository : IProductRepository {
 
 	public async Task<GenericResponse> CreateReaction(ReactionCreateUpdateDto dto) {
 		ReactionEntity? reaction = await _dbContext.Set<ReactionEntity>().FirstOrDefaultAsync(f => f.UserId == _userId && f.ProductId == dto.ProductId);
-		if (reaction is not null && reaction.Reaction != dto.Reaction) {
+		if (reaction is not null && reaction.Reaction.HasValue ? reaction.Reaction.Value.HasFlag(dto.Reaction.Value) : false) {
 			reaction.Reaction = dto.Reaction;
 			reaction.UpdatedAt = DateTime.Now;
 			_dbContext.Update(reaction);
