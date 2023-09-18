@@ -41,7 +41,7 @@ public class NotificationRepository : INotificationRepository
             .Include(x => x.Media)
             .Include(x => x.CreatorUser).ThenInclude(x => x!.Media)
             .Include(x => x.CreatorUser).ThenInclude(x => x!.Categories)
-            .Include(x => x.Product).ThenInclude(x => x!.Media)
+            .Include(x => x.Product).ThenInclude(x => x!.Media)            
             .OrderByDescending(x => x.CreatedAt);
 
         if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
@@ -49,11 +49,12 @@ public class NotificationRepository : INotificationRepository
         if (dto.CreatorUserId.IsNotNullOrEmpty()) q = q.Where(x => (x.CreatorUserId ?? "").Contains(dto.CreatorUserId!));
         if (dto.UseCase.IsNotNullOrEmpty()) q = q.Where(x => (x.UseCase ?? "").Contains(dto.UseCase!));
         if (dto.Message.IsNotNullOrEmpty()) q = q.Where(x => (x.Message ?? "").Contains(dto.Message!));
-        if (dto.Tags.IsNotNullOrEmpty())
-        {
-            q.Include(x => x.Tags);
-            q = q.Where(x => dto.Tags!.All(y => x.Tags!.Contains(y)));
-        }
+        // این شرط قبلا یجور دیگه بود اینکلود نمیکرد ، من این کلود اش رو نوشتم بعد تاریخ 27 شهریور کامنتش کردم چون فرزاد مشکل داشت باهاش ، میزیتو چک شود
+        //if (dto.Tags.IsNotNullOrEmpty())
+        //{
+        //    q.Include(x => x.Tags);
+        //    q = q.Where(x => dto.Tags!.All(y => x.Tags!.Contains(y)));
+        //}
 
         int totalCount = q.Count();
         q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize).AsNoTracking();
