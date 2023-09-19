@@ -72,3 +72,12 @@ public class EnumDto {
 	public IEnumerable<IdTitleDto>? TagComments { get; set; }
 	public AppSettings? AppSettings { get; set; }
 }
+
+public class DashboardReadDto {
+	public int Categories { get; set; }
+	public int Products { get; set; }
+	public int Users { get; set; }
+	public int Orders { get; set; }
+	public int Media { get; set; }
+	public int Transactions { get; set; }
+}
