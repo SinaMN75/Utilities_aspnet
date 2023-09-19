@@ -99,9 +99,12 @@ public class CategoryFilterDto {
 	public string? Type { get; set; }
 	public List<TagCategory>? Tags { get; set; }
 	public Guid? ParentId { get; set; }
+	public bool? ShowByChildren { get; set; }
 	public bool? ShowMedia { get; set; }
 	public bool? OrderByOrder { get; set; }
 	public bool? OrderByOrderDescending { get; set; }
 	public bool? OrderByCreatedAt { get; set; }
 	public bool? OrderByCreatedAtDescending { get; set; }
+	public int PageSize { get; set; } = 10000;
+	public int PageNumber { get; set; } = 1;
 }

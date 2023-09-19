@@ -51,9 +51,9 @@ public class CategoryRepository : ICategoryRepository {
 	}
 
 	public GenericResponse<IEnumerable<CategoryEntity>> Filter(CategoryFilterDto dto) {
-		IQueryable<CategoryEntity> q = _dbContext.Set<CategoryEntity>().AsNoTracking()
-			.Where(x => x.ParentId == null).Include(x => x.Children);
+		IQueryable<CategoryEntity> q = _dbContext.Set<CategoryEntity>().AsNoTracking().Include(x => x.Children);
 
+		q = dto.ShowByChildren.IsTrue() ? q.Where(x => x.ParentId != null) : q.Where(x => x.ParentId == null);
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => x.Title!.Contains(dto.Title!));
 		if (dto.Type.IsNotNullOrEmpty()) q = q.Where(x => x.Type!.Contains(dto.Type!));
 		if (dto.UseCase.IsNotNullOrEmpty()) q = q.Where(x => x.UseCase!.Contains(dto.UseCase!));
@@ -70,7 +70,14 @@ public class CategoryRepository : ICategoryRepository {
 
 		if (dto.ShowMedia.IsTrue()) q = q.Include(x => x.Media);
 
-		return new GenericResponse<IEnumerable<CategoryEntity>>(q);
+		int totalCount = q.Count();
+		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
+
+		return new GenericResponse<IEnumerable<CategoryEntity>>(q) {
+			TotalCount = totalCount,
+			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
+			PageSize = dto.PageSize
+		};
 	}
 
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
