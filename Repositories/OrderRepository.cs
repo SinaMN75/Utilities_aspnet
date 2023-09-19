@@ -39,7 +39,8 @@ public class OrderRepository : IOrderRepository {
 			.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Media)
 			.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Parent).ThenInclude(x => x!.Media)
 			.Include(x => x.User).ThenInclude(x => x!.Media)
-			.Include(x => x.ProductOwner).ThenInclude(x => x!.Media);
+			.Include(x => x.ProductOwner).ThenInclude(x => x!.Media)
+			.OrderBy(x => x.CreatedAt);
 
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags!.Contains(y)));
 
