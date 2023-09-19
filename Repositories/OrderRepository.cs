@@ -58,7 +58,6 @@ public class OrderRepository : IOrderRepository {
 		if (dto.OrderType.HasValue)
 			if (dto.OrderType.Value != OrderType.None)
 				q = q.Where(w => w.OrderType == dto.OrderType.Value);
-		int totalCount = await q.CountAsync();
 
 		foreach (OrderEntity orderEntity in q) {
 			if (orderEntity.OrderDetails.IsNullOrEmpty()) {
@@ -68,6 +67,9 @@ public class OrderRepository : IOrderRepository {
 			}
 			await _dbContext.SaveChangesAsync();
 		}
+
+		int totalCount = await q.CountAsync();
+		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
 		List<OrderEntity> list = await q.Where(x => x.Tags.Contains(TagOrder.Pending)).ToListAsync();
 		foreach (OrderEntity orderEntity in list) {
