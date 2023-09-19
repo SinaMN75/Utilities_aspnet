@@ -1,5 +1,3 @@
-using Utilities_aspnet.Entities.Instagram;
-
 namespace Utilities_aspnet.Controllers;
 
 [ApiController]
