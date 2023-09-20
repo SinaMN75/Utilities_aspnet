@@ -21,6 +21,7 @@ public class UserRepository : IUserRepository {
 	private readonly IMemoryCache _memoryCache;
 	private readonly ISmsNotificationRepository _sms;
 	private readonly ITransactionRepository _transactionRepository;
+	private readonly IHttpContextAccessor? _http;
 	private readonly string? _userId;
 
 	public UserRepository(
@@ -31,6 +32,7 @@ public class UserRepository : IUserRepository {
 		IMemoryCache memoryCache) {
 		_dbContext = dbContext;
 		_sms = sms;
+		_http = httpContextAccessor;
 		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 		_transactionRepository = transactionRepository;
 		_memoryCache = memoryCache;
@@ -53,7 +55,7 @@ public class UserRepository : IUserRepository {
 
 		entity.CountFollowing = entity.FollowingUsers.Split(",").Count(w => w.Length >= 10);
 		entity.CountFollowers = entity.FollowedUsers.Split(",").Count(w => w.Length >= 10);
-
+		
 		return new GenericResponse<UserEntity?>(entity);
 	}
 
@@ -195,6 +197,7 @@ public class UserRepository : IUserRepository {
 	}
 
 	public async Task<GenericResponse<UserEntity?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto) {
+		string userAgent = _http!.HttpContext!.Request.Headers?.FirstOrDefault(s => s.Key.ToLower() == "user-agent").Value!;
 		string mobile = dto.Mobile.DeleteAdditionsInsteadNumber();
 		mobile = mobile.GetLast(10);
 		mobile = mobile.Insert(0, "0");
@@ -207,12 +210,16 @@ public class UserRepository : IUserRepository {
 
 		if (existingUser != null) {
 			if (!await SendOtp(existingUser.Id)) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.MaximumLimitReached);
+			existingUser.UserAgent = userAgent;
+			_dbContext.Update(existingUser);
+			await _dbContext.SaveChangesAsync();
 			return new GenericResponse<UserEntity?>(existingUser);
 		}
 		UserEntity user = new() {
 			PhoneNumber = mobile,
 			UserName = mobile,
-			CreatedAt = DateTime.Now
+			CreatedAt = DateTime.Now,
+			UserAgent = userAgent,
 		};
 
 		await _dbContext.AddAsync(user);

@@ -50,6 +50,9 @@ public class UserEntity {
 	[MaxLength(100)]
 	public string? JobStatus { get; set; }
 
+	[MaxLength(100)]
+	public string? UserAgent { get; set; }
+
 	public string? MutedChats { get; set; }
 	public GenderType? Gender { get; set; }
 	public int? Wallet { get; set; } = 0;
