@@ -50,7 +50,7 @@ public class UserEntity {
 	[MaxLength(100)]
 	public string? JobStatus { get; set; }
 
-	[MaxLength(100)]
+	[MaxLength(200)]
 	public string? UserAgent { get; set; }
 
 	public string? MutedChats { get; set; }
