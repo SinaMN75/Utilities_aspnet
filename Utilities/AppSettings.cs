@@ -80,4 +80,6 @@ public class DashboardReadDto {
 	public int Orders { get; set; }
 	public int Media { get; set; }
 	public int Transactions { get; set; }
+	public int Reports { get; set; }
+	public int Address { get; set; }
 }

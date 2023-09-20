@@ -54,6 +54,8 @@ public class AppSettingsRepository : IAppSettingsRepository {
 			Orders = await _dbContext.Set<OrderEntity>().CountAsync(),
 			Media = await _dbContext.Set<MediaEntity>().CountAsync(),
 			Transactions = await _dbContext.Set<TransactionEntity>().CountAsync(),
+			Reports = await _dbContext.Set<ReportEntity>().CountAsync(),
+			Address = await _dbContext.Set<AddressEntity>().CountAsync(),
 		};
 		return new GenericResponse<DashboardReadDto>(dto);
 	}
