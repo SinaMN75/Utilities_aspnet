@@ -111,7 +111,9 @@ public class ChatRepository : IChatRepository {
 	}
 
 	public async Task<GenericResponse> DeleteGroupChat(Guid id) {
-		await _dbContext.Set<GroupChatEntity>().Include(w=>w.GroupChatMessage).Where(x => x.Id == id).ExecuteDeleteAsync();
+        var medias = _dbContext.Set<MediaEntity>().Where(w => w.GroupChatId == id);
+        if (medias is not null && medias.Any()) _dbContext.RemoveRange(medias);
+        await _dbContext.Set<GroupChatEntity>().Include(w=>w.GroupChatMessage).Where(x => x.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
 	}
 
