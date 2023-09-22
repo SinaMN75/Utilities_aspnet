@@ -74,7 +74,10 @@ public class UserEntity {
 
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
-	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
+	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }	
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public IEnumerable<ReactionEntity>? Reactions{ get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
