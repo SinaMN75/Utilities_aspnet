@@ -9,7 +9,6 @@ public class TransactionController : BaseApiController {
 	public TransactionController(ITransactionRepository repository) => _repository = repository;
 
 	[HttpPost("Filter")]
-	[OutputCache(PolicyName = "24h")]
 	public ActionResult<GenericResponse<IQueryable<TransactionEntity>>> Filter(TransactionFilterDto dto) => Result(_repository.Filter(dto));
 
 	[HttpGet("Mine")]
