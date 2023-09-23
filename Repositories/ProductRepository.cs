@@ -306,7 +306,7 @@ public class ProductRepository : IProductRepository {
 				Reaction = dto.Reaction,
 				UserId = _userId
 			};
-			await _dbContext.Set<ReactionEntity>().AddAsync(reaction);
+			_dbContext.Set<ReactionEntity>().Add(reaction);
 		}
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
@@ -328,7 +328,7 @@ public class ProductRepository : IProductRepository {
 		if (dto.Reaction.HasValue) reactions = reactions.Where(w => w.Reaction.Value.HasFlag(dto.Reaction.Value));
 
         int totalCount = reactions.Count();
-        reactions = reactions.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
+        reactions = reactions.Skip((dto.PageNumber) * dto.PageSize).Take(dto.PageSize);
         return new GenericResponse<IQueryable<ReactionEntity>>(reactions.AsSingleQuery())
         {
             TotalCount = totalCount,

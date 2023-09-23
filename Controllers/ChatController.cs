@@ -15,6 +15,9 @@ public class ChatController : BaseApiController {
 	[HttpPost("FilterGroupChat")]
 	public ActionResult<GenericResponse<GroupChatEntity?>> FilterGroupChat(GroupChatFilterDto dto) => Result(_repository.FilterGroupChats(dto));
 
+	[HttpPost("FilterAllGroupChat")]
+	public ActionResult<GenericResponse<GroupChatEntity?>> FilterAllGroupChat(GroupChatFilterDto dto) => Result(_repository.FilterAllGroupChats(dto));
+
 	[HttpPut("UpdateGroupChat")]
 	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> UpdateGroupChat(GroupChatCreateUpdateDto dto) =>
 		Result(await _repository.UpdateGroupChat(dto));
