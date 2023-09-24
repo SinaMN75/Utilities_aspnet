@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Routing.Constraints;
-
 namespace Utilities_aspnet.Repositories;
 
 public interface IProductRepository {
@@ -158,12 +156,12 @@ public class ProductRepository : IProductRepository {
 		q = q.Include(x => x.Parent).ThenInclude(x => x!.Media);
 		q = q.Include(x => x.Parent).ThenInclude(x => x!.User).ThenInclude(x => x!.Media);
 
-		if (dto.OrderByPriceAscending.IsTrue()) q = q.Where(w=>w.Price.HasValue).OrderBy(o => o.Price.Value); 
-        if (dto.OrderByPriceDescending.IsTrue()) q = q.Where(x => x.Price.HasValue).OrderByDescending(x => x.Price.Value);
-        if (dto.OrderByCreatedDate.IsTrue()) q = q.OrderBy(x => x.CreatedAt);
-        if (dto.OrderByCreatedDateDescending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
+		if (dto.OrderByPriceAscending.IsTrue()) q = q.Where(w => w.Price.HasValue).OrderBy(o => o.Price.Value);
+		if (dto.OrderByPriceDescending.IsTrue()) q = q.Where(x => x.Price.HasValue).OrderByDescending(x => x.Price.Value);
+		if (dto.OrderByCreatedDate.IsTrue()) q = q.OrderBy(x => x.CreatedAt);
+		if (dto.OrderByCreatedDateDescending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 
-        int totalCount = q.Count();
+		int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
 		if (dto.ShowCountOfComment.IsTrue()) {
@@ -237,7 +235,7 @@ public class ProductRepository : IProductRepository {
 		var reaction = await _dbContext.Set<ReactionEntity>().FirstOrDefaultAsync(f => f.ProductId == i.Id);
 		if (reaction is not null) i.JsonDetail.UserReaction = reaction.Reaction.HasValue ? reaction.Reaction.Value : null;
 
-        await _promotionRepository.UserSeened(i.Id);
+		await _promotionRepository.UserSeened(i.Id);
 		return new GenericResponse<ProductEntity?>(i);
 	}
 
@@ -294,7 +292,7 @@ public class ProductRepository : IProductRepository {
 
 	public async Task<GenericResponse> CreateReaction(ReactionCreateUpdateDto dto) {
 		ReactionEntity? reaction = await _dbContext.Set<ReactionEntity>().FirstOrDefaultAsync(f => f.UserId == _userId && f.ProductId == dto.ProductId);
-		if (reaction is not null && reaction.Reaction.HasValue ? reaction.Reaction.Value.HasFlag(dto.Reaction.Value) : false) {
+		if (reaction?.Reaction != null && reaction.Reaction.Value.HasFlag(dto.Reaction.Value)) {
 			reaction.Reaction = dto.Reaction;
 			reaction.UpdatedAt = DateTime.Now;
 			_dbContext.Update(reaction);
@@ -321,20 +319,19 @@ public class ProductRepository : IProductRepository {
 	}
 
 	public GenericResponse<IQueryable<ReactionEntity>> FilterReaction(ReactionFilterDto dto) {
-		IQueryable<ReactionEntity> reactions = _dbContext.Set<ReactionEntity>()
+		IQueryable<ReactionEntity> q = _dbContext.Set<ReactionEntity>()
 			.Include(i => i.User)
 			.Where(w => w.ProductId == dto.ProductId);
 
-		if (dto.Reaction.HasValue) reactions = reactions.Where(w => w.Reaction.Value.HasFlag(dto.Reaction.Value));
+		if (dto.Reaction.HasValue) q = q.Where(w => w.Reaction.Value.HasFlag(dto.Reaction.Value));
 
-        int totalCount = reactions.Count();
-        reactions = reactions.Skip((dto.PageNumber) * dto.PageSize).Take(dto.PageSize);
-        return new GenericResponse<IQueryable<ReactionEntity>>(reactions.AsSingleQuery())
-        {
-            TotalCount = totalCount,
-            PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
-            PageSize = dto.PageSize
-        };
+		int totalCount = q.Count();
+		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
+		return new GenericResponse<IQueryable<ReactionEntity>>(q.AsSingleQuery()) {
+			TotalCount = totalCount,
+			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
+			PageSize = dto.PageSize
+		};
 	}
 
 	public async Task<GenericResponse<IQueryable<CustomersPaymentPerProduct>?>> GetMyCustomersPerProduct(Guid id) {
