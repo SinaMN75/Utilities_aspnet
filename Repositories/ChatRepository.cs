@@ -122,6 +122,21 @@ public class ChatRepository : IChatRepository {
 	public async Task<GenericResponse<GroupChatMessageEntity?>> CreateGroupChatMessage(GroupChatMessageCreateUpdateDto dto) {
 		List<ProductEntity?> products = new();
 		foreach (Guid id in dto.Products ?? new List<Guid>()) products.Add(await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id));
+
+		var groupChat = await _dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(f => f.Id == dto.GroupChatId);
+		if(groupChat != null)
+		{
+			if(groupChat.Type == ChatType.Private)
+			{
+				if (groupChat.Users == null || !groupChat.Users.Any()) return new GenericResponse<GroupChatMessageEntity?>(null, UtilitiesStatusCodes.BadRequest);
+				var firstUserId = groupChat.Users.First().Id;
+				var secondUserId = groupChat.Users.Last().Id;
+				Tuple<bool, UtilitiesStatusCodes> blockedState = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == firstUserId),
+																					 _dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == secondUserId));
+				if (blockedState.Item1)
+					return new GenericResponse<GroupChatMessageEntity?>(null, blockedState.Item2);
+			}
+        }
 		GroupChatMessageEntity entity = new() {
 			Message = dto.Message,
 			Type = dto.Type,
