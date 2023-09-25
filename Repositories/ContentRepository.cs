@@ -66,7 +66,7 @@ public class ContentRepository : IContentRepository {
 	}
 
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
-		ContentEntity e = (await _dbContext.Set<ContentEntity>().FirstOrDefaultAsync(x => x.Id == id, ct))!;
+		ContentEntity e = (await _dbContext.Set<ContentEntity>().Include(x => x.Media).FirstOrDefaultAsync(x => x.Id == id, ct))!;
 		await _mediaRepository.DeleteMedia(e.Media);
 		_dbContext.Set<ContentEntity>().Remove(e);
 		await _dbContext.SaveChangesAsync(ct);
