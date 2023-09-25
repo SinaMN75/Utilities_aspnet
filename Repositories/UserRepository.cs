@@ -1,4 +1,6 @@
-﻿namespace Utilities_aspnet.Repositories;
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace Utilities_aspnet.Repositories;
 
 public interface IUserRepository {
 	GenericResponse<IQueryable<UserEntity>> Filter(UserFilterDto dto);
@@ -249,8 +251,8 @@ public class UserRepository : IUserRepository {
 	}
 
 	public async Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList() {
-		UserEntity? user = await ReadByIdMinimal(_userId);
-		GenericResponse<IQueryable<UserEntity>> blockedUsers = Filter(new UserFilterDto {
+		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
+        GenericResponse<IQueryable<UserEntity>> blockedUsers = Filter(new UserFilterDto {
 			ShowMedia = true,
 			UserIds = user?.BlockedUsers.Split(",")
 		});
@@ -258,9 +260,7 @@ public class UserRepository : IUserRepository {
 	}
 
 	public async Task<GenericResponse> ToggleBlock(string userId) {
-		UserEntity? user = await ReadByIdMinimal(_userId);
-
-		await Update(new UserCreateUpdateDto { Id = user!.Id, BlockedUsers = user.BlockedUsers + "," + userId });
+		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
 		if (user.BlockedUsers.Contains(userId))
 			await Update(new UserCreateUpdateDto { Id = user.Id, BlockedUsers = user.BlockedUsers.Replace($",{userId}", "") });
 		else await Update(new UserCreateUpdateDto { Id = user.Id, BlockedUsers = user.BlockedUsers + "," + userId });
