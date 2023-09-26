@@ -181,7 +181,7 @@ public class ChatRepository : IChatRepository {
 			IQueryable<GroupChatMessageEntity> groupchatMessages = _dbContext.Set<GroupChatMessageEntity>().Where(w => w.GroupChatId == item.Id);
 			if (seenUsers is null) { countOfMessage = groupchatMessages.Count(); }
 			else {
-				GroupChatMessageEntity lastSeenMessage = (await groupchatMessages.Where(w => w.Id == seenUsers.FkGroupChatMessage).FirstOrDefaultAsync())!;
+				GroupChatMessageEntity lastSeenMessage = (await groupchatMessages.Where(w => w.Id == seenUsers.FkGroupChatMessage.Value).FirstOrDefaultAsync())!;
 				countOfMessage = await groupchatMessages.Where(w => w.CreatedAt > lastSeenMessage.CreatedAt).CountAsync();
 			}
 			item.CountOfUnreadMessages = countOfMessage;
@@ -208,8 +208,10 @@ public class ChatRepository : IChatRepository {
 	public async Task<GenericResponse> DeleteGroupChatMessage(Guid id) {
 		var medias = _dbContext.Set<MediaEntity>().Where(w => w.GroupChatMessageId == id);
 		if(medias is not null && medias.Any()) _dbContext.RemoveRange(medias);
+		var seenUsers = _dbContext.Set<SeenUsers>().Where(w=>w.FkGroupChatMessage == id);
+        if (seenUsers is not null && seenUsers.Any()) _dbContext.RemoveRange(seenUsers);
         await _dbContext.Set<GroupChatMessageEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
-		await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}
 
