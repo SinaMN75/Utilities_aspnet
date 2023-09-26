@@ -46,16 +46,11 @@ public class OrderRepository : IOrderRepository {
 
 		if (dto.Id.HasValue) q = q.Where(x => x.Id == dto.Id);
 		if (dto.PayNumber.IsNotNullOrEmpty()) q = q.Where(x => (x.PayNumber ?? "").Contains(dto.PayNumber!));
-
-		if (dto.UserId.IsNotNullOrEmpty() && dto.ProductOwnerId.IsNotNullOrEmpty())
-			q = q.Where(x => x.ProductOwnerId == dto.ProductOwnerId || x.UserId == dto.UserId);
-		else {
-			if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => x.UserId == dto.UserId);
-			if (dto.ProductOwnerId.IsNotNullOrEmpty()) q = q.Where(x => x.ProductOwnerId == dto.ProductOwnerId);
-		}
+		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => x.UserId == dto.UserId);
+		if (dto.ProductOwnerId.IsNotNullOrEmpty()) q = q.Where(x => x.ProductOwnerId == dto.ProductOwnerId);
 		if (dto.StartDate.HasValue) q = q.Where(x => x.CreatedAt >= dto.StartDate);
 		if (dto.EndDate.HasValue) q = q.Where(x => x.CreatedAt <= dto.EndDate);
-		
+
 		if (dto.OrderType.HasValue)
 			if (dto.OrderType.Value != OrderType.None)
 				q = q.Where(w => w.OrderType == dto.OrderType.Value);
@@ -72,19 +67,21 @@ public class OrderRepository : IOrderRepository {
 		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
-		List<OrderEntity> list = await q.Where(x => x.Tags.Contains(TagOrder.Pending)).ToListAsync();
-		foreach (OrderEntity orderEntity in list) {
-			foreach (OrderDetailEntity orderEntityOrderDetail in orderEntity.OrderDetails!) {
-				orderEntityOrderDetail.FinalPrice = orderEntityOrderDetail.Product!.Price * orderEntityOrderDetail.Count;
-				_dbContext.Update(orderEntityOrderDetail);
+		if (dto.Tags!.Contains(TagOrder.Pending)) {
+			List<OrderEntity> list = await q.Where(x => x.Tags.Contains(TagOrder.Pending)).ToListAsync();
+			foreach (OrderEntity orderEntity in list) {
+				foreach (OrderDetailEntity orderEntityOrderDetail in orderEntity.OrderDetails!) {
+					orderEntityOrderDetail.FinalPrice = orderEntityOrderDetail.Product!.Price * orderEntityOrderDetail.Count;
+					_dbContext.Update(orderEntityOrderDetail);
+					await _dbContext.SaveChangesAsync();
+				}
+				orderEntity.TotalPrice = orderEntity.OrderDetails.Select(x => x.FinalPrice!).Sum() + orderEntity.ProductOwner!.JsonDetail.DeliveryPrice1;
+				_dbContext.Update(orderEntity);
 				await _dbContext.SaveChangesAsync();
 			}
-			orderEntity.TotalPrice = orderEntity.OrderDetails.Select(x => x.FinalPrice!).Sum() + orderEntity.ProductOwner!.JsonDetail.DeliveryPrice1;
-			_dbContext.Update(orderEntity);
-			await _dbContext.SaveChangesAsync();
 		}
 
-		return new GenericResponse<IEnumerable<OrderEntity>>(list) {
+		return new GenericResponse<IEnumerable<OrderEntity>>(q) {
 			TotalCount = totalCount,
 			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
 			PageSize = dto.PageSize
