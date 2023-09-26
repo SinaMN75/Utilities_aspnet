@@ -122,6 +122,21 @@ public class ChatRepository : IChatRepository {
 	public async Task<GenericResponse<GroupChatMessageEntity?>> CreateGroupChatMessage(GroupChatMessageCreateUpdateDto dto) {
 		List<ProductEntity?> products = new();
 		foreach (Guid id in dto.Products ?? new List<Guid>()) products.Add(await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id));
+
+		var groupChat = await _dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(f => f.Id == dto.GroupChatId);
+		if(groupChat != null)
+		{
+			if(groupChat.Type == ChatType.Private)
+			{
+				if (groupChat.Users == null || !groupChat.Users.Any()) return new GenericResponse<GroupChatMessageEntity?>(null, UtilitiesStatusCodes.BadRequest);
+				var firstUserId = groupChat.Users.First().Id;
+				var secondUserId = groupChat.Users.Last().Id;
+				Tuple<bool, UtilitiesStatusCodes> blockedState = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == firstUserId),
+																					 _dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == secondUserId));
+				if (blockedState.Item1)
+					return new GenericResponse<GroupChatMessageEntity?>(null, blockedState.Item2);
+			}
+        }
 		GroupChatMessageEntity entity = new() {
 			Message = dto.Message,
 			Type = dto.Type,
@@ -166,7 +181,7 @@ public class ChatRepository : IChatRepository {
 			IQueryable<GroupChatMessageEntity> groupchatMessages = _dbContext.Set<GroupChatMessageEntity>().Where(w => w.GroupChatId == item.Id);
 			if (seenUsers is null) { countOfMessage = groupchatMessages.Count(); }
 			else {
-				GroupChatMessageEntity lastSeenMessage = (await groupchatMessages.Where(w => w.Id == seenUsers.FkGroupChatMessage).FirstOrDefaultAsync())!;
+				GroupChatMessageEntity lastSeenMessage = (await groupchatMessages.Where(w => w.Id == seenUsers.FkGroupChatMessage.Value).FirstOrDefaultAsync())!;
 				countOfMessage = await groupchatMessages.Where(w => w.CreatedAt > lastSeenMessage.CreatedAt).CountAsync();
 			}
 			item.CountOfUnreadMessages = countOfMessage;
@@ -193,8 +208,10 @@ public class ChatRepository : IChatRepository {
 	public async Task<GenericResponse> DeleteGroupChatMessage(Guid id) {
 		var medias = _dbContext.Set<MediaEntity>().Where(w => w.GroupChatMessageId == id);
 		if(medias is not null && medias.Any()) _dbContext.RemoveRange(medias);
+		var seenUsers = _dbContext.Set<SeenUsers>().Where(w=>w.FkGroupChatMessage == id);
+        if (seenUsers is not null && seenUsers.Any()) _dbContext.RemoveRange(seenUsers);
         await _dbContext.Set<GroupChatMessageEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
-		await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}
 
