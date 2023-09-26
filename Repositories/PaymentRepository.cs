@@ -80,46 +80,43 @@ public class PaymentRepository : IPaymentRepository {
 	}
 
 	public async Task<GenericResponse<string?>> PayOrder(Guid orderId) {
-		try {
-			OrderEntity order = (await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails).FirstOrDefaultAsync(x => x.Id == orderId))!;
+		OrderEntity order = (await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails).FirstOrDefaultAsync(x => x.Id == orderId))!;
 
-			bool orderHasPhisycalProduct = order.OrderDetails!.Any(a => a.ProductId.HasValue);
-			if (orderHasPhisycalProduct) {
-				foreach (OrderDetailEntity orderDetail in order.OrderDetails!) {
-					ProductEntity? product = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == orderDetail.ProductId);
-					if (product != null) {
-						if (product.Stock < orderDetail.Count) {
-                            await _dbContext.Set<OrderDetailEntity>().Where(i => i.Id == orderDetail.Id).ExecuteDeleteAsync();
-                        }
-                    }
+		bool orderHasPhisycalProduct = order.OrderDetails!.Any(a => a.ProductId.HasValue);
+		if (orderHasPhisycalProduct) {
+			foreach (OrderDetailEntity orderDetail in order.OrderDetails!) {
+				ProductEntity? product = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == orderDetail.ProductId);
+				if (product != null) {
+					if (product.Stock < orderDetail.Count) {
+						await _dbContext.Set<OrderDetailEntity>().Where(i => i.Id == orderDetail.Id).ExecuteDeleteAsync();
+					}
 				}
 			}
-
-			UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
-			Payment payment = new(_appSettings.PaymentSettings.Id, order.TotalPrice!.Value);
-			string callbackUrl = $"{Server.ServerAddress}/CallBack/{orderId}";
-			string desc = $"خرید محصول {order.Description}";
-			PaymentRequestResponse? result = payment.PaymentRequest(desc, callbackUrl, "", user?.PhoneNumber).Result;
-			await _dbContext.Set<TransactionEntity>().AddAsync(new TransactionEntity {
-				Amount = order.TotalPrice,
-				Authority = result.Authority,
-				CreatedAt = DateTime.Now,
-				TransactionType = TransactionType.Buy,
-				Descriptions = desc,
-				GatewayName = "ZarinPal",
-				UserId = _userId,
-				OrderId = orderId,
-				StatusId = TransactionStatus.Pending
-			});
-			await _dbContext.SaveChangesAsync();
-
-			if (result.Status == 100 && result.Authority.Length == 36) {
-				string url = $"https://www.zarinpal.com/pg/StartPay/{result.Authority}";
-				return new GenericResponse<string?>(url);
-			}
-			return new GenericResponse<string?>("", UtilitiesStatusCodes.BadRequest);
 		}
-		catch (Exception ex) { return new GenericResponse<string?>(ex.Message, UtilitiesStatusCodes.BadRequest); }
+
+		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
+		Payment payment = new(_appSettings.PaymentSettings.Id, order.TotalPrice!.Value);
+		string callbackUrl = $"{Server.ServerAddress}/CallBack/{orderId}";
+		string desc = $"خرید محصول {order.Description}";
+		PaymentRequestResponse? result = payment.PaymentRequest(desc, callbackUrl, "", user?.PhoneNumber).Result;
+		await _dbContext.Set<TransactionEntity>().AddAsync(new TransactionEntity {
+			Amount = order.TotalPrice,
+			Authority = result.Authority,
+			CreatedAt = DateTime.Now,
+			TransactionType = TransactionType.Buy,
+			Descriptions = desc,
+			GatewayName = "ZarinPal",
+			UserId = _userId,
+			OrderId = orderId,
+			StatusId = TransactionStatus.Pending
+		});
+		await _dbContext.SaveChangesAsync();
+
+		if (result.Status == 100 && result.Authority.Length == 36) {
+			string url = $"https://www.zarinpal.com/pg/StartPay/{result.Authority}";
+			return new GenericResponse<string?>(url);
+		}
+		return new GenericResponse<string?>("", UtilitiesStatusCodes.BadRequest);
 	}
 
 	public async Task<GenericResponse> WalletCallBack(
