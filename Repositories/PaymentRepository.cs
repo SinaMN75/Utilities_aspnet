@@ -82,16 +82,9 @@ public class PaymentRepository : IPaymentRepository {
 	public async Task<GenericResponse<string?>> PayOrder(Guid orderId) {
 		OrderEntity order = (await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails).FirstOrDefaultAsync(x => x.Id == orderId))!;
 
-		bool orderHasPhisycalProduct = order.OrderDetails!.Any(a => a.ProductId.HasValue);
-		if (orderHasPhisycalProduct) {
-			foreach (OrderDetailEntity orderDetail in order.OrderDetails!) {
-				ProductEntity? product = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == orderDetail.ProductId);
-				if (product != null) {
-					if (product.Stock < orderDetail.Count) {
-						await _dbContext.Set<OrderDetailEntity>().Where(i => i.Id == orderDetail.Id).ExecuteDeleteAsync();
-					}
-				}
-			}
+		foreach (OrderDetailEntity orderDetail in order.OrderDetails!) {
+			ProductEntity product = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == orderDetail.ProductId))!;
+			if (product.Stock < orderDetail.Count) { await _dbContext.Set<OrderDetailEntity>().Where(i => i.Id == orderDetail.Id).ExecuteDeleteAsync(); }
 		}
 
 		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
