@@ -223,11 +223,11 @@ public class OrderRepository : IOrderRepository {
 			
 			foreach (OrderDetailEntity orderEntityOrderDetail in orderEntity.OrderDetails!) {
 				orderEntityOrderDetail.FinalPrice = orderEntityOrderDetail.Product!.Price * orderEntityOrderDetail.Count;
-				_dbContext.Update(orderEntityOrderDetail);
+				_dbContext.Set<OrderDetailEntity>().Update(orderEntityOrderDetail);
 				await _dbContext.SaveChangesAsync();
 			}
 			orderEntity.TotalPrice = orderEntity.OrderDetails.Select(x => x.FinalPrice!).Sum() + (orderEntity.ProductOwner!.JsonDetail.DeliveryPrice1 ?? 0);
-			_dbContext.Update(orderEntity);
+			_dbContext.Set<OrderEntity>().Update(orderEntity);
 			await _dbContext.SaveChangesAsync();
 		}
 	}
