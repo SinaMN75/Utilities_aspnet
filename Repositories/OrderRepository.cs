@@ -50,11 +50,7 @@ public class OrderRepository : IOrderRepository {
 		if (dto.ProductOwnerId.IsNotNullOrEmpty()) q = q.Where(x => x.ProductOwnerId == dto.ProductOwnerId);
 		if (dto.StartDate.HasValue) q = q.Where(x => x.CreatedAt >= dto.StartDate);
 		if (dto.EndDate.HasValue) q = q.Where(x => x.CreatedAt <= dto.EndDate);
-
-		if (dto.OrderType.HasValue)
-			if (dto.OrderType.Value != OrderType.None)
-				q = q.Where(w => w.OrderType == dto.OrderType.Value);
-
+		
 		foreach (OrderEntity orderEntity in q) {
 			if (orderEntity.OrderDetails.IsNullOrEmpty()) {
 				foreach (TransactionEntity orderEntityTransaction in orderEntity.Transactions ?? new List<TransactionEntity>())

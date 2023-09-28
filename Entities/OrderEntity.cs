@@ -75,7 +75,6 @@ public class ApplyDiscountCodeOnOrderDto {
 
 public class OrderFilterDto {
 	public Guid? Id { get; set; }
-	public OrderType? OrderType { get; set; }
 	public string? PayNumber { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
