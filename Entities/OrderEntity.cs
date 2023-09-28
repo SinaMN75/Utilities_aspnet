@@ -2,8 +2,6 @@
 
 [Table("Order")]
 public class OrderEntity : BaseEntity {
-	public OrderType OrderType { get; set; } = OrderType.None;
-
 	[MaxLength(500)]
 	public string? Description { get; set; }
 
@@ -44,6 +42,8 @@ public class OrderDetailEntity : BaseEntity {
 	public int? UnitPrice { get; set; }
 	public int? Count { get; set; }
 
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public OrderEntity? Order { get; set; }
 	public Guid? OrderId { get; set; }
 

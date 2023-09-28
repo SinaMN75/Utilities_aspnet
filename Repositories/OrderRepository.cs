@@ -34,6 +34,7 @@ public class OrderRepository : IOrderRepository {
 	}
 
 	public async Task<GenericResponse<IEnumerable<OrderEntity>>> Filter(OrderFilterDto dto) {
+		await UpdateCartPrices();
 		IQueryable<OrderEntity> q = _dbContext.Set<OrderEntity>()
 			.Include(x => x.Address)
 			.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product).ThenInclude(x => x!.Media)
@@ -50,29 +51,9 @@ public class OrderRepository : IOrderRepository {
 		if (dto.ProductOwnerId.IsNotNullOrEmpty()) q = q.Where(x => x.ProductOwnerId == dto.ProductOwnerId);
 		if (dto.StartDate.HasValue) q = q.Where(x => x.CreatedAt >= dto.StartDate);
 		if (dto.EndDate.HasValue) q = q.Where(x => x.CreatedAt <= dto.EndDate);
-
-		foreach (OrderEntity orderEntity in q) {
-			if (orderEntity.OrderDetails.IsNullOrEmpty())
-				_dbContext.Remove(orderEntity);
-		}
-		await _dbContext.SaveChangesAsync();
-
+		
 		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
-
-		if (dto.Tags!.Contains(TagOrder.Pending)) {
-			List<OrderEntity> list = await q.Where(x => x.Tags.Contains(TagOrder.Pending)).ToListAsync();
-			foreach (OrderEntity orderEntity in list) {
-				foreach (OrderDetailEntity orderEntityOrderDetail in orderEntity.OrderDetails!) {
-					orderEntityOrderDetail.FinalPrice = orderEntityOrderDetail.Product!.Price * orderEntityOrderDetail.Count;
-					_dbContext.Update(orderEntityOrderDetail);
-					await _dbContext.SaveChangesAsync();
-				}
-				orderEntity.TotalPrice = orderEntity.OrderDetails.Select(x => x.FinalPrice!).Sum() + orderEntity.ProductOwner!.JsonDetail.DeliveryPrice1;
-				_dbContext.Update(orderEntity);
-				await _dbContext.SaveChangesAsync();
-			}
-		}
 
 		return new GenericResponse<IEnumerable<OrderEntity>>(q) {
 			TotalCount = totalCount,
@@ -226,5 +207,28 @@ public class OrderRepository : IOrderRepository {
 		_dbContext.Update(orderDetail);
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
+	}
+
+	private async Task UpdateCartPrices() {
+		List<OrderEntity> q = await _dbContext.Set<OrderEntity>()
+			.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product)
+			.Include(x => x.ProductOwner)
+			.Where(x => x.Tags.Contains(TagOrder.Pending))
+			.ToListAsync();
+
+		foreach (OrderEntity orderEntity in q) {
+			if (orderEntity.OrderDetails.IsNullOrEmpty())
+				_dbContext.Remove(orderEntity);
+			await _dbContext.SaveChangesAsync();
+			
+			foreach (OrderDetailEntity orderEntityOrderDetail in orderEntity.OrderDetails!) {
+				orderEntityOrderDetail.FinalPrice = orderEntityOrderDetail.Product!.Price * orderEntityOrderDetail.Count;
+				_dbContext.Update(orderEntityOrderDetail);
+				await _dbContext.SaveChangesAsync();
+			}
+			orderEntity.TotalPrice = orderEntity.OrderDetails.Select(x => x.FinalPrice!).Sum() + (orderEntity.ProductOwner!.JsonDetail.DeliveryPrice1 ?? 0);
+			_dbContext.Update(orderEntity);
+			await _dbContext.SaveChangesAsync();
+		}
 	}
 }

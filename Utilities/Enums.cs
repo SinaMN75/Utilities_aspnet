@@ -96,12 +96,6 @@ public enum Priority {
 	Low = 103
 }
 
-public enum OrderType {
-	None = 100,
-	Physical = 101,
-	Digital = 102
-}
-
 public enum SubscriptionType {
 	None = 100,
 	Promotion = 101,
