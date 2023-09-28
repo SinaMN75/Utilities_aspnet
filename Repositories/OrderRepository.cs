@@ -50,15 +50,12 @@ public class OrderRepository : IOrderRepository {
 		if (dto.ProductOwnerId.IsNotNullOrEmpty()) q = q.Where(x => x.ProductOwnerId == dto.ProductOwnerId);
 		if (dto.StartDate.HasValue) q = q.Where(x => x.CreatedAt >= dto.StartDate);
 		if (dto.EndDate.HasValue) q = q.Where(x => x.CreatedAt <= dto.EndDate);
-		
+
 		foreach (OrderEntity orderEntity in q) {
-			if (orderEntity.OrderDetails.IsNullOrEmpty()) {
-				foreach (TransactionEntity orderEntityTransaction in orderEntity.Transactions ?? new List<TransactionEntity>())
-					_dbContext.Remove(orderEntityTransaction);
+			if (orderEntity.OrderDetails.IsNullOrEmpty())
 				_dbContext.Remove(orderEntity);
-			}
-			await _dbContext.SaveChangesAsync();
 		}
+		await _dbContext.SaveChangesAsync();
 
 		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
