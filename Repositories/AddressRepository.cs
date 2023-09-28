@@ -37,14 +37,14 @@ public class AddressRepository : IAddressRepository {
 
 	public async Task<GenericResponse<AddressEntity?>> Update(AddressCreateUpdateDto addressDto, CancellationToken ct) {
 		AddressEntity e = (await _dbContext.Set<AddressEntity>().FirstOrDefaultAsync(f => f.Id == addressDto.Id, ct))!;
-		e.PostalCode = addressDto.PostalCode ?? e.PostalCode;
-		e.Pelak = addressDto.Pelak ?? e.Pelak;
-		e.Unit = addressDto.Unit ?? e.Unit;
-		e.Address = addressDto.Address ?? e.Address;
+		e.PostalCode = addressDto.PostalCode;
+		e.Pelak = addressDto.Pelak;
+		e.Unit = addressDto.Unit;
+		e.Address = addressDto.Address;
 		e.UpdatedAt = DateTime.Now;
-		e.ReceiverFullName = addressDto.ReceiverFullName ?? e.ReceiverFullName;
-		e.ReceiverPhoneNumber = addressDto.ReceiverPhoneNumber ?? e.ReceiverPhoneNumber;
-		if (addressDto.IsDefault.IsTrue() && _dbContext.Set<AddressEntity>().Any(a => a.UserId == e.UserId && a.Id != e.Id && e.IsDefault))
+		e.ReceiverFullName = addressDto.ReceiverFullName;
+		e.ReceiverPhoneNumber = addressDto.ReceiverPhoneNumber;
+		if (addressDto.IsDefault && _dbContext.Set<AddressEntity>().Any(a => a.UserId == e.UserId && a.Id != e.Id && e.IsDefault))
 			foreach (AddressEntity? item in _dbContext.Set<AddressEntity>().Where(a => a.UserId == e.UserId && a.Id != e.Id && e.IsDefault)) {
 				item.IsDefault = false;
 				_dbContext.Update(item);
