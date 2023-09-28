@@ -43,7 +43,7 @@ public class OrderRepository : IOrderRepository {
 			.Include(x => x.ProductOwner).ThenInclude(x => x!.Media)
 			.OrderBy(x => x.CreatedAt);
 
-		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags!.Contains(y)));
+		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.Any(y => x.Tags!.Contains(y)));
 
 		if (dto.Id.HasValue) q = q.Where(x => x.Id == dto.Id);
 		if (dto.PayNumber.IsNotNullOrEmpty()) q = q.Where(x => (x.PayNumber ?? "").Contains(dto.PayNumber!));
