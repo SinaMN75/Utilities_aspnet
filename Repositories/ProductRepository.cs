@@ -124,7 +124,7 @@ public class ProductRepository : IProductRepository {
 			q = q.Where(w => w.User!.IsPrivate == false);
 		}
 		if (dto.ShowChildren.IsTrue()) q = q.Include(i => i.Children)!.ThenInclude(x => x.Media);
-		if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories);
+		if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(x => x.Children);
 		if (dto.ShowComments.IsTrue()) q = q.Include(i => i.Comments!.Where(x => x.Parent == null));
 		if (dto.ShowCategoryMedia.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.Media);
 		if (dto.ShowForms.IsTrue()) q = q.Include(i => i.Forms);
