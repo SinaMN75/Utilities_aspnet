@@ -82,4 +82,7 @@ public class DashboardReadDto {
 	public int Transactions { get; set; }
 	public int Reports { get; set; }
 	public int Address { get; set; }
+	public int ReleasedProducts { get; set; }
+	public int InQueueProducts { get; set; }
+	public int NotAcceptedProducts { get; set; }
 }
