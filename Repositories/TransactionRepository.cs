@@ -27,15 +27,14 @@ public class TransactionRepository : ITransactionRepository {
 	public GenericResponse<IQueryable<TransactionEntity>> Filter(TransactionFilterDto dto) {
 		IQueryable<TransactionEntity> q = _dbContext.Set<TransactionEntity>().Include(x => x.User).Include(x => x.Order).AsNoTracking();
 		if (dto.RefId is not null) q = q.Where(x => x.RefId == dto.RefId);
-		if (dto.StatusId is not null) q = q.Where(x => x.StatusId == dto.StatusId);
 		if (dto.UserId is not null) q = q.Where(x => x.UserId == dto.UserId);
 		if (dto.Authority is not null) q = q.Where(x => x.Authority == dto.Authority);
 		if (dto.Amount is not null) q = q.Where(x => x.Amount == dto.Amount);
 		if (dto.ShebaNumber is not null) q = q.Where(x => x.ShebaNumber == dto.ShebaNumber);
-		if (dto.TransactionType is not null) q = q.Where(x => x.TransactionType == dto.TransactionType);
 		if (dto.OrderId is not null) q = q.Where(x => x.OrderId == dto.OrderId);
 		if (dto.GatewayName is not null) q = q.Where(x => x.GatewayName == dto.GatewayName);
 		if (dto.PaymentId is not null) q = q.Where(x => x.PaymentId == dto.PaymentId);
+		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
 
 		return new GenericResponse<IQueryable<TransactionEntity>>(q.AsNoTracking());
 	}

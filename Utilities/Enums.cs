@@ -175,6 +175,17 @@ public enum TransactionType {
 	Recharge = 105
 }
 
+public enum TagTransaction {
+	DepositToWallet = 101,
+	WithdrawFromTheWallet = 102,
+	Buy = 103,
+	Sell = 104,
+	Recharge = 105,
+	Pending = 200,
+	Fail = 201,
+	Success = 202
+}
+
 public enum TagCategory {
 	Category = 100,
 	YooNote = 101,

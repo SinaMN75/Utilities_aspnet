@@ -20,9 +20,10 @@ public class TransactionEntity : BaseEntity {
 	public string? ShebaNumber { get; set; }
 
 	public long? RefId { get; set; }
-	public TransactionStatus? StatusId { get; set; } = TransactionStatus.Pending;
-	public TransactionType? TransactionType { get; set; } = Utilities.TransactionType.None;
 
+	[MaxLength(100)]
+	public List<TagTransaction> Tags { get; set; } = new();
+	
 	public UserEntity? User { get; set; }
 	public string? UserId { get; set; }
 
@@ -39,8 +40,7 @@ public class TransactionFilterDto {
 	public string? PaymentId { get; set; }
 	public string? ShebaNumber { get; set; }
 	public long? RefId { get; set; }
-	public TransactionStatus? StatusId { get; set; } = TransactionStatus.Pending;
-	public TransactionType? TransactionType { get; set; } = Utilities.TransactionType.None;
+	public List<TagTransaction>? Tags { get; set; }
 	public string? UserId { get; set; }
 	public Guid? OrderId { get; set; }
 }
