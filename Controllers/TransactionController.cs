@@ -10,7 +10,4 @@ public class TransactionController : BaseApiController {
 
 	[HttpPost("Filter")]
 	public ActionResult<GenericResponse<IQueryable<TransactionEntity>>> Filter(TransactionFilterDto dto) => Result(_repository.Filter(dto));
-
-	[HttpGet("Mine")]
-	public ActionResult<GenericResponse<IQueryable<TransactionEntity>>> ReadMine() => Result(_repository.ReadMine());
 }

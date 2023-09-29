@@ -2,7 +2,6 @@ namespace Utilities_aspnet.Repositories;
 
 public interface ITransactionRepository {
 	GenericResponse<IQueryable<TransactionEntity>> Filter(TransactionFilterDto dto);
-	GenericResponse<IQueryable<TransactionEntity>> ReadMine();
 	Task<GenericResponse<TransactionEntity>> Create(TransactionEntity dto, CancellationToken ct);
 }
 
@@ -40,6 +39,4 @@ public class TransactionRepository : ITransactionRepository {
 
 		return new GenericResponse<IQueryable<TransactionEntity>>(q.AsNoTracking());
 	}
-
-	public GenericResponse<IQueryable<TransactionEntity>> ReadMine() => new(_dbContext.Set<TransactionEntity>().Where(i => i.UserId == _userId).AsNoTracking());
 }
