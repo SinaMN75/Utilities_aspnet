@@ -395,17 +395,10 @@ public enum TagOrder {
 	CoinPay = 305,
 	PaypalPay = 306,
 	Pending = 400,
-	Canceled = 401,
 	Paid = 402,
-	Accept = 403,
-	Reject = 404,
-	InProgress = 405,
 	InProcess = 406,
 	Shipping = 407,
-	Refund = 408,
-	RefundComplete = 409,
-	Complete = 410,
-	PaidFail = 412
+	Complete = 410
 }
 
 public enum TagUser {
