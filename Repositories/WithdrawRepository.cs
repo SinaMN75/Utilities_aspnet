@@ -48,7 +48,6 @@ public class WithdrawRepository : IWithdrawRepository {
 			ShebaNumber = dto.ShebaNumber,
 			Amount = dto.Amount,
 			CreatedAt = DateTime.Now,
-			TransactionType = TransactionType.WithdrawFromTheWallet,
 			UpdatedAt = DateTime.Now
 		};
 		await _dbContext.Set<TransactionEntity>().AddAsync(transaction);

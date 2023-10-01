@@ -33,11 +33,9 @@ public class PaymentRepository : IPaymentRepository {
 				Amount = p.Price,
 				Authority = result.Authority,
 				CreatedAt = DateTime.Now,
-				TransactionType = TransactionType.Buy,
 				Descriptions = desc,
 				GatewayName = "ZarinPal",
 				UserId = _userId,
-				StatusId = TransactionStatus.Pending
 			});
 			await _dbContext.SaveChangesAsync();
 
@@ -64,9 +62,9 @@ public class PaymentRepository : IPaymentRepository {
 				CreatedAt = DateTime.Now,
 				Descriptions = desc,
 				GatewayName = "ZarinPal",
-				TransactionType = TransactionType.Recharge,
+				// TransactionType = TransactionType.Recharge,
 				UserId = _userId,
-				StatusId = TransactionStatus.Pending
+				// StatusId = TransactionStatus.Pending
 			});
 			await _dbContext.SaveChangesAsync();
 
@@ -96,12 +94,12 @@ public class PaymentRepository : IPaymentRepository {
 			Amount = order.TotalPrice,
 			Authority = result.Authority,
 			CreatedAt = DateTime.Now,
-			TransactionType = TransactionType.Buy,
+			// TransactionType = TransactionType.Buy,
 			Descriptions = desc,
 			GatewayName = "ZarinPal",
 			UserId = _userId,
 			OrderId = orderId,
-			StatusId = TransactionStatus.Pending
+			// StatusId = TransactionStatus.Pending
 		});
 		await _dbContext.SaveChangesAsync();
 
@@ -125,7 +123,7 @@ public class PaymentRepository : IPaymentRepository {
 		PaymentVerificationResponse? verify = payment.Verification(authority).Result;
 		TransactionEntity? pay = _dbContext.Set<TransactionEntity>().FirstOrDefault(x => x.Authority == authority);
 		if (pay != null) {
-			pay.StatusId = (TransactionStatus?) Math.Abs(verify.Status);
+			// pay.StatusId = (TransactionStatus?) Math.Abs(verify.Status);
 			pay.RefId = verify.RefId;
 			pay.UpdatedAt = DateTime.Now;
 			_dbContext.Set<TransactionEntity>().Update(pay);
@@ -150,7 +148,7 @@ public class PaymentRepository : IPaymentRepository {
 		PaymentVerificationResponse? verify = payment.Verification(authority).Result;
 		TransactionEntity? pay = await _dbContext.Set<TransactionEntity>().FirstOrDefaultAsync(x => x.Authority == authority);
 		if (pay != null) {
-			pay.StatusId = (TransactionStatus?) Math.Abs(verify.Status);
+			// pay.StatusId = (TransactionStatus?) Math.Abs(verify.Status);
 			pay.RefId = verify.RefId;
 			pay.UpdatedAt = DateTime.Now;
 			_dbContext.Set<TransactionEntity>().Update(pay);
@@ -195,7 +193,7 @@ public class PaymentRepository : IPaymentRepository {
 			Descriptions = $"پرداختی بابت سفارش محصول {order.OrderDetails!.Select(s => s.Product!.Title).ToList()}",
 			GatewayName = pay?.GatewayName ?? "",
 			OrderId = order.Id,
-			TransactionType = TransactionType.Sell,
+			// TransactionType = TransactionType.Sell,
 			UserId = productOwner.Id
 		};
 		await _dbContext.AddAsync(prOwnerTransaction);
@@ -216,12 +214,12 @@ public class PaymentRepository : IPaymentRepository {
 				Amount = (int) spe.Amount,
 				Authority = result.Authority,
 				CreatedAt = DateTime.Now,
-				TransactionType = TransactionType.Recharge,
+				// TransactionType = TransactionType.Recharge,
 				Descriptions = desc,
 				GatewayName = "ZarinPal",
 				UserId = _userId,
 				SubscriptionId = spe.Id,
-				StatusId = TransactionStatus.Pending
+				// StatusId = TransactionStatus.Pending
 			});
 			await _dbContext.SaveChangesAsync();
 
@@ -245,7 +243,7 @@ public class PaymentRepository : IPaymentRepository {
 		PaymentVerificationResponse? verify = payment.Verification(authority).Result;
 		TransactionEntity? pay = await _dbContext.Set<TransactionEntity>().FirstOrDefaultAsync(x => x.Authority == authority);
 		if (pay != null) {
-			pay.StatusId = (TransactionStatus?) Math.Abs(verify.Status);
+			// pay.StatusId = (TransactionStatus?) Math.Abs(verify.Status);
 			pay.RefId = verify.RefId;
 			pay.UpdatedAt = DateTime.Now;
 			_dbContext.Set<TransactionEntity>().Update(pay);
