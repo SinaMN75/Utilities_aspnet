@@ -253,7 +253,9 @@ public class UserFilterDto {
 	public bool? ShowSuspend { get; set; }
 	public bool? ShowMyCustomers { get; set; }
 	public bool? OrderByUserName { get; set; }
-	public IEnumerable<string>? UserIds { get; set; }
+    public bool? NoneOfMyFollowing { get; set; }
+    public bool? NoneOfMyFollower{ get; set; }
+    public IEnumerable<string>? UserIds { get; set; }
 	public IEnumerable<string>? PhoneNumbers { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 	public List<TagUser>? Tags { get; set; }
