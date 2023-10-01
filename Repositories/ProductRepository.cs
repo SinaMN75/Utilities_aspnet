@@ -333,7 +333,7 @@ public class ProductRepository : IProductRepository {
 			.Include(i => i.User)
 			.Where(w => w.ProductId == dto.ProductId);
 
-		if (dto.Reaction.HasValue) q = q.Where(w => w.Reaction.Value.HasFlag(dto.Reaction.Value));
+		if (dto.Reaction.HasValue) q = q.Where(w => (int)w.Reaction!.Value == (int)dto.Reaction.Value);
 
 		int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
