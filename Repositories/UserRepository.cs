@@ -384,7 +384,7 @@ public class UserRepository : IUserRepository {
 		UserId = userId,
 		Amount = amount,
 		Descriptions = description,
-		TransactionType = type,
+		// TransactionType = type,
 		ShebaNumber = shebaNumber
 	};
 
