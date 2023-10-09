@@ -271,7 +271,7 @@ public enum TagCategory {
 	Payment = 181,
 	Favorites = 182,
 	Special = 183,
-	Recommended
+	Recommended = 184
 }
 
 public enum TagContent {
@@ -381,6 +381,17 @@ public enum TagProduct {
 	Payment = 164,
 	Participants = 165,
 	File = 166,
+	Remote = 168,
+	OnSite = 169,
+	PricePerDay = 170,
+	PricePerPerson = 171,
+	PricePerPage = 172,
+	PricePerCount = 173,
+	PricePerHour = 174,
+	PricePerMinute = 175,
+	Reserve = 176,
+	MicroBlog = 177,
+	DeliveryCost = 178,
 	New = 201,
 	KindOfNew = 202,
 	Used = 203,
@@ -409,6 +420,7 @@ public enum TagOrder {
 	Paid = 402,
 	InProcess = 406,
 	Shipping = 407,
+	Sent = 408,
 	Complete = 410
 }
 
