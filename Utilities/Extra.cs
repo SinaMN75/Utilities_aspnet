@@ -59,6 +59,21 @@ public static partial class StringExtension {
 
 	[GeneratedRegex(@"^[^@\s]+@[^@\s]+\.(com|net|org|gov)$", RegexOptions.IgnoreCase, "en-US")]
 	private static partial Regex MyRegex();
+
+    private static Random rand = new Random();
+
+    public static IQueryable<ProductEntity> Shuffle(this IQueryable<ProductEntity> list)
+    {
+        var values = list.ToList();
+        for (int i = values.Count - 1; i > 0; i--)
+        {
+            int k = rand.Next(i + 1);
+            ProductEntity value = values[k];
+            values[k] = values[i];
+            values[i] = value;
+        }
+        return values.AsQueryable();
+    }
 }
 
 public class Utils {

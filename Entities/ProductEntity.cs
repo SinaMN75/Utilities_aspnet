@@ -227,6 +227,9 @@ public class ProductFilterDto {
 	public bool ShowExpired { get; set; } = false;
 	public bool Boosted { get; set; }
 	public bool ShowWithChildren { get; set; } = false;
+	public bool? Shuffle1 { get; set; } = false;
+	public bool? Shuffle2 { get; set; } = false;
+	public bool? PostsThatMyFollowersSeen { get; set; } = false;
 }
 
 public class ProductInsightDto {
