@@ -194,8 +194,12 @@ public class ProductRepository : IProductRepository
         if (dto.OrderByCreatedDate.IsTrue()) q = q.OrderBy(x => x.CreatedAt);
         if (dto.OrderByCreatedDateDescending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 
-        postsThatMyFollowersSeen.AddRange(q.ToList());
-        q = postsThatMyFollowersSeen.AsQueryable();
+        //Its Important to double check this condition , dont delete it <MohamadHosein>
+        if (dto.PostsThatMyFollowersSeen.IsTrue())
+        {
+            postsThatMyFollowersSeen.AddRange(q.ToList());
+            q = postsThatMyFollowersSeen.AsQueryable();
+        }
 
         if (dto.Shuffle1.IsTrue()) q = q.Shuffle();
         if (dto.Shuffle2.IsTrue())
