@@ -90,7 +90,18 @@ public class UserRepository : IUserRepository {
 		if (dto.AppUserName != null) q = q.Where(x => x.AppUserName!.Contains(dto.AppUserName));
 		if (dto.AppPhoneNumber != null) q = q.Where(x => x.AppPhoneNumber!.Contains(dto.AppPhoneNumber));
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
-
+		if (dto.NoneOfMyFollowing.IsTrue())
+		{
+			var user = _dbContext.Set<UserEntity>().FirstOrDefault(x => x.Id == _userId);
+			var myFollowing = user.FollowingUsers.Split(",");
+            q = q.Where(x => !myFollowing.Contains(x.Id));
+		}
+		if (dto.NoneOfMyFollower.IsTrue())
+		{
+			var user = _dbContext.Set<UserEntity>().FirstOrDefault(x => x.Id == _userId);
+			var myFollower = user.FollowedUsers.Split(",");
+            q = q.Where(x => !myFollower.Contains(x.Id));
+		}
 
 		if (dto.Query != null)
 			q = q.Where(x => x.FirstName!.Contains(dto.Query) ||
