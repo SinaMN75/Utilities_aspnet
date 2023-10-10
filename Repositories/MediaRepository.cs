@@ -21,7 +21,6 @@ public class MediaRepository : IMediaRepository {
 
 		if (model.Files != null)
 			foreach (IFormFile file in model.Files) {
-				string name = Guid.NewGuid() + Path.GetExtension(file.FileName);
 
 				List<string> allowedExtensions = new() { ".png", ".gif", ".jpg", ".jpeg", ".mp4", ".mp3", ".pdf", ".aac", ".apk", ".zip", ".rar" };
 				if (!allowedExtensions.Contains(Path.GetExtension(file.FileName.ToLower())))
@@ -38,8 +37,9 @@ public class MediaRepository : IMediaRepository {
 				else if (model.NotificationId is not null) folderName = "notifications/";
 				else if (model.GroupChatId is not null) folderName = "groupChats/";
 				else if (model.GroupChatMessageId is not null) folderName = "groupChatMessages/";
+				string name = $"{folderName}{Guid.NewGuid() + Path.GetExtension(file.FileName)}";
 				MediaEntity media = new() {
-					FileName = $"{folderName}{name}",
+					FileName = name,
 					UserId = model.UserId,
 					ProductId = model.ProductId,
 					ContentId = model.ContentId,
