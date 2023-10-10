@@ -27,8 +27,19 @@ public class MediaRepository : IMediaRepository {
 				if (!allowedExtensions.Contains(Path.GetExtension(file.FileName.ToLower())))
 					return new GenericResponse<IEnumerable<MediaEntity>?>(null, UtilitiesStatusCodes.BadRequest);
 
+				string folderName = "";
+				if (model.UserId is not null) folderName = "users/";
+				else if (model.ProductId is not null) folderName = "products/";
+				else if (model.ContentId is not null) folderName = "contents/";
+				else if (model.CategoryId is not null) folderName = "categories/";
+				else if (model.ChatId is not null) folderName = "chats/";
+				else if (model.CommentId is not null) folderName = "comments/";
+				else if (model.BookmarkId is not null) folderName = "bookmarks/";
+				else if (model.NotificationId is not null) folderName = "notifications/";
+				else if (model.GroupChatId is not null) folderName = "groupChats/";
+				else if (model.GroupChatMessageId is not null) folderName = "groupChatMessages/";
 				MediaEntity media = new() {
-					FileName = name,
+					FileName = $"{folderName}{name}",
 					UserId = model.UserId,
 					ProductId = model.ProductId,
 					ContentId = model.ContentId,
@@ -130,7 +141,6 @@ public class MediaRepository : IMediaRepository {
 
 	public void SaveMedia(IFormFile image, string name) {
 		string webRoot = _env.WebRootPath;
-		string nullPath = Path.Combine(webRoot, "Medias", "null.png");
 		string path = Path.Combine(webRoot, "Medias", name);
 		string uploadDir = Path.Combine(webRoot, "Medias");
 		if (!Directory.Exists(uploadDir))
@@ -143,7 +153,7 @@ public class MediaRepository : IMediaRepository {
 			image.CopyTo(stream);
 		}
 		catch (Exception ex) {
-			File.Copy(nullPath, path);
+			File.Copy(Path.Combine(webRoot, "Medias", "null.png"), path);
 			throw new ArgumentException("Exception in SaveMedia- NullPath! " + ex.Message);
 		}
 	}
