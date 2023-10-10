@@ -303,17 +303,22 @@ public class ProductRepository : IProductRepository
 
         if (entity == null) return new GenericResponse<ProductEntity>(new ProductEntity());
 
+        if (dto.Children is not null)
+            foreach (ProductCreateUpdateDto childDto in dto.Children)
+            {
+                if(childDto.Id is null) 
+                    await Create(childDto , ct);
+                else
+                {
+                    childDto.ParentId = dto.Id;
+                    await Update(childDto, ct);
+                }
+            }
+
         if (dto.ProductInsight is not null) dto.ProductInsight.UserId = _userId;
 
         ProductEntity e = await entity.FillData(dto, _dbContext);
         _dbContext.Update(e);
-
-        if (dto.Children is not null)
-            foreach (ProductCreateUpdateDto childDto in dto.Children)
-            {
-                childDto.ParentId = dto.ParentId;
-                await Update(childDto, ct);
-            }
 
         await _dbContext.SaveChangesAsync(ct);
 
