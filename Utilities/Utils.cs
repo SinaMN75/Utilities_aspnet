@@ -65,8 +65,10 @@ public static class StartupExtension {
 			options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
 			options.UseCamelCasing(true);
 		});
-
-		builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+		//Encrypt/Decrypt
+        //builder.Services.AddTransient<EncryptionMiddleware>();
+        //Encrypt/Decrypt
+        builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 		builder.Services.AddScoped<AppSettings>();
 		builder.Services.AddScoped<IReportRepository, ReportRepository>();
 		builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -154,9 +156,12 @@ public static class StartupExtension {
 		app.UseAuthorization();
 
 		app.MapHub<ChatHub>("/hubs/ChatHub");
-	}
+        //Encrypt/Decrypt
+        //app.UseMiddleware<EncryptionMiddleware>();
+        //Encrypt/Decrypt
+    }
 
-	private static void UseUtilitiesSwagger(this IApplicationBuilder app) {
+    private static void UseUtilitiesSwagger(this IApplicationBuilder app) {
 		app.UseSwagger();
 		app.UseSwaggerUI(c => {
 			c.DocExpansion(DocExpansion.None);

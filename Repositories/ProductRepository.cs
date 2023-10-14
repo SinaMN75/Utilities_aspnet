@@ -1,5 +1,4 @@
 using Newtonsoft.Json.Linq;
-using Utilities_aspnet.Utilities;
 
 namespace Utilities_aspnet.Repositories;
 
@@ -49,7 +48,6 @@ public class ProductRepository : IProductRepository
         _formRepository = formRepository;
         _commentRepository = commentRepository;
         _followBookMark = followBookMark;
-
     }
 
     public async Task<GenericResponse<ProductEntity?>> Create(ProductCreateUpdateDto dto, CancellationToken ct)
