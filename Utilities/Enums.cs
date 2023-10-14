@@ -158,6 +158,7 @@ public enum WithdrawState {
 	Requested = 101,
 	Accepted = 102,
 	Rejected = 103,
+	Done = 104
 }
 
 public enum DisplayType {
@@ -430,8 +431,22 @@ public enum TagUser {
 	Public = 102,
 	Male = 200,
 	Female = 201,
-	Unkhown = 202,
-	Legal = 203
+	Unknown = 202,
+	Legal = 203,
+	AdminCategoryRead = 300,
+	AdminCategoryUpdate = 301,
+	AdminProductRead = 302,
+	AdminProductUpdate = 303,
+	AdminUserRead= 304,
+	AdminUserUpdate= 305,
+	AdminReportRead= 306,
+	AdminReportUpdate= 307,
+	AdminTransactionRead= 308,
+	AdminTransactionUpdate= 309,
+	AdminOrderRead = 310,
+	AdminOrderUpdate= 311,
+	AdminContentRead= 312,
+	AdminContentUpdate= 313
 }
 
 public enum TagNotification { }

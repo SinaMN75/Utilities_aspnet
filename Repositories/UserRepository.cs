@@ -358,6 +358,7 @@ public class UserRepository : IUserRepository {
 		entity.ExpireUpgradeAccount = dto.ExpireUpgradeAccount ?? entity.ExpireUpgradeAccount;
 		entity.AgeCategory = dto.AgeCategory ?? entity.AgeCategory;
 		entity.Tags = dto.Tags ?? entity.Tags;
+		entity.Password = dto.Password ?? entity.Password;
 		entity.JsonDetail = new UserJsonDetail {
 			Instagram = dto.Instagram ?? entity.JsonDetail.Instagram,
 			Telegram = dto.Telegram ?? entity.JsonDetail.Telegram,

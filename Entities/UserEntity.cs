@@ -212,6 +212,7 @@ public class UserCreateUpdateDto {
 	public string? Website { get; set; }
 	public string? Activity { get; set; }
 	public string? Color { get; set; }
+	public string? Password { get; set; }
 	public GenderType? Gender { get; set; }
 	public LegalAuthenticationType? LegalAuthenticationType { get; set; }
 	public NationalityType? NationalityType { get; set; }
