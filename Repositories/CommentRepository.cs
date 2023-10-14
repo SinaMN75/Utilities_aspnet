@@ -133,8 +133,17 @@ public class CommentRepository : ICommentRepository {
 		if (dto.ProductId.HasValue) comment.ProductId = dto.ProductId;
 		if (dto.Status.HasValue) comment.Status = dto.Status;
 		if (dto.Tags.IsNotNullOrEmpty()) comment.Tags = dto.Tags;
+        if (dto.RemoveTags.IsNotNullOrEmpty())
+        {
+            dto.RemoveTags.ForEach(item => comment.Tags?.Remove(item));
+        }
 
-		comment.UpdatedAt = DateTime.Now;
+        if (dto.AddTags.IsNotNullOrEmpty())
+        {
+            comment.Tags.AddRange(dto.AddTags);
+        }
+
+        comment.UpdatedAt = DateTime.Now;
 		_dbContext.Set<CommentEntity>().Update(comment);
 		await _dbContext.SaveChangesAsync(ct);
 		await _outputCache.EvictByTagAsync("comment", ct);

@@ -129,6 +129,16 @@ public static class CategoryEntityExtension {
 			SendPrice = dto.SendPrice ?? entity.JsonDetail.SendPrice
 		};
 
-		return entity;
+        if (dto.RemoveTags.IsNotNullOrEmpty())
+        {
+            dto.RemoveTags.ForEach(item => entity.Tags?.Remove(item));
+        }
+
+        if (dto.AddTags.IsNotNullOrEmpty())
+        {
+            entity.Tags.AddRange(dto.AddTags);
+        }
+
+        return entity;
 	}
 }

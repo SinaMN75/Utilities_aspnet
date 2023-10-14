@@ -59,4 +59,6 @@ public class ContentCreateUpdateDto {
 	public string? Address2 { get; set; }
 	public string? Address3 { get; set; }
 	public List<TagContent>? Tags { get; set; }
+	public List<TagContent>? RemoveTags { get; set; }
+	public List<TagContent>? AddTags { get; set; }
 }

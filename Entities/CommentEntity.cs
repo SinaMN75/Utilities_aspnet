@@ -51,6 +51,8 @@ public class CommentCreateUpdateDto {
 	public Guid? ProductId { get; set; }
 	public ChatStatus? Status { get; set; }
 	public List<TagComment>? Tags { get; set; }
+	public List<TagComment>? RemoveTags { get; set; }
+	public List<TagComment>? AddTags { get; set; }
 }
 
 public class CommentFilterDto {

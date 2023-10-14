@@ -111,6 +111,15 @@ public class NotificationRepository : INotificationRepository
             Tags = model.Tags,
             Visited = false
         };
+        if (model.RemoveTags.IsNotNullOrEmpty())
+        {
+            model.RemoveTags.ForEach(item => notification.Tags?.Remove(item));
+        }
+
+        if (model.AddTags.IsNotNullOrEmpty())
+        {
+            notification.Tags.AddRange(model.AddTags);
+        }
         await _dbContext.Set<NotificationEntity>().AddAsync(notification);
         await _dbContext.SaveChangesAsync();
 

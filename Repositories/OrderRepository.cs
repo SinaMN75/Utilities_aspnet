@@ -28,7 +28,17 @@ public class OrderRepository : IOrderRepository {
 		oldOrder.DiscountCode = dto.DiscountCode ?? oldOrder.DiscountCode;
 		oldOrder.AddressId = dto.AddressId ?? oldOrder.AddressId;
 		oldOrder.UpdatedAt = DateTime.Now;
-		await _dbContext.SaveChangesAsync();
+
+        if (dto.RemoveTags.IsNotNullOrEmpty())
+        {
+            dto.RemoveTags.ForEach(item => oldOrder.Tags?.Remove(item));
+        }
+
+        if (dto.AddTags.IsNotNullOrEmpty())
+        {
+            oldOrder.Tags.AddRange(dto.AddTags);
+        }
+        await _dbContext.SaveChangesAsync();
 
 		return new GenericResponse<OrderEntity?>(oldOrder);
 	}

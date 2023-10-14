@@ -89,6 +89,8 @@ public class CategoryCreateUpdateDto {
 	public Guid? ParentId { get; set; }
 	public bool IsUnique { get; set; } = true;
 	public List<TagCategory>? Tags { get; set; }
+	public List<TagCategory>? RemoveTags { get; set; }
+	public List<TagCategory>? AddTags { get; set; }
 }
 
 public class CategoryFilterDto {

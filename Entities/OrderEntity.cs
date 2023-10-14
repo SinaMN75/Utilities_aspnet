@@ -61,6 +61,8 @@ public class OrderCreateUpdateDto {
 	public DateTime? ReceivedDate { get; set; }
 	public Guid? AddressId { get; set; }
 	public List<TagOrder>? Tags { get; set; }
+	public List<TagOrder>? RemoveTags { get; set; }
+	public List<TagOrder>? AddTags { get; set; }
 }
 
 public class OrderDetailCreateUpdateDto {

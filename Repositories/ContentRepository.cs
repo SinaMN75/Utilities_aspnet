@@ -59,7 +59,17 @@ public class ContentRepository : IContentRepository {
 		e.Description = dto.Description ?? e.Description;
 		e.UpdatedAt = DateTime.Now;
 		e.Tags = dto.Tags ?? e.Tags;
-		_dbContext.Update(e);
+
+        if (dto.RemoveTags.IsNotNullOrEmpty())
+        {
+            dto.RemoveTags.ForEach(item => e.Tags?.Remove(item));
+        }
+
+        if (dto.AddTags.IsNotNullOrEmpty())
+        {
+            e.Tags.AddRange(dto.AddTags);
+        }
+        _dbContext.Update(e);
 		await _dbContext.SaveChangesAsync(ct);
 		await _outputCache.EvictByTagAsync("content", ct);
 		return new GenericResponse<ContentEntity>(e);

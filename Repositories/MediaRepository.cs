@@ -133,7 +133,17 @@ public class MediaRepository : IMediaRepository {
 		media.Tags = model.Tags ?? media.Tags;
 		media.Order = model.Order ?? media.Order;
 
-		_dbContext.Set<MediaEntity>().Update(media);
+        if (model.RemoveTags.IsNotNullOrEmpty())
+        {
+            model.RemoveTags.ForEach(item => media.Tags?.Remove(item));
+        }
+
+        if (model.AddTags.IsNotNullOrEmpty())
+        {
+            media.Tags.AddRange(model.AddTags);
+        }
+
+        _dbContext.Set<MediaEntity>().Update(media);
 		await _dbContext.SaveChangesAsync();
 
 		return new GenericResponse<MediaEntity?>(media);

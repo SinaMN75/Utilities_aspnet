@@ -171,6 +171,8 @@ public class ProductCreateUpdateDto {
 	public Guid? ParentId { get; set; }
 	public List<KeyValue>? KeyValues { get; set; }
 	public List<TagProduct>? Tags { get; set; }
+	public List<TagProduct>? RemoveTags { get; set; }
+	public List<TagProduct>? AddTags { get; set; }
 
 	[JsonIgnore]
 	[System.Text.Json.Serialization.JsonIgnore]

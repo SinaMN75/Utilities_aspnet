@@ -390,7 +390,17 @@ public class UserRepository : IUserRepository {
 
 			entity.Categories = list;
 		}
-	}
+
+        if (dto.RemoveTags.IsNotNullOrEmpty())
+        {
+            dto.RemoveTags.ForEach(item => entity.Tags?.Remove(item));
+        }
+
+        if (dto.AddTags.IsNotNullOrEmpty())
+        {
+            entity.Tags.AddRange(dto.AddTags);
+        }
+    }
 
 	private static TransactionEntity MakeTransaction(string userId, int amount, string description, string? shebaNumber, TransactionType type) => new() {
 		UserId = userId,

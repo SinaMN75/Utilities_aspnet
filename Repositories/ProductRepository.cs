@@ -522,6 +522,16 @@ public static class ProductEntityExtension
             entity.Teams = temp;
         }
 
+        if (dto.RemoveTags.IsNotNullOrEmpty())
+        {
+            dto.RemoveTags.ForEach(item => entity.Tags?.Remove(item));
+        }
+
+        if (dto.AddTags.IsNotNullOrEmpty())
+        {
+            entity.Tags.AddRange(dto.AddTags);
+        }
+
         if (dto.ProductInsight is not null)
         {
             List<ProductInsight> productInsights = new();

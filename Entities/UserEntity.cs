@@ -225,6 +225,8 @@ public class UserCreateUpdateDto {
 	public string? Code { get; set; }
 	public string? ShebaNumber { get; set; }
 	public List<TagUser>? Tags { get; set; }
+	public List<TagUser>? RemoveTags { get; set; }
+	public List<TagUser>? AddTags { get; set; }
 }
 
 public class UserFilterDto {

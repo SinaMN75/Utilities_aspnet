@@ -138,4 +138,6 @@ public class UpdateMediaDto {
 	public string? Album { get; set; }
 	public int? Order { get; set; }
 	public List<TagMedia>? Tags { get; set; }
+	public List<TagMedia>? RemoveTags { get; set; }
+	public List<TagMedia>? AddTags { get; set; }
 }

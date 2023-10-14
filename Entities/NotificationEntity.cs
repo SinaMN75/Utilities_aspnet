@@ -45,6 +45,8 @@ public class NotificationCreateUpdateDto {
 	public string? UseCase { get; set; }
 	public Guid? ProductId { get; set; }
 	public List<TagNotification>? Tags { get; set; }
+	public List<TagNotification>? RemoveTags { get; set; }
+	public List<TagNotification>? AddTags { get; set; }
 }
 
 public class NotificationFilterDto {
