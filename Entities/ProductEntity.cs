@@ -86,8 +86,8 @@ public class ProductJsonDetail {
     public DateTime? EndDate { get; set; }
     public Reaction? UserReaction { get; set; }
     public List<KeyValue>? KeyValues { get; set; }
-    public List<ReservationDays>? DaysAvailable { get; set; }
-    public List<ReservationDays>? DaysReserved { get; set; }
+    public List<ReservationDays> DaysAvailable { get; set; } = new();
+    public List<ReservationDays> DaysReserved { get; set; } = new();
 }
 
 public class ReservationDays {
