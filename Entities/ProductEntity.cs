@@ -87,7 +87,7 @@ public class ProductJsonDetail {
     public Reaction? UserReaction { get; set; }
     public List<KeyValue>? KeyValues { get; set; }
     public List<ReservationDays>? DaysAvailable { get; set; }
-    public List<ReservationDays>? DaysReservedAvailable { get; set; }
+    public List<ReservationDays>? DaysReserved { get; set; }
 }
 
 public class ReservationDays {

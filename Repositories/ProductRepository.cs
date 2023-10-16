@@ -492,7 +492,7 @@ public static class ProductEntityExtension
             Type2 = dto.Type2 ?? entity.JsonDetail.Type2,
             KeyValues = dto.KeyValues ?? entity.JsonDetail.KeyValues,
             DaysAvailable = dto.DaysAvailable ?? entity.JsonDetail.DaysAvailable,
-            DaysReservedAvailable = dto.DaysReservedAvailable ?? entity.JsonDetail.DaysReservedAvailable,
+            DaysReserved = dto.DaysReservedAvailable ?? entity.JsonDetail.DaysReserved,
         };
 
         if (dto.ScorePlus.HasValue)
