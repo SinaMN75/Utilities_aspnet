@@ -64,7 +64,7 @@ public static partial class StringExtension {
 
     public static IQueryable<ProductEntity> Shuffle(this IQueryable<ProductEntity> list)
     {
-        var values = list.ToList();
+        List<ProductEntity>? values = list.ToList();
         for (int i = values.Count - 1; i > 0; i--)
         {
             int k = rand.Next(i + 1);
@@ -168,7 +168,7 @@ public class Utils {
 
 		if (discountPercent.HasValue)
 		{
-			var result = (price.Value * discountPercent.Value) / 100;
+			int result = (price.Value * discountPercent.Value) / 100;
 			return price.Value - result;
 		}
 

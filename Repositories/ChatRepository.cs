@@ -112,7 +112,7 @@ public class ChatRepository : IChatRepository {
 	}
 
 	public async Task<GenericResponse> DeleteGroupChat(Guid id) {
-        var medias = _dbContext.Set<MediaEntity>().Where(w => w.GroupChatId == id);
+        IQueryable<MediaEntity>? medias = _dbContext.Set<MediaEntity>().Where(w => w.GroupChatId == id);
         if (medias is not null && medias.Any()) _dbContext.RemoveRange(medias);
 		await _dbContext.SaveChangesAsync();
         await _dbContext.Set<GroupChatEntity>().Include(w=>w.GroupChatMessage).Where(x => x.Id == id).ExecuteDeleteAsync();
@@ -123,14 +123,14 @@ public class ChatRepository : IChatRepository {
 		List<ProductEntity?> products = new();
 		foreach (Guid id in dto.Products ?? new List<Guid>()) products.Add(await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id));
 
-		var groupChat = await _dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(f => f.Id == dto.GroupChatId);
+		GroupChatEntity? groupChat = await _dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(f => f.Id == dto.GroupChatId);
 		if(groupChat != null)
 		{
 			if(groupChat.Type == ChatType.Private)
 			{
 				if (groupChat.Users == null || !groupChat.Users.Any()) return new GenericResponse<GroupChatMessageEntity?>(null, UtilitiesStatusCodes.BadRequest);
-				var firstUserId = groupChat.Users.First().Id;
-				var secondUserId = groupChat.Users.Last().Id;
+				string? firstUserId = groupChat.Users.First().Id;
+				string? secondUserId = groupChat.Users.Last().Id;
 				Tuple<bool, UtilitiesStatusCodes> blockedState = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == firstUserId),
 																					 _dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == secondUserId));
 				if (blockedState.Item1)
@@ -206,9 +206,9 @@ public class ChatRepository : IChatRepository {
 	}
 
 	public async Task<GenericResponse> DeleteGroupChatMessage(Guid id) {
-		var medias = _dbContext.Set<MediaEntity>().Where(w => w.GroupChatMessageId == id);
+		IQueryable<MediaEntity>? medias = _dbContext.Set<MediaEntity>().Where(w => w.GroupChatMessageId == id);
 		if(medias is not null && medias.Any()) _dbContext.RemoveRange(medias);
-		var seenUsers = _dbContext.Set<SeenUsers>().Where(w=>w.FkGroupChatMessage == id);
+		IQueryable<SeenUsers>? seenUsers = _dbContext.Set<SeenUsers>().Where(w=>w.FkGroupChatMessage == id);
         if (seenUsers is not null && seenUsers.Any()) _dbContext.RemoveRange(seenUsers);
         await _dbContext.Set<GroupChatMessageEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
         await _dbContext.SaveChangesAsync();

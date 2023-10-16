@@ -189,8 +189,8 @@ public class ProductCreateUpdateDto {
     public IEnumerable<UploadDto>? Upload { get; set; }
     public IEnumerable<FormTitleDto>? Form { get; set; }
     public IEnumerable<ProductCreateUpdateDto>? Children { get; set; }
-    public List<ReservationDays> DaysAvailable { get; set; }
-    public List<ReservationDays> DaysReservedAvailable { get; set; }
+    public List<ReservationDays>? DaysAvailable { get; set; }
+    public List<ReservationDays>? DaysReservedAvailable { get; set; }
 }
 
 public class ProductFilterDto {

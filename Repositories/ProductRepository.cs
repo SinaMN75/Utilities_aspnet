@@ -118,10 +118,10 @@ public class ProductRepository : IProductRepository
         List<ProductEntity>? postsThatMyFollowersSeen = new List<ProductEntity>();
         if (dto.PostsThatMyFollowersSeen.IsTrue())
         {
-            var myFollower = await _followBookMark.GetFollowers(_userId);
+            GenericResponse<IQueryable<UserEntity>> myFollower = await _followBookMark.GetFollowers(_userId);
             if (myFollower.Result != null && myFollower.Result.Any())
             {
-                var productsThatMyFollowerSeen = _dbContext.Set<VisitProducts>().Where(w => myFollower.Result.Any(a => a.Id == w.UserId));
+                IQueryable<VisitProducts> productsThatMyFollowerSeen = _dbContext.Set<VisitProducts>().Where(w => myFollower.Result.Any(a => a.Id == w.UserId));
                 postsThatMyFollowersSeen = q.Where(x => productsThatMyFollowerSeen.Select(s => s.ProductId).Contains(x.Id)).ToList();
             }
         }
@@ -285,7 +285,7 @@ public class ProductRepository : IProductRepository
 
         i.Orders = completeOrder.OrderByDescending(x => x.TotalPrice);
 
-        var reaction = await _dbContext.Set<ReactionEntity>().FirstOrDefaultAsync(f => f.ProductId == i.Id);
+        ReactionEntity? reaction = await _dbContext.Set<ReactionEntity>().FirstOrDefaultAsync(f => f.ProductId == i.Id);
         if (reaction is not null) i.JsonDetail.UserReaction = reaction.Reaction.HasValue ? reaction.Reaction.Value : null;
 
         await _promotionRepository.UserSeened(i.Id);
@@ -490,7 +490,9 @@ public static class ProductEntityExtension
             KeyValue = dto.KeyValue ?? entity.JsonDetail.KeyValue,
             Type1 = dto.Type1 ?? entity.JsonDetail.Type1,
             Type2 = dto.Type2 ?? entity.JsonDetail.Type2,
-            KeyValues = dto.KeyValues ?? entity.JsonDetail.KeyValues
+            KeyValues = dto.KeyValues ?? entity.JsonDetail.KeyValues,
+            DaysAvailable = dto.DaysAvailable ?? entity.JsonDetail.DaysAvailable,
+            DaysReservedAvailable = dto.DaysReservedAvailable ?? entity.JsonDetail.DaysReservedAvailable,
         };
 
         if (dto.ScorePlus.HasValue)

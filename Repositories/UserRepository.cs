@@ -92,14 +92,14 @@ public class UserRepository : IUserRepository {
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
 		if (dto.NoneOfMyFollowing.IsTrue())
 		{
-			var user = _dbContext.Set<UserEntity>().FirstOrDefault(x => x.Id == _userId);
-			var myFollowing = user.FollowingUsers.Split(",");
+			UserEntity? user = _dbContext.Set<UserEntity>().FirstOrDefault(x => x.Id == _userId);
+			string[]? myFollowing = user.FollowingUsers.Split(",");
             q = q.Where(x => !myFollowing.Contains(x.Id));
 		}
 		if (dto.NoneOfMyFollower.IsTrue())
 		{
-			var user = _dbContext.Set<UserEntity>().FirstOrDefault(x => x.Id == _userId);
-			var myFollower = user.FollowedUsers.Split(",");
+			UserEntity? user = _dbContext.Set<UserEntity>().FirstOrDefault(x => x.Id == _userId);
+			string[]? myFollower = user.FollowedUsers.Split(",");
             q = q.Where(x => !myFollower.Contains(x.Id));
 		}
 
