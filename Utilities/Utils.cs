@@ -131,9 +131,9 @@ public static class StartupExtension {
 				ValidateAudience = true,
 				RequireExpirationTime = true,
 				ClockSkew = TimeSpan.Zero,
-				ValidAudience = "https://SinaMN75.com",
-				ValidIssuer = "https://SinaMN75.com",
-				IssuerSigningKey = new SymmetricSecurityKey("https://SinaMN75.com"u8.ToArray())
+				ValidAudience = "https://SinaMN75.com,BetterSoft1234",
+				ValidIssuer = "https://SinaMN75.com,BetterSoft1234",
+				IssuerSigningKey = new SymmetricSecurityKey("https://SinaMN75.com,BetterSoft1234"u8.ToArray())
 			};
 		});
 

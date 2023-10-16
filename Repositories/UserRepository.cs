@@ -329,7 +329,13 @@ public class UserRepository : IUserRepository {
 		};
 		SymmetricSecurityKey key = new("https://SinaMN75.com,BetterSoft1234"u8.ToArray());
 		SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha256);
-		JwtSecurityToken token = new("https://SinaMN75.com", "https://SinaMN75.com", claims, expires: DateTime.Now.AddDays(365), signingCredentials: creds);
+		JwtSecurityToken token = new(
+			issuer: "https://SinaMN75.com,BetterSoft1234",
+			audience: "https://SinaMN75.com,BetterSoft1234",
+			claims: claims,
+			expires: DateTime.Now.AddDays(365),
+			signingCredentials: creds
+		);
 		return token;
 	}
 
