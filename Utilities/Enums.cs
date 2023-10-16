@@ -408,6 +408,7 @@ public enum TagOrder {
 	Physical = 100,
 	Digital = 101,
 	Donate = 102,
+	Reserve = 103,
 	PishtazDelivery = 201,
 	SendTipaxDelivery = 202,
 	CustomDelivery = 203,

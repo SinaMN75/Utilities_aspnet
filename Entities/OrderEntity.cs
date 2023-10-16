@@ -35,6 +35,8 @@ public class OrderEntity : BaseEntity {
 	public List<TagOrder> Tags { get; set; } = new();
 
 	public IEnumerable<OrderDetailEntity>? OrderDetails { get; set; }
+
+	public List<ReservationDays> DaysReserved { get; set; } = new();
 }
 
 [Table("OrderDetail")]
@@ -68,6 +70,12 @@ public class OrderCreateUpdateDto {
 public class OrderDetailCreateUpdateDto {
 	public Guid? ProductId { get; set; }
 	public int? Count { get; set; }
+	public List<ReservationDays>? Days { get; set; }
+}
+
+public class ReserveCreateUpdateDto {
+	public Guid? ProductId { get; set; }
+	public List<ReservationDays>? Days { get; set; }
 }
 
 public class ApplyDiscountCodeOnOrderDto {
