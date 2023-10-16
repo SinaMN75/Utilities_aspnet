@@ -154,7 +154,9 @@ public class UserRepository : IUserRepository {
 		string m = mobile ?? "09351902721";
 		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == m);
 		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
+		Console.WriteLine("LLLLLLLLLLLL");
 		JwtSecurityToken token = CreateToken(user);
+		Console.WriteLine("LLLLLLLLLLLL");
 		return new GenericResponse<UserEntity?>(ReadByIdMinimal(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result);
 	}
 
@@ -321,9 +323,11 @@ public class UserRepository : IUserRepository {
 			new Claim(JwtRegisteredClaimNames.Sub, user.Id),
 			new Claim(ClaimTypes.NameIdentifier, user.Id),
 			new Claim(ClaimTypes.Name, user.Id),
+			new Claim(ClaimTypes.Email, user.Email ?? user.Id),
+			new Claim(ClaimTypes.MobilePhone, user.PhoneNumber ?? user.Id),
 			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
 		};
-		SymmetricSecurityKey key = new("https://SinaMN75.com"u8.ToArray());
+		SymmetricSecurityKey key = new("https://SinaMN75.com,BetterSoft1234"u8.ToArray());
 		SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha256);
 		JwtSecurityToken token = new("https://SinaMN75.com", "https://SinaMN75.com", claims, expires: DateTime.Now.AddDays(365), signingCredentials: creds);
 		return token;
