@@ -115,7 +115,7 @@ public class ProductRepository : IProductRepository
         if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.Now);
         q = !dto.ShowWithChildren ? q.Where(x => x.ParentId == null) : q.Include(x => x.Parent);
 
-        List<ProductEntity>? postsThatMyFollowersSeen = new List<ProductEntity>();
+        List<ProductEntity>? postsThatMyFollowersSeen = new();
         if (dto.PostsThatMyFollowersSeen.IsTrue())
         {
             GenericResponse<IQueryable<UserEntity>> myFollower = await _followBookMark.GetFollowers(_userId);
@@ -202,7 +202,7 @@ public class ProductRepository : IProductRepository
         if (dto.Shuffle1.IsTrue()) q = q.Shuffle();
         if (dto.Shuffle2.IsTrue())
         {
-            Random rand = new Random();
+            Random rand = new();
             q = q.OrderBy(_ => rand.Next()).ToList().AsQueryable();
         }
 

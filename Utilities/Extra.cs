@@ -60,7 +60,7 @@ public static partial class StringExtension {
 	[GeneratedRegex(@"^[^@\s]+@[^@\s]+\.(com|net|org|gov)$", RegexOptions.IgnoreCase, "en-US")]
 	private static partial Regex MyRegex();
 
-    private static Random rand = new Random();
+    private static Random rand = new();
 
     public static IQueryable<ProductEntity> Shuffle(this IQueryable<ProductEntity> list)
     {
