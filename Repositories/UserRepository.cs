@@ -72,23 +72,23 @@ public class UserRepository : IUserRepository {
 	public GenericResponse<IQueryable<UserEntity>> Filter(UserFilterDto dto) {
 		IQueryable<UserEntity> q = _dbContext.Set<UserEntity>();
 
-		if (dto.UserNameExact != null) q = q.Where(x => x.AppUserName == dto.UserNameExact || x.UserName == dto.UserNameExact);
-		if (dto.UserId != null) q = q.Where(x => x.Id == dto.UserId);
-		if (dto.Badge != null) q = q.Where(x => x.Badge!.Contains(dto.Badge));
-		if (dto.Bio != null) q = q.Where(x => x.Bio!.Contains(dto.Bio));
-		if (dto.Email != null) q = q.Where(x => x.Email!.Contains(dto.Email));
+		if (dto.UserNameExact .IsNotNullOrEmpty()) q = q.Where(x => x.AppUserName == dto.UserNameExact || x.UserName == dto.UserNameExact);
+		if (dto.UserId .IsNotNullOrEmpty()) q = q.Where(x => x.Id == dto.UserId);
+		if (dto.Badge .IsNotNullOrEmpty()) q = q.Where(x => x.Badge!.Contains(dto.Badge));
+		if (dto.Bio .IsNotNullOrEmpty()) q = q.Where(x => x.Bio!.Contains(dto.Bio));
+		if (dto.Email .IsNotNullOrEmpty()) q = q.Where(x => x.Email!.Contains(dto.Email));
 		if (dto.Gender != null) q = q.Where(x => x.Gender == dto.Gender);
-		if (dto.Headline != null) q = q.Where(x => x.Headline!.Contains(dto.Headline));
-		if (dto.JobStatus != null) q = q.Where(x => x.Headline!.Contains(dto.JobStatus));
-		if (dto.Region != null) q = q.Where(x => x.Region!.Contains(dto.Region));
-		if (dto.State != null) q = q.Where(x => x.State!.Contains(dto.State));
-		if (dto.AppEmail != null) q = q.Where(x => x.AppEmail!.Contains(dto.AppEmail));
-		if (dto.FirstName != null) q = q.Where(x => x.FirstName!.Contains(dto.FirstName));
-		if (dto.LastName != null) q = q.Where(x => x.LastName!.Contains(dto.LastName));
-		if (dto.FullName != null) q = q.Where(x => x.FullName!.Contains(dto.FullName));
-		if (dto.PhoneNumber != null) q = q.Where(x => x.PhoneNumber!.Contains(dto.PhoneNumber));
-		if (dto.AppUserName != null) q = q.Where(x => x.AppUserName!.Contains(dto.AppUserName));
-		if (dto.AppPhoneNumber != null) q = q.Where(x => x.AppPhoneNumber!.Contains(dto.AppPhoneNumber));
+		if (dto.Headline .IsNotNullOrEmpty()) q = q.Where(x => x.Headline!.Contains(dto.Headline));
+		if (dto.JobStatus .IsNotNullOrEmpty()) q = q.Where(x => x.Headline!.Contains(dto.JobStatus));
+		if (dto.Region .IsNotNullOrEmpty()) q = q.Where(x => x.Region!.Contains(dto.Region));
+		if (dto.State .IsNotNullOrEmpty()) q = q.Where(x => x.State!.Contains(dto.State));
+		if (dto.AppEmail .IsNotNullOrEmpty()) q = q.Where(x => x.AppEmail!.Contains(dto.AppEmail));
+		if (dto.FirstName .IsNotNullOrEmpty()) q = q.Where(x => x.FirstName!.Contains(dto.FirstName));
+		if (dto.LastName .IsNotNullOrEmpty()) q = q.Where(x => x.LastName!.Contains(dto.LastName));
+		if (dto.FullName.IsNotNullOrEmpty()) q = q.Where(x => x.FullName!.Contains(dto.FullName));
+		if (dto.PhoneNumber.IsNotNullOrEmpty()) q = q.Where(x => x.PhoneNumber!.Contains(dto.PhoneNumber));
+		if (dto.AppUserName.IsNotNullOrEmpty()) q = q.Where(x => x.AppUserName!.Contains(dto.AppUserName));
+		if (dto.AppPhoneNumber.IsNotNullOrEmpty()) q = q.Where(x => x.AppPhoneNumber!.Contains(dto.AppPhoneNumber));
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
 		if (dto.NoneOfMyFollowing.IsTrue())
 		{
@@ -103,7 +103,7 @@ public class UserRepository : IUserRepository {
             q = q.Where(x => !myFollower.Contains(x.Id));
 		}
 
-		if (dto.Query != null)
+		if (dto.Query.IsNotNullOrEmpty())
 			q = q.Where(x => x.FirstName!.Contains(dto.Query) ||
 			                 x.LastName!.Contains(dto.Query) ||
 			                 x.FullName!.Contains(dto.Query) ||
@@ -114,9 +114,9 @@ public class UserRepository : IUserRepository {
 
 		if (dto.Categories.IsNotNullOrEmpty()) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
 
-		if (dto.UserIds != null) q = q.Where(x => dto.UserIds.Contains(x.Id));
-		if (dto.PhoneNumbers != null) q = q.Where(x => dto.PhoneNumbers.Contains(x.PhoneNumber));
-		if (dto.UserName != null) q = q.Where(x => (x.AppUserName ?? "").ToLower().Contains(dto.UserName.ToLower()));
+		if (dto.UserIds.IsNotNullOrEmpty()) q = q.Where(x => dto.UserIds.Contains(x.Id));
+		if (dto.PhoneNumbers.IsNotNullOrEmpty()) q = q.Where(x => dto.PhoneNumbers.Contains(x.PhoneNumber));
+		if (dto.UserName.IsNotNullOrEmpty()) q = q.Where(x => (x.AppUserName ?? "").ToLower().Contains(dto.UserName.ToLower()));
 		if (dto.ShowSuspend.IsTrue()) q = q.Where(x => x.Suspend == true);
 
 		if (dto.OrderByUserName.IsTrue()) q = q.OrderBy(x => x.UserName);
