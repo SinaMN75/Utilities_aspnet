@@ -388,7 +388,6 @@ public class UserRepository : IUserRepository {
 			DeliveryPrice1 = dto.DeliveryPrice1 ?? entity.JsonDetail.DeliveryPrice1,
 			DeliveryPrice2 = dto.DeliveryPrice2 ?? entity.JsonDetail.DeliveryPrice2,
 			DeliveryPrice3 = dto.DeliveryPrice3 ?? entity.JsonDetail.DeliveryPrice3,
-			AccessLevel = dto.AccessLevel ?? entity.JsonDetail.AccessLevel
 		};
 
 		if (dto.Categories.IsNotNullOrEmpty()) {
