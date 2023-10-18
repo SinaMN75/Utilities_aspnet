@@ -447,7 +447,9 @@ public enum TagUser {
 	AdminOrderRead = 310,
 	AdminOrderUpdate= 311,
 	AdminContentRead= 312,
-	AdminContentUpdate= 313
+	AdminContentUpdate= 313,
+	AdminCommentRead= 314,
+	AdminCommentUpdate= 315
 }
 
 public enum TagNotification { }
