@@ -61,4 +61,6 @@ public class CommentFilterDto {
 	public Guid? ProductId { get; set; }
 	public ChatStatus? Status { get; set; }
 	public List<TagComment>? Tags { get; set; }
+	public int PageSize { get; set; } = 100;
+	public int PageNumber { get; set; } = 1;
 }

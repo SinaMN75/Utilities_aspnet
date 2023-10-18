@@ -60,7 +60,15 @@ public class CommentRepository : ICommentRepository {
 		if (dto.ProductOwnerId is not null) q = q.Where(x => x.Product!.UserId == dto.ProductOwnerId);
 		if (dto.Tags is not null) q = q.Where(x => dto.Tags!.All(y => x.Tags!.Contains(y)));
 
-		return new GenericResponse<IQueryable<CommentEntity>?>(q);
+		int totalCount = q.Count();
+		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
+
+		return new GenericResponse<IQueryable<CommentEntity>?>(q) {
+			TotalCount = totalCount,
+			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
+			PageSize = dto.PageSize
+		};
+		;
 	}
 
 	public async Task<GenericResponse<CommentEntity?>> ReadById(Guid id) {
@@ -87,7 +95,7 @@ public class CommentRepository : ICommentRepository {
 		ProductEntity? prdct = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == dto.ProductId, ct);
 		if (prdct is not null) {
 			Tuple<bool, UtilitiesStatusCodes> blockedState = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == prdct.UserId),
-			                                                                     _dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == _userId));
+				_dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == _userId));
 			if (blockedState.Item1) return new GenericResponse<CommentEntity?>(null, blockedState.Item2);
 		}
 
@@ -119,6 +127,7 @@ public class CommentRepository : ICommentRepository {
 				});
 		}
 		catch { }
+
 		await _dbContext.SaveChangesAsync(ct);
 		await _outputCache.EvictByTagAsync("comment", ct);
 		return await ReadById(comment.Id);
@@ -133,17 +142,15 @@ public class CommentRepository : ICommentRepository {
 		if (dto.ProductId.HasValue) comment.ProductId = dto.ProductId;
 		if (dto.Status.HasValue) comment.Status = dto.Status;
 		if (dto.Tags.IsNotNullOrEmpty()) comment.Tags = dto.Tags;
-        if (dto.RemoveTags.IsNotNullOrEmpty())
-        {
-            dto.RemoveTags.ForEach(item => comment.Tags?.Remove(item));
-        }
+		if (dto.RemoveTags.IsNotNullOrEmpty()) {
+			dto.RemoveTags.ForEach(item => comment.Tags?.Remove(item));
+		}
 
-        if (dto.AddTags.IsNotNullOrEmpty())
-        {
-            comment.Tags.AddRange(dto.AddTags);
-        }
+		if (dto.AddTags.IsNotNullOrEmpty()) {
+			comment.Tags.AddRange(dto.AddTags);
+		}
 
-        comment.UpdatedAt = DateTime.Now;
+		comment.UpdatedAt = DateTime.Now;
 		_dbContext.Set<CommentEntity>().Update(comment);
 		await _dbContext.SaveChangesAsync(ct);
 		await _outputCache.EvictByTagAsync("comment", ct);
