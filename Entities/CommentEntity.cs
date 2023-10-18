@@ -17,6 +17,9 @@ public class CommentEntity : BaseEntity {
 
 	public UserEntity? User { get; set; }
 	public string? UserId { get; set; }
+	
+	public ProductEntity? Product { get; set; }
+	public Guid? ProductId { get; set; }
 
 	[MaxLength(100)]
 	public List<TagComment>? Tags { get; set; } = new();
@@ -25,14 +28,6 @@ public class CommentEntity : BaseEntity {
 	public IEnumerable<CommentEntity>? Children { get; set; }
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public ProductEntity? Product { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public Guid? ProductId { get; set; }
 }
 
 public class CommentJsonDetail {
