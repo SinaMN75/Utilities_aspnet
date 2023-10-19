@@ -1,4 +1,4 @@
-﻿namespace Utilities_aspnet.Utilities;
+﻿namespace Utilities_aspnet.Entities;
 
 public class AppSettings {
 	public SmsPanelSettings SmsPanelSettings { get; set; } = null!;
@@ -17,7 +17,7 @@ public class AppSettings {
 	public string? IosDownloadLink2 { get; set; }
 }
 
-public abstract class SmsPanelSettings {
+public class SmsPanelSettings {
 	public string? Provider { get; set; }
 	public string? UserName { get; set; }
 	public string? SmsApiKey { get; set; }
@@ -25,18 +25,18 @@ public abstract class SmsPanelSettings {
 	public string? PatternCode { get; set; }
 }
 
-public abstract class UsageRules {
+public class UsageRules {
 	public int MaxProductPerDay { get; set; }
 	public int MaxCommentPerDay { get; set; }
 	public int MaxChatPerDay { get; set; }
 }
 
-public abstract class PaymentSettings {
+public class PaymentSettings {
 	public string? Id { get; set; }
 	public string? Provider { get; set; }
 }
 
-public abstract class PushNotificationSetting {
+public class PushNotificationSetting {
 	public string? Provider { get; set; }
 	public string? Token { get; set; }
 	public string? AppId { get; set; }
