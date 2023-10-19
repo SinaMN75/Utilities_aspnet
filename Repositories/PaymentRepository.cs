@@ -25,23 +25,39 @@ public class PaymentRepository : IPaymentRepository {
 		try {
 			ProductEntity p = (await _dbContext.Set<ProductEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == productId))!;
 			UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
-			Payment payment = new(_appSettings.PaymentSettings.Id, p.Price!.Value);
 			string callbackUrl = $"{Server.ServerAddress}/CallBack/{productId}";
 			string desc = $"خرید محصول {p.Title}";
-			PaymentRequestResponse? result = payment.PaymentRequest(desc, callbackUrl, "", user?.PhoneNumber).Result;
-			await _dbContext.Set<TransactionEntity>().AddAsync(new TransactionEntity {
-				Amount = p.Price,
-				Authority = result.Authority,
-				CreatedAt = DateTime.Now,
-				Descriptions = desc,
-				GatewayName = "ZarinPal",
-				UserId = _userId,
-			});
-			await _dbContext.SaveChangesAsync();
+			
+			switch (_appSettings.PaymentSettings.Provider) {
+				case "ZarinPal": {
+					Payment payment = new(_appSettings.PaymentSettings.Id, p.Price!.Value);
+					PaymentRequestResponse? result = payment.PaymentRequest(desc, callbackUrl, "", user?.PhoneNumber).Result;
 
-			if (result.Status == 100 && result.Authority.Length == 36) {
-				string url = $"https://www.zarinpal.com/pg/StartPay/{result.Authority}";
-				return new GenericResponse<string>(url);
+					await _dbContext.Set<TransactionEntity>().AddAsync(new TransactionEntity {
+						Amount = p.Price,
+						Authority = result.Authority,
+						CreatedAt = DateTime.Now,
+						Descriptions = desc,
+						GatewayName = "ZarinPal",
+						UserId = _userId,
+					});
+					await _dbContext.SaveChangesAsync();
+
+					if (result.Status == 100 && result.Authority.Length == 36) {
+						string url = $"https://www.zarinpal.com/pg/StartPay/{result.Authority}";
+						return new GenericResponse<string>(url);
+					}
+
+					break;
+				}
+				case "PaymentPol": {
+					RestRequest request = new(Method.POST);
+					request.AddParameter("MerchantID", _appSettings.PaymentSettings.Id!);
+					request.AddParameter("Amount", p.Price!);
+					request.AddParameter("CallbackURL", callbackUrl);
+					IRestResponse response = await new RestClient("https://paymentpol.com/webservice/rest/PaymentRequest").ExecuteAsync(request);
+					break;
+				}
 			}
 
 			return new GenericResponse<string>("", UtilitiesStatusCodes.BadRequest);

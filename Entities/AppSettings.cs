@@ -17,7 +17,7 @@ public class AppSettings {
 	public string? IosDownloadLink2 { get; set; }
 }
 
-public class SmsPanelSettings {
+public abstract class SmsPanelSettings {
 	public string? Provider { get; set; }
 	public string? UserName { get; set; }
 	public string? SmsApiKey { get; set; }
@@ -25,17 +25,18 @@ public class SmsPanelSettings {
 	public string? PatternCode { get; set; }
 }
 
-public class UsageRules {
+public abstract class UsageRules {
 	public int MaxProductPerDay { get; set; }
 	public int MaxCommentPerDay { get; set; }
 	public int MaxChatPerDay { get; set; }
 }
 
-public class PaymentSettings {
+public abstract class PaymentSettings {
 	public string? Id { get; set; }
+	public string? Provider { get; set; }
 }
 
-public class PushNotificationSetting {
+public abstract class PushNotificationSetting {
 	public string? Provider { get; set; }
 	public string? Token { get; set; }
 	public string? AppId { get; set; }
