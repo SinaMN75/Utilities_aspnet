@@ -2,7 +2,8 @@
 
 [Table("Bookmarks")]
 public class BookmarkEntity : BaseEntity {
-	[MaxLength(50)] public string? FolderName { get; set; }
+	[MaxLength(50)]
+	public string? FolderName { get; set; }
 
 	public UserEntity? User { get; set; }
 	public string? UserId { get; set; }
@@ -13,7 +14,8 @@ public class BookmarkEntity : BaseEntity {
 	public BookmarkEntity? Parent { get; set; }
 	public Guid? ParentId { get; set; }
 
-	[InverseProperty("Parent")] public IEnumerable<BookmarkEntity>? Children { get; set; }
+	[InverseProperty("Parent")]
+	public IEnumerable<BookmarkEntity>? Children { get; set; }
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 }

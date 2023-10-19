@@ -2,15 +2,20 @@ namespace Utilities_aspnet.Entities;
 
 [Table("Contents")]
 public class ContentEntity : BaseEntity {
-	[MaxLength(100)] public string? Title { get; set; }
+	[MaxLength(100)]
+	public string? Title { get; set; }
 
-	[MaxLength(100)] public string? SubTitle { get; set; }
+	[MaxLength(100)]
+	public string? SubTitle { get; set; }
 
-	[MaxLength(5000)] public string? Description { get; set; }
+	[MaxLength(5000)]
+	public string? Description { get; set; }
 
-	[MaxLength(100)] public List<TagContent>? Tags { get; set; } = new();
+	[MaxLength(100)]
+	public List<TagContent>? Tags { get; set; } = new();
 
-	[MaxLength(1000)] public ContentJsonDetail JsonDetail { get; set; } = new();
+	[MaxLength(1000)]
+	public ContentJsonDetail JsonDetail { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 }

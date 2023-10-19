@@ -4,19 +4,25 @@
 public class TransactionEntity : BaseEntity {
 	public int? Amount { get; set; }
 
-	[MaxLength(500)] public string? Descriptions { get; set; }
+	[MaxLength(500)]
+	public string? Descriptions { get; set; }
 
-	[MaxLength(100)] public string? Authority { get; set; }
+	[MaxLength(100)]
+	public string? Authority { get; set; }
 
-	[MaxLength(100)] public string? GatewayName { get; set; }
+	[MaxLength(100)]
+	public string? GatewayName { get; set; }
 
-	[MaxLength(20)] public string? PaymentId { get; set; }
+	[MaxLength(20)]
+	public string? PaymentId { get; set; }
 
-	[MaxLength(30)] public string? ShebaNumber { get; set; }
+	[MaxLength(30)]
+	public string? ShebaNumber { get; set; }
 
 	public long? RefId { get; set; }
 
-	[MaxLength(100)] public List<TagTransaction> Tags { get; set; } = new();
+	[MaxLength(100)]
+	public List<TagTransaction> Tags { get; set; } = new();
 
 	public UserEntity? User { get; set; }
 	public string? UserId { get; set; }

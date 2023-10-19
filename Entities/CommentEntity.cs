@@ -4,9 +4,11 @@
 public class CommentEntity : BaseEntity {
 	public double? Score { get; set; } = 0;
 
-	[MaxLength(1000)] public CommentJsonDetail JsonDetail { get; set; } = new();
+	[MaxLength(1000)]
+	public CommentJsonDetail JsonDetail { get; set; } = new();
 
-	[MaxLength(2000)] public string? Comment { get; set; }
+	[MaxLength(2000)]
+	public string? Comment { get; set; }
 
 	public ChatStatus? Status { get; set; }
 
@@ -19,9 +21,11 @@ public class CommentEntity : BaseEntity {
 	public ProductEntity? Product { get; set; }
 	public Guid? ProductId { get; set; }
 
-	[MaxLength(100)] public List<TagComment>? Tags { get; set; } = new();
+	[MaxLength(100)]
+	public List<TagComment>? Tags { get; set; } = new();
 
-	[InverseProperty("Parent")] public IEnumerable<CommentEntity>? Children { get; set; }
+	[InverseProperty("Parent")]
+	public IEnumerable<CommentEntity>? Children { get; set; }
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 }

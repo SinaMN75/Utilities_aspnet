@@ -2,11 +2,14 @@
 
 [Table("Order")]
 public class OrderEntity : BaseEntity {
-	[MaxLength(500)] public string? Description { get; set; }
+	[MaxLength(500)]
+	public string? Description { get; set; }
 
-	[MaxLength(20)] public string? DiscountCode { get; set; }
+	[MaxLength(20)]
+	public string? DiscountCode { get; set; }
 
-	[MaxLength(20)] public string? PayNumber { get; set; }
+	[MaxLength(20)]
+	public string? PayNumber { get; set; }
 
 	public int? TotalPrice { get; set; }
 	public int? DiscountPrice { get; set; }
@@ -20,11 +23,13 @@ public class OrderEntity : BaseEntity {
 
 	public UserEntity? User { get; set; }
 
-	[ForeignKey(nameof(User))] public string? UserId { get; set; }
+	[ForeignKey(nameof(User))]
+	public string? UserId { get; set; }
 
 	public UserEntity? ProductOwner { get; set; }
 
-	[ForeignKey(nameof(ProductOwner))] public string? ProductOwnerId { get; set; }
+	[ForeignKey(nameof(ProductOwner))]
+	public string? ProductOwnerId { get; set; }
 
 	public IEnumerable<TransactionEntity>? Transactions { get; set; }
 	public List<TagOrder> Tags { get; set; } = new();

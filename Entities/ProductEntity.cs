@@ -2,17 +2,23 @@ namespace Utilities_aspnet.Entities;
 
 [Table("Products")]
 public class ProductEntity : BaseEntity {
-	[MaxLength(100)] public string? Title { get; set; }
+	[MaxLength(100)]
+	public string? Title { get; set; }
 
-	[MaxLength(100)] public string? Subtitle { get; set; }
+	[MaxLength(100)]
+	public string? Subtitle { get; set; }
 
-	[MaxLength(2000)] public string? Description { get; set; }
+	[MaxLength(2000)]
+	public string? Description { get; set; }
 
-	[MaxLength(20)] public string? UseCase { get; set; }
+	[MaxLength(20)]
+	public string? UseCase { get; set; }
 
-	[MaxLength(20)] public string? Type { get; set; }
+	[MaxLength(20)]
+	public string? Type { get; set; }
 
-	[MaxLength(100)] public string? State { get; set; }
+	[MaxLength(100)]
+	public string? State { get; set; }
 
 	public DateTime Boosted { get; set; }
 	public int? Stock { get; set; }
@@ -27,19 +33,23 @@ public class ProductEntity : BaseEntity {
 
 	public string? SeenUsers { get; set; } = "";
 
-	[MaxLength(500)] public string? Teams { get; set; } = "";
+	[MaxLength(500)]
+	public string? Teams { get; set; } = "";
 
 	public ProductEntity? Parent { get; set; }
 	public Guid? ParentId { get; set; }
 
-	[InverseProperty("Parent")] public IEnumerable<ProductEntity>? Children { get; set; }
+	[InverseProperty("Parent")]
+	public IEnumerable<ProductEntity>? Children { get; set; }
 
 	public string? UserId { get; set; }
 	public UserEntity? User { get; set; }
 
-	[MaxLength(1000)] public ProductJsonDetail JsonDetail { get; set; } = new();
+	[MaxLength(1000)]
+	public ProductJsonDetail JsonDetail { get; set; } = new();
 
-	[MaxLength(100)] public List<TagProduct>? Tags { get; set; } = new();
+	[MaxLength(100)]
+	public List<TagProduct>? Tags { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<FormEntity>? Forms { get; set; }
@@ -49,9 +59,11 @@ public class ProductEntity : BaseEntity {
 	public IEnumerable<OrderDetailEntity>? OrderDetail { get; set; }
 	public IEnumerable<CommentEntity>? Comments { get; set; }
 
-	[NotMapped] public IEnumerable<OrderEntity>? Orders { get; set; }
+	[NotMapped]
+	public IEnumerable<OrderEntity>? Orders { get; set; }
 
-	[NotMapped] public int? SuccessfulPurchase { get; set; }
+	[NotMapped]
+	public int? SuccessfulPurchase { get; set; }
 }
 
 public class ProductJsonDetail {
@@ -115,7 +127,8 @@ public class ProductInsight : BaseEntity {
 	public ProductEntity? Product { get; set; }
 	public Guid? ProductId { get; set; }
 
-	[NotMapped] public int? Count { get; set; } = 0;
+	[NotMapped]
+	public int? Count { get; set; } = 0;
 }
 
 [Table("VisitProducts")]

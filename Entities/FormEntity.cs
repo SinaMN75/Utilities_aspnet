@@ -2,7 +2,8 @@
 
 [Table("Forms")]
 public class FormEntity : BaseEntity {
-	[MaxLength(50)] public string? Title { get; set; }
+	[MaxLength(50)]
+	public string? Title { get; set; }
 
 	[ForeignKey(nameof(FormFieldId))]
 	[InverseProperty(nameof(FormFieldEntity.Forms))]
@@ -29,11 +30,13 @@ public class FormEntity : BaseEntity {
 
 [Table("FormFields")]
 public class FormFieldEntity : BaseEntity {
-	[MaxLength(100)] public string? Label { get; set; }
+	[MaxLength(100)]
+	public string? Label { get; set; }
 
 	public bool? IsRequired { get; set; } = false;
 
-	[MaxLength(2000)] public List<string>? OptionList { get; set; } = new();
+	[MaxLength(2000)]
+	public List<string>? OptionList { get; set; } = new();
 
 	public TagFormField? Type { get; set; }
 

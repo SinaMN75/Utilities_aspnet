@@ -2,13 +2,16 @@
 
 [Table("GroupChat")]
 public class GroupChatEntity : BaseEntity {
-	[MaxLength(100)] public string? Title { get; set; }
+	[MaxLength(100)]
+	public string? Title { get; set; }
 
-	[MaxLength(50)] public string? CreatorUserId { get; set; }
+	[MaxLength(50)]
+	public string? CreatorUserId { get; set; }
 
 	public ChatType? Type { get; set; }
 
-	[MaxLength(1000)] public GroupChatJsonDetail JsonDetail { get; set; } = new();
+	[MaxLength(1000)]
+	public GroupChatJsonDetail JsonDetail { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<UserEntity>? Users { get; set; }
@@ -16,7 +19,8 @@ public class GroupChatEntity : BaseEntity {
 	public IEnumerable<GroupChatMessageEntity>? GroupChatMessage { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
 
-	[NotMapped] public int CountOfUnreadMessages { get; set; }
+	[NotMapped]
+	public int CountOfUnreadMessages { get; set; }
 }
 
 public class GroupChatJsonDetail {
@@ -30,11 +34,14 @@ public class GroupChatJsonDetail {
 
 [Table("GroupChatMessage")]
 public class GroupChatMessageEntity : BaseEntity {
-	[MaxLength(2000)] public string? Message { get; set; }
+	[MaxLength(2000)]
+	public string? Message { get; set; }
 
-	[MaxLength(50)] public string? Type { get; set; }
+	[MaxLength(50)]
+	public string? Type { get; set; }
 
-	[MaxLength(50)] public string? UseCase { get; set; }
+	[MaxLength(50)]
+	public string? UseCase { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
@@ -50,7 +57,8 @@ public class GroupChatMessageEntity : BaseEntity {
 
 	public Guid? ForwardedMessageId { get; set; }
 
-	[ForeignKey(nameof(ParentId))] public GroupChatMessageEntity? Parent { get; set; }
+	[ForeignKey(nameof(ParentId))]
+	public GroupChatMessageEntity? Parent { get; set; }
 
 	public Guid? ParentId { get; set; }
 
@@ -60,14 +68,16 @@ public class GroupChatMessageEntity : BaseEntity {
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<ProductEntity?>? Products { get; set; }
 
-	[NotMapped] public List<UserEntity>? MessageSeenBy { get; set; }
+	[NotMapped]
+	public List<UserEntity>? MessageSeenBy { get; set; }
 }
 
 [Table("SeenUsers")]
 public class SeenUsers : BaseEntity {
 	public Guid? FkGroupChat { get; set; }
 
-	[MaxLength(50)] public string? FkUserId { get; set; }
+	[MaxLength(50)]
+	public string? FkUserId { get; set; }
 
 	public Guid? FkGroupChatMessage { get; set; }
 }

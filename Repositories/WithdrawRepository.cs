@@ -3,6 +3,7 @@
 public interface IWithdrawRepository {
 	Task<GenericResponse> WalletWithdrawal(WalletWithdrawalDto dto);
 	GenericResponse<IQueryable<WithdrawEntity>> Filter(WithdrawalFilterDto dto);
+	Task<GenericResponse<WithdrawEntity?>> Update(WithdrawCreateUpdateDto dto);
 }
 
 public class WithdrawRepository : IWithdrawRepository {
@@ -17,50 +18,42 @@ public class WithdrawRepository : IWithdrawRepository {
 	}
 
 	public async Task<GenericResponse> WalletWithdrawal(WalletWithdrawalDto dto) {
-		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId && f.Suspend != true);
-		if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound);
+		UserEntity user = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId && f.Suspend != true))!;
 
-		if (user.Wallet <= dto.Amount) return new GenericResponse(UtilitiesStatusCodes.NotEnoughMoney);
+		if (user.Wallet <= dto.Amount || dto.Amount < 100000) return new GenericResponse(UtilitiesStatusCodes.NotEnoughMoney);
 
 		string? sheba = dto.ShebaNumber.GetShebaNumber();
 
-		if (dto.Amount < 100000) return new GenericResponse(UtilitiesStatusCodes.NotEnoughMoney);
-
-		double limit = _appSettings.WithdrawalLimit;
-		int dateLimit = _appSettings.WithdrawalTimeLimit;
-		IQueryable<WithdrawEntity> listOfWithdrawalInIntervalDate = _dbContext.Set<WithdrawEntity>()
-			.Where(a => a.CreatedAt > DateTime.Now.AddDays(-dateLimit) && a.CreatedAt < DateTime.Now && a.WithdrawState == WithdrawState.Accepted);
-		int sumOfWithDrawal = listOfWithdrawalInIntervalDate.Sum(s => s.Amount) ?? 0;
-		if (dto.Amount + sumOfWithDrawal > limit) return new GenericResponse(UtilitiesStatusCodes.MoreThanAllowedMoney);
-		if (sheba is null) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
+		IQueryable<WithdrawEntity> unDoneRequests = _dbContext.Set<WithdrawEntity>().Where(a => a.WithdrawState != WithdrawState.Requested).AsNoTracking();
+		if (unDoneRequests.IsNotNullOrEmpty()) return new GenericResponse(UtilitiesStatusCodes.Overused);
 
 		WithdrawEntity withdraw = new() {
 			Amount = dto.Amount,
 			UserId = user.Id,
 			CreatedAt = DateTime.Now,
-			ShebaNumber = dto.ShebaNumber,
-			WithdrawState = WithdrawState.Requested
-		};
-		await _dbContext.Set<WithdrawEntity>().AddAsync(withdraw);
-
-		TransactionEntity transaction = new() {
-			UserId = _userId,
-			ShebaNumber = dto.ShebaNumber,
-			Amount = dto.Amount,
-			CreatedAt = DateTime.Now,
+			ShebaNumber = sheba,
+			WithdrawState = WithdrawState.Requested,
 			UpdatedAt = DateTime.Now
 		};
-		await _dbContext.Set<TransactionEntity>().AddAsync(transaction);
-
+		await _dbContext.Set<WithdrawEntity>().AddAsync(withdraw);
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}
 
 	public GenericResponse<IQueryable<WithdrawEntity>> Filter(WithdrawalFilterDto dto) {
-		IQueryable<WithdrawEntity> q = _dbContext.Set<WithdrawEntity>().OrderByDescending(o => o.CreatedAt);
-
-		if (dto.WithdrawState.HasValue) q = q.Where(w => w.WithdrawState == dto.WithdrawState);
-
+		IQueryable<WithdrawEntity> q = _dbContext.Set<WithdrawEntity>().AsNoTracking().OrderByDescending(o => o.CreatedAt);
+		if (dto.State.HasValue) q = q.Where(w => w.WithdrawState == dto.State);
+		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => x.UserId == dto.UserId);
 		return new GenericResponse<IQueryable<WithdrawEntity>>(q);
+	}
+
+	public async Task<GenericResponse<WithdrawEntity?>> Update(WithdrawCreateUpdateDto dto) {
+		WithdrawEntity e = (await _dbContext.Set<WithdrawEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id))!;
+		if (e.WithdrawState != WithdrawState.Requested)
+			return new GenericResponse<WithdrawEntity?>(null, UtilitiesStatusCodes.OrderPayed, "امکان تغییر دادن دوباره وجود ندارد");
+		e.WithdrawState = dto.WithdrawState;
+		e.AdminMessage = dto.AdminMessage ?? "";
+		await _dbContext.SaveChangesAsync();
+		return new GenericResponse<WithdrawEntity?>(e);
 	}
 }

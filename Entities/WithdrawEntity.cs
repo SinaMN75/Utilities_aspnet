@@ -2,12 +2,20 @@
 
 [Table("Withdraw")]
 public class WithdrawEntity : BaseEntity {
-	[MaxLength(20)] public string? ShebaNumber { get; set; }
+	[MaxLength(20)]
+	public required string? ShebaNumber { get; set; }
 
-	public int? Amount { get; set; }
-	public WithdrawState? WithdrawState { get; set; }
+	public required int Amount { get; set; }
+	public required WithdrawState WithdrawState { get; set; }
 	public UserEntity? User { get; set; }
-	public string? UserId { get; set; }
+	public required string UserId { get; set; }
+	public string? AdminMessage { get; set; }
+}
+
+public class WithdrawCreateUpdateDto {
+	public required Guid Id { get; set; }
+	public required WithdrawState WithdrawState { get; set; }
+	public string? AdminMessage { get; set; }
 }
 
 public class WalletWithdrawalDto {
@@ -16,5 +24,6 @@ public class WalletWithdrawalDto {
 }
 
 public class WithdrawalFilterDto {
-	public WithdrawState? WithdrawState { get; set; }
+	public WithdrawState? State { get; set; }
+	public string? UserId { get; set; }
 }

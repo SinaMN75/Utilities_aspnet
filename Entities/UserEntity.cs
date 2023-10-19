@@ -5,37 +5,53 @@ public class UserEntity {
 	[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 	public string Id { get; set; } = null!;
 
-	[MaxLength(50)] public string? FirstName { get; set; }
+	[MaxLength(50)]
+	public string? FirstName { get; set; }
 
-	[MaxLength(50)] public string? LastName { get; set; }
+	[MaxLength(50)]
+	public string? LastName { get; set; }
 
-	[MaxLength(50)] public string? FullName { get; set; }
+	[MaxLength(50)]
+	public string? FullName { get; set; }
 
-	[MaxLength(100)] public string? Headline { get; set; }
+	[MaxLength(100)]
+	public string? Headline { get; set; }
 
-	[MaxLength(2000)] public string? Bio { get; set; }
+	[MaxLength(2000)]
+	public string? Bio { get; set; }
 
-	[MaxLength(50)] public string? AppUserName { get; set; }
+	[MaxLength(50)]
+	public string? AppUserName { get; set; }
 
-	[MaxLength(20)] public string? AppPhoneNumber { get; set; }
+	[MaxLength(20)]
+	public string? AppPhoneNumber { get; set; }
 
-	[MaxLength(50)] public string? UserName { get; set; }
+	[MaxLength(50)]
+	public string? UserName { get; set; }
 
-	[MaxLength(20)] public string? PhoneNumber { get; set; }
+	[MaxLength(20)]
+	public string? PhoneNumber { get; set; }
 
-	[MaxLength(50)] public string? AppEmail { get; set; }
+	[MaxLength(50)]
+	public string? AppEmail { get; set; }
 
-	[MaxLength(50)] public string? Email { get; set; }
+	[MaxLength(50)]
+	public string? Email { get; set; }
 
-	[MaxLength(100)] public string? Region { get; set; }
+	[MaxLength(100)]
+	public string? Region { get; set; }
 
-	[MaxLength(100)] public string? State { get; set; }
+	[MaxLength(100)]
+	public string? State { get; set; }
 
-	[MaxLength(100)] public string? Badge { get; set; }
+	[MaxLength(100)]
+	public string? Badge { get; set; }
 
-	[MaxLength(100)] public string? JobStatus { get; set; }
+	[MaxLength(100)]
+	public string? JobStatus { get; set; }
 
-	[MaxLength(200)] public string? UserAgent { get; set; }
+	[MaxLength(200)]
+	public string? UserAgent { get; set; }
 
 	public string? MutedChats { get; set; }
 	public GenderType? Gender { get; set; }
@@ -93,15 +109,20 @@ public class UserEntity {
 	[JsonIgnore]
 	public string BlockedUsers { get; set; } = "";
 
-	[NotMapped] public bool IsFollowing { get; set; }
+	[NotMapped]
+	public bool IsFollowing { get; set; }
 
-	[NotMapped] public int? CountProducts { get; set; }
+	[NotMapped]
+	public int? CountProducts { get; set; }
 
-	[NotMapped] public int? CountFollowers { get; set; }
+	[NotMapped]
+	public int? CountFollowers { get; set; }
 
-	[NotMapped] public int? CountFollowing { get; set; }
+	[NotMapped]
+	public int? CountFollowing { get; set; }
 
-	[NotMapped] public string? Token { get; set; }
+	[NotMapped]
+	public string? Token { get; set; }
 }
 
 public class UserJsonDetail {
