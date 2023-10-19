@@ -6,7 +6,7 @@ public static class EnumExtension {
 }
 
 public static class UtilitiesStatusCodesExtension {
-	public static int Value(this UtilitiesStatusCodes statusCode) => (int) statusCode;
+	public static int Value(this UtilitiesStatusCodes statusCode) => (int)statusCode;
 }
 
 public enum UtilitiesStatusCodes {
@@ -438,18 +438,18 @@ public enum TagUser {
 	AdminCategoryUpdate = 301,
 	AdminProductRead = 302,
 	AdminProductUpdate = 303,
-	AdminUserRead= 304,
-	AdminUserUpdate= 305,
-	AdminReportRead= 306,
-	AdminReportUpdate= 307,
-	AdminTransactionRead= 308,
-	AdminTransactionUpdate= 309,
+	AdminUserRead = 304,
+	AdminUserUpdate = 305,
+	AdminReportRead = 306,
+	AdminReportUpdate = 307,
+	AdminTransactionRead = 308,
+	AdminTransactionUpdate = 309,
 	AdminOrderRead = 310,
-	AdminOrderUpdate= 311,
-	AdminContentRead= 312,
-	AdminContentUpdate= 313,
-	AdminCommentRead= 314,
-	AdminCommentUpdate= 315
+	AdminOrderUpdate = 311,
+	AdminContentRead = 312,
+	AdminContentUpdate = 313,
+	AdminCommentRead = 314,
+	AdminCommentUpdate = 315
 }
 
 public enum TagNotification { }

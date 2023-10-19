@@ -17,24 +17,15 @@ public interface IChatRepository {
 	Task<GenericResponse> Mute(Guid id);
 }
 
-public class ChatRepository : IChatRepository {
-	private readonly IConfiguration _config;
-	private readonly DbContext _dbContext;
-	private readonly IPromotionRepository _promotionRepository;
-	private readonly string? _userId;
-
-	public ChatRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IConfiguration config, IPromotionRepository promotionRepository) {
-		_dbContext = dbContext;
-		_config = config;
-		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
-		_promotionRepository = promotionRepository;
-	}
+public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IConfiguration config, IPromotionRepository promotionRepository)
+	: IChatRepository {
+	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	public async Task<GenericResponse<GroupChatEntity?>> CreateGroupChat(GroupChatCreateUpdateDto dto) {
 		AppSettings appSettings = new();
-		_config.GetSection("AppSettings").Bind(appSettings);
+		config.GetSection("AppSettings").Bind(appSettings);
 		Tuple<bool, UtilitiesStatusCodes> overUsedCheck =
-			Utils.IsUserOverused(_dbContext, _userId ?? string.Empty, CallerType.CreateGroupChat, dto.Type, null, appSettings.UsageRules);
+			Utils.IsUserOverused(dbContext, _userId ?? string.Empty, CallerType.CreateGroupChat, dto.Type, null, appSettings.UsageRules);
 		if (overUsedCheck.Item1)
 			return new GenericResponse<GroupChatEntity?>(null, overUsedCheck.Item2);
 
@@ -42,12 +33,12 @@ public class ChatRepository : IChatRepository {
 			string firstUserId = dto.UserIds!.ToList()[0];
 			string secondUserId = dto.UserIds!.ToList()[1];
 
-			Tuple<bool, UtilitiesStatusCodes> blockedState = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == firstUserId),
-			                                                                     _dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == secondUserId));
+			Tuple<bool, UtilitiesStatusCodes> blockedState = Utils.IsBlockedUser(dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == firstUserId),
+				dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == secondUserId));
 			if (blockedState.Item1)
 				return new GenericResponse<GroupChatEntity?>(null, blockedState.Item2);
 
-			GroupChatEntity? e = await _dbContext.Set<GroupChatEntity>().AsNoTracking()
+			GroupChatEntity? e = await dbContext.Set<GroupChatEntity>().AsNoTracking()
 				.Include(x => x.Users)!.ThenInclude(x => x.Media)
 				.Include(x => x.Products)!.ThenInclude(x => x.Media)
 				.Include(x => x.Products)!.ThenInclude(x => x.Categories)
@@ -61,11 +52,12 @@ public class ChatRepository : IChatRepository {
 			if (e == null) return await CreateGroupChatLogic(dto);
 			return new GenericResponse<GroupChatEntity?>(e);
 		}
+
 		return await CreateGroupChatLogic(dto);
 	}
 
 	public async Task<GenericResponse<GroupChatEntity?>> UpdateGroupChat(GroupChatCreateUpdateDto dto) {
-		GroupChatEntity e = (await _dbContext.Set<GroupChatEntity>()
+		GroupChatEntity e = (await dbContext.Set<GroupChatEntity>()
 			.Include(x => x.Users)
 			.Include(x => x.Products)
 			.FirstOrDefaultAsync(x => x.Id == dto.Id))!;
@@ -73,22 +65,23 @@ public class ChatRepository : IChatRepository {
 		if (dto.UserIds.IsNotNull()) {
 			List<UserEntity> users = new();
 			foreach (string id in dto.UserIds!) {
-				Tuple<bool, UtilitiesStatusCodes> isBlocked = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == id),
-				                                                                  _dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == _userId));
-				if (!isBlocked.Item1) users.Add((await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
+				Tuple<bool, UtilitiesStatusCodes> isBlocked = Utils.IsBlockedUser(dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == id),
+					dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == _userId));
+				if (!isBlocked.Item1) users.Add((await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
 			}
+
 			e.Users = users;
 		}
 
 		if (dto.Products.IsNotNull()) {
 			List<ProductEntity> products = new();
-			foreach (Guid id in dto.Products!) products.Add((await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
+			foreach (Guid id in dto.Products!) products.Add((await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
 			e.Products = products;
 		}
 
 		if (dto.Categories.IsNotNull()) {
 			List<CategoryEntity> list = new();
-			foreach (Guid id in dto.Categories!) list.Add((await _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
+			foreach (Guid id in dto.Categories!) list.Add((await dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
 			e.Categories = list;
 		}
 
@@ -104,37 +97,36 @@ public class ChatRepository : IChatRepository {
 			ChatStatus = dto.ChatStatus ?? e.JsonDetail.ChatStatus
 		};
 
-		EntityEntry<GroupChatEntity> entity = _dbContext.Set<GroupChatEntity>().Update(e);
-		await _dbContext.SaveChangesAsync();
+		EntityEntry<GroupChatEntity> entity = dbContext.Set<GroupChatEntity>().Update(e);
+		await dbContext.SaveChangesAsync();
 		return new GenericResponse<GroupChatEntity?>(entity.Entity);
 	}
 
 	public async Task<GenericResponse> DeleteGroupChat(Guid id) {
-        IQueryable<MediaEntity>? medias = _dbContext.Set<MediaEntity>().Where(w => w.GroupChatId == id);
-        if (medias is not null && medias.Any()) _dbContext.RemoveRange(medias);
-		await _dbContext.SaveChangesAsync();
-        await _dbContext.Set<GroupChatEntity>().Include(w=>w.GroupChatMessage).Where(x => x.Id == id).ExecuteDeleteAsync();
+		IQueryable<MediaEntity>? medias = dbContext.Set<MediaEntity>().Where(w => w.GroupChatId == id);
+		if (medias is not null && medias.Any()) dbContext.RemoveRange(medias);
+		await dbContext.SaveChangesAsync();
+		await dbContext.Set<GroupChatEntity>().Include(w => w.GroupChatMessage).Where(x => x.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
 	}
 
 	public async Task<GenericResponse<GroupChatMessageEntity?>> CreateGroupChatMessage(GroupChatMessageCreateUpdateDto dto) {
 		List<ProductEntity?> products = new();
-		foreach (Guid id in dto.Products ?? new List<Guid>()) products.Add(await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id));
+		foreach (Guid id in dto.Products ?? new List<Guid>()) products.Add(await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id));
 
-		GroupChatEntity? groupChat = await _dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(f => f.Id == dto.GroupChatId);
-		if(groupChat != null)
-		{
-			if(groupChat.Type == ChatType.Private)
-			{
+		GroupChatEntity? groupChat = await dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(f => f.Id == dto.GroupChatId);
+		if (groupChat != null) {
+			if (groupChat.Type == ChatType.Private) {
 				if (groupChat.Users == null || !groupChat.Users.Any()) return new GenericResponse<GroupChatMessageEntity?>(null, UtilitiesStatusCodes.BadRequest);
 				string? firstUserId = groupChat.Users.First().Id;
 				string? secondUserId = groupChat.Users.Last().Id;
-				Tuple<bool, UtilitiesStatusCodes> blockedState = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == firstUserId),
-																					 _dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == secondUserId));
+				Tuple<bool, UtilitiesStatusCodes> blockedState = Utils.IsBlockedUser(dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == firstUserId),
+					dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == secondUserId));
 				if (blockedState.Item1)
 					return new GenericResponse<GroupChatMessageEntity?>(null, blockedState.Item2);
 			}
-        }
+		}
+
 		GroupChatMessageEntity entity = new() {
 			Message = dto.Message,
 			Type = dto.Type,
@@ -148,26 +140,26 @@ public class ChatRepository : IChatRepository {
 			ForwardedMessageId = dto.ForwardedMessageId
 		};
 
-		EntityEntry<GroupChatMessageEntity> e = await _dbContext.Set<GroupChatMessageEntity>().AddAsync(entity);
-		await _dbContext.SaveChangesAsync();
+		EntityEntry<GroupChatMessageEntity> e = await dbContext.Set<GroupChatMessageEntity>().AddAsync(entity);
+		await dbContext.SaveChangesAsync();
 		return new GenericResponse<GroupChatMessageEntity?>(e.Entity);
 	}
 
 	public async Task<GenericResponse<IQueryable<GroupChatEntity>?>> ReadMyGroupChats() {
-		List<GroupChatEntity> e = await _dbContext.Set<GroupChatEntity>().AsNoTracking()
+		List<GroupChatEntity> e = await dbContext.Set<GroupChatEntity>().AsNoTracking()
 			.Where(x => x.Users!.Any(y => y.Id == _userId))
 			.Include(x => x.Users)!.ThenInclude(x => x.Media)
-			.Include(x=>x.Media)
+			.Include(x => x.Media)
 			.Include(x => x.GroupChatMessage!.OrderByDescending(y => y.CreatedAt).Take(1)).ThenInclude(x => x.Media)
 			.ToListAsync();
 
 		foreach (GroupChatEntity groupChatEntity in e.Where(groupChatEntity => groupChatEntity.Type == ChatType.Private))
 			if (groupChatEntity.Users!.First().Id == _userId) {
-				UserEntity u = (await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == groupChatEntity.Users!.Last().Id))!;
+				UserEntity u = (await dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == groupChatEntity.Users!.Last().Id))!;
 				groupChatEntity.Title = u.AppUserName;
 			}
 			else {
-				UserEntity u = (await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == groupChatEntity.Users!.First().Id))!;
+				UserEntity u = (await dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == groupChatEntity.Users!.First().Id))!;
 				groupChatEntity.Title = u.AppUserName;
 			}
 
@@ -175,13 +167,16 @@ public class ChatRepository : IChatRepository {
 
 		foreach (GroupChatEntity? item in e) {
 			int countOfMessage = 0;
-			SeenUsers? seenUsers = _dbContext.Set<SeenUsers>().FirstOrDefault(w => w.FkGroupChat == item.Id && w.FkUserId == _userId);
-			IQueryable<GroupChatMessageEntity> groupchatMessages = _dbContext.Set<GroupChatMessageEntity>().Where(w => w.GroupChatId == item.Id);
-			if (seenUsers is null) { countOfMessage = groupchatMessages.Count(); }
+			SeenUsers? seenUsers = dbContext.Set<SeenUsers>().FirstOrDefault(w => w.FkGroupChat == item.Id && w.FkUserId == _userId);
+			IQueryable<GroupChatMessageEntity> groupchatMessages = dbContext.Set<GroupChatMessageEntity>().Where(w => w.GroupChatId == item.Id);
+			if (seenUsers is null) {
+				countOfMessage = groupchatMessages.Count();
+			}
 			else {
 				GroupChatMessageEntity lastSeenMessage = (await groupchatMessages.Where(w => w.Id == seenUsers.FkGroupChatMessage.Value).FirstOrDefaultAsync())!;
 				countOfMessage = await groupchatMessages.Where(w => w.CreatedAt > lastSeenMessage.CreatedAt).CountAsync();
 			}
+
 			item.CountOfUnreadMessages = countOfMessage;
 			myGroupChats.Add(item);
 		}
@@ -190,7 +185,7 @@ public class ChatRepository : IChatRepository {
 	}
 
 	public async Task<GenericResponse<GroupChatMessageEntity?>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto) {
-		GroupChatMessageEntity e = (await _dbContext.Set<GroupChatMessageEntity>()
+		GroupChatMessageEntity e = (await dbContext.Set<GroupChatMessageEntity>()
 			.FirstOrDefaultAsync(x => x.Id == dto.Id))!;
 
 		e.Message = dto.Message ?? e.Message;
@@ -198,23 +193,23 @@ public class ChatRepository : IChatRepository {
 		e.UpdatedAt = DateTime.Now;
 		e.UseCase = dto.UseCase ?? e.UseCase;
 
-		EntityEntry<GroupChatMessageEntity> entity = _dbContext.Set<GroupChatMessageEntity>().Update(e);
-		await _dbContext.SaveChangesAsync();
+		EntityEntry<GroupChatMessageEntity> entity = dbContext.Set<GroupChatMessageEntity>().Update(e);
+		await dbContext.SaveChangesAsync();
 		return new GenericResponse<GroupChatMessageEntity?>(entity.Entity);
 	}
 
 	public async Task<GenericResponse> DeleteGroupChatMessage(Guid id) {
-		IQueryable<MediaEntity>? medias = _dbContext.Set<MediaEntity>().Where(w => w.GroupChatMessageId == id);
-		if(medias is not null && medias.Any()) _dbContext.RemoveRange(medias);
-		IQueryable<SeenUsers>? seenUsers = _dbContext.Set<SeenUsers>().Where(w=>w.FkGroupChatMessage == id);
-        if (seenUsers is not null && seenUsers.Any()) _dbContext.RemoveRange(seenUsers);
-        await _dbContext.Set<GroupChatMessageEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
-        await _dbContext.SaveChangesAsync();
+		IQueryable<MediaEntity>? medias = dbContext.Set<MediaEntity>().Where(w => w.GroupChatMessageId == id);
+		if (medias is not null && medias.Any()) dbContext.RemoveRange(medias);
+		IQueryable<SeenUsers>? seenUsers = dbContext.Set<SeenUsers>().Where(w => w.FkGroupChatMessage == id);
+		if (seenUsers is not null && seenUsers.Any()) dbContext.RemoveRange(seenUsers);
+		await dbContext.Set<GroupChatMessageEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
+		await dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}
 
 	public GenericResponse<IQueryable<GroupChatEntity>> FilterGroupChats(GroupChatFilterDto dto) {
-		IQueryable<GroupChatEntity> q = _dbContext.Set<GroupChatEntity>()
+		IQueryable<GroupChatEntity> q = dbContext.Set<GroupChatEntity>()
 			.Where(x => x.Users!.Any(y => y.Id == _userId));
 
 		if (dto.UsersIds.IsNotNullOrEmpty()) q = q.Where(x => x.Users!.Any(y => y.Id == dto.UsersIds!.FirstOrDefault()));
@@ -238,7 +233,7 @@ public class ChatRepository : IChatRepository {
 
 		if (dto.Boosted) q = q.OrderByDescending(o => o.JsonDetail.Boosted);
 		if (dto.ShowAhtorized) {
-			List<OrderEntity> orders = _dbContext.Set<OrderEntity>().Where(w => w.ProductOwnerId == _userId).ToList();
+			List<OrderEntity> orders = dbContext.Set<OrderEntity>().Where(w => w.ProductOwnerId == _userId).ToList();
 			q = q.Where(w => orders.Any(a => a.UserId == w.Users!.FirstOrDefault()!.Id));
 		}
 
@@ -251,8 +246,9 @@ public class ChatRepository : IChatRepository {
 			PageSize = dto.PageSize
 		};
 	}
+
 	public GenericResponse<IQueryable<GroupChatEntity>> FilterAllGroupChats(GroupChatFilterDto dto) {
-		IQueryable<GroupChatEntity> q = _dbContext.Set<GroupChatEntity>();
+		IQueryable<GroupChatEntity> q = dbContext.Set<GroupChatEntity>();
 
 		if (dto.UsersIds.IsNotNullOrEmpty()) q = q.Where(x => x.Users!.Any(y => y.Id == dto.UsersIds!.FirstOrDefault()));
 		if (dto.ProductsIds.IsNotNullOrEmpty()) q = q.Where(x => x.Products!.Any(y => y.Id == dto.ProductsIds!.FirstOrDefault()));
@@ -275,7 +271,7 @@ public class ChatRepository : IChatRepository {
 
 		if (dto.Boosted) q = q.OrderByDescending(o => o.JsonDetail.Boosted);
 		if (dto.ShowAhtorized) {
-			List<OrderEntity> orders = _dbContext.Set<OrderEntity>().Where(w => w.ProductOwnerId == _userId).ToList();
+			List<OrderEntity> orders = dbContext.Set<OrderEntity>().Where(w => w.ProductOwnerId == _userId).ToList();
 			q = q.Where(w => orders.Any(a => a.UserId == w.Users!.FirstOrDefault()!.Id));
 		}
 
@@ -290,7 +286,7 @@ public class ChatRepository : IChatRepository {
 	}
 
 	public async Task<GenericResponse<GroupChatEntity>> ReadGroupChatById(Guid id) {
-		GroupChatEntity? e = await _dbContext.Set<GroupChatEntity>()
+		GroupChatEntity? e = await dbContext.Set<GroupChatEntity>()
 			.Include(x => x.Users)!.ThenInclude(x => x.Media)
 			.Include(x => x.Products)!.ThenInclude(x => x.Media)
 			.Include(x => x.Products)!.ThenInclude(x => x.Categories)
@@ -299,22 +295,25 @@ public class ChatRepository : IChatRepository {
 
 		if (e != null) {
 			int countOfMessage;
-			SeenUsers? seenUsers = _dbContext.Set<SeenUsers>().FirstOrDefault(w => w.FkGroupChat == e.Id && w.FkUserId == _userId);
-			IQueryable<GroupChatMessageEntity> groupchatMessages = _dbContext.Set<GroupChatMessageEntity>().Where(w => w.GroupChatId == e.Id);
-			if (seenUsers is null) { countOfMessage = groupchatMessages.Count(); }
+			SeenUsers? seenUsers = dbContext.Set<SeenUsers>().FirstOrDefault(w => w.FkGroupChat == e.Id && w.FkUserId == _userId);
+			IQueryable<GroupChatMessageEntity> groupchatMessages = dbContext.Set<GroupChatMessageEntity>().Where(w => w.GroupChatId == e.Id);
+			if (seenUsers is null) {
+				countOfMessage = groupchatMessages.Count();
+			}
 			else {
 				GroupChatMessageEntity lastSeenMessage = groupchatMessages.FirstOrDefault(w => w.Id == seenUsers.FkGroupChatMessage)!;
 				countOfMessage = groupchatMessages.Count(w => w.CreatedAt > lastSeenMessage.CreatedAt);
 			}
+
 			e.CountOfUnreadMessages = countOfMessage;
-			await _promotionRepository.UserSeened(e.Id);
+			await promotionRepository.UserSeened(e.Id);
 		}
 
 		return new GenericResponse<GroupChatEntity>(e!);
 	}
 
 	public GenericResponse<IQueryable<GroupChatMessageEntity>?> ReadGroupChatMessages(Guid id, int pageSize, int pageNumber) {
-		IQueryable<GroupChatMessageEntity> q = _dbContext.Set<GroupChatMessageEntity>()
+		IQueryable<GroupChatMessageEntity> q = dbContext.Set<GroupChatMessageEntity>()
 			.Where(x => x.GroupChatId == id)
 			.Include(x => x.Media)
 			.Include(x => x.Products)!.ThenInclude(x => x!.Media)
@@ -335,15 +334,16 @@ public class ChatRepository : IChatRepository {
 		q = q.Skip((pageNumber - 1) * pageSize).Take(pageSize);
 
 		List<GroupChatMessageEntity> tempGroupChatsMessage = q.ToList();
-		IQueryable<SeenUsers> messageSeen = _dbContext.Set<SeenUsers>().Where(w => w.FkGroupChat == id);
+		IQueryable<SeenUsers> messageSeen = dbContext.Set<SeenUsers>().Where(w => w.FkGroupChat == id);
 		foreach (GroupChatMessageEntity? item in tempGroupChatsMessage) {
 			List<UserEntity> usersMessage = new();
 			foreach (SeenUsers? seenTbl in messageSeen) {
 				GroupChatMessageEntity? lastMessageThatUserSeened = q.FirstOrDefault(f => f.Id == seenTbl.FkGroupChatMessage);
-				UserEntity? user = _dbContext.Set<UserEntity>().Where(w => w.Id == seenTbl.FkUserId).Include(x => x.Media).FirstOrDefault();
+				UserEntity? user = dbContext.Set<UserEntity>().Where(w => w.Id == seenTbl.FkUserId).Include(x => x.Media).FirstOrDefault();
 				if (user is not null && (lastMessageThatUserSeened?.CreatedAt > item.CreatedAt || lastMessageThatUserSeened?.Id == item.Id))
 					usersMessage.Add(user);
 			}
+
 			item.MessageSeenBy = usersMessage;
 		}
 
@@ -355,18 +355,18 @@ public class ChatRepository : IChatRepository {
 	}
 
 	public async Task<GenericResponse> SeenGroupChatMessage(Guid messageId) {
-		GroupChatMessageEntity? groupMessageChat = await _dbContext.Set<GroupChatMessageEntity>().Where(e => e.Id == messageId).FirstOrDefaultAsync();
+		GroupChatMessageEntity? groupMessageChat = await dbContext.Set<GroupChatMessageEntity>().Where(e => e.Id == messageId).FirstOrDefaultAsync();
 		if (groupMessageChat is null)
 			return new GenericResponse(UtilitiesStatusCodes.NotFound, "GroupChatMessage Not Found!");
 
-		GroupChatEntity? groupChat = await _dbContext.Set<GroupChatEntity>().Where(w => w.Id == groupMessageChat.GroupChatId).FirstOrDefaultAsync();
+		GroupChatEntity? groupChat = await dbContext.Set<GroupChatEntity>().Where(w => w.Id == groupMessageChat.GroupChatId).FirstOrDefaultAsync();
 		if (groupChat is null)
 			return new GenericResponse(UtilitiesStatusCodes.NotFound, "GroupChate Not Found!");
 
-		SeenUsers? seenUsers = await _dbContext.Set<SeenUsers>().Where(w => w.FkGroupChat == groupChat.Id && w.FkUserId == _userId).FirstOrDefaultAsync();
+		SeenUsers? seenUsers = await dbContext.Set<SeenUsers>().Where(w => w.FkGroupChat == groupChat.Id && w.FkUserId == _userId).FirstOrDefaultAsync();
 
 		if (seenUsers is null) {
-			await _dbContext.Set<SeenUsers>().AddAsync(new SeenUsers {
+			await dbContext.Set<SeenUsers>().AddAsync(new SeenUsers {
 				CreatedAt = DateTime.Now,
 				FkGroupChat = groupChat.Id,
 				FkUserId = _userId,
@@ -375,24 +375,24 @@ public class ChatRepository : IChatRepository {
 		}
 		else {
 			GroupChatMessageEntity? lastMessageSeen =
-				await _dbContext.Set<GroupChatMessageEntity>().FirstOrDefaultAsync(f => f.Id == seenUsers.FkGroupChatMessage);
+				await dbContext.Set<GroupChatMessageEntity>().FirstOrDefaultAsync(f => f.Id == seenUsers.FkGroupChatMessage);
 			if (lastMessageSeen?.CreatedAt > groupMessageChat.CreatedAt || seenUsers.FkGroupChatMessage == messageId) return new GenericResponse();
 
 			seenUsers.FkGroupChatMessage = messageId;
-			_dbContext.Update(seenUsers);
+			dbContext.Update(seenUsers);
 		}
 
-		await _dbContext.SaveChangesAsync();
+		await dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}
 
 	public async Task<GenericResponse> ExitFromGroup(Guid id) {
-		GroupChatEntity? groupChat = await _dbContext.Set<GroupChatEntity>().Include(i => i.Users).FirstOrDefaultAsync(f => f.Id == id);
+		GroupChatEntity? groupChat = await dbContext.Set<GroupChatEntity>().Include(i => i.Users).FirstOrDefaultAsync(f => f.Id == id);
 		if (groupChat is null) return new GenericResponse(UtilitiesStatusCodes.NotFound, "Group Chat not Founded");
 
 		if (groupChat.Users!.All(a => a.Id != _userId)) return new GenericResponse(UtilitiesStatusCodes.UserNotFound, "User Not Founded in GroupChat");
 
-		UserEntity? user = await _dbContext.Set<UserEntity>().Where(w => w.Id == _userId).FirstOrDefaultAsync();
+		UserEntity? user = await dbContext.Set<UserEntity>().Where(w => w.Id == _userId).FirstOrDefaultAsync();
 
 		List<UserEntity> tempUsers = groupChat.Users!.ToList();
 		bool result = tempUsers.Remove(user!);
@@ -400,22 +400,23 @@ public class ChatRepository : IChatRepository {
 		if (result) {
 			groupChat.Users = tempUsers;
 
-			_dbContext.Update(groupChat);
-			await _dbContext.SaveChangesAsync();
+			dbContext.Update(groupChat);
+			await dbContext.SaveChangesAsync();
 			return new GenericResponse();
 		}
+
 		return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 	}
 
 	public async Task<GenericResponse> Mute(Guid id) {
-		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
+		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
 		if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound);
 
 		if (user.MutedChats.IsNullOrEmpty()) user.MutedChats += id.ToString();
 		else user.MutedChats = user.MutedChats + "," + id;
 
-		_dbContext.Update(user);
-		await _dbContext.SaveChangesAsync();
+		dbContext.Update(user);
+		await dbContext.SaveChangesAsync();
 
 		return new GenericResponse();
 	}
@@ -426,15 +427,15 @@ public class ChatRepository : IChatRepository {
 		List<UserEntity> users = new();
 		if (dto.UserIds.IsNotNullOrEmpty())
 			foreach (string id in dto.UserIds!) {
-				Tuple<bool, UtilitiesStatusCodes> isBlocked = Utils.IsBlockedUser(_dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == id),
-				                                                                  _dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == _userId));
-				if (!isBlocked.Item1) users.Add((await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
+				Tuple<bool, UtilitiesStatusCodes> isBlocked = Utils.IsBlockedUser(dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == id),
+					dbContext.Set<UserEntity>().FirstOrDefault(f => f.Id == _userId));
+				if (!isBlocked.Item1) users.Add((await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
 			}
 
 		List<ProductEntity> products = new();
 		if (dto.Products.IsNotNullOrEmpty())
 			foreach (Guid id in dto.Products!)
-				products.Add((await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
+				products.Add((await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id))!);
 
 		GroupChatEntity entity = new() {
 			Title = dto.Title,
@@ -452,21 +453,22 @@ public class ChatRepository : IChatRepository {
 				Priority = dto.Priority
 			}
 		};
-		if (dto.Id != null) entity.Id = (Guid) dto.Id;
+		if (dto.Id != null) entity.Id = (Guid)dto.Id;
 
 		if (dto.Categories.IsNotNullOrEmpty()) {
 			List<CategoryEntity> listCategory = new();
 			foreach (Guid item in dto.Categories!) {
-				CategoryEntity? ce = await _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item);
+				CategoryEntity? ce = await dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item);
 				if (ce != null) listCategory.Add(ce);
 			}
+
 			entity.Categories = listCategory;
 		}
 
 		if (entity.Type == ChatType.PublicChannel) entity.JsonDetail.Boosted = DateTime.Now;
 
-		EntityEntry<GroupChatEntity> e = await _dbContext.Set<GroupChatEntity>().AddAsync(entity);
-		await _dbContext.SaveChangesAsync();
+		EntityEntry<GroupChatEntity> e = await dbContext.Set<GroupChatEntity>().AddAsync(entity);
+		await dbContext.SaveChangesAsync();
 		return new GenericResponse<GroupChatEntity?>(e.Entity);
 	}
 }

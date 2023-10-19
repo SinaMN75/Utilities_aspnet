@@ -16,31 +16,18 @@ public interface IUserRepository {
 	Task<GenericResponse> Authorize(AuthorizeUserDto dto);
 }
 
-public class UserRepository : IUserRepository {
-	private readonly DbContext _dbContext;
-	private readonly IMemoryCache _memoryCache;
-	private readonly ISmsNotificationRepository _sms;
-	private readonly ITransactionRepository _transactionRepository;
-	private readonly IHttpContextAccessor? _http;
-	private readonly string? _userId;
-
-	public UserRepository(
-		DbContext dbContext,
+public class UserRepository(DbContext dbContext,
 		ISmsNotificationRepository sms,
 		IHttpContextAccessor httpContextAccessor,
 		ITransactionRepository transactionRepository,
-		IMemoryCache memoryCache) {
-		_dbContext = dbContext;
-		_sms = sms;
-		_http = httpContextAccessor;
-		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
-		_transactionRepository = transactionRepository;
-		_memoryCache = memoryCache;
-	}
+		IMemoryCache memoryCache)
+	: IUserRepository {
+	private readonly IHttpContextAccessor? _http = httpContextAccessor;
+	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	public async Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null) {
 		bool isUserId = Guid.TryParse(idOrUserName, out _);
-		UserEntity? entity = await _dbContext.Set<UserEntity>()
+		UserEntity? entity = await dbContext.Set<UserEntity>()
 			.Include(u => u.Media)
 			.Include(u => u.Categories)!.ThenInclude(u => u.Media)
 			.FirstOrDefaultAsync(u => isUserId ? u.Id == idOrUserName : u.UserName == idOrUserName);
@@ -55,50 +42,49 @@ public class UserRepository : IUserRepository {
 
 		entity.CountFollowing = entity.FollowingUsers.Split(",").Count(w => w.Length >= 10);
 		entity.CountFollowers = entity.FollowedUsers.Split(",").Count(w => w.Length >= 10);
-		
+
 		return new GenericResponse<UserEntity?>(entity);
 	}
 
 	public async Task<GenericResponse<UserEntity?>> Update(UserCreateUpdateDto dto) {
-		UserEntity? entity = await _dbContext.Set<UserEntity>().Include(x => x.Categories).FirstOrDefaultAsync(x => x.Id == dto.Id);
+		UserEntity? entity = await dbContext.Set<UserEntity>().Include(x => x.Categories).FirstOrDefaultAsync(x => x.Id == dto.Id);
 		if (entity == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
 		await FillUserData(dto, entity);
-		await _dbContext.SaveChangesAsync();
+		await dbContext.SaveChangesAsync();
 		return new GenericResponse<UserEntity?>(entity);
 	}
 
 	public GenericResponse<IQueryable<UserEntity>> Filter(UserFilterDto dto) {
-		IQueryable<UserEntity> q = _dbContext.Set<UserEntity>();
+		IQueryable<UserEntity> q = dbContext.Set<UserEntity>();
 
-		if (dto.UserNameExact .IsNotNullOrEmpty()) q = q.Where(x => x.AppUserName == dto.UserNameExact || x.UserName == dto.UserNameExact);
-		if (dto.UserId .IsNotNullOrEmpty()) q = q.Where(x => x.Id == dto.UserId);
-		if (dto.Badge .IsNotNullOrEmpty()) q = q.Where(x => x.Badge!.Contains(dto.Badge));
-		if (dto.Bio .IsNotNullOrEmpty()) q = q.Where(x => x.Bio!.Contains(dto.Bio));
-		if (dto.Email .IsNotNullOrEmpty()) q = q.Where(x => x.Email!.Contains(dto.Email));
+		if (dto.UserNameExact.IsNotNullOrEmpty()) q = q.Where(x => x.AppUserName == dto.UserNameExact || x.UserName == dto.UserNameExact);
+		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => x.Id == dto.UserId);
+		if (dto.Badge.IsNotNullOrEmpty()) q = q.Where(x => x.Badge!.Contains(dto.Badge));
+		if (dto.Bio.IsNotNullOrEmpty()) q = q.Where(x => x.Bio!.Contains(dto.Bio));
+		if (dto.Email.IsNotNullOrEmpty()) q = q.Where(x => x.Email!.Contains(dto.Email));
 		if (dto.Gender != null) q = q.Where(x => x.Gender == dto.Gender);
-		if (dto.Headline .IsNotNullOrEmpty()) q = q.Where(x => x.Headline!.Contains(dto.Headline));
-		if (dto.JobStatus .IsNotNullOrEmpty()) q = q.Where(x => x.Headline!.Contains(dto.JobStatus));
-		if (dto.Region .IsNotNullOrEmpty()) q = q.Where(x => x.Region!.Contains(dto.Region));
-		if (dto.State .IsNotNullOrEmpty()) q = q.Where(x => x.State!.Contains(dto.State));
-		if (dto.AppEmail .IsNotNullOrEmpty()) q = q.Where(x => x.AppEmail!.Contains(dto.AppEmail));
-		if (dto.FirstName .IsNotNullOrEmpty()) q = q.Where(x => x.FirstName!.Contains(dto.FirstName));
-		if (dto.LastName .IsNotNullOrEmpty()) q = q.Where(x => x.LastName!.Contains(dto.LastName));
+		if (dto.Headline.IsNotNullOrEmpty()) q = q.Where(x => x.Headline!.Contains(dto.Headline));
+		if (dto.JobStatus.IsNotNullOrEmpty()) q = q.Where(x => x.Headline!.Contains(dto.JobStatus));
+		if (dto.Region.IsNotNullOrEmpty()) q = q.Where(x => x.Region!.Contains(dto.Region));
+		if (dto.State.IsNotNullOrEmpty()) q = q.Where(x => x.State!.Contains(dto.State));
+		if (dto.AppEmail.IsNotNullOrEmpty()) q = q.Where(x => x.AppEmail!.Contains(dto.AppEmail));
+		if (dto.FirstName.IsNotNullOrEmpty()) q = q.Where(x => x.FirstName!.Contains(dto.FirstName));
+		if (dto.LastName.IsNotNullOrEmpty()) q = q.Where(x => x.LastName!.Contains(dto.LastName));
 		if (dto.FullName.IsNotNullOrEmpty()) q = q.Where(x => x.FullName!.Contains(dto.FullName));
 		if (dto.PhoneNumber.IsNotNullOrEmpty()) q = q.Where(x => x.PhoneNumber!.Contains(dto.PhoneNumber));
 		if (dto.AppUserName.IsNotNullOrEmpty()) q = q.Where(x => x.AppUserName!.Contains(dto.AppUserName));
 		if (dto.AppPhoneNumber.IsNotNullOrEmpty()) q = q.Where(x => x.AppPhoneNumber!.Contains(dto.AppPhoneNumber));
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
-		if (dto.NoneOfMyFollowing.IsTrue())
-		{
-			UserEntity? user = _dbContext.Set<UserEntity>().FirstOrDefault(x => x.Id == _userId);
+		if (dto.NoneOfMyFollowing.IsTrue()) {
+			UserEntity? user = dbContext.Set<UserEntity>().FirstOrDefault(x => x.Id == _userId);
 			string[]? myFollowing = user.FollowingUsers.Split(",");
-            q = q.Where(x => !myFollowing.Contains(x.Id));
+			q = q.Where(x => !myFollowing.Contains(x.Id));
 		}
-		if (dto.NoneOfMyFollower.IsTrue())
-		{
-			UserEntity? user = _dbContext.Set<UserEntity>().FirstOrDefault(x => x.Id == _userId);
+
+		if (dto.NoneOfMyFollower.IsTrue()) {
+			UserEntity? user = dbContext.Set<UserEntity>().FirstOrDefault(x => x.Id == _userId);
 			string[]? myFollower = user.FollowedUsers.Split(",");
-            q = q.Where(x => !myFollower.Contains(x.Id));
+			q = q.Where(x => !myFollower.Contains(x.Id));
 		}
 
 		if (dto.Query.IsNotNullOrEmpty())
@@ -123,7 +109,7 @@ public class UserRepository : IUserRepository {
 		if (dto.ShowCategories.IsTrue()) q = q.Include(u => u.Categories);
 
 		if (dto.ShowMyCustomers.IsTrue()) {
-			IQueryable<OrderEntity> orders = _dbContext.Set<OrderEntity>()
+			IQueryable<OrderEntity> orders = dbContext.Set<OrderEntity>()
 				.Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p!.Media)
 				.Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p!.Categories)
 				.Include(i => i.Address)
@@ -150,7 +136,7 @@ public class UserRepository : IUserRepository {
 
 	public async Task<GenericResponse<UserEntity?>> GetTokenForTest(string? mobile) {
 		string m = mobile ?? "09351902721";
-		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == m);
+		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == m);
 		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
 		Console.WriteLine("LLLLLLLLLLLL");
 		JwtSecurityToken token = CreateToken(user);
@@ -159,27 +145,27 @@ public class UserRepository : IUserRepository {
 	}
 
 	public async Task<UserEntity?> ReadByIdMinimal(string? idOrUserName, string? token = null) {
-		UserEntity e = (await _dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(u => u.Id == idOrUserName || u.UserName == idOrUserName))!;
+		UserEntity e = (await dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(u => u.Id == idOrUserName || u.UserName == idOrUserName))!;
 		e.Token = token;
 		return e;
 	}
 
 	public async Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model) {
-		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Email == model.Email ||
-		                                                                               x.UserName == model.Email ||
-		                                                                               x.PhoneNumber == model.Email ||
-		                                                                               x.Password == model.Password);
+		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Email == model.Email ||
+		                                                                              x.UserName == model.Email ||
+		                                                                              x.PhoneNumber == model.Email ||
+		                                                                              x.Password == model.Password);
 
 		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
 
-		await _dbContext.SaveChangesAsync();
+		await dbContext.SaveChangesAsync();
 		JwtSecurityToken token = CreateToken(user);
 
 		return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result);
 	}
 
 	public async Task<GenericResponse<UserEntity?>> Register(RegisterDto dto) {
-		UserEntity? model = await _dbContext.Set<UserEntity>()
+		UserEntity? model = await dbContext.Set<UserEntity>()
 			.FirstOrDefaultAsync(x => x.UserName == dto.UserName || x.Email == dto.Email || x.PhoneNumber == dto.PhoneNumber);
 		if (model != null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.UserAlreadyExist);
 
@@ -196,14 +182,16 @@ public class UserRepository : IUserRepository {
 			JsonDetail = dto.JsonDetail = new UserJsonDetail(),
 		};
 
-		await _dbContext.AddAsync(user);
-		await _dbContext.SaveChangesAsync();
+		await dbContext.AddAsync(user);
+		await dbContext.SaveChangesAsync();
 
 		JwtSecurityToken token = CreateToken(user);
 
 		if (dto.SendSms) {
 			if (dto.Email != null && dto.Email.IsEmail()) { }
-			else { await SendOtp(user.Id); }
+			else {
+				await SendOtp(user.Id);
+			}
 		}
 
 		return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result);
@@ -215,19 +203,20 @@ public class UserRepository : IUserRepository {
 		mobile = mobile.GetLast(10);
 		mobile = mobile.Insert(0, "0");
 		if (mobile.Length is > 12 or < 9) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.BadRequest);
-		UserEntity? existingUser = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Email == mobile ||
-		                                                                                       x.PhoneNumber == mobile ||
-		                                                                                       x.AppUserName == mobile ||
-		                                                                                       x.AppPhoneNumber == mobile ||
-		                                                                                       x.UserName == mobile);
+		UserEntity? existingUser = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Email == mobile ||
+		                                                                                      x.PhoneNumber == mobile ||
+		                                                                                      x.AppUserName == mobile ||
+		                                                                                      x.AppPhoneNumber == mobile ||
+		                                                                                      x.UserName == mobile);
 
 		if (existingUser != null) {
 			if (!await SendOtp(existingUser.Id)) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.MaximumLimitReached);
 			existingUser.UserAgent = userAgent;
-			_dbContext.Update(existingUser);
-			await _dbContext.SaveChangesAsync();
+			dbContext.Update(existingUser);
+			await dbContext.SaveChangesAsync();
 			return new GenericResponse<UserEntity?>(existingUser);
 		}
+
 		UserEntity user = new() {
 			PhoneNumber = mobile,
 			UserName = mobile,
@@ -235,15 +224,15 @@ public class UserRepository : IUserRepository {
 			UserAgent = userAgent,
 		};
 
-		await _dbContext.AddAsync(user);
-		await _dbContext.SaveChangesAsync();
+		await dbContext.AddAsync(user);
+		await dbContext.SaveChangesAsync();
 		await SendOtp(user.Id);
 		return new GenericResponse<UserEntity?>(user);
 	}
 
 	public async Task<GenericResponse<UserEntity?>> VerifyCodeForLogin(VerifyMobileForLoginDto dto) {
 		string mobile = dto.Mobile.Replace("+", "");
-		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == mobile || x.Email == mobile);
+		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == mobile || x.Email == mobile);
 		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.UserNotFound);
 		if (user.Suspend ?? false) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.UserSuspended);
 
@@ -251,19 +240,19 @@ public class UserRepository : IUserRepository {
 		user.LastName = dto.LastName ?? user.LastName;
 		user.AppUserName = dto.UserName ?? user.AppUserName;
 
-		_dbContext.Update(user);
+		dbContext.Update(user);
 
-		await _dbContext.SaveChangesAsync();
+		await dbContext.SaveChangesAsync();
 		JwtSecurityToken token = CreateToken(user);
 
-		return dto.VerificationCode == "1375" || dto.VerificationCode == _memoryCache.Get<string>(user.Id)
+		return dto.VerificationCode == "1375" || dto.VerificationCode == memoryCache.Get<string>(user.Id)
 			? new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result)
 			: new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.WrongVerificationCode);
 	}
 
 	public async Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList() {
-		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
-        GenericResponse<IQueryable<UserEntity>> blockedUsers = Filter(new UserFilterDto {
+		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
+		GenericResponse<IQueryable<UserEntity>> blockedUsers = Filter(new UserFilterDto {
 			ShowMedia = true,
 			UserIds = user?.BlockedUsers.Split(",")
 		});
@@ -271,7 +260,7 @@ public class UserRepository : IUserRepository {
 	}
 
 	public async Task<GenericResponse> ToggleBlock(string userId) {
-		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
+		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
 		if (user.BlockedUsers.Contains(userId))
 			await Update(new UserCreateUpdateDto { Id = user.Id, BlockedUsers = user.BlockedUsers.Replace($",{userId}", "") });
 		else await Update(new UserCreateUpdateDto { Id = user.Id, BlockedUsers = user.BlockedUsers + "," + userId });
@@ -284,14 +273,14 @@ public class UserRepository : IUserRepository {
 
 		if (fromUser.Wallet <= dto.Amount) return new GenericResponse(UtilitiesStatusCodes.NotEnoughMoney);
 		await Update(new UserCreateUpdateDto { Id = fromUser.Id, Wallet = fromUser.Wallet - dto.Amount });
-		await _transactionRepository.Create(MakeTransaction(fromUser.Id, dto.Amount, "کسر", null, TransactionType.WithdrawFromTheWallet), ct);
+		await transactionRepository.Create(MakeTransaction(fromUser.Id, dto.Amount, "کسر", null, TransactionType.WithdrawFromTheWallet), ct);
 		await Update(new UserCreateUpdateDto { Id = toUser.Id, Wallet = toUser.Wallet + dto.Amount });
-		await _transactionRepository.Create(MakeTransaction(toUser.Id, dto.Amount, "واریز", null, TransactionType.DepositToWallet), ct);
+		await transactionRepository.Create(MakeTransaction(toUser.Id, dto.Amount, "واریز", null, TransactionType.DepositToWallet), ct);
 		return new GenericResponse();
 	}
 
 	public async Task<GenericResponse> Authorize(AuthorizeUserDto dto) {
-		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
+		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
 		if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound);
 
 		string? sheba = dto.ShebaNumber.GetShebaNumber();
@@ -310,8 +299,8 @@ public class UserRepository : IUserRepository {
 			user.JsonDetail.LegalAuthenticationType = LegalAuthenticationType.Authenticated;
 		}
 
-		_dbContext.Set<UserEntity>().Update(user);
-		await _dbContext.SaveChangesAsync();
+		dbContext.Set<UserEntity>().Update(user);
+		await dbContext.SaveChangesAsync();
 
 		return new GenericResponse();
 	}
@@ -391,23 +380,21 @@ public class UserRepository : IUserRepository {
 		if (dto.Categories.IsNotNullOrEmpty()) {
 			List<CategoryEntity> list = new();
 			foreach (Guid item in dto.Categories!) {
-				CategoryEntity? e = await _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item);
+				CategoryEntity? e = await dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item);
 				if (e != null) list.Add(e);
 			}
 
 			entity.Categories = list;
 		}
 
-        if (dto.RemoveTags.IsNotNullOrEmpty())
-        {
-            dto.RemoveTags.ForEach(item => entity.Tags?.Remove(item));
-        }
+		if (dto.RemoveTags.IsNotNullOrEmpty()) {
+			dto.RemoveTags.ForEach(item => entity.Tags?.Remove(item));
+		}
 
-        if (dto.AddTags.IsNotNullOrEmpty())
-        {
-            entity.Tags.AddRange(dto.AddTags);
-        }
-    }
+		if (dto.AddTags.IsNotNullOrEmpty()) {
+			entity.Tags.AddRange(dto.AddTags);
+		}
+	}
 
 	private static TransactionEntity MakeTransaction(string userId, int amount, string description, string? shebaNumber, TransactionType type) => new() {
 		UserId = userId,
@@ -418,17 +405,17 @@ public class UserRepository : IUserRepository {
 	};
 
 	private async Task<bool> SendOtp(string userId) {
-		if (_memoryCache.Get<string>(userId) != null) return false;
+		if (memoryCache.Get<string>(userId) != null) return false;
 
 		string newOtp = Random.Shared.Next(1000, 9999).ToString();
-		_memoryCache.GetOrCreate<string>(userId, entry => {
+		memoryCache.GetOrCreate<string>(userId, entry => {
 			entry.Value = newOtp;
 			entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(120);
 			return newOtp;
 		});
 		UserEntity? user = await ReadByIdMinimal(userId);
-		_sms.SendSms(user?.PhoneNumber!, newOtp);
-		await _dbContext.SaveChangesAsync();
+		sms.SendSms(user?.PhoneNumber!, newOtp);
+		await dbContext.SaveChangesAsync();
 		return true;
 	}
 }

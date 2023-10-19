@@ -4,23 +4,18 @@
 public class PromotionEntity : BaseEntity {
 	public DisplayType DisplayType { get; set; }
 
-	[MaxLength(1000)]
-	public string? Skills { get; set; }
+	[MaxLength(1000)] public string? Skills { get; set; }
 
-	[MaxLength(1000)]
-	public string? Gender { get; set; }
+	[MaxLength(1000)] public string? Gender { get; set; }
 
-	[MaxLength(1000)]
-	public string? AgeCategories { get; set; }
+	[MaxLength(1000)] public string? AgeCategories { get; set; }
 
-	[MaxLength(1000)]
-	public string? States { get; set; }
+	[MaxLength(1000)] public string? States { get; set; }
 
 	public ProductEntity? Product { get; set; }
 	public Guid? ProductId { get; set; }
 
-	[MaxLength(1000)]
-	public string? Users { get; set; }
+	[MaxLength(1000)] public string? Users { get; set; }
 
 	public UserEntity? User { get; set; }
 	public string? UserId { get; set; }

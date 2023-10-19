@@ -2,34 +2,26 @@ namespace Utilities_aspnet.Entities;
 
 [Table("Categories")]
 public class CategoryEntity : BaseEntity {
-	[MaxLength(100)]
-	public string? Title { get; set; }
+	[MaxLength(100)] public string? Title { get; set; }
 
-	[MaxLength(100)]
-	public string? TitleTr1 { get; set; }
+	[MaxLength(100)] public string? TitleTr1 { get; set; }
 
-	[MaxLength(100)]
-	public string? TitleTr2 { get; set; }
+	[MaxLength(100)] public string? TitleTr2 { get; set; }
 
-	[MaxLength(20)]
-	public string? UseCase { get; set; }
+	[MaxLength(20)] public string? UseCase { get; set; }
 
-	[MaxLength(20)]
-	public string? Type { get; set; }
+	[MaxLength(20)] public string? Type { get; set; }
 
 	public int? Order { get; set; }
 
-	[MaxLength(1000)]
-	public CategoryJsonDetail JsonDetail { get; set; } = new();
+	[MaxLength(1000)] public CategoryJsonDetail JsonDetail { get; set; } = new();
 
-	[MaxLength(100)]
-	public List<TagCategory> Tags { get; set; } = new();
+	[MaxLength(100)] public List<TagCategory> Tags { get; set; } = new();
 
 	public Guid? ParentId { get; set; }
 	public CategoryEntity? Parent { get; set; }
 
-	[InverseProperty("Parent")]
-	public IEnumerable<CategoryEntity>? Children { get; set; }
+	[InverseProperty("Parent")] public IEnumerable<CategoryEntity>? Children { get; set; }
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 

@@ -2,22 +2,18 @@
 
 [ApiController]
 [Route("api/[controller]")]
-public class PromotionController : BaseApiController {
-	private readonly IPromotionRepository _repository;
-
-	public PromotionController(IPromotionRepository repository) => _repository = repository;
-
+public class PromotionController(IPromotionRepository repository) : BaseApiController {
 	[HttpPost]
 	[Authorize]
 	public async Task<ActionResult<GenericResponse<PromotionEntity?>>> CreatePromotion(CreateUpdatePromotionDto dto) =>
-		Result(await _repository.CreatePromotion(dto));
+		Result(await repository.CreatePromotion(dto));
 
 	[HttpGet("GetPromotionTrackingInformation/{id:guid}")]
 	[Authorize]
 	public async Task<ActionResult<GenericResponse<PromotionDetail?>>> GetPromotionTrackingInformation(Guid id) =>
-		Result(await _repository.GetPromotionTrackingInformation(id));
+		Result(await repository.GetPromotionTrackingInformation(id));
 
 	[HttpGet("ReadById/{id:guid}")]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse<PromotionEntity?>>> ReadById(Guid id) => Result(await _repository.ReadById(id));
+	public async Task<ActionResult<GenericResponse<PromotionEntity?>>> ReadById(Guid id) => Result(await repository.ReadById(id));
 }

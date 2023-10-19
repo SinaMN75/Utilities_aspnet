@@ -8,35 +8,27 @@ public interface ICategoryRepository {
 	public Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 }
 
-public class CategoryRepository : ICategoryRepository {
-	private readonly DbContext _dbContext;
-	private readonly IMediaRepository _mediaRepository;
-	private readonly IOutputCacheStore _outputCache;
-
-	public CategoryRepository(DbContext context, IOutputCacheStore outputCache, IMediaRepository mediaRepository) {
-		_dbContext = context;
-		_outputCache = outputCache;
-		_mediaRepository = mediaRepository;
-	}
-
+public class CategoryRepository(DbContext context, IOutputCacheStore outputCache, IMediaRepository mediaRepository) : ICategoryRepository {
 	public async Task<GenericResponse<CategoryEntity>> Create(CategoryCreateUpdateDto dto, CancellationToken ct) {
 		CategoryEntity entity = new();
-		if (dto.Id is not null) entity.Id = (Guid) dto.Id;
+		if (dto.Id is not null) entity.Id = (Guid)dto.Id;
 		CategoryEntity i = entity.FillData(dto);
-		await _outputCache.EvictByTagAsync("category", ct);
+		await outputCache.EvictByTagAsync("category", ct);
 		if (dto.IsUnique) {
 			CategoryEntity? exists =
-				await _dbContext.Set<CategoryEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Title == dto.Title, ct);
+				await context.Set<CategoryEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Title == dto.Title, ct);
 			if (exists == null) {
-				await _dbContext.AddAsync(i, ct);
-				await _dbContext.SaveChangesAsync(ct);
+				await context.AddAsync(i, ct);
+				await context.SaveChangesAsync(ct);
 				return new GenericResponse<CategoryEntity>(i);
 			}
+
 			return new GenericResponse<CategoryEntity>(exists);
 		}
+
 		{
-			await _dbContext.AddAsync(i, ct);
-			await _dbContext.SaveChangesAsync(ct);
+			await context.AddAsync(i, ct);
+			await context.SaveChangesAsync(ct);
 			return new GenericResponse<CategoryEntity>(i);
 		}
 	}
@@ -47,11 +39,12 @@ public class CategoryRepository : ICategoryRepository {
 			GenericResponse<CategoryEntity> j = await Create(i, ct);
 			list.Add(j.Result!);
 		}
+
 		return new GenericResponse<IEnumerable<CategoryEntity>>(list);
 	}
 
 	public GenericResponse<IEnumerable<CategoryEntity>> Filter(CategoryFilterDto dto) {
-		IQueryable<CategoryEntity> q = _dbContext.Set<CategoryEntity>().AsNoTracking().Include(x => x.Children);
+		IQueryable<CategoryEntity> q = context.Set<CategoryEntity>().AsNoTracking().Include(x => x.Children);
 
 		q = dto.ShowByChildren.IsTrue() ? q.Where(x => x.ParentId != null) : q.Where(x => x.ParentId == null);
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => x.Title!.Contains(dto.Title!));
@@ -81,24 +74,25 @@ public class CategoryRepository : ICategoryRepository {
 	}
 
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
-		CategoryEntity i = (await _dbContext.Set<CategoryEntity>().Include(x => x.Children).Include(x => x.Media).FirstOrDefaultAsync(x => x.Id == id, ct))!;
+		CategoryEntity i = (await context.Set<CategoryEntity>().Include(x => x.Children).Include(x => x.Media).FirstOrDefaultAsync(x => x.Id == id, ct))!;
 		foreach (CategoryEntity c in i.Children ?? new List<CategoryEntity>()) {
-			_dbContext.Remove(c);
-			await _mediaRepository.DeleteMedia(c.Media);
+			context.Remove(c);
+			await mediaRepository.DeleteMedia(c.Media);
 		}
-		_dbContext.Remove(i);
-		await _mediaRepository.DeleteMedia(i.Media);
-		await _dbContext.SaveChangesAsync(ct);
-		await _outputCache.EvictByTagAsync("category", ct);
+
+		context.Remove(i);
+		await mediaRepository.DeleteMedia(i.Media);
+		await context.SaveChangesAsync(ct);
+		await outputCache.EvictByTagAsync("category", ct);
 		return new GenericResponse();
 	}
 
 	public async Task<GenericResponse<CategoryEntity?>> Update(CategoryCreateUpdateDto dto, CancellationToken ct) {
-		CategoryEntity? entity = await _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id, ct);
+		CategoryEntity? entity = await context.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id, ct);
 		if (entity == null) return new GenericResponse<CategoryEntity?>(null, UtilitiesStatusCodes.NotFound);
 		entity.FillData(dto);
-		await _dbContext.SaveChangesAsync(ct);
-		await _outputCache.EvictByTagAsync("category", ct);
+		await context.SaveChangesAsync(ct);
+		await outputCache.EvictByTagAsync("category", ct);
 		return new GenericResponse<CategoryEntity?>(entity);
 	}
 }
@@ -129,16 +123,14 @@ public static class CategoryEntityExtension {
 			SendPrice = dto.SendPrice ?? entity.JsonDetail.SendPrice
 		};
 
-        if (dto.RemoveTags.IsNotNullOrEmpty())
-        {
-            dto.RemoveTags.ForEach(item => entity.Tags?.Remove(item));
-        }
+		if (dto.RemoveTags.IsNotNullOrEmpty()) {
+			dto.RemoveTags.ForEach(item => entity.Tags?.Remove(item));
+		}
 
-        if (dto.AddTags.IsNotNullOrEmpty())
-        {
-            entity.Tags.AddRange(dto.AddTags);
-        }
+		if (dto.AddTags.IsNotNullOrEmpty()) {
+			entity.Tags.AddRange(dto.AddTags);
+		}
 
-        return entity;
+		return entity;
 	}
 }

@@ -7,17 +7,7 @@ public interface IContentRepository {
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 }
 
-public class ContentRepository : IContentRepository {
-	private readonly DbContext _dbContext;
-	private readonly IMediaRepository _mediaRepository;
-	private readonly IOutputCacheStore _outputCache;
-
-	public ContentRepository(DbContext dbContext, IOutputCacheStore cache, IMediaRepository mediaRepository) {
-		_dbContext = dbContext;
-		_outputCache = cache;
-		_mediaRepository = mediaRepository;
-	}
-
+public class ContentRepository(DbContext dbContext, IOutputCacheStore cache, IMediaRepository mediaRepository) : IContentRepository {
 	public async Task<GenericResponse<ContentEntity>> Create(ContentCreateUpdateDto dto, CancellationToken ct) {
 		ContentEntity entity = new() {
 			Description = dto.Description,
@@ -42,45 +32,44 @@ public class ContentRepository : IContentRepository {
 				Email2 = dto.Email2
 			}
 		};
-		EntityEntry<ContentEntity> e = await _dbContext.Set<ContentEntity>().AddAsync(entity, ct);
-		await _dbContext.SaveChangesAsync(ct);
-		await _outputCache.EvictByTagAsync("content", ct);
+		EntityEntry<ContentEntity> e = await dbContext.Set<ContentEntity>().AddAsync(entity, ct);
+		await dbContext.SaveChangesAsync(ct);
+		await cache.EvictByTagAsync("content", ct);
 		return new GenericResponse<ContentEntity>(e.Entity);
 	}
 
 	public GenericResponse<IQueryable<ContentEntity>> Read() {
-		return new GenericResponse<IQueryable<ContentEntity>>(_dbContext.Set<ContentEntity>().AsNoTracking().Include(x => x.Media));
+		return new GenericResponse<IQueryable<ContentEntity>>(dbContext.Set<ContentEntity>().AsNoTracking().Include(x => x.Media));
 	}
 
 	public async Task<GenericResponse<ContentEntity>> Update(ContentCreateUpdateDto dto, CancellationToken ct) {
-		ContentEntity e = (await _dbContext.Set<ContentEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id, ct))!;
+		ContentEntity e = (await dbContext.Set<ContentEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id, ct))!;
 		e.Title = dto.Title ?? e.Title;
 		e.SubTitle = dto.SubTitle ?? e.SubTitle;
 		e.Description = dto.Description ?? e.Description;
 		e.UpdatedAt = DateTime.Now;
 		e.Tags = dto.Tags ?? e.Tags;
 
-        if (dto.RemoveTags.IsNotNullOrEmpty())
-        {
-            dto.RemoveTags.ForEach(item => e.Tags?.Remove(item));
-        }
+		if (dto.RemoveTags.IsNotNullOrEmpty()) {
+			dto.RemoveTags.ForEach(item => e.Tags?.Remove(item));
+		}
 
-        if (dto.AddTags.IsNotNullOrEmpty())
-        {
-            e.Tags.AddRange(dto.AddTags);
-        }
-        _dbContext.Update(e);
-		await _dbContext.SaveChangesAsync(ct);
-		await _outputCache.EvictByTagAsync("content", ct);
+		if (dto.AddTags.IsNotNullOrEmpty()) {
+			e.Tags.AddRange(dto.AddTags);
+		}
+
+		dbContext.Update(e);
+		await dbContext.SaveChangesAsync(ct);
+		await cache.EvictByTagAsync("content", ct);
 		return new GenericResponse<ContentEntity>(e);
 	}
 
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
-		ContentEntity e = (await _dbContext.Set<ContentEntity>().Include(x => x.Media).FirstOrDefaultAsync(x => x.Id == id, ct))!;
-		await _mediaRepository.DeleteMedia(e.Media);
-		_dbContext.Set<ContentEntity>().Remove(e);
-		await _dbContext.SaveChangesAsync(ct);
-		await _outputCache.EvictByTagAsync("content", ct);
+		ContentEntity e = (await dbContext.Set<ContentEntity>().Include(x => x.Media).FirstOrDefaultAsync(x => x.Id == id, ct))!;
+		await mediaRepository.DeleteMedia(e.Media);
+		dbContext.Set<ContentEntity>().Remove(e);
+		await dbContext.SaveChangesAsync(ct);
+		await cache.EvictByTagAsync("content", ct);
 		return new GenericResponse();
 	}
 }

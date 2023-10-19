@@ -8,23 +8,17 @@ public interface IDiscountRepository {
 	Task<GenericResponse<DiscountEntity?>> ReadDiscountCode(string code);
 }
 
-public class DiscountRepository : IDiscountRepository {
-	private readonly DbContext _dbContext;
-	private readonly string? _userId;
-
-	public DiscountRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) {
-		_dbContext = dbContext;
-		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
-	}
+public class DiscountRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) : IDiscountRepository {
+	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	public async Task<GenericResponse<DiscountEntity>> Create(DiscountEntity dto) {
-		EntityEntry<DiscountEntity> i = await _dbContext.AddAsync(dto);
-		await _dbContext.SaveChangesAsync();
+		EntityEntry<DiscountEntity> i = await dbContext.AddAsync(dto);
+		await dbContext.SaveChangesAsync();
 		return new GenericResponse<DiscountEntity>(i.Entity);
 	}
 
 	public GenericResponse<IQueryable<DiscountEntity>> Filter(DiscountFilterDto dto) {
-		IQueryable<DiscountEntity> q = _dbContext.Set<DiscountEntity>();
+		IQueryable<DiscountEntity> q = dbContext.Set<DiscountEntity>();
 
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => x.Title.Contains(dto.Title!));
 		if (dto.Code.IsNotNullOrEmpty()) q = q.Where(x => x.Code.Contains(dto.Code!));
@@ -44,7 +38,7 @@ public class DiscountRepository : IDiscountRepository {
 	}
 
 	public async Task<GenericResponse<DiscountEntity?>> Update(DiscountEntity dto) {
-		DiscountEntity? e = await _dbContext.Set<DiscountEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id);
+		DiscountEntity? e = await dbContext.Set<DiscountEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id);
 
 		if (e == null) return new GenericResponse<DiscountEntity?>(null, UtilitiesStatusCodes.NotFound);
 		e.Title = dto.Title;
@@ -53,19 +47,19 @@ public class DiscountRepository : IDiscountRepository {
 		e.StartDate = dto.StartDate;
 		e.EndDate = dto.EndDate;
 		e.UpdatedAt = DateTime.Now;
-		await _dbContext.SaveChangesAsync();
+		await dbContext.SaveChangesAsync();
 		return new GenericResponse<DiscountEntity?>(e);
 	}
 
 	public async Task<GenericResponse> Delete(Guid id) {
-		await _dbContext.Set<DiscountEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
+		await dbContext.Set<DiscountEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
 	}
 
 	public async Task<GenericResponse<DiscountEntity?>> ReadDiscountCode(string code) {
-		DiscountEntity? discountEntity = await _dbContext.Set<DiscountEntity>().FirstOrDefaultAsync(p => p.Code == code);
+		DiscountEntity? discountEntity = await dbContext.Set<DiscountEntity>().FirstOrDefaultAsync(p => p.Code == code);
 		if (discountEntity == null) return new GenericResponse<DiscountEntity?>(null, UtilitiesStatusCodes.NotFound);
-		IQueryable<OrderEntity> orders = _dbContext.Set<OrderEntity>()
+		IQueryable<OrderEntity> orders = dbContext.Set<OrderEntity>()
 			.Where(p => p.UserId == _userId && p.DiscountCode == code);
 		return await orders.CountAsync() >= discountEntity.NumberUses
 			? new GenericResponse<DiscountEntity?>(null, UtilitiesStatusCodes.MaximumLimitReached)

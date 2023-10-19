@@ -19,9 +19,7 @@ public static class StartupExtension {
 
 	private static void AddUtilitiesServices<T>(this WebApplicationBuilder builder, string connectionStrings) where T : DbContext {
 		builder.Services.AddOptions();
-		builder.Services.AddOutputCache(x => {
-			x.AddPolicy("24h", new OutputCachePolicy(TimeSpan.FromHours(24), new List<string> { "content", "category", "address", "comment", "transaction" }));
-		});
+		builder.Services.AddOutputCache(x => { x.AddPolicy("24h", new OutputCachePolicy(TimeSpan.FromHours(24), new List<string> { "content", "category", "address", "comment", "transaction" })); });
 
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
@@ -49,9 +47,7 @@ public static class StartupExtension {
 		});
 		builder.Services.AddScoped<DbContext, T>();
 
-		builder.Services.AddDbContextPool<T>(options => {
-			options.UseSqlServer(connectionStrings, o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
-		});
+		builder.Services.AddDbContextPool<T>(options => { options.UseSqlServer(connectionStrings, o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)); });
 
 		builder.Services.AddMemoryCache();
 		builder.Services.AddHttpContextAccessor();
@@ -66,9 +62,9 @@ public static class StartupExtension {
 			options.UseCamelCasing(true);
 		});
 		//Encrypt/Decrypt
-        //builder.Services.AddTransient<EncryptionMiddleware>();
-        //Encrypt/Decrypt
-        builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+		//builder.Services.AddTransient<EncryptionMiddleware>();
+		//Encrypt/Decrypt
+		builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 		builder.Services.AddScoped<AppSettings>();
 		builder.Services.AddScoped<IReportRepository, ReportRepository>();
 		builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -156,12 +152,12 @@ public static class StartupExtension {
 		app.UseAuthorization();
 
 		app.MapHub<ChatHub>("/hubs/ChatHub");
-        //Encrypt/Decrypt
-        //app.UseMiddleware<EncryptionMiddleware>();
-        //Encrypt/Decrypt
-    }
+		//Encrypt/Decrypt
+		//app.UseMiddleware<EncryptionMiddleware>();
+		//Encrypt/Decrypt
+	}
 
-    private static void UseUtilitiesSwagger(this IApplicationBuilder app) {
+	private static void UseUtilitiesSwagger(this IApplicationBuilder app) {
 		app.UseSwagger();
 		app.UseSwaggerUI(c => {
 			c.DocExpansion(DocExpansion.None);
@@ -170,26 +166,18 @@ public static class StartupExtension {
 	}
 }
 
-internal class OutputCachePolicy : IOutputCachePolicy {
-	private readonly List<string> _tags;
-	private readonly TimeSpan _timeSpan;
-
-	public OutputCachePolicy(TimeSpan seconds, List<string> tags) {
-		_timeSpan = seconds;
-		_tags = tags;
-	}
-
+internal class OutputCachePolicy(TimeSpan seconds, List<string> tags) : IOutputCachePolicy {
 	public ValueTask ServeFromCacheAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
 
 	public ValueTask ServeResponseAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
 
 	public ValueTask CacheRequestAsync(OutputCacheContext context, CancellationToken cancellation) {
-		foreach (string tag in _tags) context.Tags.Add(tag);
+		foreach (string tag in tags) context.Tags.Add(tag);
 		context.AllowCacheLookup = true;
 		context.AllowCacheStorage = true;
 		context.AllowLocking = true;
 		context.EnableOutputCaching = true;
-		context.ResponseExpirationTimeSpan = _timeSpan;
+		context.ResponseExpirationTimeSpan = seconds;
 		context.CacheVaryByRules.QueryKeys = "*";
 		context.CacheVaryByRules.VaryByHost = true;
 		context.CacheVaryByRules.HeaderNames = "*";

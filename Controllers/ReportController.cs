@@ -2,25 +2,21 @@
 
 [ApiController]
 [Route("api/[controller]")]
-public class ReportController : BaseApiController {
-	private readonly IReportRepository _repository;
-
-	public ReportController(IReportRepository repository) => _repository = repository;
-
+public class ReportController(IReportRepository repository) : BaseApiController {
 	[HttpPost("Filter")]
-	public ActionResult<GenericResponse<IEnumerable<ReportEntity>>> Filter(ReportFilterDto parameters) => Result(_repository.Read(parameters));
+	public ActionResult<GenericResponse<IEnumerable<ReportEntity>>> Filter(ReportFilterDto parameters) => Result(repository.Read(parameters));
 
 	[HttpGet]
-	public ActionResult<GenericResponse<IEnumerable<ReportEntity>>> Read([FromQuery] ReportFilterDto parameters) => Result(_repository.Read(parameters));
+	public ActionResult<GenericResponse<IEnumerable<ReportEntity>>> Read([FromQuery] ReportFilterDto parameters) => Result(repository.Read(parameters));
 
 	[HttpGet("{id:guid}")]
-	public async Task<ActionResult<GenericResponse<ReportEntity>>> ReadById(Guid id) => Result(await _repository.ReadById(id));
+	public async Task<ActionResult<GenericResponse<ReportEntity>>> ReadById(Guid id) => Result(await repository.ReadById(id));
 
 	[HttpPost]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse<ReportEntity?>>> Create(ReportCreateUpdateDto parameters) => Result(await _repository.Create(parameters));
+	public async Task<ActionResult<GenericResponse<ReportEntity?>>> Create(ReportCreateUpdateDto parameters) => Result(await repository.Create(parameters));
 
 	[HttpDelete]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse>> Delete(Guid id) => Result(await _repository.Delete(id));
+	public async Task<ActionResult<GenericResponse>> Delete(Guid id) => Result(await repository.Delete(id));
 }

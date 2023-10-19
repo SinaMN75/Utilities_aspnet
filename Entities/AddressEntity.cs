@@ -2,23 +2,17 @@
 
 [Table("Address")]
 public class AddressEntity : BaseEntity {
-	[MaxLength(50)]
-	public string ReceiverFullName { get; set; } = null!;
+	[MaxLength(50)] public string ReceiverFullName { get; set; } = null!;
 
-	[MaxLength(20)]
-	public string ReceiverPhoneNumber { get; set; } = null!;
+	[MaxLength(20)] public string ReceiverPhoneNumber { get; set; } = null!;
 
-	[MaxLength(100)]
-	public string Address { get; set; } = null!;
+	[MaxLength(100)] public string Address { get; set; } = null!;
 
-	[MaxLength(10)]
-	public string Pelak { get; set; } = null!;
+	[MaxLength(10)] public string Pelak { get; set; } = null!;
 
-	[MaxLength(10)]
-	public string Unit { get; set; } = null!;
+	[MaxLength(10)] public string Unit { get; set; } = null!;
 
-	[MaxLength(20)]
-	public string PostalCode { get; set; } = null!;
+	[MaxLength(20)] public string PostalCode { get; set; } = null!;
 
 	public bool IsDefault { get; set; }
 	public UserEntity? User { get; set; }

@@ -2,8 +2,7 @@
 
 [Table("Withdraw")]
 public class WithdrawEntity : BaseEntity {
-	[MaxLength(20)]
-	public string? ShebaNumber { get; set; }
+	[MaxLength(20)] public string? ShebaNumber { get; set; }
 
 	public int? Amount { get; set; }
 	public WithdrawState? WithdrawState { get; set; }

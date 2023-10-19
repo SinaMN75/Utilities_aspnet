@@ -5,14 +5,10 @@ public interface ISmsNotificationRepository {
 	public Task<GenericResponse> SendNotification(NotificationCreateDto dto);
 }
 
-public class SmsNotificationRepository : ISmsNotificationRepository {
-	private readonly IConfiguration _config;
-
-	public SmsNotificationRepository(IConfiguration config) => _config = config;
-
+public class SmsNotificationRepository(IConfiguration config) : ISmsNotificationRepository {
 	public async void SendSms(string mobileNumber, string message) {
 		AppSettings appSettings = new();
-		_config.GetSection("AppSettings").Bind(appSettings);
+		config.GetSection("AppSettings").Bind(appSettings);
 		SmsPanelSettings smsSetting = appSettings.SmsPanelSettings;
 
 		switch (smsSetting.Provider) {
@@ -52,7 +48,7 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 
 	public async Task<GenericResponse> SendNotification(NotificationCreateDto dto) {
 		AppSettings appSettings = new();
-		_config.GetSection("AppSettings").Bind(appSettings);
+		config.GetSection("AppSettings").Bind(appSettings);
 		PushNotificationSetting setting = appSettings.PushNotificationSetting;
 
 		switch (setting.Provider) {
@@ -76,6 +72,7 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 				break;
 			}
 		}
+
 		return new GenericResponse();
 	}
 }

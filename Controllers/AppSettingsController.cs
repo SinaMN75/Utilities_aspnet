@@ -2,14 +2,10 @@
 
 [ApiController]
 [Route("api/[controller]")]
-public class AppSettingsController : BaseApiController {
-	private readonly IAppSettingsRepository _repository;
-
-	public AppSettingsController(IAppSettingsRepository repository) { _repository = repository; }
-
+public class AppSettingsController(IAppSettingsRepository repository) : BaseApiController {
 	[HttpGet]
-	public ActionResult<GenericResponse<EnumDto>> Read() => _repository.ReadAppSettings();
+	public ActionResult<GenericResponse<EnumDto>> Read() => repository.ReadAppSettings();
 
 	[HttpGet("ReadDashboardData")]
-	public async Task<ActionResult<GenericResponse<DashboardReadDto>>> ReadDashboardData() => await _repository.ReadDashboardData();
+	public async Task<ActionResult<GenericResponse<DashboardReadDto>>> ReadDashboardData() => await repository.ReadDashboardData();
 }

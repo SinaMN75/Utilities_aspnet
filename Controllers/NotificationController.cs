@@ -2,30 +2,26 @@ namespace Utilities_aspnet.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class NotificationController : BaseApiController {
-	private readonly INotificationRepository _repository;
-
-	public NotificationController(INotificationRepository repository) => _repository = repository;
-
+public class NotificationController(INotificationRepository repository) : BaseApiController {
 	[Authorize]
 	[AllowAnonymous]
 	[HttpGet]
-	public ActionResult<GenericResponse<IQueryable<NotificationEntity>>> Read() => Result(_repository.Read());
+	public ActionResult<GenericResponse<IQueryable<NotificationEntity>>> Read() => Result(repository.Read());
 
 	[Authorize]
 	[HttpGet("{id:guid}")]
-	public async Task<ActionResult<GenericResponse<IQueryable<NotificationEntity>>>> ReadById(Guid id) => Result(await _repository.ReadById(id));
+	public async Task<ActionResult<GenericResponse<IQueryable<NotificationEntity>>>> ReadById(Guid id) => Result(await repository.ReadById(id));
 
 	[Authorize]
 	[HttpPost]
-	public async Task<ActionResult<GenericResponse>> Create(NotificationCreateUpdateDto model) => Result(await _repository.Create(model));
+	public async Task<ActionResult<GenericResponse>> Create(NotificationCreateUpdateDto model) => Result(await repository.Create(model));
 
 	[Authorize]
 	[HttpPost("Filter")]
-	public ActionResult<GenericResponse> Filter(NotificationFilterDto dto) => Result(_repository.Filter(dto));
+	public ActionResult<GenericResponse> Filter(NotificationFilterDto dto) => Result(repository.Filter(dto));
 
 	[Authorize]
 	[HttpPost("UpdateSeenStatus")]
 	public async Task<ActionResult<GenericResponse>> UpdateSeenStatus(IEnumerable<Guid> ids, SeenStatus seenStatus) =>
-		Result(await _repository.UpdateSeenStatus(ids, seenStatus));
+		Result(await repository.UpdateSeenStatus(ids, seenStatus));
 }

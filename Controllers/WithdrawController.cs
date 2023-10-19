@@ -2,16 +2,12 @@
 
 [ApiController]
 [Route("api/withdraw")]
-public class WithdrawController : BaseApiController {
-	private readonly IWithdrawRepository _repository;
-
-	public WithdrawController(IWithdrawRepository repository) => _repository = repository;
-
+public class WithdrawController(IWithdrawRepository repository) : BaseApiController {
 	[HttpPost("WalletWithdrawal")]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse>> WalletWithdrawal(WalletWithdrawalDto dto) => Result(await _repository.WalletWithdrawal(dto));
+	public async Task<ActionResult<GenericResponse>> WalletWithdrawal(WalletWithdrawalDto dto) => Result(await repository.WalletWithdrawal(dto));
 
 	[HttpPost("Filter")]
 	[Authorize]
-	public ActionResult<GenericResponse<IQueryable<WithdrawEntity>>> Filter(WithdrawalFilterDto dto) => Result(_repository.Filter(dto));
+	public ActionResult<GenericResponse<IQueryable<WithdrawEntity>>> Filter(WithdrawalFilterDto dto) => Result(repository.Filter(dto));
 }

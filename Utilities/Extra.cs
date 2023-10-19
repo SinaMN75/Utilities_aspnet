@@ -10,17 +10,12 @@ public class GenericResponse<T> : GenericResponse {
 	public T? Result { get; }
 }
 
-public class GenericResponse {
-	public GenericResponse(UtilitiesStatusCodes status = UtilitiesStatusCodes.Success, string message = "") {
-		Status = status;
-		Message = message;
-	}
-
-	public UtilitiesStatusCodes Status { get; protected set; }
+public class GenericResponse(UtilitiesStatusCodes status = UtilitiesStatusCodes.Success, string message = "") {
+	public UtilitiesStatusCodes Status { get; protected set; } = status;
 	public int? PageSize { get; set; }
 	public int? PageCount { get; set; }
 	public int? TotalCount { get; set; }
-	protected string Message { get; set; }
+	protected string Message { get; set; } = message;
 }
 
 public static class BoolExtension {
@@ -34,7 +29,7 @@ public static class EnumerableExtension {
 }
 
 public static class NumberExtension {
-	public static int ToInt(this double value) => (int) value;
+	public static int ToInt(this double value) => (int)value;
 }
 
 public static partial class StringExtension {
@@ -60,20 +55,19 @@ public static partial class StringExtension {
 	[GeneratedRegex(@"^[^@\s]+@[^@\s]+\.(com|net|org|gov)$", RegexOptions.IgnoreCase, "en-US")]
 	private static partial Regex MyRegex();
 
-    private static Random rand = new();
+	private static Random rand = new();
 
-    public static IQueryable<ProductEntity> Shuffle(this IQueryable<ProductEntity> list)
-    {
-        List<ProductEntity>? values = list.ToList();
-        for (int i = values.Count - 1; i > 0; i--)
-        {
-            int k = rand.Next(i + 1);
-            ProductEntity value = values[k];
-            values[k] = values[i];
-            values[i] = value;
-        }
-        return values.AsQueryable();
-    }
+	public static IQueryable<ProductEntity> Shuffle(this IQueryable<ProductEntity> list) {
+		List<ProductEntity>? values = list.ToList();
+		for (int i = values.Count - 1; i > 0; i--) {
+			int k = rand.Next(i + 1);
+			ProductEntity value = values[k];
+			values[k] = values[i];
+			values[i] = value;
+		}
+
+		return values.AsQueryable();
+	}
 }
 
 public class Utils {
@@ -90,6 +84,7 @@ public class Utils {
 				if (isBlocked) utilCode = UtilitiesStatusCodes.UserRecieverBlocked;
 			}
 		}
+
 		return new Tuple<bool, UtilitiesStatusCodes>(isBlocked, utilCode);
 	}
 
@@ -121,6 +116,7 @@ public class Utils {
 						else
 							overUsed = false;
 					}
+
 					break;
 				case CallerType.CreateComment:
 					if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
@@ -147,32 +143,34 @@ public class Utils {
 							overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt.Date == DateTime.Today) >
 							           usageRules.MaxProductPerDay;
 					}
+
 					break;
 				case CallerType.None:
 				default:
 					overUsed = false;
 					break;
 			}
+
 			return overUsed
 				? new Tuple<bool, UtilitiesStatusCodes>(overUsed, UtilitiesStatusCodes.Overused)
 				: new Tuple<bool, UtilitiesStatusCodes>(false, UtilitiesStatusCodes.Success);
 		}
-		catch (Exception) { return new Tuple<bool, UtilitiesStatusCodes>(true, UtilitiesStatusCodes.BadRequest); }
+		catch (Exception) {
+			return new Tuple<bool, UtilitiesStatusCodes>(true, UtilitiesStatusCodes.BadRequest);
+		}
 	}
 
-	public static int CalculatePriceWithDiscount(int? price , int? discountPercent , int? discountPrice)
-	{
-		if(!price.HasValue) return 0;
-		
-		if(discountPrice.HasValue && discountPercent.HasValue) return price.Value;
+	public static int CalculatePriceWithDiscount(int? price, int? discountPercent, int? discountPrice) {
+		if (!price.HasValue) return 0;
 
-		if (discountPercent.HasValue)
-		{
+		if (discountPrice.HasValue && discountPercent.HasValue) return price.Value;
+
+		if (discountPercent.HasValue) {
 			int result = (price.Value * discountPercent.Value) / 100;
 			return price.Value - result;
 		}
 
-		if(discountPrice.HasValue)
+		if (discountPrice.HasValue)
 			return price.Value - discountPrice.Value;
 
 		return -99999;

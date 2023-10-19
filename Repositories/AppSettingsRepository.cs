@@ -5,18 +5,10 @@ public interface IAppSettingsRepository {
 	Task<GenericResponse<DashboardReadDto>> ReadDashboardData();
 }
 
-public class AppSettingsRepository : IAppSettingsRepository {
-	private readonly IConfiguration _config;
-	private readonly DbContext _dbContext;
-
-	public AppSettingsRepository(IConfiguration config, DbContext dbContext) {
-		_config = config;
-		_dbContext = dbContext;
-	}
-
+public class AppSettingsRepository(IConfiguration config, DbContext dbContext) : IAppSettingsRepository {
 	public GenericResponse<EnumDto> ReadAppSettings() {
 		AppSettings appSettings = new();
-		_config.GetSection("AppSettings").Bind(appSettings);
+		config.GetSection("AppSettings").Bind(appSettings);
 		return new GenericResponse<EnumDto>(new EnumDto {
 				DateTime = DateTime.Now,
 				FormFieldType = EnumExtension.GetValues<TagFormField>(),
@@ -48,17 +40,17 @@ public class AppSettingsRepository : IAppSettingsRepository {
 
 	public async Task<GenericResponse<DashboardReadDto>> ReadDashboardData() {
 		DashboardReadDto dto = new() {
-			Categories = await _dbContext.Set<CategoryEntity>().AsNoTracking().CountAsync(),
-			Users = await _dbContext.Set<UserEntity>().AsNoTracking().CountAsync(),
-			Products = await _dbContext.Set<ProductEntity>().AsNoTracking().CountAsync(),
-			Orders = await _dbContext.Set<OrderEntity>().AsNoTracking().CountAsync(),
-			Media = await _dbContext.Set<MediaEntity>().AsNoTracking().CountAsync(),
-			Transactions = await _dbContext.Set<TransactionEntity>().AsNoTracking().CountAsync(),
-			Reports = await _dbContext.Set<ReportEntity>().AsNoTracking().CountAsync(),
-			Address = await _dbContext.Set<AddressEntity>().AsNoTracking().CountAsync(),
-			ReleasedProducts = await _dbContext.Set<ProductEntity>().AsNoTracking().Where(x => x.Tags!.Contains(TagProduct.Released)).CountAsync(),
-			InQueueProducts = await _dbContext.Set<ProductEntity>().AsNoTracking().Where(x => x.Tags!.Contains(TagProduct.InQueue)).CountAsync(),
-			NotAcceptedProducts = await _dbContext.Set<ProductEntity>().AsNoTracking().Where(x => x.Tags!.Contains(TagProduct.NotAccepted)).CountAsync(),
+			Categories = await dbContext.Set<CategoryEntity>().AsNoTracking().CountAsync(),
+			Users = await dbContext.Set<UserEntity>().AsNoTracking().CountAsync(),
+			Products = await dbContext.Set<ProductEntity>().AsNoTracking().CountAsync(),
+			Orders = await dbContext.Set<OrderEntity>().AsNoTracking().CountAsync(),
+			Media = await dbContext.Set<MediaEntity>().AsNoTracking().CountAsync(),
+			Transactions = await dbContext.Set<TransactionEntity>().AsNoTracking().CountAsync(),
+			Reports = await dbContext.Set<ReportEntity>().AsNoTracking().CountAsync(),
+			Address = await dbContext.Set<AddressEntity>().AsNoTracking().CountAsync(),
+			ReleasedProducts = await dbContext.Set<ProductEntity>().AsNoTracking().Where(x => x.Tags!.Contains(TagProduct.Released)).CountAsync(),
+			InQueueProducts = await dbContext.Set<ProductEntity>().AsNoTracking().Where(x => x.Tags!.Contains(TagProduct.InQueue)).CountAsync(),
+			NotAcceptedProducts = await dbContext.Set<ProductEntity>().AsNoTracking().Where(x => x.Tags!.Contains(TagProduct.NotAccepted)).CountAsync(),
 		};
 		return new GenericResponse<DashboardReadDto>(dto);
 	}

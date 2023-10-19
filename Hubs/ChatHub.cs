@@ -6,14 +6,8 @@ using Microsoft.Extensions.Hosting;
 
 namespace Utilities_aspnet.Hubs;
 
-public class ChatHub : Hub {
-	private readonly DbContext _context;
-	private readonly string _uploadsFolder;
-
-	public ChatHub(DbContext db, IHostEnvironment hostingEnvironment) {
-		_context = db;
-		_uploadsFolder = Path.Combine(hostingEnvironment.ContentRootPath, "intranet");
-	}
+public class ChatHub(DbContext db, IHostEnvironment hostingEnvironment) : Hub {
+	private readonly string _uploadsFolder = Path.Combine(hostingEnvironment.ContentRootPath, "intranet");
 
 	public override async Task OnConnectedAsync() {
 		string fileName = Path.Combine(_uploadsFolder, $"OnConnected - {DateTime.Now:yyyy-MM-dd-hh-mm-ss}");
@@ -22,14 +16,15 @@ public class ChatHub : Hub {
 		await sw.WriteLineAsync("onConnect Started");
 		string? userId = Context.User!.Identity!.Name;
 		await sw.WriteLineAsync($"user Id that get from context is : {userId}");
-		UserEntity? user = _context.Set<UserEntity>().FirstOrDefault(f => f.Id == userId);
+		UserEntity? user = db.Set<UserEntity>().FirstOrDefault(f => f.Id == userId);
 		if (user is not null) {
 			await sw.WriteLineAsync($"user finded - user id is : {user.Id}");
 			user.IsOnline = true;
-			_context.Update(user);
-			await _context.SaveChangesAsync();
+			db.Update(user);
+			await db.SaveChangesAsync();
 			await sw.WriteLineAsync("db updated");
 		}
+
 		await Clients.All.SendAsync("UserConnected", userId);
 		await sw.WriteLineAsync("sended to client");
 	}
@@ -41,14 +36,15 @@ public class ChatHub : Hub {
 		await sw.WriteLineAsync("disconnected Started");
 		string? userId = Context.User!.Identity!.Name;
 		await sw.WriteLineAsync($"user Id that get from context is : {userId}");
-		UserEntity? user = _context.Set<UserEntity>().FirstOrDefault(f => f.Id == userId);
+		UserEntity? user = db.Set<UserEntity>().FirstOrDefault(f => f.Id == userId);
 		if (user is not null) {
 			await sw.WriteLineAsync($"user finded - user id is : {user.Id}");
 			user.IsOnline = false;
-			_context.Update(user);
-			await _context.SaveChangesAsync();
+			db.Update(user);
+			await db.SaveChangesAsync();
 			await sw.WriteLineAsync("db updated");
 		}
+
 		await Clients.All.SendAsync("UserDisconnected", userId);
 		await sw.WriteLineAsync("sended to client");
 	}
@@ -58,7 +54,7 @@ public class ChatHub : Hub {
 		FileInfo log = new(fileName);
 		await using StreamWriter sw = log.CreateText();
 		await sw.WriteLineAsync($"sender : {sender}, reviever: {receiver} message :{message}");
-		UserEntity? user = await _context.Set<UserEntity>().FirstOrDefaultAsync(u => u.Id == receiver);
+		UserEntity? user = await db.Set<UserEntity>().FirstOrDefaultAsync(u => u.Id == receiver);
 		await sw.WriteLineAsync($"reciever id : {user!.Id}");
 		if (user.IsOnline.IsTrue()) {
 			await Clients.User(user.Id).SendAsync("MessageReceived", sender, message);
@@ -84,7 +80,7 @@ public class ChatHub : Hub {
 		FileInfo log = new(fileName);
 		await using StreamWriter sw = log.CreateText();
 		await sw.WriteLineAsync($"sender : {sender}, reviever: {receiver} type :{type}");
-		UserEntity? user = await _context.Set<UserEntity>().FirstOrDefaultAsync(u => u.Id == receiver);
+		UserEntity? user = await db.Set<UserEntity>().FirstOrDefaultAsync(u => u.Id == receiver);
 		await sw.WriteLineAsync($"reciever id : {user!.Id}");
 		if (user.IsOnline.IsTrue()) {
 			await Clients.User(user.Id).SendAsync("MessageState", sender, type);

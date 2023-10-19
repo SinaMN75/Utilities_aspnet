@@ -7,14 +7,8 @@ public interface IReportRepository {
 	Task<GenericResponse> Delete(Guid id);
 }
 
-public class ReportRepository : IReportRepository {
-	private readonly DbContext _dbContext;
-	private readonly string? _userId;
-
-	public ReportRepository(DbContext context, IHttpContextAccessor httpContextAccessor) {
-		_dbContext = context;
-		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
-	}
+public class ReportRepository(DbContext context, IHttpContextAccessor httpContextAccessor) : IReportRepository {
+	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	public async Task<GenericResponse<ReportEntity?>> Create(ReportCreateUpdateDto dto) {
 		ReportEntity entity = new() {
@@ -27,13 +21,13 @@ public class ReportRepository : IReportRepository {
 		if (dto.GroupChatId.HasValue) entity.GroupChatId = dto.GroupChatId;
 		if (dto.GroupChatMessageId.HasValue) entity.GroupChatMessageId = dto.GroupChatMessageId;
 		if (!dto.UserId.IsNotNullOrEmpty()) entity.UserId = dto.UserId;
-		await _dbContext.Set<ReportEntity>().AddAsync(entity);
-		await _dbContext.SaveChangesAsync();
+		await context.Set<ReportEntity>().AddAsync(entity);
+		await context.SaveChangesAsync();
 		return await ReadById(entity.Id);
 	}
 
 	public GenericResponse<IQueryable<ReportEntity>> Read(ReportFilterDto dto) {
-		IQueryable<ReportEntity> e = _dbContext.Set<ReportEntity>().AsNoTracking();
+		IQueryable<ReportEntity> e = context.Set<ReportEntity>().AsNoTracking();
 		if (dto.User == true) e = e.Include(x => x.User).ThenInclude(x => x!.Media);
 		if (dto.Product == true) e = e.Include(x => x.Product).ThenInclude(x => x!.Media);
 		if (dto.GroupChat == true) e = e.Include(x => x.GroupChat);
@@ -42,12 +36,12 @@ public class ReportRepository : IReportRepository {
 	}
 
 	public async Task<GenericResponse> Delete(Guid id) {
-		await _dbContext.Set<ReportEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
+		await context.Set<ReportEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
 	}
 
 	public async Task<GenericResponse<ReportEntity?>> ReadById(Guid id) {
-		ReportEntity? entity = await _dbContext.Set<ReportEntity>()
+		ReportEntity? entity = await context.Set<ReportEntity>()
 			.Include(x => x.User)
 			.Include(x => x.Product).ThenInclude(x => x!.Media)
 			.Include(x => x.Comment)

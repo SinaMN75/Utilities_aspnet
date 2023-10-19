@@ -2,22 +2,17 @@
 
 [Table("Media")]
 public class MediaEntity : BaseEntity {
-	[MaxLength(50)]
-	public string? FileName { get; set; }
+	[MaxLength(50)] public string? FileName { get; set; }
 
-	[MaxLength(20)]
-	public string? UseCase { get; set; }
+	[MaxLength(20)] public string? UseCase { get; set; }
 
 	public int? Order { get; set; }
 
-	[MaxLength(1000)]
-	public MediaJsonDetail JsonDetail { get; set; } = new();
+	[MaxLength(1000)] public MediaJsonDetail JsonDetail { get; set; } = new();
 
-	[MaxLength(100)]
-	public List<TagMedia>? Tags { get; set; } = new();
+	[MaxLength(100)] public List<TagMedia>? Tags { get; set; } = new();
 
-	[NotMapped]
-	public string Url => $"{Server.ServerAddress}/Medias/{FileName}";
+	[NotMapped] public string Url => $"{Server.ServerAddress}/Medias/{FileName}";
 
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]

@@ -15,6 +15,7 @@ public class Encryption {
 			while (i < tmpNewHash.Length && tmpNewHash[i] == storedHashData[i]) i += 1;
 			if (i == tmpNewHash.Length) bEqual = true;
 		}
+
 		return bEqual;
 	}
 }

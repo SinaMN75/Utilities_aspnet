@@ -7,21 +7,14 @@ public interface IPromotionRepository {
 	Task<GenericResponse<PromotionEntity?>> ReadById(Guid id);
 }
 
-public class PromotionRepository : IPromotionRepository {
-	private readonly DbContext _dbContext;
-	private readonly string? _userId;
-
-	public PromotionRepository(
-		DbContext dbContext,
-		IHttpContextAccessor httpContextAccessor) {
-		_dbContext = dbContext;
-		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
-	}
+public class PromotionRepository(DbContext dbContext,
+	IHttpContextAccessor httpContextAccessor) : IPromotionRepository {
+	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	// noktei ke vojod dare dar in dto zamani ke dare az front ersal mishe faqat yeki az in property haye category ,userId, groupChatId , product bayad por bashe
 	//2 ta por nabayad bashe
 	public async Task<GenericResponse<PromotionEntity?>> CreatePromotion(CreateUpdatePromotionDto dto) {
-		PromotionEntity? promotion = await _dbContext.Set<PromotionEntity>()
+		PromotionEntity? promotion = await dbContext.Set<PromotionEntity>()
 			.FirstOrDefaultAsync(f => f.ProductId == dto.ProductId || f.GroupChatId == dto.GroupChatId || f.UserPromotedId == dto.UserId ||
 			                          f.CategoryId == dto.CategoryId);
 		if (promotion is not null)
@@ -40,40 +33,40 @@ public class PromotionRepository : IPromotionRepository {
 			Skills = dto.Skills is not null ? string.Join(",", dto.Skills) : "",
 			AgeCategories = dto.AgeCategories is not null ? string.Join(",", dto.AgeCategories) : ""
 		};
-		await _dbContext.Set<PromotionEntity>().AddAsync(promotion);
+		await dbContext.Set<PromotionEntity>().AddAsync(promotion);
 
-		ProductEntity? product = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == dto.ProductId);
+		ProductEntity? product = await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == dto.ProductId);
 		if (product is not null) {
 			product.Boosted = DateTime.Now;
-			_dbContext.Update(product);
+			dbContext.Update(product);
 		}
 
-		GroupChatEntity? groupChat = await _dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(f => f.Id == dto.GroupChatId);
+		GroupChatEntity? groupChat = await dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(f => f.Id == dto.GroupChatId);
 		if (groupChat is not null) {
 			groupChat.JsonDetail.Boosted = DateTime.Now;
-			_dbContext.Update(groupChat);
+			dbContext.Update(groupChat);
 		}
 
-		CategoryEntity? category = await _dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(f => f.Id == dto.CategoryId);
+		CategoryEntity? category = await dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(f => f.Id == dto.CategoryId);
 		if (category is not null) {
 			category.JsonDetail.Boosted = DateTime.Now;
-			_dbContext.Update(category);
+			dbContext.Update(category);
 		}
 
-		UserEntity? userEntity = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == dto.UserId);
+		UserEntity? userEntity = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == dto.UserId);
 		if (userEntity is not null) {
 			userEntity.JsonDetail.Boosted = DateTime.Now;
-			_dbContext.Update(userEntity);
+			dbContext.Update(userEntity);
 		}
 
-		await _dbContext.SaveChangesAsync();
+		await dbContext.SaveChangesAsync();
 		return new GenericResponse<PromotionEntity?>(promotion);
 	}
 
 	public async Task<GenericResponse<PromotionDetail?>> GetPromotionTrackingInformation(Guid id) {
 		//user Id ro ham guid gereftam vase inke dast nabaram to structure clean proje faqat kafie front az code payin estefade kone va userId ro tabdil be Guid kone befreste vasam
 		//Uuid.parse('79700043-11eb-1101-80d6-510900000d10'); flutter
-		PromotionEntity? promotion = await _dbContext.Set<PromotionEntity>()
+		PromotionEntity? promotion = await dbContext.Set<PromotionEntity>()
 			.FirstOrDefaultAsync(f => f.ProductId == id || f.GroupChatId == id || f.CategoryId == id || f.UserPromotedId == id.ToString());
 		if (promotion is null) return new GenericResponse<PromotionDetail?>(null, UtilitiesStatusCodes.NotFound);
 
@@ -84,7 +77,7 @@ public class PromotionRepository : IPromotionRepository {
 		if (usersId is null) return new GenericResponse<PromotionDetail?>(null, UtilitiesStatusCodes.BadRequest);
 		List<UserEntity> users = new();
 		foreach (string? item in usersId) {
-			UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == item);
+			UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == item);
 			if (user is null) continue;
 			users.Add(user);
 		}
@@ -116,17 +109,17 @@ public class PromotionRepository : IPromotionRepository {
 	}
 
 	public async Task<GenericResponse<PromotionEntity?>> ReadById(Guid id) {
-		PromotionEntity? p = await _dbContext.Set<PromotionEntity>().FirstOrDefaultAsync(f => f.Id == id);
+		PromotionEntity? p = await dbContext.Set<PromotionEntity>().FirstOrDefaultAsync(f => f.Id == id);
 		return p is null ? new GenericResponse<PromotionEntity?>(null, UtilitiesStatusCodes.NotFound) : new GenericResponse<PromotionEntity?>(p);
 	}
 
 	public async Task<GenericResponse> UserSeened(Guid id) {
-		PromotionEntity? promotion = await _dbContext.Set<PromotionEntity>().FirstOrDefaultAsync(f => f.ProductId == id || f.GroupChatId == id);
+		PromotionEntity? promotion = await dbContext.Set<PromotionEntity>().FirstOrDefaultAsync(f => f.ProductId == id || f.GroupChatId == id);
 		if (promotion is null)
 			return new GenericResponse(UtilitiesStatusCodes.NotFound);
 		promotion.Users = promotion.Users.AddCommaSeperatorUsers(_userId);
-		_dbContext.Update(promotion);
-		await _dbContext.SaveChangesAsync();
+		dbContext.Update(promotion);
+		await dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}
 }

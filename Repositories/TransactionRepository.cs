@@ -5,27 +5,19 @@ public interface ITransactionRepository {
 	Task<GenericResponse<TransactionEntity>> Create(TransactionEntity dto, CancellationToken ct);
 }
 
-public class TransactionRepository : ITransactionRepository {
-	private readonly DbContext _dbContext;
-	private readonly IOutputCacheStore _outputCache;
-	private readonly string? _userId;
-
-	public TransactionRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IOutputCacheStore outputCache) {
-		_dbContext = dbContext;
-		_outputCache = outputCache;
-		_userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
-	}
+public class TransactionRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IOutputCacheStore outputCache) : ITransactionRepository {
+	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	public async Task<GenericResponse<TransactionEntity>> Create(TransactionEntity entity, CancellationToken ct) {
 		entity.UserId ??= _userId;
-		await _dbContext.Set<TransactionEntity>().AddAsync(entity, ct);
-		await _dbContext.SaveChangesAsync(ct);
-		await _outputCache.EvictByTagAsync("transaction", ct);
+		await dbContext.Set<TransactionEntity>().AddAsync(entity, ct);
+		await dbContext.SaveChangesAsync(ct);
+		await outputCache.EvictByTagAsync("transaction", ct);
 		return new GenericResponse<TransactionEntity>(entity);
 	}
 
 	public GenericResponse<IQueryable<TransactionEntity>> Filter(TransactionFilterDto dto) {
-		IQueryable<TransactionEntity> q = _dbContext.Set<TransactionEntity>().Include(x => x.User).Include(x => x.Order).AsNoTracking();
+		IQueryable<TransactionEntity> q = dbContext.Set<TransactionEntity>().Include(x => x.User).Include(x => x.Order).AsNoTracking();
 		if (dto.RefId is not null) q = q.Where(x => x.RefId == dto.RefId);
 		if (dto.UserId is not null) q = q.Where(x => x.UserId == dto.UserId);
 		if (dto.Authority is not null) q = q.Where(x => x.Authority == dto.Authority);

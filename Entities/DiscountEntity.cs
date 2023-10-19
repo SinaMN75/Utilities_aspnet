@@ -2,11 +2,9 @@
 
 [Table("Discount")]
 public class DiscountEntity : BaseEntity {
-	[MaxLength(100)]
-	public string Title { get; set; } = null!;
+	[MaxLength(100)] public string Title { get; set; } = null!;
 
-	[MaxLength(20)]
-	public string Code { get; set; } = null!;
+	[MaxLength(20)] public string Code { get; set; } = null!;
 
 	public int DiscountPrice { get; set; }
 	public int NumberUses { get; set; } = 1000;

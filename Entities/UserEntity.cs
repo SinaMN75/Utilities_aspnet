@@ -5,53 +5,37 @@ public class UserEntity {
 	[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 	public string Id { get; set; } = null!;
 
-	[MaxLength(50)]
-	public string? FirstName { get; set; }
+	[MaxLength(50)] public string? FirstName { get; set; }
 
-	[MaxLength(50)]
-	public string? LastName { get; set; }
+	[MaxLength(50)] public string? LastName { get; set; }
 
-	[MaxLength(50)]
-	public string? FullName { get; set; }
+	[MaxLength(50)] public string? FullName { get; set; }
 
-	[MaxLength(100)]
-	public string? Headline { get; set; }
+	[MaxLength(100)] public string? Headline { get; set; }
 
-	[MaxLength(2000)]
-	public string? Bio { get; set; }
+	[MaxLength(2000)] public string? Bio { get; set; }
 
-	[MaxLength(50)]
-	public string? AppUserName { get; set; }
+	[MaxLength(50)] public string? AppUserName { get; set; }
 
-	[MaxLength(20)]
-	public string? AppPhoneNumber { get; set; }
+	[MaxLength(20)] public string? AppPhoneNumber { get; set; }
 
-	[MaxLength(50)]
-	public string? UserName { get; set; }
+	[MaxLength(50)] public string? UserName { get; set; }
 
-	[MaxLength(20)]
-	public string? PhoneNumber { get; set; }
+	[MaxLength(20)] public string? PhoneNumber { get; set; }
 
-	[MaxLength(50)]
-	public string? AppEmail { get; set; }
+	[MaxLength(50)] public string? AppEmail { get; set; }
 
-	[MaxLength(50)]
-	public string? Email { get; set; }
+	[MaxLength(50)] public string? Email { get; set; }
 
-	[MaxLength(100)]
-	public string? Region { get; set; }
+	[MaxLength(100)] public string? Region { get; set; }
 
-	[MaxLength(100)]
-	public string? State { get; set; }
+	[MaxLength(100)] public string? State { get; set; }
 
-	[MaxLength(100)]
-	public string? Badge { get; set; }
+	[MaxLength(100)] public string? Badge { get; set; }
 
-	[MaxLength(100)]
-	public string? JobStatus { get; set; }
+	[MaxLength(100)] public string? JobStatus { get; set; }
 
-	[MaxLength(200)]
-	public string? UserAgent { get; set; }
+	[MaxLength(200)] public string? UserAgent { get; set; }
 
 	public string? MutedChats { get; set; }
 	public GenderType? Gender { get; set; }
@@ -66,7 +50,7 @@ public class UserEntity {
 	public DateTime? ExpireUpgradeAccount { get; set; }
 	public AgeCategory? AgeCategory { get; set; }
 	public UserJsonDetail JsonDetail { get; set; } = new();
-	
+
 	public List<TagUser> Tags { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
@@ -74,10 +58,11 @@ public class UserEntity {
 
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
-	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }	
+	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
+
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
-	public IEnumerable<ReactionEntity>? Reactions{ get; set; }
+	public IEnumerable<ReactionEntity>? Reactions { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
@@ -108,20 +93,15 @@ public class UserEntity {
 	[JsonIgnore]
 	public string BlockedUsers { get; set; } = "";
 
-	[NotMapped]
-	public bool IsFollowing { get; set; }
+	[NotMapped] public bool IsFollowing { get; set; }
 
-	[NotMapped]
-	public int? CountProducts { get; set; }
+	[NotMapped] public int? CountProducts { get; set; }
 
-	[NotMapped]
-	public int? CountFollowers { get; set; }
+	[NotMapped] public int? CountFollowers { get; set; }
 
-	[NotMapped]
-	public int? CountFollowing { get; set; }
+	[NotMapped] public int? CountFollowing { get; set; }
 
-	[NotMapped]
-	public string? Token { get; set; }
+	[NotMapped] public string? Token { get; set; }
 }
 
 public class UserJsonDetail {
@@ -255,9 +235,9 @@ public class UserFilterDto {
 	public bool? ShowSuspend { get; set; }
 	public bool? ShowMyCustomers { get; set; }
 	public bool? OrderByUserName { get; set; }
-    public bool? NoneOfMyFollowing { get; set; }
-    public bool? NoneOfMyFollower{ get; set; }
-    public IEnumerable<string>? UserIds { get; set; }
+	public bool? NoneOfMyFollowing { get; set; }
+	public bool? NoneOfMyFollower { get; set; }
+	public IEnumerable<string>? UserIds { get; set; }
 	public IEnumerable<string>? PhoneNumbers { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 	public List<TagUser>? Tags { get; set; }

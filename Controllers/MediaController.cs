@@ -2,21 +2,17 @@
 
 [ApiController]
 [Route("api/[controller]")]
-public class MediaController : BaseApiController {
-	private readonly IMediaRepository _repository;
-
-	public MediaController(IMediaRepository repository) => _repository = repository;
-
+public class MediaController(IMediaRepository repository) : BaseApiController {
 	[HttpPost]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse<MediaEntity>>> Upload([FromForm] UploadDto dto) => Result(await _repository.Upload(dto));
+	public async Task<ActionResult<GenericResponse<MediaEntity>>> Upload([FromForm] UploadDto dto) => Result(await repository.Upload(dto));
 
 	[HttpDelete("{id:guid}")]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse>> Delete(Guid id) => Result(await _repository.Delete(id));
+	public async Task<ActionResult<GenericResponse>> Delete(Guid id) => Result(await repository.Delete(id));
 
 	[HttpPut("{id:guid}")]
 	[Authorize]
 	public async Task<ActionResult<GenericResponse<MediaEntity>>> Update(Guid id, UpdateMediaDto updateMediaDto) =>
-		Result(await _repository.UpdateMedia(id, updateMediaDto));
+		Result(await repository.UpdateMedia(id, updateMediaDto));
 }
