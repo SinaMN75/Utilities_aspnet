@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace Utilities_aspnet.Utilities;
+﻿namespace Utilities_aspnet.Utilities;
 
 public static class StartupExtension {
 	public static void SetupUtilities<T>(this WebApplicationBuilder builder, string connectionStrings) where T : DbContext {
@@ -21,7 +19,9 @@ public static class StartupExtension {
 
 	private static void AddUtilitiesServices<T>(this WebApplicationBuilder builder, string connectionStrings) where T : DbContext {
 		builder.Services.AddOptions();
-		builder.Services.AddOutputCache(x => { x.AddPolicy("24h", new OutputCachePolicy(TimeSpan.FromHours(24), new List<string> { "content", "category", "address", "comment", "transaction" })); });
+		builder.Services.AddOutputCache(x => {
+			x.AddPolicy("24h", new OutputCachePolicy(TimeSpan.FromHours(24), new List<string> { "content", "category", "address", "comment", "transaction" }));
+		});
 
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
@@ -139,6 +139,7 @@ public static class StartupExtension {
 	}
 
 	public static void UseUtilitiesServices(this WebApplication app) {
+		MethodTimeLogger.Logger = app.Logger;
 		app.UseCors(option => option.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 		app.UseRateLimiter();
 		app.UseOutputCache();
@@ -169,8 +170,10 @@ public static class StartupExtension {
 }
 
 public static class MethodTimeLogger {
+	public static ILogger Logger;
+
 	public static void Log(MethodBase methodBase, TimeSpan timeSpan, string message) {
-		Console.WriteLine();
+		Logger.LogTrace("{Class}.{Method} {Duration}", methodBase.DeclaringType!.Name, timeSpan);
 	}
 }
 

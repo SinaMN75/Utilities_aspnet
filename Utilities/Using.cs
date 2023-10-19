@@ -44,5 +44,7 @@ global using Swashbuckle.AspNetCore.SwaggerUI;
 global using Zarinpal;
 global using Zarinpal.Models;
 global using MethodTimer;
+global using System.Reflection;
+global using Microsoft.Extensions.Logging;
 
 #endregion
