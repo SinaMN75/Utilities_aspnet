@@ -139,7 +139,6 @@ public static class StartupExtension {
 	}
 
 	public static void UseUtilitiesServices(this WebApplication app) {
-		MethodTimeLogger.Logger = app.Logger;
 		app.UseCors(option => option.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 		app.UseRateLimiter();
 		app.UseOutputCache();
@@ -166,14 +165,6 @@ public static class StartupExtension {
 			c.DocExpansion(DocExpansion.None);
 			c.DefaultModelsExpandDepth(2);
 		});
-	}
-}
-
-public static class MethodTimeLogger {
-	public static ILogger Logger;
-
-	public static void Log(MethodBase methodBase, TimeSpan timeSpan, string message) {
-		Logger.LogTrace("{Class}.{Method} {Duration}", methodBase.DeclaringType!.Name, timeSpan);
 	}
 }
 
