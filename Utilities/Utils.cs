@@ -1,4 +1,6 @@
-﻿namespace Utilities_aspnet.Utilities;
+﻿using System.Reflection;
+
+namespace Utilities_aspnet.Utilities;
 
 public static class StartupExtension {
 	public static void SetupUtilities<T>(this WebApplicationBuilder builder, string connectionStrings) where T : DbContext {
@@ -163,6 +165,12 @@ public static class StartupExtension {
 			c.DocExpansion(DocExpansion.None);
 			c.DefaultModelsExpandDepth(2);
 		});
+	}
+}
+
+public static class MethodTimeLogger {
+	public static void Log(MethodBase methodBase, TimeSpan timeSpan, string message) {
+		Console.WriteLine();
 	}
 }
 
