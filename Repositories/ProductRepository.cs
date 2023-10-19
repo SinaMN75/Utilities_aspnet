@@ -25,6 +25,7 @@ public class ProductRepository(DbContext dbContext,
 	: IProductRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
+	[Time]
 	public async Task<GenericResponse<ProductEntity?>> Create(ProductCreateUpdateDto dto, CancellationToken ct) {
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
@@ -56,6 +57,7 @@ public class ProductRepository(DbContext dbContext,
 		return new GenericResponse<ProductEntity?>(i.Entity);
 	}
 
+	[Time]
 	public async Task<GenericResponse<ProductEntity?>> CreateWithFiles(ProductCreateUpdateDto dto, CancellationToken ct) {
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
@@ -79,6 +81,7 @@ public class ProductRepository(DbContext dbContext,
 		return new GenericResponse<ProductEntity?>(i.Entity);
 	}
 
+	[Time]
 	public async Task<GenericResponse<IQueryable<ProductEntity>>> Filter(ProductFilterDto dto) {
 		IQueryable<ProductEntity> q = dbContext.Set<ProductEntity>().AsNoTracking();
 		if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.Now);
@@ -190,6 +193,7 @@ public class ProductRepository(DbContext dbContext,
 		};
 	}
 
+	[Time]
 	public async Task<GenericResponse<ProductEntity?>> ReadById(Guid id, CancellationToken ct) {
 		ProductEntity? i = await dbContext.Set<ProductEntity>()
 			.Include(i => i.Media)
@@ -251,6 +255,7 @@ public class ProductRepository(DbContext dbContext,
 		return new GenericResponse<ProductEntity?>(i);
 	}
 
+	[Time]
 	public async Task<GenericResponse<ProductEntity>> Update(ProductCreateUpdateDto dto, CancellationToken ct) {
 		ProductEntity entity = (await dbContext.Set<ProductEntity>()
 			.Include(x => x.Categories)
@@ -277,6 +282,7 @@ public class ProductRepository(DbContext dbContext,
 		return new GenericResponse<ProductEntity>(e);
 	}
 
+	[Time]
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
 		ProductEntity i = (await dbContext.Set<ProductEntity>()
 			.Include(x => x.Media)
@@ -305,6 +311,7 @@ public class ProductRepository(DbContext dbContext,
 		return new GenericResponse();
 	}
 
+	[Time]
 	public async Task<GenericResponse> CreateReaction(ReactionCreateUpdateDto dto) {
 		ReactionEntity? reaction = await dbContext.Set<ReactionEntity>().FirstOrDefaultAsync(f => f.UserId == _userId && f.ProductId == dto.ProductId);
 		if (reaction?.Reaction == null) {
@@ -330,6 +337,7 @@ public class ProductRepository(DbContext dbContext,
 		return new GenericResponse();
 	}
 
+	[Time]
 	public GenericResponse<IQueryable<ReactionEntity>> ReadReactionsById(Guid id) {
 		IQueryable<ReactionEntity> reactions = dbContext.Set<ReactionEntity>()
 			.Include(i => i.User)
@@ -338,6 +346,7 @@ public class ProductRepository(DbContext dbContext,
 		return new GenericResponse<IQueryable<ReactionEntity>>(reactions);
 	}
 
+	[Time]
 	public GenericResponse<IQueryable<ReactionEntity>> FilterReaction(ReactionFilterDto dto) {
 		IQueryable<ReactionEntity> q = dbContext.Set<ReactionEntity>()
 			.Include(i => i.User)
@@ -354,6 +363,7 @@ public class ProductRepository(DbContext dbContext,
 		};
 	}
 
+	[Time]
 	public async Task<GenericResponse<IQueryable<CustomersPaymentPerProduct>?>> GetMyCustomersPerProduct(Guid id) {
 		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
 		if (user is null) return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(null, UtilitiesStatusCodes.UserNotFound);

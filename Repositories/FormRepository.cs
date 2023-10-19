@@ -10,6 +10,7 @@ public interface IFormRepository {
 }
 
 public class FormRepository(DbContext dbContext) : IFormRepository {
+	[Time]
 	public async Task<GenericResponse<IQueryable<FormEntity>>> CreateForm(FormCreateDto model) {
 		foreach (FormTitleDto item in model.Form!)
 			try {
@@ -40,12 +41,14 @@ public class FormRepository(DbContext dbContext) : IFormRepository {
 		return new GenericResponse<IQueryable<FormEntity>>(entity);
 	}
 
+	[Time]
 	public async Task<GenericResponse> CreateFormField(FormFieldEntity dto) {
 		await dbContext.Set<FormFieldEntity>().AddAsync(dto);
 		await dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}
 
+	[Time]
 	public async Task<GenericResponse> UpdateFormField(FormFieldEntity dto) {
 		FormFieldEntity entity = (await dbContext.Set<FormFieldEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id))!;
 		entity.Label = dto.Label;
@@ -59,17 +62,20 @@ public class FormRepository(DbContext dbContext) : IFormRepository {
 		return new GenericResponse();
 	}
 
+	[Time]
 	public GenericResponse<IQueryable<FormFieldEntity>> ReadFormFields(Guid categoryId) {
 		return new GenericResponse<IQueryable<FormFieldEntity>>(dbContext.Set<FormFieldEntity>()
 			.Where(x => x.CategoryId == categoryId)
 			.AsNoTracking());
 	}
 
+	[Time]
 	public async Task<GenericResponse> DeleteFormField(Guid id) {
 		await dbContext.Set<FormFieldEntity>().Where(i => i.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
 	}
 
+	[Time]
 	public async Task<GenericResponse> DeleteForm(Guid id) {
 		await dbContext.Set<FormEntity>().Where(i => i.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();

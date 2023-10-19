@@ -10,6 +10,7 @@ public interface ISubscriptionPaymentRepository {
 public class SubscriptionPaymentRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) : ISubscriptionPaymentRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
+	[Time]
 	public async Task<GenericResponse<SubscriptionPaymentEntity?>> Create(SubscriptionPaymentCreateUpdateDto dto, CancellationToken ct) {
 		UserEntity? userUpgraded = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == dto.UserId, ct);
 		PromotionEntity? promotionEntity = await dbContext.Set<PromotionEntity>().FirstOrDefaultAsync(f => f.Id == dto.PromotionId, ct);
@@ -31,6 +32,7 @@ public class SubscriptionPaymentRepository(DbContext dbContext, IHttpContextAcce
 		return new GenericResponse<SubscriptionPaymentEntity?>(e);
 	}
 
+	[Time]
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
 		SubscriptionPaymentEntity? subscription = await dbContext.Set<SubscriptionPaymentEntity>().FirstOrDefaultAsync(f => f.Id == id, ct);
 		if (subscription == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
@@ -39,6 +41,7 @@ public class SubscriptionPaymentRepository(DbContext dbContext, IHttpContextAcce
 		return new GenericResponse();
 	}
 
+	[Time]
 	public GenericResponse<IEnumerable<SubscriptionPaymentEntity>> Filter(SubscriptionPaymentFilter dto) {
 		IQueryable<SubscriptionPaymentEntity> q = dbContext.Set<SubscriptionPaymentEntity>().AsNoTracking();
 
@@ -50,6 +53,7 @@ public class SubscriptionPaymentRepository(DbContext dbContext, IHttpContextAcce
 		return new GenericResponse<IEnumerable<SubscriptionPaymentEntity>>(q);
 	}
 
+	[Time]
 	public async Task<GenericResponse<SubscriptionPaymentEntity?>> Update(SubscriptionPaymentCreateUpdateDto dto, CancellationToken ct) {
 		SubscriptionPaymentEntity? subscription = await dbContext.Set<SubscriptionPaymentEntity>().FirstOrDefaultAsync(f => f.Id == dto.Id, ct);
 		if (subscription == null) return new GenericResponse<SubscriptionPaymentEntity?>(null, UtilitiesStatusCodes.NotFound);

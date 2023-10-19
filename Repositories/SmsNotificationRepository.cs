@@ -6,6 +6,7 @@ public interface ISmsNotificationRepository {
 }
 
 public class SmsNotificationRepository(IConfiguration config) : ISmsNotificationRepository {
+	[Time]
 	public async void SendSms(string mobileNumber, string message) {
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
@@ -46,6 +47,7 @@ public class SmsNotificationRepository(IConfiguration config) : ISmsNotification
 		}
 	}
 
+	[Time]
 	public async Task<GenericResponse> SendNotification(NotificationCreateDto dto) {
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);

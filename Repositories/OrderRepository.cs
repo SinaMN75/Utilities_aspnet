@@ -14,6 +14,7 @@ public interface IOrderRepository {
 public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) : IOrderRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
+	[Time]
 	public async Task<GenericResponse<OrderEntity?>> Update(OrderCreateUpdateDto dto) {
 		OrderEntity oldOrder = (await dbContext.Set<OrderEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id))!;
 
@@ -37,6 +38,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 		return new GenericResponse<OrderEntity?>(oldOrder);
 	}
 
+	[Time]
 	public async Task<GenericResponse<IEnumerable<OrderEntity>>> Filter(OrderFilterDto dto) {
 		await UpdateCartPrices();
 		IQueryable<OrderEntity> q = dbContext.Set<OrderEntity>()
@@ -67,6 +69,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 		};
 	}
 
+	[Time]
 	public async Task<GenericResponse<OrderEntity>> ReadById(Guid id) {
 		OrderEntity? i = await dbContext.Set<OrderEntity>()
 			.Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p!.Media)
@@ -80,6 +83,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 		return new GenericResponse<OrderEntity>(i!);
 	}
 
+	[Time]
 	public async Task<GenericResponse> Delete(Guid id) {
 		await dbContext.Set<TransactionEntity>().Where(i => i.OrderId == id).ExecuteDeleteAsync();
 		await dbContext.Set<OrderDetailEntity>().Where(i => i.OrderId == id).ExecuteDeleteAsync();
@@ -87,6 +91,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 		return new GenericResponse();
 	}
 
+	[Time]
 	public async Task<GenericResponse<OrderEntity?>> CreateUpdateOrderDetail(OrderDetailCreateUpdateDto dto) {
 		ProductEntity p = (await dbContext.Set<ProductEntity>().Include(x => x.User)
 			.FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
@@ -196,6 +201,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 		return new GenericResponse<OrderEntity?>(o);
 	}
 
+	[Time]
 	public async Task<GenericResponse<OrderEntity?>> CreateReservationOrder(ReserveCreateUpdateDto dto) {
 		ProductEntity p = (await dbContext.Set<ProductEntity>().Include(x => x.User)
 			.FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
@@ -218,6 +224,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 		return new GenericResponse<OrderEntity?>(orderEntity.Entity);
 	}
 
+	[Time]
 	public async Task<GenericResponse<OrderEntity?>> ApplyDiscountCode(ApplyDiscountCodeOnOrderDto dto) {
 		OrderEntity o = (await dbContext.Set<OrderEntity>()
 			.Include(x => x.ProductOwner).FirstOrDefaultAsync(x => x.Id == dto.OrderId))!;
@@ -237,6 +244,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 		return new GenericResponse<OrderEntity?>(o);
 	}
 
+	[Time]
 	public async Task<GenericResponse> Vote(OrderVoteDto dto) {
 		OrderDetailEntity? orderDetail =
 			await dbContext.Set<OrderDetailEntity>().FirstOrDefaultAsync(f => f.Id == dto.Id);

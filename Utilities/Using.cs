@@ -43,5 +43,6 @@ global using RestSharp;
 global using Swashbuckle.AspNetCore.SwaggerUI;
 global using Zarinpal;
 global using Zarinpal.Models;
+global using MethodTimer;
 
 #endregion

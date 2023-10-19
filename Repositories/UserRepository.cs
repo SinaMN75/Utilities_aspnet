@@ -25,6 +25,7 @@ public class UserRepository(DbContext dbContext,
 	private readonly IHttpContextAccessor? _http = httpContextAccessor;
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
+	[Time]
 	public async Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null) {
 		bool isUserId = Guid.TryParse(idOrUserName, out _);
 		UserEntity? entity = await dbContext.Set<UserEntity>()
@@ -46,6 +47,7 @@ public class UserRepository(DbContext dbContext,
 		return new GenericResponse<UserEntity?>(entity);
 	}
 
+	[Time]
 	public async Task<GenericResponse<UserEntity?>> Update(UserCreateUpdateDto dto) {
 		UserEntity? entity = await dbContext.Set<UserEntity>().Include(x => x.Categories).FirstOrDefaultAsync(x => x.Id == dto.Id);
 		if (entity == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
@@ -54,6 +56,7 @@ public class UserRepository(DbContext dbContext,
 		return new GenericResponse<UserEntity?>(entity);
 	}
 
+	[Time]
 	public GenericResponse<IQueryable<UserEntity>> Filter(UserFilterDto dto) {
 		IQueryable<UserEntity> q = dbContext.Set<UserEntity>();
 
@@ -134,6 +137,7 @@ public class UserRepository(DbContext dbContext,
 		};
 	}
 
+	[Time]
 	public async Task<GenericResponse<UserEntity?>> GetTokenForTest(string? mobile) {
 		string m = mobile ?? "09351902721";
 		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == m);
@@ -144,12 +148,14 @@ public class UserRepository(DbContext dbContext,
 		return new GenericResponse<UserEntity?>(ReadByIdMinimal(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result);
 	}
 
+	[Time]
 	public async Task<UserEntity?> ReadByIdMinimal(string? idOrUserName, string? token = null) {
 		UserEntity e = (await dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(u => u.Id == idOrUserName || u.UserName == idOrUserName))!;
 		e.Token = token;
 		return e;
 	}
 
+	[Time]
 	public async Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model) {
 		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Email == model.Email ||
 		                                                                              x.UserName == model.Email ||
@@ -164,6 +170,7 @@ public class UserRepository(DbContext dbContext,
 		return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result);
 	}
 
+	[Time]
 	public async Task<GenericResponse<UserEntity?>> Register(RegisterDto dto) {
 		UserEntity? model = await dbContext.Set<UserEntity>()
 			.FirstOrDefaultAsync(x => x.UserName == dto.UserName || x.Email == dto.Email || x.PhoneNumber == dto.PhoneNumber);
@@ -197,6 +204,7 @@ public class UserRepository(DbContext dbContext,
 		return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result);
 	}
 
+	[Time]
 	public async Task<GenericResponse<UserEntity?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto) {
 		string userAgent = _http!.HttpContext!.Request.Headers?.FirstOrDefault(s => s.Key.ToLower() == "user-agent").Value!;
 		string mobile = dto.Mobile.DeleteAdditionsInsteadNumber();
@@ -230,6 +238,7 @@ public class UserRepository(DbContext dbContext,
 		return new GenericResponse<UserEntity?>(user);
 	}
 
+	[Time]
 	public async Task<GenericResponse<UserEntity?>> VerifyCodeForLogin(VerifyMobileForLoginDto dto) {
 		string mobile = dto.Mobile.Replace("+", "");
 		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == mobile || x.Email == mobile);
@@ -250,6 +259,7 @@ public class UserRepository(DbContext dbContext,
 			: new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.WrongVerificationCode);
 	}
 
+	[Time]
 	public async Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList() {
 		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
 		GenericResponse<IQueryable<UserEntity>> blockedUsers = Filter(new UserFilterDto {
@@ -259,6 +269,7 @@ public class UserRepository(DbContext dbContext,
 		return new GenericResponse<IEnumerable<UserEntity>>(blockedUsers.Result!);
 	}
 
+	[Time]
 	public async Task<GenericResponse> ToggleBlock(string userId) {
 		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
 		if (user.BlockedUsers.Contains(userId))
@@ -267,6 +278,7 @@ public class UserRepository(DbContext dbContext,
 		return new GenericResponse();
 	}
 
+	[Time]
 	public async Task<GenericResponse> TransferWalletToWallet(TransferFromWalletToWalletDto dto, CancellationToken ct) {
 		UserEntity fromUser = (await ReadByIdMinimal(dto.FromUserId))!;
 		UserEntity toUser = (await ReadByIdMinimal(dto.ToUserId))!;
@@ -279,6 +291,7 @@ public class UserRepository(DbContext dbContext,
 		return new GenericResponse();
 	}
 
+	[Time]
 	public async Task<GenericResponse> Authorize(AuthorizeUserDto dto) {
 		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
 		if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound);

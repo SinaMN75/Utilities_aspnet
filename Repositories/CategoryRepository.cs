@@ -9,6 +9,7 @@ public interface ICategoryRepository {
 }
 
 public class CategoryRepository(DbContext context, IOutputCacheStore outputCache, IMediaRepository mediaRepository) : ICategoryRepository {
+	[Time]
 	public async Task<GenericResponse<CategoryEntity>> Create(CategoryCreateUpdateDto dto, CancellationToken ct) {
 		CategoryEntity entity = new();
 		if (dto.Id is not null) entity.Id = (Guid)dto.Id;
@@ -33,6 +34,7 @@ public class CategoryRepository(DbContext context, IOutputCacheStore outputCache
 		}
 	}
 
+	[Time]
 	public async Task<GenericResponse<IEnumerable<CategoryEntity>>> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto, CancellationToken ct) {
 		List<CategoryEntity> list = new();
 		foreach (CategoryCreateUpdateDto i in dto) {
@@ -43,6 +45,7 @@ public class CategoryRepository(DbContext context, IOutputCacheStore outputCache
 		return new GenericResponse<IEnumerable<CategoryEntity>>(list);
 	}
 
+	[Time]
 	public GenericResponse<IEnumerable<CategoryEntity>> Filter(CategoryFilterDto dto) {
 		IQueryable<CategoryEntity> q = context.Set<CategoryEntity>().AsNoTracking().Include(x => x.Children);
 
@@ -73,6 +76,7 @@ public class CategoryRepository(DbContext context, IOutputCacheStore outputCache
 		};
 	}
 
+	[Time]
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
 		CategoryEntity i = (await context.Set<CategoryEntity>().Include(x => x.Children).Include(x => x.Media).FirstOrDefaultAsync(x => x.Id == id, ct))!;
 		foreach (CategoryEntity c in i.Children ?? new List<CategoryEntity>()) {
@@ -87,6 +91,7 @@ public class CategoryRepository(DbContext context, IOutputCacheStore outputCache
 		return new GenericResponse();
 	}
 
+	[Time]
 	public async Task<GenericResponse<CategoryEntity?>> Update(CategoryCreateUpdateDto dto, CancellationToken ct) {
 		CategoryEntity? entity = await context.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id, ct);
 		if (entity == null) return new GenericResponse<CategoryEntity?>(null, UtilitiesStatusCodes.NotFound);

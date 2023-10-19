@@ -19,6 +19,7 @@ public class CommentRepository(DbContext dbContext,
 	: ICommentRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
+	[Time]
 	public GenericResponse<IQueryable<CommentEntity>?> ReadByProductId(Guid id) {
 		IQueryable<CommentEntity> comment = dbContext.Set<CommentEntity>()
 			.Include(x => x.Media)
@@ -30,6 +31,7 @@ public class CommentRepository(DbContext dbContext,
 		return new GenericResponse<IQueryable<CommentEntity>?>(comment);
 	}
 
+	[Time]
 	public GenericResponse<IQueryable<CommentEntity>?> Filter(CommentFilterDto dto) {
 		IQueryable<CommentEntity> q = dbContext.Set<CommentEntity>();
 
@@ -57,6 +59,7 @@ public class CommentRepository(DbContext dbContext,
 		;
 	}
 
+	[Time]
 	public async Task<GenericResponse<CommentEntity?>> ReadById(Guid id) {
 		CommentEntity? comment = await dbContext.Set<CommentEntity>()
 			.Include(x => x.User).ThenInclude(x => x!.Media)
@@ -71,6 +74,7 @@ public class CommentRepository(DbContext dbContext,
 		return new GenericResponse<CommentEntity?>(comment);
 	}
 
+	[Time]
 	public async Task<GenericResponse<CommentEntity?>> Create(CommentCreateUpdateDto dto, CancellationToken ct) {
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
@@ -119,6 +123,7 @@ public class CommentRepository(DbContext dbContext,
 		return await ReadById(comment.Id);
 	}
 
+	[Time]
 	public async Task<GenericResponse<CommentEntity?>> Update(Guid id, CommentCreateUpdateDto dto, CancellationToken ct) {
 		CommentEntity? comment = await dbContext.Set<CommentEntity>().FirstOrDefaultAsync(x => x.Id == id, ct);
 
@@ -143,6 +148,7 @@ public class CommentRepository(DbContext dbContext,
 		return await ReadById(comment.Id);
 	}
 
+	[Time]
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
 		CommentEntity? comment = await dbContext.Set<CommentEntity>().Include(i => i.Media).Include(i => i.Children).FirstOrDefaultAsync(x => x.Id == id, ct);
 		if (comment == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
@@ -154,6 +160,7 @@ public class CommentRepository(DbContext dbContext,
 		return new GenericResponse();
 	}
 
+	[Time]
 	public async Task<GenericResponse> AddReactionToComment(Guid commentId, Reaction reaction, CancellationToken ct) {
 		UserEntity? user = await dbContext.Set<UserEntity>().Where(w => w.Id == _userId).FirstOrDefaultAsync(ct);
 		if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound, "User Donest Logged In");

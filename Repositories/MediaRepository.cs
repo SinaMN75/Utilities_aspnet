@@ -8,6 +8,7 @@ public interface IMediaRepository {
 }
 
 public class MediaRepository(IWebHostEnvironment env, DbContext dbContext) : IMediaRepository {
+	[Time]
 	public async Task<GenericResponse<IEnumerable<MediaEntity>?>> Upload(UploadDto model) {
 		List<MediaEntity> medias = new();
 
@@ -90,6 +91,7 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext) : IMe
 		return new GenericResponse<IEnumerable<MediaEntity>?>(medias);
 	}
 
+	[Time]
 	public async Task<GenericResponse> Delete(Guid id) {
 		MediaEntity? media = await dbContext.Set<MediaEntity>().FirstOrDefaultAsync(x => x.Id == id);
 		if (media == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
@@ -103,6 +105,7 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext) : IMe
 		return new GenericResponse();
 	}
 
+	[Time]
 	public async Task DeleteMedia(IEnumerable<MediaEntity?>? media) {
 		if (media is not null) {
 			IEnumerable<MediaEntity?> mediaEntities = media.ToList();
@@ -113,6 +116,7 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext) : IMe
 		}
 	}
 
+	[Time]
 	public async Task<GenericResponse<MediaEntity?>> UpdateMedia(Guid id, UpdateMediaDto model) {
 		MediaEntity? media = await dbContext.Set<MediaEntity>().FirstOrDefaultAsync(x => x.Id == id);
 		if (media is null)
