@@ -1,5 +1,3 @@
-using Newtonsoft.Json.Linq;
-
 namespace Utilities_aspnet.Repositories;
 
 public interface IProductRepository
@@ -294,13 +292,11 @@ public class ProductRepository : IProductRepository
 
     public async Task<GenericResponse<ProductEntity>> Update(ProductCreateUpdateDto dto, CancellationToken ct)
     {
-        ProductEntity? entity = await _dbContext.Set<ProductEntity>()
+        ProductEntity entity = (await _dbContext.Set<ProductEntity>()
             .Include(x => x.Categories)
             .Where(x => x.Id == dto.Id)
-            .FirstOrDefaultAsync(ct);
-
-        if (entity == null) return new GenericResponse<ProductEntity>(new ProductEntity());
-
+            .FirstOrDefaultAsync(ct))!;
+        
         if (dto.Children is not null)
             foreach (ProductCreateUpdateDto childDto in dto.Children)
             {
