@@ -38,6 +38,15 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 				await new RestClient("http://ippanel.com/api/select").ExecuteAsync(request);
 				break;
 			}
+			case "kavenegar": {
+				RestRequest request = new(Method.POST);
+				request.AddHeader("apikey", smsSetting.SmsApiKey!);
+				request.AddParameter("receptor", mobileNumber);
+				request.AddParameter("token", message);
+				request.AddParameter("template", smsSetting.PatternCode!);
+				await new RestClient($"https://api.kavenegar.com/v1/{smsSetting.SmsApiKey}/verify/lookup.json").ExecuteAsync(request);
+				break;
+			}
 		}
 	}
 
