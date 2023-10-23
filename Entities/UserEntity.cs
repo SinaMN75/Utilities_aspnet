@@ -65,7 +65,8 @@ public class UserEntity {
 	public bool IsPrivate { get; set; } = true;
 	public DateTime? ExpireUpgradeAccount { get; set; }
 	public AgeCategory? AgeCategory { get; set; }
-	public UserJsonDetail JsonDetail { get; set; } = new();
+	public int CommetCount { get; set; } = 0;
+    public UserJsonDetail JsonDetail { get; set; } = new();
 
 	public List<TagUser> Tags { get; set; } = new();
 

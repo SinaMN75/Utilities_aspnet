@@ -17,6 +17,8 @@ public class CommentEntity : BaseEntity {
 
 	public UserEntity? User { get; set; }
 	public string? UserId { get; set; }
+	public UserEntity? TargetUser { get; set; }
+	public string? TargetUserId { get; set; }
 
 	public ProductEntity? Product { get; set; }
 	public Guid? ProductId { get; set; }
@@ -44,6 +46,7 @@ public class CommentCreateUpdateDto {
 	public double? Score { get; set; }
 	public string? Comment { get; set; }
 	public Guid? ProductId { get; set; }
+	public string? UserId { get; set; }
 	public ChatStatus? Status { get; set; }
 	public List<TagComment>? Tags { get; set; }
 	public List<TagComment>? RemoveTags { get; set; }
@@ -54,6 +57,7 @@ public class CommentFilterDto {
 	public string? UserId { get; set; }
 	public string? ProductOwnerId { get; set; }
 	public Guid? ProductId { get; set; }
+	public string? TargetUserId { get; set; }
 	public ChatStatus? Status { get; set; }
 	public List<TagComment>? Tags { get; set; }
 	public int PageSize { get; set; } = 100;

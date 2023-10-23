@@ -1,10 +1,13 @@
-﻿namespace Utilities_aspnet.Repositories;
+﻿using RestSharp.Extensions;
+
+namespace Utilities_aspnet.Repositories;
 
 public interface ICommentRepository {
 	Task<GenericResponse<CommentEntity?>> Create(CommentCreateUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse> AddReactionToComment(Guid commentId, Reaction reaction, CancellationToken ct);
 	Task<GenericResponse<CommentEntity?>> ReadById(Guid id);
 	GenericResponse<IQueryable<CommentEntity>?> ReadByProductId(Guid id);
+	GenericResponse<IQueryable<CommentEntity>?> ReadByUserId(string id);
 	GenericResponse<IQueryable<CommentEntity>?> Filter(CommentFilterDto dto);
 	Task<GenericResponse<CommentEntity?>> Update(Guid id, CommentCreateUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
@@ -25,6 +28,19 @@ public class CommentRepository(DbContext dbContext,
 			.Include(x => x.Media)
 			.Where(x => x.ProductId == id && x.ParentId == null)
 			.Include(x => x.User).ThenInclude(x => x!.Media)
+			.Include(x => x.TargetUser).ThenInclude(x => x!.Media)
+			.Include(x => x.Children)!.ThenInclude(x => x.Media)
+			.Include(x => x.Children)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
+			.OrderByDescending(x => x.CreatedAt).AsNoTracking();
+		return new GenericResponse<IQueryable<CommentEntity>?>(comment);
+	}	
+	[Time]
+	public GenericResponse<IQueryable<CommentEntity>?> ReadByUserId(string id) {
+		IQueryable<CommentEntity> comment = dbContext.Set<CommentEntity>()
+			.Include(x => x.Media)
+			.Where(x => x.TargetUserId == id && x.ParentId == null)
+			.Include(x => x.User).ThenInclude(x => x!.Media)
+			.Include(x => x.TargetUser).ThenInclude(x => x!.Media)
 			.Include(x => x.Children)!.ThenInclude(x => x.Media)
 			.Include(x => x.Children)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
 			.OrderByDescending(x => x.CreatedAt).AsNoTracking();
@@ -37,6 +53,7 @@ public class CommentRepository(DbContext dbContext,
 
 		q = q.Include(x => x.User).ThenInclude(x => x!.Media)
 			.Include(x => x.Media)
+			.Include(x => x.TargetUser)
 			.Include(x => x.Product).ThenInclude(x => x!.Media)
 			.Include(x => x.Children)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
 			.OrderByDescending(x => x.CreatedAt)
@@ -47,8 +64,9 @@ public class CommentRepository(DbContext dbContext,
 		if (dto.UserId is not null) q = q.Where(x => x.UserId == dto.UserId);
 		if (dto.ProductOwnerId is not null) q = q.Where(x => x.Product!.UserId == dto.ProductOwnerId);
 		if (dto.Tags is not null) q = q.Where(x => dto.Tags!.All(y => x.Tags!.Contains(y)));
+		if (dto.TargetUserId is not null) q = q.Where(x => x.TargetUserId == dto.TargetUserId);
 
-		int totalCount = q.Count();
+        int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
 		return new GenericResponse<IQueryable<CommentEntity>?>(q) {
@@ -64,6 +82,7 @@ public class CommentRepository(DbContext dbContext,
 		CommentEntity? comment = await dbContext.Set<CommentEntity>()
 			.Include(x => x.User).ThenInclude(x => x!.Media)
 			.Include(x => x.Media)
+			.Include(x => x.TargetUser)
 			.Include(x => x.Children)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
 			.Include(x => x.Children)!.ThenInclude(x => x.Media)
 			.Where(x => x.Id == id)
@@ -88,12 +107,19 @@ public class CommentRepository(DbContext dbContext,
 				dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == _userId));
 			if (blockedState.Item1) return new GenericResponse<CommentEntity?>(null, blockedState.Item2);
 		}
+		UserEntity? trgtUser = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == dto.UserId, ct);
+		if (trgtUser is not null) {
+			Tuple<bool, UtilitiesStatusCodes> blockedState = Utils.IsBlockedUser(trgtUser,
+				dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == _userId));
+			if (blockedState.Item1) return new GenericResponse<CommentEntity?>(null, blockedState.Item2);
+		}
 
 		CommentEntity comment = new() {
 			CreatedAt = DateTime.Now,
 			UpdatedAt = DateTime.Now,
 			Comment = dto.Comment,
 			ProductId = dto.ProductId,
+			TargetUserId = dto.UserId,
 			Score = dto.Score,
 			ParentId = dto.ParentId,
 			UserId = _userId,
@@ -115,6 +141,20 @@ public class CommentRepository(DbContext dbContext,
 					Link = product.Id.ToString(),
 					ProductId = product.Id
 				});
+			if(dto.UserId != null)
+			{
+				trgtUser.CommetCount += 1;
+				if(trgtUser.Id != _userId)
+					await notificationRepository.Create(new NotificationCreateUpdateDto
+                    {
+                        UserId = trgtUser.Id,
+                        Message = dto.Comment ?? "",
+                        Title = "Comment",
+                        UseCase = "Comment",
+                        CreatorUserId = comment.UserId,
+                        Link = product.Id.ToString(),
+                    });
+            }	
 		}
 		catch { }
 
@@ -131,6 +171,7 @@ public class CommentRepository(DbContext dbContext,
 		if (!string.IsNullOrEmpty(dto.Comment)) comment.Comment = dto.Comment;
 		if (dto.Score.HasValue) comment.Score = dto.Score;
 		if (dto.ProductId.HasValue) comment.ProductId = dto.ProductId;
+		if (dto.UserId.IsNotNullOrEmpty()) comment.TargetUserId = dto.UserId;
 		if (dto.Status.HasValue) comment.Status = dto.Status;
 		if (dto.Tags.IsNotNullOrEmpty()) comment.Tags = dto.Tags;
 		if (dto.RemoveTags.IsNotNullOrEmpty()) {
