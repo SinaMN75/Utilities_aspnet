@@ -186,6 +186,7 @@ public class UserRepository(DbContext dbContext,
 			Password = dto.Password,
 			FirstName = dto.FirstName,
 			LastName = dto.LastName,
+			CreatedAt = DateTime.Now,
 			JsonDetail = dto.JsonDetail = new UserJsonDetail(),
 		};
 
