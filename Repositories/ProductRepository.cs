@@ -305,7 +305,8 @@ public class ProductRepository(DbContext dbContext,
 			foreach (OrderDetailEntity orderDetail in product.OrderDetail ?? new List<OrderDetailEntity>()) dbContext.Remove(orderDetail);
 			dbContext.Remove(product);
 		}
-
+		var reactions = dbContext.Set<ReactionEntity>().Where(x => x.ProductId == i.Id);
+		if (reactions != null && reactions.Any()) dbContext.Set<ReactionEntity>().RemoveRange(reactions);
 		dbContext.Remove(i);
 		await dbContext.SaveChangesAsync(ct);
 		return new GenericResponse();
