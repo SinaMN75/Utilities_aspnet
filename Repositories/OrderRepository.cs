@@ -104,6 +104,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 
 		if (o is null) {
 			EntityEntry<OrderEntity> orderEntity = await dbContext.Set<OrderEntity>().AddAsync(new OrderEntity {
+				OrderNumber = new Random().Next(10000, 99999),
 				Tags = new List<TagOrder> { TagOrder.Pending },
 				UserId = _userId,
 				SendPrice = p.User!.JsonDetail.DeliveryPrice1,
@@ -131,6 +132,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 
 		if (o.OrderDetails != null && o.OrderDetails.Any(x => p.UserId != x.Product?.UserId)) {
 			EntityEntry<OrderEntity> orderEntity = await dbContext.Set<OrderEntity>().AddAsync(new OrderEntity {
+				OrderNumber = new Random().Next(10000, 99999),
 				Tags = new List<TagOrder> { TagOrder.Pending },
 				UserId = _userId,
 				CreatedAt = DateTime.Now,
@@ -211,6 +213,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 		}
 
 		OrderEntity e = new() {
+			OrderNumber = new Random().Next(10000, 99999),
 			CreatedAt = DateTime.Now,
 			UpdatedAt = DateTime.Now,
 			ProductOwnerId = p.UserId,

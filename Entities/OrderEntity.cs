@@ -10,6 +10,8 @@ public class OrderEntity : BaseEntity {
 
 	[MaxLength(20)]
 	public string? PayNumber { get; set; }
+	
+	public required int OrderNumber { get; set; }
 
 	public int? TotalPrice { get; set; }
 	public int? DiscountPrice { get; set; }
