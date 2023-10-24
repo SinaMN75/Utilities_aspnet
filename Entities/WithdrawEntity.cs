@@ -26,4 +26,5 @@ public class WalletWithdrawalDto {
 public class WithdrawalFilterDto {
 	public WithdrawState? State { get; set; }
 	public string? UserId { get; set; }
+	public bool? ShowUser { get; set; }
 }
