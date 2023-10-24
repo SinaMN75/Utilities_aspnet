@@ -93,7 +93,7 @@ public class CategoryCreateUpdateDto {
 	public List<TagCategory>? AddTags { get; set; }
 }
 
-public class CategoryFilterDto {
+public class CategoryFilterDto : BaseFilterDto {
 	public string? Title { get; set; }
 	public string? TitleTr1 { get; set; }
 	public string? TitleTr2 { get; set; }
@@ -107,6 +107,4 @@ public class CategoryFilterDto {
 	public bool? OrderByOrderDescending { get; set; }
 	public bool? OrderByCreatedAt { get; set; }
 	public bool? OrderByCreatedAtDescending { get; set; }
-	public int PageSize { get; set; } = 10000;
-	public int PageNumber { get; set; } = 1;
 }

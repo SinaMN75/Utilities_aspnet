@@ -206,7 +206,7 @@ public class ProductCreateUpdateDto {
 	public List<ReservationDays>? DaysReservedAvailable { get; set; }
 }
 
-public class ProductFilterDto {
+public class ProductFilterDto : BaseFilterDto {
 	public string? Title { get; set; }
 	public string? Subtitle { get; set; }
 	public string? Description { get; set; }
@@ -240,8 +240,6 @@ public class ProductFilterDto {
 	public bool? OrderByAgeCategory { get; set; }
 	public bool? OrderByCategory { get; set; }
 	public bool? ShowCountOfComment { get; set; }
-	public int PageSize { get; set; } = 100;
-	public int PageNumber { get; set; } = 1;
 	public Currency? Currency { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 	public List<TagProduct>? Tags { get; set; }

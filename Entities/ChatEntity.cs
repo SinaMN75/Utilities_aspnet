@@ -96,13 +96,11 @@ public class ChatReadDto {
 	public ChatReadDto? Parent { get; set; }
 }
 
-public class ChatFilterDto {
+public class ChatFilterDto : BaseFilterDto {
 	public string UserId { get; set; } = null!;
-	public int PageSize { get; set; } = 100;
-	public int PageNumber { get; set; } = 1;
 }
 
-public class GroupChatFilterDto {
+public class GroupChatFilterDto : BaseFilterDto {
 	public IEnumerable<string>? UsersIds { get; set; }
 	public IEnumerable<Guid>? ProductsIds { get; set; }
 	public string? Title { get; set; }
@@ -121,8 +119,6 @@ public class GroupChatFilterDto {
 	public bool? OrderByCreatedDate { get; set; } = false;
 	public bool? OrderByCreaedDateDecending { get; set; } = false;
 	public bool Boosted { get; set; }
-	public int PageSize { get; set; } = 100;
-	public int PageNumber { get; set; } = 1;
 }
 
 public class ChatCreateUpdateDto {

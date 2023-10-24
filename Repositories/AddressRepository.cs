@@ -1,9 +1,9 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
 public interface IAddressRepository {
-	Task<GenericResponse<AddressEntity?>> Create(AddressCreateUpdateDto dto, CancellationToken ct);
+	Task<GenericResponse<AddressEntity?>> Create(AddressCreateDto dto, CancellationToken ct);
 	GenericResponse<IQueryable<AddressEntity>> Filter(AddressFilterDto dto);
-	Task<GenericResponse<AddressEntity?>> Update(AddressCreateUpdateDto dto, CancellationToken ct);
+	Task<GenericResponse<AddressEntity?>> Update(AddressUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse> Delete(Guid addressId, CancellationToken ct);
 }
 
@@ -11,7 +11,7 @@ public class AddressRepository(DbContext dbContext, IHttpContextAccessor httpCon
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	[Time]
-	public async Task<GenericResponse<AddressEntity?>> Create(AddressCreateUpdateDto addressDto, CancellationToken ct) {
+	public async Task<GenericResponse<AddressEntity?>> Create(AddressCreateDto addressDto, CancellationToken ct) {
 		AddressEntity e = new() {
 			Address = addressDto.Address,
 			CreatedAt = DateTime.Now,
@@ -29,16 +29,16 @@ public class AddressRepository(DbContext dbContext, IHttpContextAccessor httpCon
 	}
 
 	[Time]
-	public async Task<GenericResponse<AddressEntity?>> Update(AddressCreateUpdateDto addressDto, CancellationToken ct) {
-		AddressEntity e = (await dbContext.Set<AddressEntity>().FirstOrDefaultAsync(f => f.Id == addressDto.Id, ct))!;
-		e.PostalCode = addressDto.PostalCode;
-		e.Pelak = addressDto.Pelak;
-		e.Unit = addressDto.Unit;
-		e.Address = addressDto.Address;
-		e.UpdatedAt = DateTime.Now;
-		e.ReceiverFullName = addressDto.ReceiverFullName;
-		e.ReceiverPhoneNumber = addressDto.ReceiverPhoneNumber;
-		if (addressDto.IsDefault && dbContext.Set<AddressEntity>().Any(a => a.UserId == e.UserId && a.Id != e.Id && e.IsDefault))
+	public async Task<GenericResponse<AddressEntity?>> Update(AddressUpdateDto dto, CancellationToken ct) {
+		AddressEntity e = (await dbContext.Set<AddressEntity>().FirstOrDefaultAsync(f => f.Id == dto.Id, ct))!;
+		if (dto.PostalCode.IsNotNullOrEmpty()) e.UpdatedAt = DateTime.Now;
+		if (dto.PostalCode.IsNotNullOrEmpty()) e.PostalCode = dto.PostalCode!;
+		if (dto.Pelak.IsNotNullOrEmpty()) e.Pelak = dto.Pelak!;
+		if (dto.Unit.IsNotNullOrEmpty()) e.Unit = dto.Unit!;
+		if (dto.Address.IsNotNullOrEmpty()) e.Address = dto.Address!;
+		if (dto.ReceiverFullName.IsNotNullOrEmpty()) e.ReceiverFullName = dto.ReceiverFullName!;
+		if (dto.ReceiverPhoneNumber.IsNotNullOrEmpty()) e.ReceiverPhoneNumber = dto.ReceiverPhoneNumber!;
+		if (dto.IsDefault && dbContext.Set<AddressEntity>().Any(a => a.UserId == e.UserId && a.Id != e.Id && e.IsDefault))
 			foreach (AddressEntity? item in dbContext.Set<AddressEntity>().Where(a => a.UserId == e.UserId && a.Id != e.Id && e.IsDefault)) {
 				item.IsDefault = false;
 				dbContext.Update(item);

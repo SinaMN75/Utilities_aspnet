@@ -17,13 +17,11 @@ public class DiscountEntity : BaseEntity {
 	public string? UserId { get; set; }
 }
 
-public class DiscountFilterDto {
+public class DiscountFilterDto : BaseFilterDto {
 	public string? Title { get; set; }
 	public string? Code { get; set; }
 	public int? DiscountPercent { get; set; }
 	public int? NumberUses { get; set; }
-	public int PageSize { get; set; } = 100;
-	public int PageNumber { get; set; } = 1;
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
 }

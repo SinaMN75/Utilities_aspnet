@@ -13,3 +13,8 @@ public class KeyValue {
 	public string? Key { get; set; }
 	public string? Value { get; set; }
 }
+
+public class BaseFilterDto {
+	public int PageSize { get; set; } = 100;
+	public int PageNumber { get; set; } = 1;
+}

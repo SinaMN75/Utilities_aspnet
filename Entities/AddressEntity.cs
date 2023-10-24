@@ -25,7 +25,7 @@ public class AddressEntity : BaseEntity {
 	public string? UserId { get; set; }
 }
 
-public class AddressCreateUpdateDto {
+public class AddressCreateDto {
 	public Guid? Id { get; set; }
 	public required string ReceiverFullName { get; set; }
 	public required string ReceiverPhoneNumber { get; set; }
@@ -33,11 +33,20 @@ public class AddressCreateUpdateDto {
 	public required string Pelak { get; set; }
 	public required string Unit { get; set; }
 	public required string PostalCode { get; set; }
+	public required bool IsDefault { get; set; } = false;
+}
+
+public class AddressUpdateDto {
+	public required Guid Id { get; set; }
+	public string? ReceiverFullName { get; set; }
+	public string? ReceiverPhoneNumber { get; set; }
+	public string? Address { get; set; }
+	public string? Pelak { get; set; }
+	public string? Unit { get; set; }
+	public string? PostalCode { get; set; }
 	public bool IsDefault { get; set; } = false;
 }
 
-public class AddressFilterDto {
+public class AddressFilterDto : BaseFilterDto {
 	public string? UserId { get; set; }
-	public int PageSize { get; set; } = 100;
-	public int PageNumber { get; set; } = 1;
 }

@@ -10,7 +10,7 @@ public class CommentController(ICommentRepository commentRepository) : BaseApiCo
 	[HttpGet("ReadByProductId/{id:guid}")]
 	[OutputCache(PolicyName = "24h")]
 	public ActionResult<GenericResponse<IQueryable<CommentEntity>?>> ReadByProductId(Guid id) => Result(commentRepository.ReadByProductId(id));
-	
+
 	[HttpGet("ReadByUserId/{id}")]
 	[OutputCache(PolicyName = "24h")]
 	public ActionResult<GenericResponse<IQueryable<CommentEntity>?>> ReadByUserId(string id) => Result(commentRepository.ReadByUserId(id));

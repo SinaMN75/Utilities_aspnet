@@ -66,7 +66,7 @@ public class UserEntity {
 	public DateTime? ExpireUpgradeAccount { get; set; }
 	public AgeCategory? AgeCategory { get; set; }
 	public int CommetCount { get; set; } = 0;
-    public UserJsonDetail JsonDetail { get; set; } = new();
+	public UserJsonDetail JsonDetail { get; set; } = new();
 
 	public List<TagUser> Tags { get; set; } = new();
 
@@ -230,7 +230,7 @@ public class UserCreateUpdateDto {
 	public List<TagUser>? AddTags { get; set; }
 }
 
-public class UserFilterDto {
+public class UserFilterDto : BaseFilterDto {
 	public string? UserId { get; set; }
 	public string? UserName { get; set; }
 	public string? UserNameExact { get; set; }
@@ -250,8 +250,6 @@ public class UserFilterDto {
 	public string? Region { get; set; }
 	public string? State { get; set; }
 	public string? Badge { get; set; }
-	public int PageSize { get; set; } = 100;
-	public int PageNumber { get; set; } = 1;
 	public bool? ShowMedia { get; set; }
 	public bool? ShowCategories { get; set; }
 	public bool? ShowSuspend { get; set; }

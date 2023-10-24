@@ -49,13 +49,11 @@ public class NotificationCreateUpdateDto {
 	public List<TagNotification>? AddTags { get; set; }
 }
 
-public class NotificationFilterDto {
+public class NotificationFilterDto : BaseFilterDto {
 	public string? Title { get; set; }
 	public string? UserId { get; set; }
 	public string? CreatorUserId { get; set; }
 	public string? Message { get; set; }
 	public string? UseCase { get; set; }
-	public int PageSize { get; set; } = 100;
-	public int PageNumber { get; set; } = 1;
 	public List<TagNotification>? Tags { get; set; }
 }

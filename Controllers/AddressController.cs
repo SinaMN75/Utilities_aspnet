@@ -5,7 +5,7 @@
 public class AddressController(IAddressRepository repository) : BaseApiController {
 	[HttpPost]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse<AddressEntity>>> Create(AddressCreateUpdateDto dto, CancellationToken ct) =>
+	public async Task<ActionResult<GenericResponse<AddressEntity>>> Create(AddressCreateDto dto, CancellationToken ct) =>
 		Result(await repository.Create(dto, ct));
 
 	[HttpGet]
@@ -15,7 +15,7 @@ public class AddressController(IAddressRepository repository) : BaseApiControlle
 
 	[HttpPut]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse<AddressEntity>>> Update(AddressCreateUpdateDto dto, CancellationToken ct) =>
+	public async Task<ActionResult<GenericResponse<AddressEntity>>> Update(AddressUpdateDto dto, CancellationToken ct) =>
 		Result(await repository.Update(dto, ct));
 
 	[HttpPost("Filter")]

@@ -33,7 +33,8 @@ public class CommentRepository(DbContext dbContext,
 			.Include(x => x.Children)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
 			.OrderByDescending(x => x.CreatedAt).AsNoTracking();
 		return new GenericResponse<IQueryable<CommentEntity>?>(comment);
-	}	
+	}
+
 	[Time]
 	public GenericResponse<IQueryable<CommentEntity>?> ReadByUserId(string id) {
 		IQueryable<CommentEntity> comment = dbContext.Set<CommentEntity>()
@@ -66,7 +67,7 @@ public class CommentRepository(DbContext dbContext,
 		if (dto.Tags is not null) q = q.Where(x => dto.Tags!.All(y => x.Tags!.Contains(y)));
 		if (dto.TargetUserId is not null) q = q.Where(x => x.TargetUserId == dto.TargetUserId);
 
-        int totalCount = q.Count();
+		int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
 		return new GenericResponse<IQueryable<CommentEntity>?>(q) {
@@ -107,6 +108,7 @@ public class CommentRepository(DbContext dbContext,
 				dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == _userId));
 			if (blockedState.Item1) return new GenericResponse<CommentEntity?>(null, blockedState.Item2);
 		}
+
 		UserEntity? trgtUser = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == dto.UserId, ct);
 		if (trgtUser is not null) {
 			Tuple<bool, UtilitiesStatusCodes> blockedState = Utils.IsBlockedUser(trgtUser,
@@ -141,20 +143,18 @@ public class CommentRepository(DbContext dbContext,
 					Link = product.Id.ToString(),
 					ProductId = product.Id
 				});
-			if(dto.UserId != null)
-			{
+			if (dto.UserId != null) {
 				trgtUser.CommetCount += 1;
-				if(trgtUser.Id != _userId)
-					await notificationRepository.Create(new NotificationCreateUpdateDto
-                    {
-                        UserId = trgtUser.Id,
-                        Message = dto.Comment ?? "",
-                        Title = "Comment",
-                        UseCase = "Comment",
-                        CreatorUserId = comment.UserId,
-                        Link = product.Id.ToString(),
-                    });
-            }	
+				if (trgtUser.Id != _userId)
+					await notificationRepository.Create(new NotificationCreateUpdateDto {
+						UserId = trgtUser.Id,
+						Message = dto.Comment ?? "",
+						Title = "Comment",
+						UseCase = "Comment",
+						CreatorUserId = comment.UserId,
+						Link = product.Id.ToString(),
+					});
+			}
 		}
 		catch { }
 
