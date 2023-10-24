@@ -1,9 +1,9 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
 public interface IWithdrawRepository {
-	Task<GenericResponse> WalletWithdrawal(WalletWithdrawalDto dto);
+	Task<GenericResponse> Create(WithdrawalCreateDto createDto);
 	GenericResponse<IQueryable<WithdrawEntity>> Filter(WithdrawalFilterDto dto);
-	Task<GenericResponse<WithdrawEntity?>> Update(WithdrawCreateUpdateDto dto);
+	Task<GenericResponse<WithdrawEntity?>> Update(WithdrawUpdateDto dto);
 }
 
 public class WithdrawRepository : IWithdrawRepository {
@@ -18,18 +18,18 @@ public class WithdrawRepository : IWithdrawRepository {
 	}
 
 	[Time]
-	public async Task<GenericResponse> WalletWithdrawal(WalletWithdrawalDto dto) {
+	public async Task<GenericResponse> Create(WithdrawalCreateDto createDto) {
 		UserEntity user = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId && f.Suspend != true))!;
 
-		if (user.Wallet <= dto.Amount || dto.Amount < 100000) return new GenericResponse(UtilitiesStatusCodes.NotEnoughMoney);
+		if (user.Wallet <= createDto.Amount || createDto.Amount < 100000) return new GenericResponse(UtilitiesStatusCodes.NotEnoughMoney);
 
-		string? sheba = dto.ShebaNumber.GetShebaNumber();
+		string? sheba = createDto.ShebaNumber.GetShebaNumber();
 
 		IQueryable<WithdrawEntity> unDoneRequests = _dbContext.Set<WithdrawEntity>().Where(a => a.WithdrawState != WithdrawState.Requested).AsNoTracking();
 		if (unDoneRequests.IsNotNullOrEmpty()) return new GenericResponse(UtilitiesStatusCodes.Overused);
 
 		WithdrawEntity withdraw = new() {
-			Amount = dto.Amount,
+			Amount = createDto.Amount,
 			UserId = user.Id,
 			CreatedAt = DateTime.Now,
 			ShebaNumber = sheba,
@@ -45,13 +45,13 @@ public class WithdrawRepository : IWithdrawRepository {
 	public GenericResponse<IQueryable<WithdrawEntity>> Filter(WithdrawalFilterDto dto) {
 		IQueryable<WithdrawEntity> q = _dbContext.Set<WithdrawEntity>().AsNoTracking().OrderByDescending(o => o.CreatedAt);
 		if (dto.State.HasValue) q = q.Where(w => w.WithdrawState == dto.State);
-		if (dto.ShowUser.IsTrue()) q = q.Include(x => x.User);
 		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => x.UserId == dto.UserId);
+		if (dto.ShowUser.IsTrue()) q = q.Include(x => x.User);
 		return new GenericResponse<IQueryable<WithdrawEntity>>(q);
 	}
 
 	[Time]
-	public async Task<GenericResponse<WithdrawEntity?>> Update(WithdrawCreateUpdateDto dto) {
+	public async Task<GenericResponse<WithdrawEntity?>> Update(WithdrawUpdateDto dto) {
 		WithdrawEntity e = (await _dbContext.Set<WithdrawEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id))!;
 		if (e.WithdrawState != WithdrawState.Requested)
 			return new GenericResponse<WithdrawEntity?>(null, UtilitiesStatusCodes.OrderPayed, "امکان تغییر دادن دوباره وجود ندارد");

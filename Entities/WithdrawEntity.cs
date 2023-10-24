@@ -2,7 +2,7 @@
 
 [Table("Withdraw")]
 public class WithdrawEntity : BaseEntity {
-	[MaxLength(20)]
+	[MaxLength(30)]
 	public required string? ShebaNumber { get; set; }
 
 	public required int Amount { get; set; }
@@ -12,13 +12,13 @@ public class WithdrawEntity : BaseEntity {
 	public string? AdminMessage { get; set; }
 }
 
-public class WithdrawCreateUpdateDto {
+public class WithdrawUpdateDto {
 	public required Guid Id { get; set; }
 	public required WithdrawState WithdrawState { get; set; }
 	public string? AdminMessage { get; set; }
 }
 
-public class WalletWithdrawalDto {
+public class WithdrawalCreateDto {
 	public required string ShebaNumber { get; set; }
 	public required int Amount { get; set; }
 }

@@ -5,11 +5,11 @@
 [Authorize]
 public class WithdrawController(IWithdrawRepository repository) : BaseApiController {
 	[HttpPost]
-	public async Task<ActionResult<GenericResponse>> Create(WalletWithdrawalDto dto) => Result(await repository.WalletWithdrawal(dto));
+	public async Task<ActionResult<GenericResponse>> Create(WithdrawalCreateDto createDto) => Result(await repository.Create(createDto));
 
 	[HttpPost("Filter")]
 	public ActionResult<GenericResponse<IQueryable<WithdrawEntity>>> Filter(WithdrawalFilterDto dto) => Result(repository.Filter(dto));
 
 	[HttpPut]
-	public async Task<ActionResult<GenericResponse<WithdrawEntity?>>> Update(WithdrawCreateUpdateDto dto) => Result(await repository.Update(dto));
+	public async Task<ActionResult<GenericResponse<WithdrawEntity?>>> Update(WithdrawUpdateDto dto) => Result(await repository.Update(dto));
 }
