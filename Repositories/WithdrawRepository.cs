@@ -55,7 +55,7 @@ public class WithdrawRepository : IWithdrawRepository {
 		WithdrawEntity e = (await _dbContext.Set<WithdrawEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id))!;
 		if (e.WithdrawState != WithdrawState.Requested)
 			return new GenericResponse<WithdrawEntity?>(null, UtilitiesStatusCodes.OrderPayed, "امکان تغییر دادن دوباره وجود ندارد");
-		e.WithdrawState = dto.WithdrawState;
+		e.WithdrawState = dto.State;
 		e.AdminMessage = dto.AdminMessage ?? "";
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse<WithdrawEntity?>(e);

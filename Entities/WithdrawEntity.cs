@@ -15,7 +15,7 @@ public class WithdrawEntity : BaseEntity {
 
 public class WithdrawUpdateDto {
 	public required Guid Id { get; set; }
-	public required WithdrawState WithdrawState { get; set; }
+	public required WithdrawState State { get; set; }
 	public string? AdminMessage { get; set; }
 }
 
