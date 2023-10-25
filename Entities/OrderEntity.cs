@@ -81,6 +81,16 @@ public class ReserveCreateUpdateDto {
 	public List<ReservationDays>? Days { get; set; }
 }
 
+// public class ReservationDays {
+// 	public required DateTime DateFrom { get; set; }
+// 	public required DateTime DateTo { get; set; }
+// 	public required List<ReservationHours> Times { get; set; }
+// 	public required int Price { get; set; }
+// 	public required int PriceForAnyExtra { get; set; }
+// 	public required int MaxMemberAllowed { get; set; }
+// 	public required int MaxExtraMemberAllowed { get; set; }
+// }
+
 public class ApplyDiscountCodeOnOrderDto {
 	public Guid? OrderId { get; set; }
 	public string? Code { get; set; }
