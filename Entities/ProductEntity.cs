@@ -115,8 +115,8 @@ public class ReservationDays {
 public class ReservationHours {
 	public required DateTime TimeFrom { get; set; }
 	public required DateTime TimeTo { get; set; }
-	public required string ReservedByUserId { get; set; }
-	public required string ReservedByUserName { get; set; }
+	public string? ReservedByUserId { get; set; }
+	public string? ReservedByUserName { get; set; }
 }
 
 [Table("ProductsInsight")]

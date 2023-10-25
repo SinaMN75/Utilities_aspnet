@@ -421,6 +421,7 @@ public enum TagOrder {
 	InProcess = 406,
 	Shipping = 407,
 	Sent = 408,
+	Conflict = 409,
 	Complete = 410
 }
 
