@@ -38,7 +38,7 @@ public class OrderEntity : BaseEntity {
 
 	public IEnumerable<OrderDetailEntity>? OrderDetails { get; set; }
 
-	public List<ReservationDays> DaysReserved { get; set; } = new();
+	public List<ReserveDto> DaysReserved { get; set; } = new();
 }
 
 [Table("OrderDetail")]
@@ -77,19 +77,22 @@ public class OrderDetailCreateUpdateDto {
 }
 
 public class ReserveCreateUpdateDto {
-	public Guid? ProductId { get; set; }
-	public List<ReservationDays>? Days { get; set; }
+	public required Guid ProductId { get; set; }
+	public required List<ReserveDto> ReserveDto { get; set; }
 }
 
-// public class ReservationDays {
-// 	public required DateTime DateFrom { get; set; }
-// 	public required DateTime DateTo { get; set; }
-// 	public required List<ReservationHours> Times { get; set; }
-// 	public required int Price { get; set; }
-// 	public required int PriceForAnyExtra { get; set; }
-// 	public required int MaxMemberAllowed { get; set; }
-// 	public required int MaxExtraMemberAllowed { get; set; }
-// }
+public class ReserveDto {
+	public required DateTime DateFrom { get; set; }
+	public required DateTime DateTo { get; set; }
+	public required DateTime TimeFrom { get; set; }
+	public required DateTime TimeTo { get; set; }
+	public string? UserId { get; set; }
+	public string? UserName { get; set; }
+	public required int MemberCount { get; set; }
+	public required int ExtraMemberCount { get; set; }
+	public required int Price { get; set; }
+	public required int PriceForAnyExtra { get; set; }
+}
 
 public class ApplyDiscountCodeOnOrderDto {
 	public Guid? OrderId { get; set; }

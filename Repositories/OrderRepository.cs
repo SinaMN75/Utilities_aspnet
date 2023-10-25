@@ -205,20 +205,18 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 
 	[Time]
 	public async Task<GenericResponse<OrderEntity?>> CreateReservationOrder(ReserveCreateUpdateDto dto) {
-		ProductEntity p = (await dbContext.Set<ProductEntity>().Include(x => x.User)
-			.FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
+		ProductEntity p = (await dbContext.Set<ProductEntity>().Include(x => x.User).FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
 		int totalPrice = 0;
-		foreach (ReservationDays reservationDays in p.JsonDetail.DaysAvailable) {
-			totalPrice += reservationDays.Price;
+		foreach (ReserveDto reserveDto in dto.ReserveDto) {
+			totalPrice += reserveDto.Price + reserveDto.PriceForAnyExtra * reserveDto.ExtraMemberCount;
 		}
-
 		OrderEntity e = new() {
 			OrderNumber = new Random().Next(10000, 99999),
 			CreatedAt = DateTime.Now,
 			UpdatedAt = DateTime.Now,
 			ProductOwnerId = p.UserId,
-			DaysReserved = dto.Days,
-			Tags = new List<TagOrder>() { TagOrder.Pending, TagOrder.Reserve },
+			DaysReserved = dto.ReserveDto,
+			Tags = new List<TagOrder> { TagOrder.Pending, TagOrder.Reserve },
 			UserId = _userId,
 			TotalPrice = totalPrice
 		};
