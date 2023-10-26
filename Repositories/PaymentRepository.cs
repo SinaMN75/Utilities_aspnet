@@ -121,12 +121,10 @@ public class PaymentRepository : IPaymentRepository {
 			Amount = order.TotalPrice,
 			Authority = result.Authority,
 			CreatedAt = DateTime.Now,
-			// TransactionType = TransactionType.Buy,
 			Descriptions = desc,
 			GatewayName = "ZarinPal",
 			UserId = _userId,
 			OrderId = orderId,
-			// StatusId = TransactionStatus.Pending
 		});
 		await _dbContext.SaveChangesAsync();
 
@@ -166,11 +164,9 @@ public class PaymentRepository : IPaymentRepository {
 	}
 
 	[Time]
-	public async Task<GenericResponse> CallBack(
-		Guid orderId,
-		string authority,
-		string status) {
-		OrderEntity order = (await _dbContext.Set<OrderEntity>().Include(i => i.OrderDetails)!.ThenInclude(x => x.Product)
+	public async Task<GenericResponse> CallBack(Guid orderId, string authority, string status) {
+		OrderEntity order = (await _dbContext.Set<OrderEntity>()
+			.Include(i => i.OrderDetails)!.ThenInclude(x => x.Product)
 			.FirstOrDefaultAsync(x => x.Id == orderId))!;
 		UserEntity productOwner = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == order.ProductOwnerId))!;
 		Payment payment = new(_appSettings.PaymentSettings.Id, order.TotalPrice!.Value);
@@ -211,6 +207,14 @@ public class PaymentRepository : IPaymentRepository {
 			}
 		}
 
+		if (order.JsonDetail.DaysReserved.IsNotNullOrEmpty()) {
+			ProductEntity p = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == order.JsonDetail.DaysReserved.First().ProductId))!;
+			p.JsonDetail.DaysAvailable.Where(x => x.Id == order.JsonDetail.DaysReserved.First().ReserveId);
+			p.JsonDetail.DaysReserved.AddRange(p.JsonDetail.DaysAvailable.Where(x => x.Id == order.JsonDetail.DaysReserved.First().ReserveId));
+			_dbContext.Update(p);
+			await _dbContext.SaveChangesAsync();
+		}
+
 		productOwner.Wallet += order.TotalPrice;
 
 		_dbContext.Update(productOwner);
@@ -223,7 +227,6 @@ public class PaymentRepository : IPaymentRepository {
 			Descriptions = $"پرداختی بابت سفارش محصول {order.OrderDetails!.Select(s => s.Product!.Title).ToList()}",
 			GatewayName = pay?.GatewayName ?? "",
 			OrderId = order.Id,
-			// TransactionType = TransactionType.Sell,
 			UserId = productOwner.Id
 		};
 		await _dbContext.AddAsync(prOwnerTransaction);
