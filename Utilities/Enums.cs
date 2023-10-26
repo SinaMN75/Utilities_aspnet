@@ -288,7 +288,8 @@ public enum TagContent {
 public enum TagComment {
 	Released = 100,
 	InQueue = 101,
-	Rejected = 102
+	Rejected = 102,
+	Private = 501
 }
 
 public enum TagMedia {
@@ -399,7 +400,8 @@ public enum TagProduct {
 	InQueue = 303,
 	Deleted = 304,
 	NotAccepted = 305,
-	Special = 401
+	Special = 401,
+	Private = 501
 }
 
 public enum TagOrder {
@@ -422,7 +424,8 @@ public enum TagOrder {
 	Shipping = 407,
 	Sent = 408,
 	Conflict = 409,
-	Complete = 410
+	Complete = 410,
+	Private = 501
 }
 
 public enum TagUser {
