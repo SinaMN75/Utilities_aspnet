@@ -98,23 +98,23 @@ public class ProductJsonDetail {
 	public DateTime? EndDate { get; set; }
 	public Reaction? UserReaction { get; set; }
 	public List<KeyValue>? KeyValues { get; set; }
-	public List<ReservationDays> DaysAvailable { get; set; } = new();
-	public List<ReservationDays> DaysReserved { get; set; } = new();
+	public List<ReservationDays>? DaysAvailable { get; set; }
+	public List<ReservationDays>? DaysReserved { get; set; }
 }
 
 public class ReservationDays {
-	public required DateTime DateFrom { get; set; }
-	public required DateTime DateTo { get; set; }
-	public required List<ReservationHours> Times { get; set; }
-	public required int Price { get; set; }
-	public required int PriceForAnyExtra { get; set; }
-	public required int MaxMemberAllowed { get; set; }
-	public required int MaxExtraMemberAllowed { get; set; }
+	public DateTime? DateFrom { get; set; }
+	public DateTime? DateTo { get; set; }
+	public List<ReservationHours> Times { get; set; } = new();
+	public int? Price { get; set; }
+	public int? PriceForAnyExtra { get; set; }
+	public int? MaxMemberAllowed { get; set; }
+	public int? MaxExtraMemberAllowed { get; set; }
 }
 
 public class ReservationHours {
-	public required DateTime TimeFrom { get; set; }
-	public required DateTime TimeTo { get; set; }
+	public DateTime? TimeFrom { get; set; }
+	public DateTime? TimeTo { get; set; }
 	public string? ReservedByUserId { get; set; }
 	public string? ReservedByUserName { get; set; }
 }
