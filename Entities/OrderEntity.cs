@@ -38,7 +38,7 @@ public class OrderEntity : BaseEntity {
 
 	public IEnumerable<OrderDetailEntity>? OrderDetails { get; set; }
 
-	public List<ReserveDto> DaysReserved { get; set; } = new();
+	public OrderJsonDetail JsonDetail { get; set; } = new();
 }
 
 [Table("OrderDetail")]
@@ -79,6 +79,10 @@ public class OrderDetailCreateUpdateDto {
 public class ReserveCreateUpdateDto {
 	public required Guid ProductId { get; set; }
 	public required List<ReserveDto> ReserveDto { get; set; }
+}
+
+public class OrderJsonDetail {
+	public List<ReserveDto> DaysReserved { get; set; } = new();
 }
 
 public class ReserveDto {

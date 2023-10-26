@@ -12,7 +12,6 @@ public static class Seeder {
 		builder.Entity<GroupChatEntity>().OwnsOne(e => e.JsonDetail, b => b.ToJson());
 		builder.Entity<MediaEntity>().OwnsOne(e => e.JsonDetail, b => b.ToJson());
 		builder.Entity<ContentEntity>().OwnsOne(e => e.JsonDetail, b => b.ToJson());
-		builder.Entity<OrderEntity>().OwnsOne(e => e.DaysReserved, b => b.ToJson());
 		builder.Entity<ProductEntity>().OwnsOne(e => e.JsonDetail, b => {
 			b.ToJson();
 			b.OwnsMany(_ => _.KeyValues);
@@ -22,6 +21,10 @@ public static class Seeder {
 		builder.Entity<CommentEntity>().OwnsOne(e => e.JsonDetail, b => {
 			b.ToJson();
 			b.OwnsMany(_ => _.Reacts);
+		});
+		builder.Entity<OrderEntity>().OwnsOne(e => e.JsonDetail, b => {
+			b.ToJson();
+			b.OwnsMany(_ => _.DaysReserved);
 		});
 	}
 

@@ -215,12 +215,15 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 			CreatedAt = DateTime.Now,
 			UpdatedAt = DateTime.Now,
 			ProductOwnerId = p.UserId,
-			DaysReserved = dto.ReserveDto,
+			JsonDetail = new OrderJsonDetail {
+				DaysReserved = dto.ReserveDto,
+			},
 			Tags = new List<TagOrder> { TagOrder.Pending, TagOrder.Reserve },
 			UserId = _userId,
 			TotalPrice = totalPrice
 		};
 		EntityEntry<OrderEntity> orderEntity = await dbContext.AddAsync(e);
+		await dbContext.SaveChangesAsync();
 
 		return new GenericResponse<OrderEntity?>(orderEntity.Entity);
 	}
