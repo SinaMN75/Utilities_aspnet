@@ -66,17 +66,27 @@ public class PaymentRepository : IPaymentRepository {
 		OrderEntity order = (await _dbContext.Set<OrderEntity>()
 			.Include(i => i.OrderDetails)!.ThenInclude(x => x.Product)
 			.FirstOrDefaultAsync(x => x.Id == orderId))!;
-		UserEntity productOwner = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == order.ProductOwnerId))!;
-		Payment payment = new(_appSettings.PaymentSettings.Id, order.TotalPrice!.Value);
-		if (!status.Equals("OK")) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
-		PaymentVerificationResponse? verify = payment.Verification(authority).Result;
-		TransactionEntity? pay = await _dbContext.Set<TransactionEntity>().FirstOrDefaultAsync(x => x.Authority == authority);
-		if (pay != null) {
-			// pay.StatusId = (TransactionStatus?) Math.Abs(verify.Status);
-			pay.RefId = verify.RefId;
-			pay.UpdatedAt = DateTime.Now;
-			_dbContext.Set<TransactionEntity>().Update(pay);
+		
+		switch (_appSettings.PaymentSettings.Provider) {
+			case "ZarinPal": {
+				Payment payment = new(_appSettings.PaymentSettings.Id, order.TotalPrice!.Value);
+				if (!status.Equals("OK")) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
+				PaymentVerificationResponse? verify = payment.Verification(authority).Result;
+				break;
+			}
+			case "PaymentPol": {
+				break;
+			}
+			case "Zibal": {
+				await PaymentApi.VerifyZibal(new ZibalVerifyCreateDto {
+					Merchant = _appSettings.PaymentSettings.Id!,
+					TrackId = long.Parse(authority),
+				});
+				break;
+			}
 		}
+		
+		UserEntity productOwner = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == order.ProductOwnerId))!;
 
 		if (order.OrderDetails != null)
 			foreach (OrderDetailEntity? item in order.OrderDetails) {
@@ -117,17 +127,6 @@ public class PaymentRepository : IPaymentRepository {
 
 		_dbContext.Update(productOwner);
 		_dbContext.Update(order);
-		TransactionEntity prOwnerTransaction = new() {
-			Amount = order.TotalPrice,
-			Authority = authority,
-			CreatedAt = DateTime.Now,
-			UpdatedAt = DateTime.Now,
-			Descriptions = $"پرداختی بابت سفارش محصول {order.OrderDetails!.Select(s => s.Product!.Title).ToList()}",
-			GatewayName = pay?.GatewayName ?? "",
-			OrderId = order.Id,
-			UserId = productOwner.Id
-		};
-		await _dbContext.AddAsync(prOwnerTransaction);
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}
