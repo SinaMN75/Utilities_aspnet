@@ -87,7 +87,7 @@ public class OrderJsonDetail {
 }
 
 public class ReserveDto {
-	public required Guid ReserveId { get; set; }
+	public required string ReserveId { get; set; }
 	public required Guid ProductId { get; set; }
 	public required DateTime DateFrom { get; set; }
 	public required DateTime DateTo { get; set; }

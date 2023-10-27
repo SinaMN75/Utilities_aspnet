@@ -217,8 +217,8 @@ public class PaymentRepository : IPaymentRepository {
 
 		if (order.JsonDetail.DaysReserved.IsNotNullOrEmpty()) {
 			ProductEntity p = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == order.JsonDetail.DaysReserved.First().ProductId))!;
-			p.JsonDetail.DaysAvailable.Where(x => x.Id == order.JsonDetail.DaysReserved.First().ReserveId);
-			p.JsonDetail.DaysReserved.AddRange(p.JsonDetail.DaysAvailable.Where(x => x.Id == order.JsonDetail.DaysReserved.First().ReserveId));
+			p.JsonDetail.DaysAvailable.Where(x => x.ReserveId == order.JsonDetail.DaysReserved.First().ReserveId);
+			p.JsonDetail.DaysReserved.AddRange(p.JsonDetail.DaysAvailable.Where(x => x.ReserveId == order.JsonDetail.DaysReserved.First().ReserveId));
 			_dbContext.Update(p);
 			await _dbContext.SaveChangesAsync();
 		}

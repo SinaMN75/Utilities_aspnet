@@ -103,7 +103,7 @@ public class ProductJsonDetail {
 }
 
 public class ReservationDays {
-	public Guid Id { get; set; } = Guid.NewGuid();
+	public string ReserveId { get; set; } = Guid.NewGuid().ToString();
 	public DateTime? DateFrom { get; set; }
 	public DateTime? DateTo { get; set; }
 	public List<ReservationHours> Times { get; set; } = new();
