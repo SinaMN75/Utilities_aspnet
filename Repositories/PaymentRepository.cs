@@ -1,4 +1,6 @@
-﻿namespace Utilities_aspnet.Repositories;
+﻿using System.Net;
+
+namespace Utilities_aspnet.Repositories;
 
 public interface IPaymentRepository {
 	Task<GenericResponse<string>> PayProduct(Guid productId);
@@ -104,33 +106,44 @@ public class PaymentRepository : IPaymentRepository {
 
 		foreach (OrderDetailEntity orderDetail in order.OrderDetails!) {
 			ProductEntity product = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == orderDetail.ProductId))!;
-			if (product.Stock < orderDetail.Count) {
+			if (product.Stock < orderDetail.Count)
 				await _dbContext.Set<OrderDetailEntity>().Where(i => i.Id == orderDetail.Id).ExecuteDeleteAsync();
-			}
 		}
 
 		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
-		Payment payment = new(_appSettings.PaymentSettings.Id, order.TotalPrice!.Value);
 		string callbackUrl = $"{Server.ServerAddress}/CallBack/{orderId}";
 		string desc = $"خرید محصول {order.Description}";
-		PaymentRequestResponse? result = payment.PaymentRequest(desc, callbackUrl, "", user?.PhoneNumber).Result;
-		await _dbContext.Set<TransactionEntity>().AddAsync(new TransactionEntity {
-			Amount = order.TotalPrice,
-			Authority = result.Authority,
-			CreatedAt = DateTime.Now,
-			Descriptions = desc,
-			GatewayName = "ZarinPal",
-			UserId = _userId,
-			OrderId = orderId,
-		});
-		await _dbContext.SaveChangesAsync();
 
-		if (result.Status == 100 && result.Authority.Length == 36) {
-			string url = $"https://www.zarinpal.com/pg/StartPay/{result.Authority}";
-			return new GenericResponse<string?>(url);
+
+		switch (_appSettings.PaymentSettings.Provider) {
+			case "ZarinPal": {
+				Payment payment = new(_appSettings.PaymentSettings.Id, order.TotalPrice!.Value);
+				PaymentRequestResponse? result = payment.PaymentRequest(desc, callbackUrl, "", user?.PhoneNumber).Result;
+				if (result.Status != 100 || result.Authority.Length != 36) return new GenericResponse<string?>("", UtilitiesStatusCodes.BadRequest);
+				return new GenericResponse<string?>($"https://www.zarinpal.com/pg/StartPay/{result.Authority}");
+			}
+			case "PaymentPol": {
+				RestRequest request = new(Method.POST);
+				request.AddParameter("MerchantID", _appSettings.PaymentSettings.Id!);
+				request.AddParameter("Amount", order.TotalPrice!);
+				request.AddParameter("CallbackURL", callbackUrl);
+				IRestResponse response = await new RestClient("https://paymentpol.com/webservice/rest/PaymentRequest").ExecuteAsync(request);
+				break;
+			}
+			case "Zibal": {
+				RestRequest requestRequest = new(Method.POST);
+				requestRequest.AddParameter("merchant", _appSettings.PaymentSettings.Id!);
+				requestRequest.AddParameter("amount", order.TotalPrice!);
+				requestRequest.AddParameter("callbackUrl", callbackUrl);
+				IRestResponse responseRequest = await new RestClient("https://gateway.zibal.ir/v1/request").ExecuteAsync(requestRequest);
+				ZibalRequestReadDto? zibalRequestReadDto = ZibalRequestReadDto.FromJson(responseRequest.Content);
+				return responseRequest.StatusCode == HttpStatusCode.Continue
+					? new GenericResponse<string?>($"https://gateway.zibal.ir/start/{zibalRequestReadDto.TrackId}")
+					: new GenericResponse<string?>("NULL");
+			}
 		}
 
-		return new GenericResponse<string?>("", UtilitiesStatusCodes.BadRequest);
+		return new GenericResponse<string?>("NULL");
 	}
 
 	public async Task<GenericResponse> WalletCallBack(
