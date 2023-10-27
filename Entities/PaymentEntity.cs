@@ -25,6 +25,17 @@ public class ZibalRequestCreateDto {
 	public static string ToJson(ZibalRequestCreateDto self) => JsonConvert.SerializeObject(self, Converter.Settings);
 }
 
+public class ZibalVerifyCreateDto {
+	[JsonProperty("merchant")]
+	public required string Merchant { get; set; }
+
+	[JsonProperty("trackId")]
+	public required long TrackId { get; set; }
+
+	public static ZibalVerifyCreateDto? FromJson(string json) => JsonConvert.DeserializeObject<ZibalVerifyCreateDto>(json, Converter.Settings);
+	public static string ToJson(ZibalVerifyCreateDto self) => JsonConvert.SerializeObject(self, Converter.Settings);
+}
+
 public class ZibalRequestReadDto {
 	[JsonProperty("message", NullValueHandling = NullValueHandling.Ignore)]
 	public string? Message { get; set; }

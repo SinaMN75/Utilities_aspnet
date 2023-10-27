@@ -1,10 +1,8 @@
-﻿using System.Net;
-using Utilities_aspnet.RemoteDataSource;
+﻿using Utilities_aspnet.RemoteDataSource;
 
 namespace Utilities_aspnet.Repositories;
 
 public interface IPaymentRepository {
-	Task<GenericResponse<string>> PayProduct(Guid productId);
 	Task<GenericResponse<string?>> IncreaseWalletBalance(int amount);
 	Task<GenericResponse<string?>> PayOrder(Guid orderId);
 	Task<GenericResponse<string?>> PaySubscription(Guid subscriptionId);
@@ -24,84 +22,6 @@ public class PaymentRepository : IPaymentRepository {
 		_userId = httpContextAccessor.HttpContext?.User.Identity?.Name;
 	}
 
-	public async Task<GenericResponse<string>> PayProduct(Guid productId) {
-		try {
-			ProductEntity p = (await _dbContext.Set<ProductEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == productId))!;
-			UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
-			string callbackUrl = $"{Server.ServerAddress}/CallBack/{productId}";
-			string desc = $"خرید محصول {p.Title}";
-
-			switch (_appSettings.PaymentSettings.Provider) {
-				case "ZarinPal": {
-					Payment payment = new(_appSettings.PaymentSettings.Id, p.Price!.Value);
-					PaymentRequestResponse? result = payment.PaymentRequest(desc, callbackUrl, "", user?.PhoneNumber).Result;
-
-					await _dbContext.Set<TransactionEntity>().AddAsync(new TransactionEntity {
-						Amount = p.Price,
-						Authority = result.Authority,
-						CreatedAt = DateTime.Now,
-						Descriptions = desc,
-						GatewayName = "ZarinPal",
-						UserId = _userId,
-					});
-					await _dbContext.SaveChangesAsync();
-
-					if (result.Status == 100 && result.Authority.Length == 36) {
-						string url = $"https://www.zarinpal.com/pg/StartPay/{result.Authority}";
-						return new GenericResponse<string>(url);
-					}
-
-					break;
-				}
-				case "PaymentPol": {
-					RestRequest request = new(Method.POST);
-					request.AddParameter("MerchantID", _appSettings.PaymentSettings.Id!);
-					request.AddParameter("Amount", p.Price!);
-					request.AddParameter("CallbackURL", callbackUrl);
-					IRestResponse response = await new RestClient("https://paymentpol.com/webservice/rest/PaymentRequest").ExecuteAsync(request);
-					break;
-				}
-			}
-
-			return new GenericResponse<string>("", UtilitiesStatusCodes.BadRequest);
-		}
-		catch (Exception ex) {
-			return new GenericResponse<string>(ex.Message, UtilitiesStatusCodes.BadRequest);
-		}
-	}
-
-	public async Task<GenericResponse<string?>> IncreaseWalletBalance(int amount) {
-		try {
-			UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
-			Payment payment = new(_appSettings.PaymentSettings.Id, amount);
-			string callbackUrl = $"{Server.ServerAddress}/WalletCallBack/{user?.Id}/{amount}";
-			string desc = $"شارژ کیف پول به مبلغ {amount}";
-			PaymentRequestResponse? result = payment.PaymentRequest(desc, callbackUrl, "", user?.PhoneNumber).Result;
-
-			await _dbContext.Set<TransactionEntity>().AddAsync(new TransactionEntity {
-				Amount = amount,
-				Authority = result.Authority,
-				CreatedAt = DateTime.Now,
-				Descriptions = desc,
-				GatewayName = "ZarinPal",
-				// TransactionType = TransactionType.Recharge,
-				UserId = _userId,
-				// StatusId = TransactionStatus.Pending
-			});
-			await _dbContext.SaveChangesAsync();
-
-			if (result.Status == 100 && result.Authority.Length == 36) {
-				string url = $"https://www.zarinpal.com/pg/StartPay/{result.Authority}";
-				return new GenericResponse<string?>(url);
-			}
-
-			return new GenericResponse<string?>("", UtilitiesStatusCodes.BadRequest);
-		}
-		catch (Exception ex) {
-			return new GenericResponse<string?>(ex.Message, UtilitiesStatusCodes.BadRequest);
-		}
-	}
-
 	public async Task<GenericResponse<string?>> PayOrder(Guid orderId) {
 		OrderEntity order = (await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails).FirstOrDefaultAsync(x => x.Id == orderId))!;
 
@@ -113,8 +33,7 @@ public class PaymentRepository : IPaymentRepository {
 
 		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
 		string callbackUrl = $"{Server.ServerAddress}/CallBack/{orderId}";
-		string desc = $"خرید محصول {order.Description}";
-
+		string desc = order.Description ?? "";
 
 		switch (_appSettings.PaymentSettings.Provider) {
 			case "ZarinPal": {
@@ -141,32 +60,6 @@ public class PaymentRepository : IPaymentRepository {
 		}
 
 		return new GenericResponse<string?>("NULL");
-	}
-
-	public async Task<GenericResponse> WalletCallBack(
-		int amount,
-		string authority,
-		string status,
-		string userId) {
-		if (userId.IsNullOrEmpty()) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
-
-		UserEntity user = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == userId))!;
-		Payment payment = new(_appSettings.PaymentSettings.Id, amount);
-		if (!status.Equals("OK")) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
-		PaymentVerificationResponse? verify = payment.Verification(authority).Result;
-		TransactionEntity? pay = _dbContext.Set<TransactionEntity>().FirstOrDefault(x => x.Authority == authority);
-		if (pay != null) {
-			// pay.StatusId = (TransactionStatus?) Math.Abs(verify.Status);
-			pay.RefId = verify.RefId;
-			pay.UpdatedAt = DateTime.Now;
-			_dbContext.Set<TransactionEntity>().Update(pay);
-		}
-
-		user.Wallet += amount;
-		_dbContext.Set<UserEntity>().Update(user);
-
-		await _dbContext.SaveChangesAsync();
-		return new GenericResponse();
 	}
 
 	public async Task<GenericResponse> CallBack(Guid orderId, string authority, string status) {
@@ -235,6 +128,60 @@ public class PaymentRepository : IPaymentRepository {
 			UserId = productOwner.Id
 		};
 		await _dbContext.AddAsync(prOwnerTransaction);
+		await _dbContext.SaveChangesAsync();
+		return new GenericResponse();
+	}
+	
+	public async Task<GenericResponse<string?>> IncreaseWalletBalance(int amount) {
+		try {
+			UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
+			Payment payment = new(_appSettings.PaymentSettings.Id, amount);
+			string callbackUrl = $"{Server.ServerAddress}/WalletCallBack/{user?.Id}/{amount}";
+			string desc = $"شارژ کیف پول به مبلغ {amount}";
+			PaymentRequestResponse? result = payment.PaymentRequest(desc, callbackUrl, "", user?.PhoneNumber).Result;
+
+			await _dbContext.Set<TransactionEntity>().AddAsync(new TransactionEntity {
+				Amount = amount,
+				Authority = result.Authority,
+				CreatedAt = DateTime.Now,
+				Descriptions = desc,
+				GatewayName = "ZarinPal",
+				// TransactionType = TransactionType.Recharge,
+				UserId = _userId,
+				// StatusId = TransactionStatus.Pending
+			});
+			await _dbContext.SaveChangesAsync();
+
+			if (result.Status == 100 && result.Authority.Length == 36) {
+				string url = $"https://www.zarinpal.com/pg/StartPay/{result.Authority}";
+				return new GenericResponse<string?>(url);
+			}
+
+			return new GenericResponse<string?>("", UtilitiesStatusCodes.BadRequest);
+		}
+		catch (Exception ex) {
+			return new GenericResponse<string?>(ex.Message, UtilitiesStatusCodes.BadRequest);
+		}
+	}
+
+	public async Task<GenericResponse> WalletCallBack(int amount, string authority, string status, string userId) {
+		if (userId.IsNullOrEmpty()) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
+
+		UserEntity user = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == userId))!;
+		Payment payment = new(_appSettings.PaymentSettings.Id, amount);
+		if (!status.Equals("OK")) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
+		PaymentVerificationResponse? verify = payment.Verification(authority).Result;
+		TransactionEntity? pay = _dbContext.Set<TransactionEntity>().FirstOrDefault(x => x.Authority == authority);
+		if (pay != null) {
+			// pay.StatusId = (TransactionStatus?) Math.Abs(verify.Status);
+			pay.RefId = verify.RefId;
+			pay.UpdatedAt = DateTime.Now;
+			_dbContext.Set<TransactionEntity>().Update(pay);
+		}
+
+		user.Wallet += amount;
+		_dbContext.Set<UserEntity>().Update(user);
+
 		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}
