@@ -17,7 +17,6 @@ public class FollowBookmarkRepository(DbContext dbContext,
 	: IFollowBookmarkRepository {
 	private readonly string _userId = httpContextAccessor.HttpContext!.User.Identity!.Name!;
 
-	[Time]
 	public async Task<GenericResponse<BookmarkEntity?>> ToggleBookmark(BookmarkCreateDto dto) {
 		BookmarkEntity? oldBookmark = dbContext.Set<BookmarkEntity>()
 			.FirstOrDefault(x => x.ProductId != null && x.ProductId == dto.ProductId && x.UserId == _userId);
@@ -51,7 +50,6 @@ public class FollowBookmarkRepository(DbContext dbContext,
 		return new GenericResponse<BookmarkEntity?>(oldBookmark);
 	}
 
-	[Time]
 	public GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarks(string? userId) {
 		string uId = userId ?? _userId;
 		IQueryable<BookmarkEntity> bookmark = dbContext.Set<BookmarkEntity>().Include(x => x.Media)
@@ -65,7 +63,6 @@ public class FollowBookmarkRepository(DbContext dbContext,
 		return new GenericResponse<IQueryable<BookmarkEntity>?>(bookmark);
 	}
 
-	[Time]
 	public async Task<GenericResponse<IQueryable<UserEntity>>> GetFollowers(string id) {
 		UserEntity myUser = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!;
 		GenericResponse<IQueryable<UserEntity>> q = userRepository.Filter(new UserFilterDto {
@@ -77,7 +74,6 @@ public class FollowBookmarkRepository(DbContext dbContext,
 		return new GenericResponse<IQueryable<UserEntity>>(q.Result!);
 	}
 
-	[Time]
 	public async Task<GenericResponse<IQueryable<UserEntity>>> GetFollowing(string id) {
 		UserEntity myUser = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!;
 		GenericResponse<IQueryable<UserEntity>> q = userRepository.Filter(new UserFilterDto {
@@ -89,7 +85,6 @@ public class FollowBookmarkRepository(DbContext dbContext,
 		return new GenericResponse<IQueryable<UserEntity>>(q.Result!);
 	}
 
-	[Time]
 	public async Task<GenericResponse> ToggleFollow(FollowCreateDto parameters) {
 		UserEntity myUser = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId))!;
 		UserEntity targetUser = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == parameters.UserId))!;
@@ -137,7 +132,6 @@ public class FollowBookmarkRepository(DbContext dbContext,
 		return new GenericResponse();
 	}
 
-	[Time]
 	public async Task<GenericResponse> RemoveFollowings(FollowCreateDto parameters) {
 		UserEntity myUser = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId))!;
 		await userRepository.Update(new UserCreateUpdateDto {
@@ -147,7 +141,6 @@ public class FollowBookmarkRepository(DbContext dbContext,
 		return new GenericResponse();
 	}
 
-	[Time]
 	public async Task<GenericResponse<BookmarkEntity?>> UpdateBookmark(Guid bookmarkId, BookmarkCreateDto dto) {
 		BookmarkEntity? oldBookmark = await dbContext.Set<BookmarkEntity>().FirstOrDefaultAsync(x => x.Id == bookmarkId);
 		if (oldBookmark is null) return new GenericResponse<BookmarkEntity?>(null, UtilitiesStatusCodes.NotFound);

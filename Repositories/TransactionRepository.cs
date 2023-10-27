@@ -8,7 +8,6 @@ public interface ITransactionRepository {
 public class TransactionRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IOutputCacheStore outputCache) : ITransactionRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
-	[Time]
 	public async Task<GenericResponse<TransactionEntity>> Create(TransactionEntity entity, CancellationToken ct) {
 		entity.UserId ??= _userId;
 		await dbContext.Set<TransactionEntity>().AddAsync(entity, ct);
@@ -17,7 +16,6 @@ public class TransactionRepository(DbContext dbContext, IHttpContextAccessor htt
 		return new GenericResponse<TransactionEntity>(entity);
 	}
 
-	[Time]
 	public GenericResponse<IQueryable<TransactionEntity>> Filter(TransactionFilterDto dto) {
 		IQueryable<TransactionEntity> q = dbContext.Set<TransactionEntity>().Include(x => x.User).Include(x => x.Order).AsNoTracking();
 		if (dto.RefId is not null) q = q.Where(x => x.RefId == dto.RefId);

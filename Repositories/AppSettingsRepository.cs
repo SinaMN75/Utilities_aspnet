@@ -6,7 +6,6 @@ public interface IAppSettingsRepository {
 }
 
 public class AppSettingsRepository(IConfiguration config, DbContext dbContext) : IAppSettingsRepository {
-	[Time]
 	public GenericResponse<EnumDto> ReadAppSettings() {
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
@@ -39,7 +38,6 @@ public class AppSettingsRepository(IConfiguration config, DbContext dbContext) :
 		);
 	}
 
-	[Time]
 	public async Task<GenericResponse<DashboardReadDto>> ReadDashboardData() {
 		DashboardReadDto dto = new() {
 			Categories = await dbContext.Set<CategoryEntity>().AsNoTracking().CountAsync(),

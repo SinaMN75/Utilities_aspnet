@@ -21,7 +21,6 @@ public class PaymentRepository : IPaymentRepository {
 		_userId = httpContextAccessor.HttpContext?.User.Identity?.Name;
 	}
 
-	[Time]
 	public async Task<GenericResponse<string>> PayProduct(Guid productId) {
 		try {
 			ProductEntity p = (await _dbContext.Set<ProductEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == productId))!;
@@ -68,7 +67,6 @@ public class PaymentRepository : IPaymentRepository {
 		}
 	}
 
-	[Time]
 	public async Task<GenericResponse<string?>> IncreaseWalletBalance(int amount) {
 		try {
 			UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
@@ -101,7 +99,6 @@ public class PaymentRepository : IPaymentRepository {
 		}
 	}
 
-	[Time]
 	public async Task<GenericResponse<string?>> PayOrder(Guid orderId) {
 		OrderEntity order = (await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails).FirstOrDefaultAsync(x => x.Id == orderId))!;
 
@@ -136,7 +133,6 @@ public class PaymentRepository : IPaymentRepository {
 		return new GenericResponse<string?>("", UtilitiesStatusCodes.BadRequest);
 	}
 
-	[Time]
 	public async Task<GenericResponse> WalletCallBack(
 		int amount,
 		string authority,
@@ -163,7 +159,6 @@ public class PaymentRepository : IPaymentRepository {
 		return new GenericResponse();
 	}
 
-	[Time]
 	public async Task<GenericResponse> CallBack(Guid orderId, string authority, string status) {
 		OrderEntity order = (await _dbContext.Set<OrderEntity>()
 			.Include(i => i.OrderDetails)!.ThenInclude(x => x.Product)
@@ -234,7 +229,6 @@ public class PaymentRepository : IPaymentRepository {
 		return new GenericResponse();
 	}
 
-	[Time]
 	public async Task<GenericResponse<string?>> PaySubscription(Guid subscriptionId) {
 		try {
 			SubscriptionPaymentEntity spe = (await _dbContext.Set<SubscriptionPaymentEntity>().FirstOrDefaultAsync(x => x.Id == subscriptionId))!;
@@ -269,7 +263,6 @@ public class PaymentRepository : IPaymentRepository {
 		}
 	}
 
-	[Time]
 	public async Task<GenericResponse> CallBackSubscription(
 		Guid subscriptionId,
 		string authority,

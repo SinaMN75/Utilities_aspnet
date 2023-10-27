@@ -8,7 +8,6 @@ public interface IContentRepository {
 }
 
 public class ContentRepository(DbContext dbContext, IOutputCacheStore cache, IMediaRepository mediaRepository) : IContentRepository {
-	[Time]
 	public async Task<GenericResponse<ContentEntity>> Create(ContentCreateUpdateDto dto, CancellationToken ct) {
 		ContentEntity entity = new() {
 			Description = dto.Description,
@@ -39,12 +38,10 @@ public class ContentRepository(DbContext dbContext, IOutputCacheStore cache, IMe
 		return new GenericResponse<ContentEntity>(e.Entity);
 	}
 
-	[Time]
 	public GenericResponse<IQueryable<ContentEntity>> Read() {
 		return new GenericResponse<IQueryable<ContentEntity>>(dbContext.Set<ContentEntity>().AsNoTracking().Include(x => x.Media));
 	}
 
-	[Time]
 	public async Task<GenericResponse<ContentEntity>> Update(ContentCreateUpdateDto dto, CancellationToken ct) {
 		ContentEntity e = (await dbContext.Set<ContentEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id, ct))!;
 		e.Title = dto.Title ?? e.Title;
@@ -67,7 +64,6 @@ public class ContentRepository(DbContext dbContext, IOutputCacheStore cache, IMe
 		return new GenericResponse<ContentEntity>(e);
 	}
 
-	[Time]
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
 		ContentEntity e = (await dbContext.Set<ContentEntity>().Include(x => x.Media).FirstOrDefaultAsync(x => x.Id == id, ct))!;
 		await mediaRepository.DeleteMedia(e.Media);

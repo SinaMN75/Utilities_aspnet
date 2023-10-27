@@ -17,7 +17,6 @@ public class WithdrawRepository : IWithdrawRepository {
 		config.GetSection("AppSettings").Bind(_appSettings);
 	}
 
-	[Time]
 	public async Task<GenericResponse> Create(WithdrawalCreateDto createDto) {
 		UserEntity user = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId && f.Suspend != true))!;
 
@@ -41,7 +40,6 @@ public class WithdrawRepository : IWithdrawRepository {
 		return new GenericResponse();
 	}
 
-	[Time]
 	public GenericResponse<IQueryable<WithdrawEntity>> Filter(WithdrawalFilterDto dto) {
 		IQueryable<WithdrawEntity> q = _dbContext.Set<WithdrawEntity>().AsNoTracking().OrderByDescending(o => o.CreatedAt);
 		if (dto.State.HasValue) q = q.Where(w => w.WithdrawState == dto.State);
@@ -50,7 +48,6 @@ public class WithdrawRepository : IWithdrawRepository {
 		return new GenericResponse<IQueryable<WithdrawEntity>>(q);
 	}
 
-	[Time]
 	public async Task<GenericResponse<WithdrawEntity?>> Update(WithdrawUpdateDto dto) {
 		WithdrawEntity e = (await _dbContext.Set<WithdrawEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id))!;
 		if (e.WithdrawState != WithdrawState.Requested)

@@ -10,7 +10,6 @@ public interface IReportRepository {
 public class ReportRepository(DbContext context, IHttpContextAccessor httpContextAccessor) : IReportRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
-	[Time]
 	public async Task<GenericResponse<ReportEntity?>> Create(ReportCreateUpdateDto dto) {
 		ReportEntity entity = new() {
 			CreatorUserId = _userId,
@@ -27,7 +26,6 @@ public class ReportRepository(DbContext context, IHttpContextAccessor httpContex
 		return await ReadById(entity.Id);
 	}
 
-	[Time]
 	public GenericResponse<IQueryable<ReportEntity>> Read(ReportFilterDto dto) {
 		IQueryable<ReportEntity> e = context.Set<ReportEntity>().AsNoTracking();
 		if (dto.User == true) e = e.Include(x => x.User).ThenInclude(x => x!.Media);
@@ -37,13 +35,11 @@ public class ReportRepository(DbContext context, IHttpContextAccessor httpContex
 		return new GenericResponse<IQueryable<ReportEntity>>(e);
 	}
 
-	[Time]
 	public async Task<GenericResponse> Delete(Guid id) {
 		await context.Set<ReportEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
 	}
 
-	[Time]
 	public async Task<GenericResponse<ReportEntity?>> ReadById(Guid id) {
 		ReportEntity? entity = await context.Set<ReportEntity>()
 			.Include(x => x.User)

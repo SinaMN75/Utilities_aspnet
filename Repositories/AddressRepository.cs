@@ -10,7 +10,6 @@ public interface IAddressRepository {
 public class AddressRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IOutputCacheStore outputCache) : IAddressRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
-	[Time]
 	public async Task<GenericResponse<AddressEntity?>> Create(AddressCreateDto addressDto, CancellationToken ct) {
 		AddressEntity e = new() {
 			Address = addressDto.Address,
@@ -28,7 +27,6 @@ public class AddressRepository(DbContext dbContext, IHttpContextAccessor httpCon
 		return new GenericResponse<AddressEntity?>(e);
 	}
 
-	[Time]
 	public async Task<GenericResponse<AddressEntity?>> Update(AddressUpdateDto dto, CancellationToken ct) {
 		AddressEntity e = (await dbContext.Set<AddressEntity>().FirstOrDefaultAsync(f => f.Id == dto.Id, ct))!;
 		if (dto.PostalCode.IsNotNullOrEmpty()) e.UpdatedAt = DateTime.Now;
@@ -50,14 +48,12 @@ public class AddressRepository(DbContext dbContext, IHttpContextAccessor httpCon
 		return new GenericResponse<AddressEntity?>(e);
 	}
 
-	[Time]
 	public async Task<GenericResponse> Delete(Guid addressId, CancellationToken ct) {
 		await dbContext.Set<AddressEntity>().Where(f => f.Id == addressId).ExecuteDeleteAsync(ct);
 		await outputCache.EvictByTagAsync("address", ct);
 		return new GenericResponse();
 	}
 
-	[Time]
 	public GenericResponse<IQueryable<AddressEntity>> Filter(AddressFilterDto dto) {
 		IQueryable<AddressEntity> q = dbContext.Set<AddressEntity>().AsNoTracking();
 		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(o => o.UserId == dto.UserId);

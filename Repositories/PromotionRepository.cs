@@ -13,7 +13,6 @@ public class PromotionRepository(DbContext dbContext,
 
 	// noktei ke vojod dare dar in dto zamani ke dare az front ersal mishe faqat yeki az in property haye category ,userId, groupChatId , product bayad por bashe
 	//2 ta por nabayad bashe
-	[Time]
 	public async Task<GenericResponse<PromotionEntity?>> CreatePromotion(CreateUpdatePromotionDto dto) {
 		PromotionEntity? promotion = await dbContext.Set<PromotionEntity>()
 			.FirstOrDefaultAsync(f => f.ProductId == dto.ProductId || f.GroupChatId == dto.GroupChatId || f.UserPromotedId == dto.UserId ||
@@ -64,7 +63,6 @@ public class PromotionRepository(DbContext dbContext,
 		return new GenericResponse<PromotionEntity?>(promotion);
 	}
 
-	[Time]
 	public async Task<GenericResponse<PromotionDetail?>> GetPromotionTrackingInformation(Guid id) {
 		//user Id ro ham guid gereftam vase inke dast nabaram to structure clean proje faqat kafie front az code payin estefade kone va userId ro tabdil be Guid kone befreste vasam
 		//Uuid.parse('79700043-11eb-1101-80d6-510900000d10'); flutter
@@ -110,13 +108,11 @@ public class PromotionRepository(DbContext dbContext,
 		});
 	}
 
-	[Time]
 	public async Task<GenericResponse<PromotionEntity?>> ReadById(Guid id) {
 		PromotionEntity? p = await dbContext.Set<PromotionEntity>().FirstOrDefaultAsync(f => f.Id == id);
 		return p is null ? new GenericResponse<PromotionEntity?>(null, UtilitiesStatusCodes.NotFound) : new GenericResponse<PromotionEntity?>(p);
 	}
 
-	[Time]
 	public async Task<GenericResponse> UserSeened(Guid id) {
 		PromotionEntity? promotion = await dbContext.Set<PromotionEntity>().FirstOrDefaultAsync(f => f.ProductId == id || f.GroupChatId == id);
 		if (promotion is null)

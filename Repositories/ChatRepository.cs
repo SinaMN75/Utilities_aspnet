@@ -21,7 +21,6 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 	: IChatRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
-	[Time]
 	public async Task<GenericResponse<GroupChatEntity?>> CreateGroupChat(GroupChatCreateUpdateDto dto) {
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
@@ -57,7 +56,6 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		return await CreateGroupChatLogic(dto);
 	}
 
-	[Time]
 	public async Task<GenericResponse<GroupChatEntity?>> UpdateGroupChat(GroupChatCreateUpdateDto dto) {
 		GroupChatEntity e = (await dbContext.Set<GroupChatEntity>()
 			.Include(x => x.Users)
@@ -104,7 +102,6 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		return new GenericResponse<GroupChatEntity?>(entity.Entity);
 	}
 
-	[Time]
 	public async Task<GenericResponse> DeleteGroupChat(Guid id) {
 		IQueryable<MediaEntity>? medias = dbContext.Set<MediaEntity>().Where(w => w.GroupChatId == id);
 		if (medias is not null && medias.Any()) dbContext.RemoveRange(medias);
@@ -113,7 +110,6 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		return new GenericResponse();
 	}
 
-	[Time]
 	public async Task<GenericResponse<GroupChatMessageEntity?>> CreateGroupChatMessage(GroupChatMessageCreateUpdateDto dto) {
 		List<ProductEntity?> products = new();
 		foreach (Guid id in dto.Products ?? new List<Guid>()) products.Add(await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id));
@@ -149,7 +145,6 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		return new GenericResponse<GroupChatMessageEntity?>(e.Entity);
 	}
 
-	[Time]
 	public async Task<GenericResponse<IQueryable<GroupChatEntity>?>> ReadMyGroupChats() {
 		List<GroupChatEntity> e = await dbContext.Set<GroupChatEntity>().AsNoTracking()
 			.Where(x => x.Users!.Any(y => y.Id == _userId))
@@ -189,7 +184,6 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		return new GenericResponse<IQueryable<GroupChatEntity>?>(myGroupChats.AsQueryable());
 	}
 
-	[Time]
 	public async Task<GenericResponse<GroupChatMessageEntity?>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto) {
 		GroupChatMessageEntity e = (await dbContext.Set<GroupChatMessageEntity>()
 			.FirstOrDefaultAsync(x => x.Id == dto.Id))!;
@@ -204,7 +198,6 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		return new GenericResponse<GroupChatMessageEntity?>(entity.Entity);
 	}
 
-	[Time]
 	public async Task<GenericResponse> DeleteGroupChatMessage(Guid id) {
 		IQueryable<MediaEntity>? medias = dbContext.Set<MediaEntity>().Where(w => w.GroupChatMessageId == id);
 		if (medias is not null && medias.Any()) dbContext.RemoveRange(medias);
@@ -215,7 +208,6 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		return new GenericResponse();
 	}
 
-	[Time]
 	public GenericResponse<IQueryable<GroupChatEntity>> FilterGroupChats(GroupChatFilterDto dto) {
 		IQueryable<GroupChatEntity> q = dbContext.Set<GroupChatEntity>()
 			.Where(x => x.Users!.Any(y => y.Id == _userId));
@@ -255,7 +247,6 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		};
 	}
 
-	[Time]
 	public GenericResponse<IQueryable<GroupChatEntity>> FilterAllGroupChats(GroupChatFilterDto dto) {
 		IQueryable<GroupChatEntity> q = dbContext.Set<GroupChatEntity>();
 
@@ -294,7 +285,6 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		};
 	}
 
-	[Time]
 	public async Task<GenericResponse<GroupChatEntity>> ReadGroupChatById(Guid id) {
 		GroupChatEntity? e = await dbContext.Set<GroupChatEntity>()
 			.Include(x => x.Users)!.ThenInclude(x => x.Media)
@@ -322,7 +312,6 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		return new GenericResponse<GroupChatEntity>(e!);
 	}
 
-	[Time]
 	public GenericResponse<IQueryable<GroupChatMessageEntity>?> ReadGroupChatMessages(Guid id, int pageSize, int pageNumber) {
 		IQueryable<GroupChatMessageEntity> q = dbContext.Set<GroupChatMessageEntity>()
 			.Where(x => x.GroupChatId == id)
@@ -365,7 +354,6 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		};
 	}
 
-	[Time]
 	public async Task<GenericResponse> SeenGroupChatMessage(Guid messageId) {
 		GroupChatMessageEntity? groupMessageChat = await dbContext.Set<GroupChatMessageEntity>().Where(e => e.Id == messageId).FirstOrDefaultAsync();
 		if (groupMessageChat is null)
@@ -398,7 +386,6 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		return new GenericResponse();
 	}
 
-	[Time]
 	public async Task<GenericResponse> ExitFromGroup(Guid id) {
 		GroupChatEntity? groupChat = await dbContext.Set<GroupChatEntity>().Include(i => i.Users).FirstOrDefaultAsync(f => f.Id == id);
 		if (groupChat is null) return new GenericResponse(UtilitiesStatusCodes.NotFound, "Group Chat not Founded");
@@ -421,7 +408,6 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		return new GenericResponse(UtilitiesStatusCodes.BadRequest);
 	}
 
-	[Time]
 	public async Task<GenericResponse> Mute(Guid id) {
 		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
 		if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound);

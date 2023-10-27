@@ -11,14 +11,12 @@ public interface IDiscountRepository {
 public class DiscountRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) : IDiscountRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
-	[Time]
 	public async Task<GenericResponse<DiscountEntity>> Create(DiscountEntity dto) {
 		EntityEntry<DiscountEntity> i = await dbContext.AddAsync(dto);
 		await dbContext.SaveChangesAsync();
 		return new GenericResponse<DiscountEntity>(i.Entity);
 	}
 
-	[Time]
 	public GenericResponse<IQueryable<DiscountEntity>> Filter(DiscountFilterDto dto) {
 		IQueryable<DiscountEntity> q = dbContext.Set<DiscountEntity>();
 
@@ -39,7 +37,6 @@ public class DiscountRepository(DbContext dbContext, IHttpContextAccessor httpCo
 		};
 	}
 
-	[Time]
 	public async Task<GenericResponse<DiscountEntity?>> Update(DiscountEntity dto) {
 		DiscountEntity? e = await dbContext.Set<DiscountEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id);
 
@@ -54,13 +51,11 @@ public class DiscountRepository(DbContext dbContext, IHttpContextAccessor httpCo
 		return new GenericResponse<DiscountEntity?>(e);
 	}
 
-	[Time]
 	public async Task<GenericResponse> Delete(Guid id) {
 		await dbContext.Set<DiscountEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
 	}
 
-	[Time]
 	public async Task<GenericResponse<DiscountEntity?>> ReadDiscountCode(string code) {
 		DiscountEntity? discountEntity = await dbContext.Set<DiscountEntity>().FirstOrDefaultAsync(p => p.Code == code);
 		if (discountEntity == null) return new GenericResponse<DiscountEntity?>(null, UtilitiesStatusCodes.NotFound);

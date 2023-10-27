@@ -11,7 +11,6 @@ public interface INotificationRepository {
 public class NotificationRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) : INotificationRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
-	[Time]
 	public GenericResponse<IQueryable<NotificationEntity>> Read() {
 		IQueryable<NotificationEntity> i = dbContext.Set<NotificationEntity>()
 			.Include(x => x.Media)
@@ -26,7 +25,6 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 		return new GenericResponse<IQueryable<NotificationEntity>>(i);
 	}
 
-	[Time]
 	public GenericResponse<IQueryable<NotificationEntity>> Filter(NotificationFilterDto dto) {
 		IQueryable<NotificationEntity> q = dbContext.Set<NotificationEntity>()
 			.Include(x => x.Media)
@@ -57,7 +55,6 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 		};
 	}
 
-	[Time]
 	public async Task<GenericResponse<NotificationEntity?>> ReadById(Guid id) {
 		NotificationEntity? e = await dbContext.Set<NotificationEntity>().AsNoTracking()
 			.Include(x => x.Media)
@@ -67,7 +64,6 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 		return e == null ? new GenericResponse<NotificationEntity?>(null, UtilitiesStatusCodes.NotFound) : new GenericResponse<NotificationEntity?>(e);
 	}
 
-	[Time]
 	public async Task<GenericResponse> UpdateSeenStatus(IEnumerable<Guid> ids, SeenStatus seenStatus) {
 		IQueryable<NotificationEntity> i = dbContext.Set<NotificationEntity>()
 			.Include(x => x.Media)
@@ -86,7 +82,6 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 		return new GenericResponse();
 	}
 
-	[Time]
 	public async Task<GenericResponse> Create(NotificationCreateUpdateDto model) {
 		NotificationEntity notification = new() {
 			UseCase = model.UseCase,

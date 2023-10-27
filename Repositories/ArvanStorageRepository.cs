@@ -25,7 +25,6 @@ public class ArvanStorageRepository : IArvanStorageRepository {
 		return new AmazonS3Client(awsCredentials, config);
 	}
 
-	[Time]
 	public async Task DeleteObjects(IAmazonS3 client, string bucketName) {
 		DeleteObjectsRequest request = new() {
 			BucketName = bucketName,
@@ -50,7 +49,6 @@ public class ArvanStorageRepository : IArvanStorageRepository {
 		}
 	}
 
-	[Time]
 	public async Task DeleteObject(IAmazonS3 client, string bucketName, string objectName) {
 		try {
 			// Create the request
@@ -73,7 +71,6 @@ public class ArvanStorageRepository : IArvanStorageRepository {
 		}
 	}
 
-	[Time]
 	public async Task ListingObjectsAsync(IAmazonS3 client, string bucketName) {
 		try {
 			ListObjectsRequest? request = new() { BucketName = bucketName, MaxKeys = 5, };
@@ -99,7 +96,6 @@ public class ArvanStorageRepository : IArvanStorageRepository {
 		}
 	}
 
-	[Time]
 	public async Task ReadObjectDataAsync(IAmazonS3 client, string bucketName, string keyName) {
 		string responseBody = string.Empty;
 
@@ -133,7 +129,6 @@ public class ArvanStorageRepository : IArvanStorageRepository {
 		}
 	}
 
-	[Time]
 	public async Task UploadObjectAsync(IAmazonS3 client, string bucketName, string keyName, string filePath) {
 		// Create list to store upload part responses.
 		List<UploadPartResponse> uploadResponses = new();
@@ -195,7 +190,6 @@ public class ArvanStorageRepository : IArvanStorageRepository {
 		}
 	}
 
-	[Time]
 	public async Task UploadObjectFromFileAsync(IAmazonS3 client, string bucketName, string objectName, string filePath) {
 		try {
 			PutObjectRequest putRequest = new() {
@@ -220,7 +214,6 @@ public class ArvanStorageRepository : IArvanStorageRepository {
 		}
 	}
 
-	[Time]
 	public async Task DeleteBucketTaggingAsync(IAmazonS3 client, string bucketName) {
 		try {
 			DeleteBucketTaggingRequest request = new() { BucketName = bucketName, };
@@ -236,7 +229,6 @@ public class ArvanStorageRepository : IArvanStorageRepository {
 		}
 	}
 
-	[Time]
 	public async Task PutBucketTagsAsync(IAmazonS3 client, string bucketName) {
 		try {
 			List<Tag> tagList = new() {
