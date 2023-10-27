@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Utilities_aspnet.RemoteDataSource;
 
 namespace Utilities_aspnet.Repositories;
 
@@ -131,15 +132,11 @@ public class PaymentRepository : IPaymentRepository {
 				break;
 			}
 			case "Zibal": {
-				RestRequest requestRequest = new(Method.POST);
-				requestRequest.AddParameter("merchant", _appSettings.PaymentSettings.Id!);
-				requestRequest.AddParameter("amount", order.TotalPrice!);
-				requestRequest.AddParameter("callbackUrl", callbackUrl);
-				IRestResponse responseRequest = await new RestClient("https://gateway.zibal.ir/v1/request").ExecuteAsync(requestRequest);
-				ZibalRequestReadDto? zibalRequestReadDto = ZibalRequestReadDto.FromJson(responseRequest.Content);
-				return responseRequest.StatusCode == HttpStatusCode.Continue
-					? new GenericResponse<string?>($"https://gateway.zibal.ir/start/{zibalRequestReadDto.TrackId}")
-					: new GenericResponse<string?>("NULL");
+				return new GenericResponse<string?>(await PaymentApi.PayZibal(new ZibalRequestCreateDto {
+					Merchant = _appSettings.PaymentSettings.Id!,
+					Amount = long.Parse(order.TotalPrice!.ToString()!),
+					CallbackUrl = callbackUrl,
+				}));
 			}
 		}
 
