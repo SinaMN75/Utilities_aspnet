@@ -38,6 +38,16 @@ public class ContentJsonDetail {
 	public string? Address3 { get; set; }
 }
 
+public class ContentReadDto {
+	public Guid Id { get; set; }
+	public required string Title { get; set; }
+	public required string SubTitle { get; set; }
+	public required string Description { get; set; }
+	public required List<TagContent> Tags { get; set; } = new();
+	public required ContentJsonDetail JsonDetail { get; set; } = new();
+	public IEnumerable<MediaEntity>? Media { get; set; }
+}
+
 public class ContentCreateUpdateDto {
 	public Guid? Id { get; set; }
 	public string? Title { get; set; }
@@ -59,6 +69,53 @@ public class ContentCreateUpdateDto {
 	public string? Address2 { get; set; }
 	public string? Address3 { get; set; }
 	public List<TagContent>? Tags { get; set; }
+	public List<TagContent>? RemoveTags { get; set; }
+	public List<TagContent>? AddTags { get; set; }
+}
+
+public record ContentCreateDto {
+	public string Title { get; set; } = "";
+	public string SubTitle { get; set; } = "";
+	public string Description { get; set; } = "";
+	public string Instagram { get; set; } = "";
+	public string Telegram { get; set; } = "";
+	public string WhatsApp { get; set; } = "";
+	public string LinkedIn { get; set; } = "";
+	public string Dribble { get; set; } = "";
+	public string SoundCloud { get; set; } = "";
+	public string Pinterest { get; set; } = "";
+	public string Website { get; set; } = "";
+	public string PhoneNumber1 { get; set; } = "";
+	public string PhoneNumber2 { get; set; } = "";
+	public string Email1 { get; set; } = "";
+	public string Email2 { get; set; } = "";
+	public string Address1 { get; set; } = "";
+	public string Address2 { get; set; } = "";
+	public string Address3 { get; set; } = "";
+	public List<TagContent> Tags { get; set; } = new();
+}
+
+public record ContentUpdateDto {
+	public Guid? Id { get; set; }
+	public string? Title { get; set; }
+	public string? SubTitle { get; set; }
+	public string? Description { get; set; }
+	public string? Instagram { get; set; }
+	public string? Telegram { get; set; }
+	public string? WhatsApp { get; set; }
+	public string? LinkedIn { get; set; }
+	public string? Dribble { get; set; }
+	public string? SoundCloud { get; set; }
+	public string? Pinterest { get; set; }
+	public string? Website { get; set; }
+	public string? PhoneNumber1 { get; set; }
+	public string? PhoneNumber2 { get; set; }
+	public string? Email1 { get; set; }
+	public string? Email2 { get; set; }
+	public string? Address1 { get; set; }
+	public string? Address2 { get; set; }
+	public string? Address3 { get; set; }
+	public List<TagContent> Tags { get; set; } = new();
 	public List<TagContent>? RemoveTags { get; set; }
 	public List<TagContent>? AddTags { get; set; }
 }
