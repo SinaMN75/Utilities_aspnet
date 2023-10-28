@@ -395,7 +395,7 @@ public class UserRepository(DbContext dbContext,
 		}
 	}
 
-	private static TransactionEntity MakeTransaction(string userId, int amount, string description, string? shebaNumber, TransactionType type) => new() {
+	private static TransactionEntity MakeTransaction(string userId, long amount, string description, string? shebaNumber, TransactionType type) => new() {
 		UserId = userId,
 		Amount = amount,
 		Descriptions = description,

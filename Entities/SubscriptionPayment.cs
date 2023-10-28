@@ -4,7 +4,7 @@
 public class SubscriptionPaymentEntity : BaseEntity {
 	public SubscriptionType SubscriptionType { get; set; } = SubscriptionType.None;
 	public TagOrder Tag { get; set; } = TagOrder.Pending;
-	public double? Amount { get; set; }
+	public long? Amount { get; set; }
 	public DateTime? PayDateTime { get; set; }
 	public string? Description { get; set; }
 	public UserEntity? User { get; set; }
@@ -19,7 +19,7 @@ public class SubscriptionPaymentCreateUpdateDto {
 	public TagOrder? Tag { get; set; }
 	public Guid? PromotionId { get; set; }
 	public string? UserId { get; set; }
-	public double? Amount { get; set; }
+	public long? Amount { get; set; }
 	public string? Description { get; set; }
 }
 

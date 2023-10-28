@@ -2,7 +2,7 @@
 
 [Table("Transactions")]
 public class TransactionEntity : BaseEntity {
-	public int? Amount { get; set; }
+	public long? Amount { get; set; }
 
 	[MaxLength(500)]
 	public string? Descriptions { get; set; }
@@ -34,7 +34,7 @@ public class TransactionEntity : BaseEntity {
 }
 
 public class TransactionFilterDto {
-	public int? Amount { get; set; }
+	public long? Amount { get; set; }
 	public string? Authority { get; set; }
 	public string? GatewayName { get; set; }
 	public string? PaymentId { get; set; }

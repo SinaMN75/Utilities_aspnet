@@ -6,7 +6,7 @@ public class WithdrawEntity : BaseEntity {
 	[MinLength(10)]
 	public required string ShebaNumber { get; set; }
 
-	public required int Amount { get; set; }
+	public required long Amount { get; set; }
 	public required WithdrawState WithdrawState { get; set; }
 	public UserEntity? User { get; set; }
 	public required string UserId { get; set; }
@@ -21,7 +21,7 @@ public class WithdrawUpdateDto {
 
 public class WithdrawalCreateDto {
 	public required string ShebaNumber { get; set; }
-	public required int Amount { get; set; }
+	public required long Amount { get; set; }
 }
 
 public class WithdrawalFilterDto {

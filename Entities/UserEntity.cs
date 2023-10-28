@@ -140,9 +140,9 @@ public class UserJsonDetail {
 	public string? Code { get; set; }
 	public string? ShebaNumber { get; set; }
 	public DateTime? Boosted { get; set; }
-	public int? DeliveryPrice1 { get; set; }
-	public int? DeliveryPrice2 { get; set; }
-	public int? DeliveryPrice3 { get; set; }
+	public long? DeliveryPrice1 { get; set; }
+	public long? DeliveryPrice2 { get; set; }
+	public long? DeliveryPrice3 { get; set; }
 	public PrivacyType? PrivacyType { get; set; }
 	public LegalAuthenticationType? LegalAuthenticationType { get; set; }
 	public NationalityType? NationalityType { get; set; }
@@ -195,10 +195,10 @@ public class UserCreateUpdateDto {
 	public string? FollowedUsers { get; set; }
 	public string? FollowingUsers { get; set; }
 	public string? BlockedUsers { get; set; }
-	public int? Wallet { get; set; }
-	public int? DeliveryPrice1 { get; set; }
-	public int? DeliveryPrice2 { get; set; }
-	public int? DeliveryPrice3 { get; set; }
+	public long? Wallet { get; set; }
+	public long? DeliveryPrice1 { get; set; }
+	public long? DeliveryPrice2 { get; set; }
+	public long? DeliveryPrice3 { get; set; }
 	public List<string>? AccessLevel { get; set; }
 	public double? Point { get; set; } = 0;
 	public bool? Suspend { get; set; }
@@ -266,7 +266,7 @@ public class UserFilterDto : BaseFilterDto {
 public class TransferFromWalletToWalletDto {
 	public string FromUserId { get; set; } = null!;
 	public string ToUserId { get; set; } = null!;
-	public int Amount { get; set; }
+	public long Amount { get; set; }
 }
 
 public class AuthorizeUserDto {
