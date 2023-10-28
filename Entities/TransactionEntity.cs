@@ -8,18 +8,10 @@ public class TransactionEntity : BaseEntity {
 	public string? Descriptions { get; set; }
 
 	[MaxLength(100)]
-	public string? Authority { get; set; }
-
-	[MaxLength(100)]
-	public string? GatewayName { get; set; }
-
-	[MaxLength(20)]
-	public string? PaymentId { get; set; }
+	public string? RefId { get; set; }
 
 	[MaxLength(30)]
-	public string? ShebaNumber { get; set; }
-
-	public long? RefId { get; set; }
+	public string? CardNumber { get; set; }
 
 	[MaxLength(100)]
 	public List<TagTransaction> Tags { get; set; } = new();
@@ -29,17 +21,14 @@ public class TransactionEntity : BaseEntity {
 
 	public OrderEntity? Order { get; set; }
 	public Guid? OrderId { get; set; }
+
 	public SubscriptionPaymentEntity? SubscriptionPayment { get; set; }
 	public Guid? SubscriptionId { get; set; }
 }
 
 public class TransactionFilterDto {
 	public long? Amount { get; set; }
-	public string? Authority { get; set; }
-	public string? GatewayName { get; set; }
-	public string? PaymentId { get; set; }
-	public string? ShebaNumber { get; set; }
-	public long? RefId { get; set; }
+	public string? RefId { get; set; }
 	public List<TagTransaction>? Tags { get; set; }
 	public string? UserId { get; set; }
 	public Guid? OrderId { get; set; }

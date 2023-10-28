@@ -22,17 +22,8 @@ public class PaymentRepository : IPaymentRepository {
 	}
 
 	public async Task<GenericResponse<string?>> PayOrder(Guid orderId) {
-		OrderEntity order = (await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails).FirstOrDefaultAsync(x => x.Id == orderId))!;
-
-		foreach (OrderDetailEntity orderDetail in order.OrderDetails!) {
-			ProductEntity product = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == orderDetail.ProductId))!;
-			if (product.Stock < orderDetail.Count)
-				await _dbContext.Set<OrderDetailEntity>().Where(i => i.Id == orderDetail.Id).ExecuteDeleteAsync();
-		}
-
-		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
 		string callbackUrl = $"{Server.ServerAddress}/CallBack/{TagPayment.PayOrder.GetHashCode()}/{orderId}";
-		string desc = order.Description ?? "";
+		OrderEntity order = (await _dbContext.Set<OrderEntity>().Include(x => x.OrderDetails).FirstOrDefaultAsync(x => x.Id == orderId))!;
 
 		switch (_appSettings.PaymentSettings.Provider) {
 			case "ZarinPal": {
@@ -83,45 +74,23 @@ public class PaymentRepository : IPaymentRepository {
 					.Include(i => i.OrderDetails)!.ThenInclude(x => x.Product)
 					.FirstOrDefaultAsync(x => x.Id == Guid.Parse(id)))!;
 				UserEntity productOwner = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == order.ProductOwnerId))!;
+				productOwner.Wallet += order.TotalPrice;
+				_dbContext.Update(productOwner);
 
 				if (order.OrderDetails != null)
 					foreach (OrderDetailEntity? item in order.OrderDetails) {
-						ProductEntity? prdct = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == item.ProductId);
-						if (prdct is not null) {
-							prdct.Stock = prdct.Stock >= 1 && prdct.Stock >= item.Count ? prdct.Stock -= item.Count : prdct.Stock;
-							//Todo : inja ye exception hast ke nabayad rokh bede va pardakht ham anjam shode nemitonim throw konim 
-							//       double check  ghabl az vorod be inn safhe okaye vali mitarsam ham zaman ye filed update beshe
-							//       fek konamm bayad az ye transaction estefade konim
-							_dbContext.Update(prdct);
-						}
-
-						item.FinalPrice = item.Product != null ? item.Product.Price : item.FinalPrice;
-						_dbContext.Update(item);
+						ProductEntity p = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == item.ProductId))!;
+						p.Stock -= item.Count;
+						_dbContext.Update(p);
 					}
-
-				if (order.AddressId is not null) {
-					AddressEntity? address = await _dbContext.Set<AddressEntity>().FirstOrDefaultAsync(f => f.Id == order.AddressId);
-					if (address is not null) {
-						address.IsDefault = true;
-						_dbContext.Update(address);
-						foreach (AddressEntity? item in _dbContext.Set<AddressEntity>().Where(w => w.UserId == address.UserId && w.Id != address.Id)) {
-							item.IsDefault = false;
-							_dbContext.Update(item);
-						}
-					}
-				}
 
 				if (order.JsonDetail.DaysReserved.IsNotNullOrEmpty()) {
 					ProductEntity p = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == order.JsonDetail.DaysReserved.First().ProductId))!;
 					p.JsonDetail.DaysAvailable.Where(x => x.ReserveId == order.JsonDetail.DaysReserved.First().ReserveId);
 					p.JsonDetail.DaysReserved.AddRange(p.JsonDetail.DaysAvailable.Where(x => x.ReserveId == order.JsonDetail.DaysReserved.First().ReserveId));
 					_dbContext.Update(p);
-					await _dbContext.SaveChangesAsync();
 				}
-
-				productOwner.Wallet += order.TotalPrice;
-
-				_dbContext.Update(productOwner);
+				
 				_dbContext.Update(order);
 				await _dbContext.SaveChangesAsync();
 				return new GenericResponse();
