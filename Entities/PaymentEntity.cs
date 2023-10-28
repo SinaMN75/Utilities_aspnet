@@ -62,13 +62,13 @@ public class ZibalVerifyReadDto {
 	public string? PaidAt { get; set; }
 
 	[JsonProperty("amount", NullValueHandling = NullValueHandling.Ignore)]
-	public string? Amount { get; set; }
+	public long? Amount { get; set; }
 
 	[JsonProperty("status", NullValueHandling = NullValueHandling.Ignore)]
-	public string? Status { get; set; }
+	public long? Status { get; set; }
 
 	[JsonProperty("refNumber", NullValueHandling = NullValueHandling.Ignore)]
-	public string? RefNumber { get; set; }
+	public long? RefNumber { get; set; }
 
 	[JsonProperty("description", NullValueHandling = NullValueHandling.Ignore)]
 	public string? Description { get; set; }

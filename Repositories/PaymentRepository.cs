@@ -3,10 +3,9 @@
 namespace Utilities_aspnet.Repositories;
 
 public interface IPaymentRepository {
-	Task<GenericResponse<string?>> IncreaseWalletBalance(int amount);
+	Task<GenericResponse<string>> IncreaseWalletBalance(long amount);
 	Task<GenericResponse<string?>> PayOrder(Guid orderId);
 	Task<GenericResponse<string?>> PaySubscription(Guid subscriptionId);
-	Task<GenericResponse> WalletCallBack(int amount, string authority, string status, string userId);
 	Task<GenericResponse> CallBack(int tagPayment, string id, int success, int status, long trackId);
 	Task<GenericResponse> CallBackSubscription(Guid subscriptionId, string authority, string status);
 }
@@ -37,7 +36,7 @@ public class PaymentRepository : IPaymentRepository {
 
 		switch (_appSettings.PaymentSettings.Provider) {
 			case "ZarinPal": {
-				Payment payment = new(_appSettings.PaymentSettings.Id, int.Parse(order.TotalPrice!.Value.ToString()));
+				Payment payment = new(_appSettings.PaymentSettings.Id, int.Parse(order.TotalPrice.ToString()));
 				PaymentRequestResponse? result = payment.PaymentRequest(desc, callbackUrl, "", user?.PhoneNumber).Result;
 				if (result.Status != 100 || result.Authority.Length != 36) return new GenericResponse<string?>("", UtilitiesStatusCodes.BadRequest);
 				return new GenericResponse<string?>($"https://www.zarinpal.com/pg/StartPay/{result.Authority}");
@@ -66,10 +65,7 @@ public class PaymentRepository : IPaymentRepository {
 	}
 
 	public async Task<GenericResponse> CallBack(int tagPayment, string id, int success, int status, long trackId) {
-		OrderEntity order = (await _dbContext.Set<OrderEntity>()
-			.Include(i => i.OrderDetails)!.ThenInclude(x => x.Product)
-			.FirstOrDefaultAsync(x => x.Id == Guid.Parse(id)))!;
-
+		long amount = 0;
 		switch (_appSettings.PaymentSettings.Provider) {
 			case "ZarinPal": {
 				break;
@@ -78,13 +74,17 @@ public class PaymentRepository : IPaymentRepository {
 				break;
 			}
 			case "Zibal": {
-				await PaymentApi.VerifyZibal(new ZibalVerifyCreateDto { Merchant = _appSettings.PaymentSettings.Id!, TrackId = trackId });
+				ZibalVerifyReadDto? i = await PaymentApi.VerifyZibal(new ZibalVerifyCreateDto { Merchant = _appSettings.PaymentSettings.Id!, TrackId = trackId });
+				amount = i.Amount ?? 0;
 				break;
 			}
 		}
 
 		switch (tagPayment) {
 			case 101: {
+				OrderEntity order = (await _dbContext.Set<OrderEntity>()
+					.Include(i => i.OrderDetails)!.ThenInclude(x => x.Product)
+					.FirstOrDefaultAsync(x => x.Id == Guid.Parse(id)))!;
 				UserEntity productOwner = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == order.ProductOwnerId))!;
 
 				if (order.OrderDetails != null)
@@ -130,6 +130,10 @@ public class PaymentRepository : IPaymentRepository {
 				return new GenericResponse();
 			}
 			case 102: {
+				UserEntity user = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!;
+				user.Wallet += amount;
+				_dbContext.Update(user);
+				await _dbContext.SaveChangesAsync();
 				break;
 			}
 			case 103: {
@@ -143,60 +147,31 @@ public class PaymentRepository : IPaymentRepository {
 		return new GenericResponse();
 	}
 
-	public async Task<GenericResponse<string?>> IncreaseWalletBalance(int amount) {
-		try {
-			UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
-			Payment payment = new(_appSettings.PaymentSettings.Id, amount);
-			string callbackUrl = $"{Server.ServerAddress}/WalletCallBack/{user?.Id}/{amount}";
-			string desc = $"شارژ کیف پول به مبلغ {amount}";
-			PaymentRequestResponse? result = payment.PaymentRequest(desc, callbackUrl, "", user?.PhoneNumber).Result;
+	public async Task<GenericResponse<string>> IncreaseWalletBalance(long amount) {
+		string callbackUrl = $"{Server.ServerAddress}/CallBack/{TagPayment.PayWallet.GetHashCode()}/{_userId}";
 
-			await _dbContext.Set<TransactionEntity>().AddAsync(new TransactionEntity {
-				Amount = amount,
-				Authority = result.Authority,
-				CreatedAt = DateTime.Now,
-				Descriptions = desc,
-				GatewayName = "ZarinPal",
-				// TransactionType = TransactionType.Recharge,
-				UserId = _userId,
-				// StatusId = TransactionStatus.Pending
-			});
-			await _dbContext.SaveChangesAsync();
-
-			if (result.Status == 100 && result.Authority.Length == 36) {
-				string url = $"https://www.zarinpal.com/pg/StartPay/{result.Authority}";
-				return new GenericResponse<string?>(url);
+		switch (_appSettings.PaymentSettings.Provider) {
+			case "ZarinPal": {
+				break;
 			}
+			case "PaymentPol": {
+				break;
+			}
+			case "Zibal": {
+				ZibalRequestReadDto? zibalRequestReadDto = await PaymentApi.PayZibal(new ZibalRequestCreateDto {
+					Merchant = _appSettings.PaymentSettings.Id!,
+					Amount = amount,
+					CallbackUrl = callbackUrl,
+				});
+				return new GenericResponse<string>(zibalRequestReadDto?.Result == 100
+					? $"https://gateway.zibal.ir/start/{zibalRequestReadDto.TrackId}"
+					: zibalRequestReadDto?.Message ?? "");
+			}
+		}
 
-			return new GenericResponse<string?>("", UtilitiesStatusCodes.BadRequest);
-		}
-		catch (Exception ex) {
-			return new GenericResponse<string?>(ex.Message, UtilitiesStatusCodes.BadRequest);
-		}
+		return new GenericResponse<string>("");
 	}
-
-	public async Task<GenericResponse> WalletCallBack(int amount, string authority, string status, string userId) {
-		if (userId.IsNullOrEmpty()) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
-
-		UserEntity user = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == userId))!;
-		Payment payment = new(_appSettings.PaymentSettings.Id, amount);
-		if (!status.Equals("OK")) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
-		PaymentVerificationResponse? verify = payment.Verification(authority).Result;
-		TransactionEntity? pay = _dbContext.Set<TransactionEntity>().FirstOrDefault(x => x.Authority == authority);
-		if (pay != null) {
-			// pay.StatusId = (TransactionStatus?) Math.Abs(verify.Status);
-			pay.RefId = verify.RefId;
-			pay.UpdatedAt = DateTime.Now;
-			_dbContext.Set<TransactionEntity>().Update(pay);
-		}
-
-		user.Wallet += amount;
-		_dbContext.Set<UserEntity>().Update(user);
-
-		await _dbContext.SaveChangesAsync();
-		return new GenericResponse();
-	}
-
+	
 	public async Task<GenericResponse<string?>> PaySubscription(Guid subscriptionId) {
 		try {
 			SubscriptionPaymentEntity spe = (await _dbContext.Set<SubscriptionPaymentEntity>().FirstOrDefaultAsync(x => x.Id == subscriptionId))!;
