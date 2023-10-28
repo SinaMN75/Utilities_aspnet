@@ -138,9 +138,7 @@ public class UserRepository(DbContext dbContext,
 		string m = mobile ?? "09351902721";
 		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == m);
 		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
-		Console.WriteLine("LLLLLLLLLLLL");
 		JwtSecurityToken token = CreateToken(user);
-		Console.WriteLine("LLLLLLLLLLLL");
 		return new GenericResponse<UserEntity?>(ReadByIdMinimal(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result);
 	}
 

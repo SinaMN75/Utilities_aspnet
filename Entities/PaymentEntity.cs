@@ -50,3 +50,15 @@ public class ZibalRequestReadDto {
 
 	public static string ToJson(ZibalRequestReadDto self) => JsonConvert.SerializeObject(self, Converter.Settings);
 }
+
+public class ZibalVerifyReadDto {
+	[JsonProperty("message", NullValueHandling = NullValueHandling.Ignore)]
+	public string? Message { get; set; }
+
+	[JsonProperty("result", NullValueHandling = NullValueHandling.Ignore)]
+	public long? Result { get; set; }
+
+	public static ZibalVerifyReadDto? FromJson(string json) => JsonConvert.DeserializeObject<ZibalVerifyReadDto>(json, Converter.Settings);
+
+	public static string ToJson(ZibalVerifyReadDto self) => JsonConvert.SerializeObject(self, Converter.Settings);
+}
