@@ -25,8 +25,8 @@ public class ProductEntity : BaseEntity {
 	public int? VoteCount { get; set; }
 	public int? DiscountPercent { get; set; }
 	public int? CommentsCount { get; set; }
-	public int? DiscountPrice { get; set; }
-	public int? Price { get; set; }
+	public long? DiscountPrice { get; set; }
+	public long? Price { get; set; }
 	public Currency? Currency { get; set; }
 	public AgeCategory? AgeCategory { get; set; }
 	public DateTime? ExpireDate { get; set; }
@@ -89,9 +89,9 @@ public class ProductJsonDetail {
 	public int? Height { get; set; }
 	public int? Weight { get; set; }
 	public int? MinOrder { get; set; }
-	public int? MaxOrder { get; set; }
-	public int? MaxPrice { get; set; }
-	public int? MinPrice { get; set; }
+	public long? MaxOrder { get; set; }
+	public long? MaxPrice { get; set; }
+	public long? MinPrice { get; set; }
 	public int? ShippingCost { get; set; }
 	public int? ShippingTime { get; set; }
 	public DateTime? StartDate { get; set; }
@@ -107,8 +107,8 @@ public class ReservationDays {
 	public DateTime? DateFrom { get; set; }
 	public DateTime? DateTo { get; set; }
 	public List<ReservationHours> Times { get; set; } = new();
-	public int? Price { get; set; }
-	public int? PriceForAnyExtra { get; set; }
+	public long? Price { get; set; }
+	public long? PriceForAnyExtra { get; set; }
 	public int? MaxMemberAllowed { get; set; }
 	public int? MaxExtraMemberAllowed { get; set; }
 }
@@ -163,18 +163,18 @@ public class ProductCreateUpdateDto {
 	public string? AdminMessage { get; set; }
 	public double? Latitude { get; set; }
 	public double? Longitude { get; set; }
-	public int? Price { get; set; }
+	public long? Price { get; set; }
 	public int? Length { get; set; }
 	public int? Width { get; set; }
 	public int? Height { get; set; }
 	public int? Weight { get; set; }
 	public int? MinOrder { get; set; }
 	public int? MaxOrder { get; set; }
-	public int? MaxPrice { get; set; }
-	public int? MinPrice { get; set; }
+	public long? MaxPrice { get; set; }
+	public long? MinPrice { get; set; }
 	public int? ScorePlus { get; set; }
 	public int? ScoreMinus { get; set; }
-	public int? DiscountPrice { get; set; }
+	public long? DiscountPrice { get; set; }
 	public int? ResponseTime { get; set; }
 	public int? OnTimeDelivery { get; set; }
 	public int? DiscountPercent { get; set; }
@@ -214,8 +214,8 @@ public class ProductFilterDto : BaseFilterDto {
 	public string? Type { get; set; }
 	public string? UseCase { get; set; }
 	public string? State { get; set; }
-	public int? StartPriceRange { get; set; }
-	public int? EndPriceRange { get; set; }
+	public long? StartPriceRange { get; set; }
+	public long? EndPriceRange { get; set; }
 	public bool? IsFollowing { get; set; }
 	public bool? IsBookmarked { get; set; }
 	public bool? HasDiscount { get; set; }

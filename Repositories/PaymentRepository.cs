@@ -37,7 +37,7 @@ public class PaymentRepository : IPaymentRepository {
 
 		switch (_appSettings.PaymentSettings.Provider) {
 			case "ZarinPal": {
-				Payment payment = new(_appSettings.PaymentSettings.Id, order.TotalPrice!.Value);
+				Payment payment = new(_appSettings.PaymentSettings.Id, int.Parse(order.TotalPrice!.Value.ToString()));
 				PaymentRequestResponse? result = payment.PaymentRequest(desc, callbackUrl, "", user?.PhoneNumber).Result;
 				if (result.Status != 100 || result.Authority.Length != 36) return new GenericResponse<string?>("", UtilitiesStatusCodes.BadRequest);
 				return new GenericResponse<string?>($"https://www.zarinpal.com/pg/StartPay/{result.Authority}");

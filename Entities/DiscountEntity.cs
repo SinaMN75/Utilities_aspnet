@@ -8,7 +8,7 @@ public class DiscountEntity : BaseEntity {
 	[MaxLength(20)]
 	public string Code { get; set; } = null!;
 
-	public int DiscountPrice { get; set; }
+	public long DiscountPrice { get; set; }
 	public int NumberUses { get; set; } = 1000;
 	public DateTime StartDate { get; set; } = new(2020);
 	public DateTime EndDate { get; set; } = new(2040);

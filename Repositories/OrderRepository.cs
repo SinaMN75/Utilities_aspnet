@@ -200,7 +200,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 
 	public async Task<GenericResponse<OrderEntity?>> CreateReservationOrder(ReserveCreateUpdateDto dto) {
 		ProductEntity p = (await dbContext.Set<ProductEntity>().Include(x => x.User).FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
-		int totalPrice = 0;
+		long totalPrice = 0;
 		foreach (ReserveDto reserveDto in dto.ReserveDto) {
 			totalPrice += reserveDto.Price + reserveDto.PriceForAnyExtra * reserveDto.ExtraMemberCount;
 		}

@@ -160,13 +160,13 @@ public class Utils {
 		}
 	}
 
-	public static int CalculatePriceWithDiscount(int? price, int? discountPercent, int? discountPrice) {
+	public static long CalculatePriceWithDiscount(long? price, int? discountPercent, long? discountPrice) {
 		if (!price.HasValue) return 0;
 
 		if (discountPrice.HasValue && discountPercent.HasValue) return price.Value;
 
 		if (discountPercent.HasValue) {
-			int result = (price.Value * discountPercent.Value) / 100;
+			long result = price.Value * discountPercent.Value / 100;
 			return price.Value - result;
 		}
 

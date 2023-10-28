@@ -56,9 +56,9 @@ public class CategoryJsonDetail {
 	public double? Latitude { get; set; }
 	public double? Longitude { get; set; }
 	public double? Value { get; set; }
-	public int? DiscountedPrice { get; set; }
-	public int? SendPrice { get; set; }
-	public int? Price { get; set; }
+	public long? DiscountedPrice { get; set; }
+	public long? SendPrice { get; set; }
+	public long? Price { get; set; }
 	public int? Stock { get; set; }
 	public string? Color { get; set; }
 	public DateTime? Boosted { get; set; }
@@ -78,9 +78,9 @@ public class CategoryCreateUpdateDto {
 	public string? Type { get; set; }
 	public double? Latitude { get; set; }
 	public double? Longitude { get; set; }
-	public int? Price { get; set; }
-	public int? DiscountedPrice { get; set; }
-	public int? SendPrice { get; set; }
+	public long? Price { get; set; }
+	public long? DiscountedPrice { get; set; }
+	public long? SendPrice { get; set; }
 	public int? Value { get; set; }
 	public int? Stock { get; set; }
 	public int? Order { get; set; }

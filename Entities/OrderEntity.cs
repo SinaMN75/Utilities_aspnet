@@ -13,10 +13,10 @@ public class OrderEntity : BaseEntity {
 
 	public required int OrderNumber { get; set; }
 
-	public int? TotalPrice { get; set; }
-	public int? DiscountPrice { get; set; }
+	public long? TotalPrice { get; set; }
+	public long? DiscountPrice { get; set; }
 	public int? DiscountPercent { get; set; }
-	public int? SendPrice { get; set; }
+	public long? SendPrice { get; set; }
 	public DateTime? PayDateTime { get; set; }
 	public DateTime? ReceivedDate { get; set; }
 	public DateTime? DeliverDate { get; set; }
@@ -43,7 +43,7 @@ public class OrderEntity : BaseEntity {
 
 [Table("OrderDetail")]
 public class OrderDetailEntity : BaseEntity {
-	public int? UnitPrice { get; set; }
+	public long? UnitPrice { get; set; }
 	public int? Count { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
@@ -56,7 +56,7 @@ public class OrderDetailEntity : BaseEntity {
 	public Guid? ProductId { get; set; }
 
 	public int? Vote { get; set; }
-	public int? FinalPrice { get; set; }
+	public long? FinalPrice { get; set; }
 }
 
 public class OrderCreateUpdateDto {
@@ -97,8 +97,8 @@ public class ReserveDto {
 	public string? UserName { get; set; }
 	public required int MemberCount { get; set; }
 	public required int ExtraMemberCount { get; set; }
-	public required int Price { get; set; }
-	public required int PriceForAnyExtra { get; set; }
+	public required long Price { get; set; }
+	public required long PriceForAnyExtra { get; set; }
 }
 
 public class ApplyDiscountCodeOnOrderDto {
