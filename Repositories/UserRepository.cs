@@ -399,8 +399,7 @@ public class UserRepository(DbContext dbContext,
 		UserId = userId,
 		Amount = amount,
 		Descriptions = description,
-		// TransactionType = type,
-		ShebaNumber = shebaNumber
+		CardNumber = shebaNumber
 	};
 
 	private async Task<bool> SendOtp(string userId) {
