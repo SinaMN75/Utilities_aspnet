@@ -7,6 +7,7 @@ public interface IPaymentRepository {
 	Task<GenericResponse<string?>> PayOrder(Guid orderId);
 	Task<GenericResponse<string?>> PaySubscription(Guid subscriptionId);
 	Task<GenericResponse> CallBack(int tagPayment, string id, int success, int status, long trackId);
+	Task<GenericResponse> CallBackFake(int tagPayment, string id, int success, int status, long trackId);
 	Task<GenericResponse> CallBackSubscription(Guid subscriptionId, string authority, string status);
 }
 
@@ -106,7 +107,78 @@ public class PaymentRepository : IPaymentRepository {
 					UserId = _userId,
 					OrderId = o.Id
 				});
-				
+
+				await _dbContext.Set<TransactionEntity>().AddAsync(new TransactionEntity {
+					Amount = o.TotalPrice,
+					Descriptions = $"فروش",
+					RefId = refId,
+					CardNumber = cardNumber,
+					Tags = new List<TagTransaction>() { TagTransaction.Buy },
+					UserId = productOwner.Id,
+					OrderId = o.Id
+				});
+
+				await _dbContext.SaveChangesAsync();
+				return new GenericResponse();
+			}
+			case 102: {
+				UserEntity user = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!;
+				user.Wallet += amount;
+				_dbContext.Update(user);
+				await _dbContext.SaveChangesAsync();
+				break;
+			}
+			case 103: {
+				await PaymentApi.VerifyZibal(new ZibalVerifyCreateDto {
+					Merchant = _appSettings.PaymentSettings.Id!, TrackId = trackId,
+				});
+				break;
+			}
+		}
+
+		return new GenericResponse();
+	}
+
+	public async Task<GenericResponse> CallBackFake(int tagPayment, string id, int success, int status, long trackId) {
+		long amount = 0;
+		string refId = "";
+		string cardNumber = "";
+
+		switch (tagPayment) {
+			case 101: {
+				OrderEntity o = (await _dbContext.Set<OrderEntity>()
+					.Include(i => i.OrderDetails)!.ThenInclude(x => x.Product)
+					.FirstOrDefaultAsync(x => x.Id == Guid.Parse(id)))!;
+				UserEntity productOwner = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == o.ProductOwnerId))!;
+				productOwner.Wallet += o.TotalPrice;
+				_dbContext.Update(productOwner);
+
+				if (o.OrderDetails != null)
+					foreach (OrderDetailEntity? item in o.OrderDetails) {
+						ProductEntity p = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == item.ProductId))!;
+						p.Stock -= item.Count;
+						_dbContext.Update(p);
+					}
+
+				if (o.JsonDetail.DaysReserved.IsNotNullOrEmpty()) {
+					ProductEntity p = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == o.JsonDetail.DaysReserved.First().ProductId))!;
+					p.JsonDetail.DaysAvailable.Where(x => x.ReserveId == o.JsonDetail.DaysReserved.First().ReserveId);
+					p.JsonDetail.DaysReserved.AddRange(p.JsonDetail.DaysAvailable.Where(x => x.ReserveId == o.JsonDetail.DaysReserved.First().ReserveId));
+					_dbContext.Update(p);
+				}
+
+				_dbContext.Update(o);
+
+				await _dbContext.Set<TransactionEntity>().AddAsync(new TransactionEntity {
+					Amount = o.TotalPrice,
+					Descriptions = $"خرید",
+					RefId = refId,
+					CardNumber = cardNumber,
+					Tags = new List<TagTransaction>() { TagTransaction.Buy },
+					UserId = _userId,
+					OrderId = o.Id
+				});
+
 				await _dbContext.Set<TransactionEntity>().AddAsync(new TransactionEntity {
 					Amount = o.TotalPrice,
 					Descriptions = $"فروش",
