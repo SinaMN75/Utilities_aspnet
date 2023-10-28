@@ -7,7 +7,7 @@ public interface IPaymentRepository {
 	Task<GenericResponse<string?>> PayOrder(Guid orderId);
 	Task<GenericResponse<string?>> PaySubscription(Guid subscriptionId);
 	Task<GenericResponse> WalletCallBack(int amount, string authority, string status, string userId);
-	Task<GenericResponse> CallBack(string orderId, int success, int status, long trackId);
+	Task<GenericResponse> CallBack(int tagPayment, string id, int success, int status, long trackId);
 	Task<GenericResponse> CallBackSubscription(Guid subscriptionId, string authority, string status);
 }
 
@@ -15,11 +15,9 @@ public class PaymentRepository : IPaymentRepository {
 	private readonly AppSettings _appSettings = new();
 	private readonly DbContext _dbContext;
 	private readonly string? _userId;
-	private readonly IMemoryCache _memoryCache;
 
-	public PaymentRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IConfiguration config, IMemoryCache memoryCache) {
+	public PaymentRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IConfiguration config) {
 		_dbContext = dbContext;
-		_memoryCache = memoryCache;
 		config.GetSection("AppSettings").Bind(_appSettings);
 		_userId = httpContextAccessor.HttpContext?.User.Identity?.Name;
 	}
@@ -34,11 +32,8 @@ public class PaymentRepository : IPaymentRepository {
 		}
 
 		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
-		string callbackUrl = $"{Server.ServerAddress}/CallBack/{orderId}";
-		Console.WriteLine("kkk");
-		Console.WriteLine(callbackUrl);
+		string callbackUrl = $"{Server.ServerAddress}/CallBack/{TagPayment.PayOrder.GetHashCode()}/{orderId}";
 		string desc = order.Description ?? "";
-		string trackId = "";
 
 		switch (_appSettings.PaymentSettings.Provider) {
 			case "ZarinPal": {
@@ -61,7 +56,6 @@ public class PaymentRepository : IPaymentRepository {
 					Amount = long.Parse(order.TotalPrice!.ToString()!),
 					CallbackUrl = callbackUrl,
 				});
-				_memoryCache.Set(orderId, trackId, absoluteExpiration: DateTimeOffset.Now.AddMinutes(5));
 				return new GenericResponse<string?>(zibalRequestReadDto?.Result == 100
 					? $"https://gateway.zibal.ir/start/{zibalRequestReadDto.TrackId}"
 					: zibalRequestReadDto?.Message);
@@ -71,10 +65,10 @@ public class PaymentRepository : IPaymentRepository {
 		return new GenericResponse<string?>("NULL");
 	}
 
-	public async Task<GenericResponse> CallBack(string orderId, int success, int status, long trackId) {
+	public async Task<GenericResponse> CallBack(int tagPayment, string id, int success, int status, long trackId) {
 		OrderEntity order = (await _dbContext.Set<OrderEntity>()
 			.Include(i => i.OrderDetails)!.ThenInclude(x => x.Product)
-			.FirstOrDefaultAsync(x => x.Id == Guid.Parse(orderId)))!;
+			.FirstOrDefaultAsync(x => x.Id == Guid.Parse(id)))!;
 
 		switch (_appSettings.PaymentSettings.Provider) {
 			case "ZarinPal": {
@@ -84,56 +78,68 @@ public class PaymentRepository : IPaymentRepository {
 				break;
 			}
 			case "Zibal": {
-				ZibalVerifyReadDto? respose = await PaymentApi.VerifyZibal(new ZibalVerifyCreateDto {
-					Merchant = _appSettings.PaymentSettings.Id!, TrackId = trackId,
-				});
-				if (respose.Result == 100) return new GenericResponse();
+				await PaymentApi.VerifyZibal(new ZibalVerifyCreateDto { Merchant = _appSettings.PaymentSettings.Id!, TrackId = trackId });
 				break;
 			}
 		}
 
-		UserEntity productOwner = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == order.ProductOwnerId))!;
+		switch (tagPayment) {
+			case 101: {
+				UserEntity productOwner = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == order.ProductOwnerId))!;
 
-		if (order.OrderDetails != null)
-			foreach (OrderDetailEntity? item in order.OrderDetails) {
-				ProductEntity? prdct = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == item.ProductId);
-				if (prdct is not null) {
-					prdct.Stock = prdct.Stock >= 1 && prdct.Stock >= item.Count ? prdct.Stock -= item.Count : prdct.Stock;
-					//Todo : inja ye exception hast ke nabayad rokh bede va pardakht ham anjam shode nemitonim throw konim 
-					//       double check  ghabl az vorod be inn safhe okaye vali mitarsam ham zaman ye filed update beshe
-					//       fek konamm bayad az ye transaction estefade konim
-					_dbContext.Update(prdct);
+				if (order.OrderDetails != null)
+					foreach (OrderDetailEntity? item in order.OrderDetails) {
+						ProductEntity? prdct = await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == item.ProductId);
+						if (prdct is not null) {
+							prdct.Stock = prdct.Stock >= 1 && prdct.Stock >= item.Count ? prdct.Stock -= item.Count : prdct.Stock;
+							//Todo : inja ye exception hast ke nabayad rokh bede va pardakht ham anjam shode nemitonim throw konim 
+							//       double check  ghabl az vorod be inn safhe okaye vali mitarsam ham zaman ye filed update beshe
+							//       fek konamm bayad az ye transaction estefade konim
+							_dbContext.Update(prdct);
+						}
+
+						item.FinalPrice = item.Product != null ? item.Product.Price : item.FinalPrice;
+						_dbContext.Update(item);
+					}
+
+				if (order.AddressId is not null) {
+					AddressEntity? address = await _dbContext.Set<AddressEntity>().FirstOrDefaultAsync(f => f.Id == order.AddressId);
+					if (address is not null) {
+						address.IsDefault = true;
+						_dbContext.Update(address);
+						foreach (AddressEntity? item in _dbContext.Set<AddressEntity>().Where(w => w.UserId == address.UserId && w.Id != address.Id)) {
+							item.IsDefault = false;
+							_dbContext.Update(item);
+						}
+					}
 				}
 
-				item.FinalPrice = item.Product != null ? item.Product.Price : item.FinalPrice;
-				_dbContext.Update(item);
+				if (order.JsonDetail.DaysReserved.IsNotNullOrEmpty()) {
+					ProductEntity p = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == order.JsonDetail.DaysReserved.First().ProductId))!;
+					p.JsonDetail.DaysAvailable.Where(x => x.ReserveId == order.JsonDetail.DaysReserved.First().ReserveId);
+					p.JsonDetail.DaysReserved.AddRange(p.JsonDetail.DaysAvailable.Where(x => x.ReserveId == order.JsonDetail.DaysReserved.First().ReserveId));
+					_dbContext.Update(p);
+					await _dbContext.SaveChangesAsync();
+				}
+
+				productOwner.Wallet += order.TotalPrice;
+
+				_dbContext.Update(productOwner);
+				_dbContext.Update(order);
+				await _dbContext.SaveChangesAsync();
+				return new GenericResponse();
 			}
-
-		if (order.AddressId is not null) {
-			AddressEntity? address = await _dbContext.Set<AddressEntity>().FirstOrDefaultAsync(f => f.Id == order.AddressId);
-			if (address is not null) {
-				address.IsDefault = true;
-				_dbContext.Update(address);
-				foreach (AddressEntity? item in _dbContext.Set<AddressEntity>().Where(w => w.UserId == address.UserId && w.Id != address.Id)) {
-					item.IsDefault = false;
-					_dbContext.Update(item);
-				}
+			case 102: {
+				break;
+			}
+			case 103: {
+				await PaymentApi.VerifyZibal(new ZibalVerifyCreateDto {
+					Merchant = _appSettings.PaymentSettings.Id!, TrackId = trackId,
+				});
+				break;
 			}
 		}
 
-		if (order.JsonDetail.DaysReserved.IsNotNullOrEmpty()) {
-			ProductEntity p = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == order.JsonDetail.DaysReserved.First().ProductId))!;
-			p.JsonDetail.DaysAvailable.Where(x => x.ReserveId == order.JsonDetail.DaysReserved.First().ReserveId);
-			p.JsonDetail.DaysReserved.AddRange(p.JsonDetail.DaysAvailable.Where(x => x.ReserveId == order.JsonDetail.DaysReserved.First().ReserveId));
-			_dbContext.Update(p);
-			await _dbContext.SaveChangesAsync();
-		}
-
-		productOwner.Wallet += order.TotalPrice;
-
-		_dbContext.Update(productOwner);
-		_dbContext.Update(order);
-		await _dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}
 

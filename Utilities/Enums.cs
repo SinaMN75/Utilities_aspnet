@@ -454,4 +454,10 @@ public enum TagUser {
 	AdminCommentUpdate = 315
 }
 
+public enum TagPayment {
+	PayOrder = 101,
+	PayWallet = 102,
+	PaySubscription = 103
+}
+
 public enum TagNotification { }

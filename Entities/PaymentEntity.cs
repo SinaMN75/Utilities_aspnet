@@ -58,6 +58,27 @@ public class ZibalVerifyReadDto {
 	[JsonProperty("result", NullValueHandling = NullValueHandling.Ignore)]
 	public long? Result { get; set; }
 
+	[JsonProperty("paidAt", NullValueHandling = NullValueHandling.Ignore)]
+	public string? PaidAt { get; set; }
+
+	[JsonProperty("amount", NullValueHandling = NullValueHandling.Ignore)]
+	public string? Amount { get; set; }
+
+	[JsonProperty("status", NullValueHandling = NullValueHandling.Ignore)]
+	public string? Status { get; set; }
+
+	[JsonProperty("refNumber", NullValueHandling = NullValueHandling.Ignore)]
+	public string? RefNumber { get; set; }
+
+	[JsonProperty("description", NullValueHandling = NullValueHandling.Ignore)]
+	public string? Description { get; set; }
+
+	[JsonProperty("cardNumber", NullValueHandling = NullValueHandling.Ignore)]
+	public string? CardNumber { get; set; }
+
+	[JsonProperty("orderId", NullValueHandling = NullValueHandling.Ignore)]
+	public long? OrderId { get; set; }
+
 	public static ZibalVerifyReadDto? FromJson(string json) => JsonConvert.DeserializeObject<ZibalVerifyReadDto>(json, Converter.Settings);
 
 	public static string ToJson(ZibalVerifyReadDto self) => JsonConvert.SerializeObject(self, Converter.Settings);
