@@ -441,7 +441,17 @@ public enum TagUser {
 	AdminContentRead = 312,
 	AdminContentUpdate = 313,
 	AdminCommentRead = 314,
-	AdminCommentUpdate = 315
+	AdminCommentUpdate = 315,
+	ProductPublic = 401,
+	BuysPublic = 402,
+	SellsPublic = 403,
+	FollowingsPublic = 404,
+	FollowersPublic = 405,	
+	ProductPrivate = 406,
+	BuysPrivate = 407,
+	SellsPrivate = 408,
+	FollowingsPrivate = 409,
+	FollowersPrivate = 410,
 }
 
 public enum TagPayment {

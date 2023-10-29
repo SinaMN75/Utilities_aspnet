@@ -26,7 +26,7 @@ public class TransactionEntity : BaseEntity {
 	public Guid? SubscriptionId { get; set; }
 }
 
-public class TransactionCreateDto : BaseEntity {
+public class TransactionCreateDto {
 	public required long Amount { get; set; }
 	public required string Descriptions { get; set; } = "";
 	public string? RefId { get; set; }
@@ -37,7 +37,7 @@ public class TransactionCreateDto : BaseEntity {
 	public Guid? SubscriptionId { get; set; }
 }
 
-public class TransactionUpdateDto : BaseEntity {
+public class TransactionUpdateDto {
 	public required Guid Id { get; set; }
 	public long? Amount { get; set; }
 	public string? Descriptions { get; set; }
