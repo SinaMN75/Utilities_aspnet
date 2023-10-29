@@ -13,7 +13,6 @@ public class AppSettingsRepository(IConfiguration config, DbContext dbContext) :
 				DateTime = DateTime.Now,
 				FormFieldType = EnumExtension.GetValues<TagFormField>(),
 				TransactionStatuses = EnumExtension.GetValues<TransactionStatus>(),
-				TransactionType = EnumExtension.GetValues<TransactionType>(),
 				UtilitiesStatusCodes = EnumExtension.GetValues<UtilitiesStatusCodes>(),
 				Currency = EnumExtension.GetValues<Currency>(),
 				SeenStatus = EnumExtension.GetValues<SeenStatus>(),

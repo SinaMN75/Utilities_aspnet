@@ -272,9 +272,9 @@ public class UserRepository(DbContext dbContext,
 
 		if (fromUser.Wallet <= dto.Amount) return new GenericResponse(UtilitiesStatusCodes.NotEnoughMoney);
 		await Update(new UserCreateUpdateDto { Id = fromUser.Id, Wallet = fromUser.Wallet - dto.Amount });
-		await transactionRepository.Create(MakeTransaction(fromUser.Id, dto.Amount, "کسر", null, TransactionType.WithdrawFromTheWallet), ct);
+		await transactionRepository.Create(MakeTransaction(fromUser.Id, dto.Amount, "کسر"), ct);
 		await Update(new UserCreateUpdateDto { Id = toUser.Id, Wallet = toUser.Wallet + dto.Amount });
-		await transactionRepository.Create(MakeTransaction(toUser.Id, dto.Amount, "واریز", null, TransactionType.DepositToWallet), ct);
+		await transactionRepository.Create(MakeTransaction(toUser.Id, dto.Amount, "واریز"), ct);
 		return new GenericResponse();
 	}
 
@@ -395,11 +395,11 @@ public class UserRepository(DbContext dbContext,
 		}
 	}
 
-	private static TransactionEntity MakeTransaction(string userId, long amount, string description, string? shebaNumber, TransactionType type) => new() {
+	private static TransactionCreateDto MakeTransaction(string userId, long amount, string description) => new() {
 		UserId = userId,
 		Amount = amount,
 		Descriptions = description,
-		CardNumber = shebaNumber
+		Tags = new List<TagTransaction>() { TagTransaction.WalletToWallet }
 	};
 
 	private async Task<bool> SendOtp(string userId) {

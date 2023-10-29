@@ -165,21 +165,13 @@ public enum DisplayType {
 	Channels = 102
 }
 
-public enum TransactionType {
-	None = 100,
-	DepositToWallet = 101,
-	WithdrawFromTheWallet = 102,
-	Buy = 103,
-	Sell = 104,
-	Recharge = 105
-}
-
 public enum TagTransaction {
 	DepositToWallet = 101,
 	WithdrawFromTheWallet = 102,
 	Buy = 103,
 	Sell = 104,
 	Recharge = 105,
+	WalletToWallet = 106,
 	Pending = 200,
 	Fail = 201,
 	Success = 202
