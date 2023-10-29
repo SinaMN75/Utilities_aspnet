@@ -12,7 +12,6 @@ public class AppSettingsRepository(IConfiguration config, DbContext dbContext) :
 		return new GenericResponse<EnumDto>(new EnumDto {
 				DateTime = DateTime.Now,
 				FormFieldType = EnumExtension.GetValues<TagFormField>(),
-				TransactionStatuses = EnumExtension.GetValues<TransactionStatus>(),
 				UtilitiesStatusCodes = EnumExtension.GetValues<UtilitiesStatusCodes>(),
 				Currency = EnumExtension.GetValues<Currency>(),
 				SeenStatus = EnumExtension.GetValues<SeenStatus>(),

@@ -51,12 +51,6 @@ public enum TagFormField {
 	DateTime
 }
 
-public enum TransactionStatus {
-	Pending = 100,
-	Fail = 101,
-	Success = 102
-}
-
 public enum Currency {
 	Rial = 100,
 	Dolor = 101,
@@ -174,7 +168,11 @@ public enum TagTransaction {
 	WalletToWallet = 106,
 	Pending = 200,
 	Fail = 201,
-	Success = 202
+	Success = 202,
+	WithdrawAccepted = 301,
+	WithdrawRejected = 302,
+	WithdrawRequested = 302
+	
 }
 
 public enum TagCategory {
