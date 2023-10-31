@@ -51,7 +51,7 @@ public static class StartupExtension {
 
 		builder.Services.AddDbContextPool<T>(options => {
 			options.UseSqlServer(connectionStrings, o => {
-				o.EnableRetryOnFailure(maxRetryCount: 2, maxRetryDelay: TimeSpan.FromSeconds(1), errorNumbersToAdd: new int[] {});
+				o.EnableRetryOnFailure(maxRetryCount: 2, maxRetryDelay: TimeSpan.FromSeconds(1), errorNumbersToAdd: new int[] { });
 				o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
 			});
 		});

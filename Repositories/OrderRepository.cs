@@ -268,6 +268,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 			.ToListAsync();
 
 		foreach (OrderEntity orderEntity in q) {
+			if (!orderEntity.JsonDetail.DaysReserved.IsNotNullOrEmpty()) continue;
 			if (orderEntity.OrderDetails.IsNullOrEmpty())
 				dbContext.Remove(orderEntity);
 			await dbContext.SaveChangesAsync();
@@ -279,8 +280,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 				await dbContext.SaveChangesAsync();
 			}
 
-			orderEntity.TotalPrice = orderEntity.OrderDetails.Select(x => x.FinalPrice!).Sum() +
-			                         (orderEntity.ProductOwner!.JsonDetail.DeliveryPrice1 ?? 0);
+			orderEntity.TotalPrice = orderEntity.OrderDetails.Select(x => x.FinalPrice!).Sum() + (orderEntity.ProductOwner!.JsonDetail.DeliveryPrice1 ?? 0);
 			dbContext.Set<OrderEntity>().Update(orderEntity);
 			await dbContext.SaveChangesAsync();
 		}
