@@ -114,8 +114,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 					Count = dto.Count,
 					ProductId = dto.ProductId,
 					UnitPrice = p.Price,
-					FinalPrice = dto.Count *
-					             Utils.CalculatePriceWithDiscount(p.Price, p.DiscountPercent, p.DiscountPrice),
+					FinalPrice = dto.Count * p.Price,
 					CreatedAt = DateTime.Now,
 					UpdatedAt = DateTime.Now
 				});
@@ -142,8 +141,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 					Count = dto.Count,
 					ProductId = dto.ProductId,
 					UnitPrice = p.Price,
-					FinalPrice = dto.Count *
-					             Utils.CalculatePriceWithDiscount(p.Price, p.DiscountPercent, p.DiscountPrice),
+					FinalPrice = dto.Count * p.Price,
 					CreatedAt = DateTime.Now,
 					UpdatedAt = DateTime.Now
 				});
@@ -163,8 +161,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 						Count = dto.Count,
 						ProductId = dto.ProductId,
 						UnitPrice = p.Price,
-						FinalPrice = dto.Count *
-						             Utils.CalculatePriceWithDiscount(p.Price, p.DiscountPercent, p.DiscountPrice),
+						FinalPrice = dto.Count * p.Price,
 						CreatedAt = DateTime.Now,
 						UpdatedAt = DateTime.Now
 					});
@@ -178,8 +175,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 			}
 			else {
 				od.Count = dto.Count;
-				od.FinalPrice =
-					dto.Count * Utils.CalculatePriceWithDiscount(p.Price, p.DiscountPercent, p.DiscountPrice);
+				od.FinalPrice = dto.Count * p.Price;
 				dbContext.Update(od);
 			}
 		}
