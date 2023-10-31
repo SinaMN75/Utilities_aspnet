@@ -92,7 +92,6 @@ public class PaymentRepository : IPaymentRepository {
 				if (o.JsonDetail.DaysReserved.IsNotNullOrEmpty()) {
 					ProductEntity p = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == o.JsonDetail.DaysReserved.First().ProductId))!;
 					p.JsonDetail.DaysAvailable.Where(x => x.ReserveId == o.JsonDetail.DaysReserved.First().ReserveId);
-					p.JsonDetail.DaysReserved.AddRange(p.JsonDetail.DaysAvailable.Where(x => x.ReserveId == o.JsonDetail.DaysReserved.First().ReserveId));
 					_dbContext.Update(p);
 				}
 
@@ -163,7 +162,6 @@ public class PaymentRepository : IPaymentRepository {
 				if (o.JsonDetail.DaysReserved.IsNotNullOrEmpty()) {
 					ProductEntity p = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == o.JsonDetail.DaysReserved.First().ProductId))!;
 					p.JsonDetail.DaysAvailable.Where(x => x.ReserveId == o.JsonDetail.DaysReserved.First().ReserveId);
-					p.JsonDetail.DaysReserved.AddRange(p.JsonDetail.DaysAvailable.Where(x => x.ReserveId == o.JsonDetail.DaysReserved.First().ReserveId));
 					_dbContext.Update(p);
 				}
 
