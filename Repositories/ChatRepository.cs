@@ -1,4 +1,6 @@
-﻿namespace Utilities_aspnet.Repositories;
+﻿using System.Xml;
+
+namespace Utilities_aspnet.Repositories;
 
 public interface IChatRepository {
 	Task<GenericResponse<GroupChatEntity?>> CreateGroupChat(GroupChatCreateUpdateDto dto);
@@ -25,7 +27,7 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
 		Tuple<bool, UtilitiesStatusCodes> overUsedCheck =
-			Utils.IsUserOverused(dbContext, _userId ?? string.Empty, CallerType.CreateGroupChat, dto.Type, null, appSettings.UsageRules);
+			Utils.IsUserOverused(dbContext, _userId ?? string.Empty, CallerType.CreateGroupChat, dto.Type, null, appSettings.UsageRulesBeforeUpgrade , appSettings.UsageRulesAfterUpgrade);
 		if (overUsedCheck.Item1)
 			return new GenericResponse<GroupChatEntity?>(null, overUsedCheck.Item2);
 
@@ -112,7 +114,7 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 
 	public async Task<GenericResponse<GroupChatMessageEntity?>> CreateGroupChatMessage(GroupChatMessageCreateUpdateDto dto) {
 		List<ProductEntity?> products = new();
-		foreach (Guid id in dto.Products ?? new List<Guid>()) products.Add(await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id));
+		foreach (Guid id in dto.Products ?? new List<Guid>()) products.Add(await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id));				
 
 		GroupChatEntity? groupChat = await dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(f => f.Id == dto.GroupChatId);
 		if (groupChat != null) {

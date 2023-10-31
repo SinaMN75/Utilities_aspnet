@@ -4,7 +4,8 @@ public class AppSettings {
 	public SmsPanelSettings SmsPanelSettings { get; set; } = null!;
 	public PaymentSettings PaymentSettings { get; set; } = null!;
 	public PushNotificationSetting PushNotificationSetting { get; set; } = null!;
-	public UsageRules UsageRules { get; set; } = null!;
+	public UsageRulesBeforeUpgrade UsageRulesBeforeUpgrade { get; set; } = null!;
+	public UsageRulesAfterUpgrade UsageRulesAfterUpgrade { get; set; } = null!;
 	public int? WithdrawalLimit { get; set; }
 	public int? WithdrawalTimeLimit { get; set; }
 	public string? AndroidMinimumVersion { get; set; }
@@ -25,10 +26,25 @@ public class SmsPanelSettings {
 	public string? PatternCode { get; set; }
 }
 
-public class UsageRules {
-	public int MaxProductPerDay { get; set; }
-	public int MaxCommentPerDay { get; set; }
-	public int MaxChatPerDay { get; set; }
+public class UsageRulesBeforeUpgrade
+{
+	public int MaxPostPerDay { get; set; }
+	public int MaxTweetPerDay { get; set; }
+	public int MaxAdvertismentPerDay { get; set; }
+	public int MaxGroupOrChannelPerProfile { get; set; }
+	public int MaxSendPostPerHour { get; set; }
+	public int MaxCommentPerHour { get; set; }
+	public int MaxChatPerHour { get; set; }
+}
+public class UsageRulesAfterUpgrade
+{
+    public int MaxPostPerDay { get; set; }
+    public int MaxTweetPerDay { get; set; }
+    public int MaxAdvertismentPerDay { get; set; }
+    public int MaxGroupOrChannelPerProfile { get; set; }
+    public int MaxSendPostPerHour { get; set; }
+    public int MaxCommentPerHour { get; set; }
+    public int MaxChatPerHour { get; set; }
 }
 
 public class PaymentSettings {

@@ -401,7 +401,8 @@ public enum TagProduct {
 	Deleted = 304,
 	NotAccepted = 305,
 	Special = 401,
-	Private = 501
+	Private = 501,
+	None = 502
 }
 
 public enum TagOrder {
