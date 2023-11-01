@@ -207,7 +207,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 			UpdatedAt = DateTime.Now,
 			ProductOwnerId = p.UserId,
 			JsonDetail = new OrderJsonDetail {
-				DaysReserved = dto.ReserveDto,
+				ReservationTimes = dto.ReserveDto,
 			},
 			Tags = new List<TagOrder> { TagOrder.Pending, TagOrder.Reserve },
 			UserId = _userId,
@@ -285,7 +285,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 			.ToListAsync();
 
 		foreach (OrderEntity orderEntity in q) {
-			if (!orderEntity.JsonDetail.DaysReserved.IsNotNullOrEmpty()) continue;
+			if (!orderEntity.JsonDetail.ReservationTimes.IsNotNullOrEmpty()) continue;
 			if (orderEntity.OrderDetails.IsNullOrEmpty())
 				dbContext.Remove(orderEntity);
 			await dbContext.SaveChangesAsync();

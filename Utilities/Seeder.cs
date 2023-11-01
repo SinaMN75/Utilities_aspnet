@@ -18,7 +18,7 @@ public static class Seeder {
 		});
 		builder.Entity<OrderEntity>().OwnsOne(e => e.JsonDetail, b => {
 			b.ToJson();
-			b.OwnsMany(_ => _.DaysReserved);
+			b.OwnsMany(_ => _.ReservationTimes);
 		});
 	}
 }

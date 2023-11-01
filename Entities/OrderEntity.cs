@@ -76,13 +76,11 @@ public class OrderDetailCreateUpdateDto {
 }
 
 public class ReserveCreateUpdateDto {
-	public required Guid ReserveId { get; set; }
 	public required Guid ProductId { get; set; }
 	public required List<ReserveDto> ReserveDto { get; set; }
 }
 
 public class OrderJsonDetail {
-	public List<ReserveDto> DaysReserved { get; set; } = new();
 	public List<ReserveDto> ReservationTimes { get; set; } = new();
 }
 
