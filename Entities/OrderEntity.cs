@@ -73,7 +73,6 @@ public class OrderCreateUpdateDto {
 public class OrderDetailCreateUpdateDto {
 	public Guid? ProductId { get; set; }
 	public int? Count { get; set; }
-	public List<ReservationDays>? Days { get; set; }
 }
 
 public class ReserveCreateUpdateDto {
@@ -84,6 +83,7 @@ public class ReserveCreateUpdateDto {
 
 public class OrderJsonDetail {
 	public List<ReserveDto> DaysReserved { get; set; } = new();
+	public List<ReserveDto> ReservationTimes { get; set; } = new();
 }
 
 public class ReserveDto {

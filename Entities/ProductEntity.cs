@@ -98,7 +98,19 @@ public class ProductJsonDetail {
 	public DateTime? EndDate { get; set; }
 	public Reaction? UserReaction { get; set; }
 	public List<KeyValue>? KeyValues { get; set; }
-	public List<ReservationDays>? DaysAvailable { get; set; }
+	public List<ReservationTime>? ReservationTimes { get; set; }
+}
+
+public class ReservationTime {
+	public string ReserveId { get; set; } = Guid.NewGuid().ToString();
+	public DateTime? DateFrom { get; set; }
+	public DateTime? DateTo { get; set; }
+	public long? Price { get; set; }
+	public long? PriceForAnyExtra { get; set; }
+	public int? MaxMemberAllowed { get; set; }
+	public int? MaxExtraMemberAllowed { get; set; }
+	public string? ReservedByUserId { get; set; }
+	public string? ReservedByUserName { get; set; }
 }
 
 public class ReservationDays {
@@ -202,7 +214,7 @@ public class ProductCreateUpdateDto {
 	public IEnumerable<UploadDto>? Upload { get; set; }
 	public IEnumerable<FormTitleDto>? Form { get; set; }
 	public IEnumerable<ProductCreateUpdateDto>? Children { get; set; }
-	public List<ReservationDays>? DaysAvailable { get; set; }
+	public List<ReservationTime>? ReservationTimes { get; set; }
 }
 
 public class ProductFilterDto : BaseFilterDto {

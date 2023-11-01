@@ -8,6 +8,7 @@ public interface IOrderRepository {
 	Task<GenericResponse> Delete(Guid id);
 	Task<GenericResponse<OrderEntity?>> CreateUpdateOrderDetail(OrderDetailCreateUpdateDto dto);
 	Task<GenericResponse<OrderEntity?>> CreateReservationOrder(ReserveCreateUpdateDto dto);
+	Task<GenericResponse<OrderEntity?>> CreateReservationOrder2(ReserveCreateUpdateDto dto);
 	Task<GenericResponse<OrderEntity?>> ApplyDiscountCode(ApplyDiscountCodeOnOrderDto dto);
 }
 
@@ -208,6 +209,26 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 			JsonDetail = new OrderJsonDetail {
 				DaysReserved = dto.ReserveDto,
 			},
+			Tags = new List<TagOrder> { TagOrder.Pending, TagOrder.Reserve },
+			UserId = _userId,
+			TotalPrice = totalPrice
+		};
+		EntityEntry<OrderEntity> orderEntity = await dbContext.AddAsync(e);
+		await dbContext.SaveChangesAsync();
+
+		return new GenericResponse<OrderEntity?>(orderEntity.Entity);
+	}
+
+	public async Task<GenericResponse<OrderEntity?>> CreateReservationOrder2(ReserveCreateUpdateDto dto) {
+		ProductEntity p = (await dbContext.Set<ProductEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
+		long totalPrice = 0;
+		foreach (ReserveDto reserveDto in dto.ReserveDto) {
+			totalPrice += reserveDto.Price + reserveDto.PriceForAnyExtra * reserveDto.ExtraMemberCount;
+		}
+		OrderEntity e = new() {
+			OrderNumber = new Random().Next(100, 99999),
+			ProductOwnerId = p.UserId,
+			JsonDetail = new OrderJsonDetail { ReservationTimes = dto.ReserveDto },
 			Tags = new List<TagOrder> { TagOrder.Pending, TagOrder.Reserve },
 			UserId = _userId,
 			TotalPrice = totalPrice
