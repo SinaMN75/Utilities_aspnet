@@ -154,20 +154,11 @@ public class PaymentRepository : IPaymentRepository {
 					}
 
 				if (o.JsonDetail.ReservationTimes.IsNotNullOrEmpty()) {
-					// ProductEntity p = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == o.JsonDetail.ReservationTimes.First().ProductId))!;
-					// p.JsonDetail.DaysAvailable.Where(x => x.ReserveId == o.JsonDetail.ReservationTimes.First().ReserveId);
-					// _dbContext.Update(p);
-					//
-					// foreach (ReserveDto reserveDto in o.JsonDetail.ReservationTimes) {
-					// 	ReservationTime reservationTime = p.JsonDetail.ReservationTimes.FirstOrDefault(x => x.ReserveId == reserveDto.ReserveId);
-					// 	reservationTime.ReservedByUserId = reserveDto.UserId;
-					// 	_dbContext.Set<ProductEntity>().Update(p);
-					// }
+					ProductEntity p = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == o.JsonDetail.ReservationTimes.First().ProductId))!;
 
-					List<string> ids = o.JsonDetail.ReservationTimes.Select(x => x.ReserveId).ToList();
-					List<ProductEntity> products = new();
-					foreach (string s in ids) {
-						ProductEntity p = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => o.JsonDetail.ReservationTimes.Select(y => y.ReserveId == s).FirstOrDefault()))!;
+					foreach (ReserveDto reserveDto in o.JsonDetail.ReservationTimes) {
+						p.JsonDetail.ReservationTimes!.FirstOrDefault(x => x.ReserveId == reserveDto.ReserveId)!.ReservedByUserId = _userId;
+						_dbContext.Set<ProductEntity>().Update(p);
 					}
 				}
 
