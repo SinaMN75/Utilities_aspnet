@@ -17,7 +17,7 @@ public class ContentEntity : BaseEntity {
 	[MaxLength(1000)]
 	public ContentJsonDetail JsonDetail { get; set; } = new();
 
-	public IEnumerable<MediaEntity>? Media { get; set; }
+	public IQueryable<MediaEntity>? Media { get; set; }
 }
 
 public class ContentJsonDetail {
@@ -129,13 +129,7 @@ public static class ContentEntityEx {
 			Description = e.Description,
 			Tags = e.Tags,
 			JsonDetail = e.JsonDetail,
-			Media = e.Media?.Select(x => new MediaReadDto {
-				Id = x.Id,
-				FileName = x.FileName,
-				Order = x.Order,
-				JsonDetail = x.JsonDetail,
-				Tags = x.Tags,
-			})
+			Media = e.Media?.MapReadDto()
 		};
 	}
 
@@ -147,13 +141,7 @@ public static class ContentEntityEx {
 			Description = x.Description,
 			Tags = x.Tags,
 			JsonDetail = x.JsonDetail,
-			Media = x.Media!.Select(y => new MediaReadDto {
-				Id = y.Id,
-				FileName = y.FileName,
-				Order = y.Order,
-				JsonDetail = y.JsonDetail,
-				Tags = y.Tags,
-			})
+			Media = x.Media!.MapReadDto()
 		});
 	}
 }
