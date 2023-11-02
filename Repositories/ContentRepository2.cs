@@ -1,6 +1,4 @@
-﻿using Utilities_aspnet.Services;
-
-namespace Utilities_aspnet.Repositories;
+﻿namespace Utilities_aspnet.Repositories;
 
 public interface IContentRepository2 {
 	Task<GenericResponse<ContentReadDto>> Create(ContentCreateDto dto, CancellationToken ct);
@@ -9,9 +7,9 @@ public interface IContentRepository2 {
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 }
 
-public class ContentRepository2(DbContext dbContext, IContentService contentService, IMediaRepository mediaRepository) : IContentRepository2 {
+public class ContentRepository2(DbContext dbContext, IMediaRepository mediaRepository) : IContentRepository2 {
 	public async Task<GenericResponse<ContentReadDto>> Create(ContentCreateDto dto, CancellationToken ct) {
-		ContentEntity response = await contentService.Create(new ContentEntity {
+		EntityEntry<ContentEntity> response = await dbContext.AddAsync(new ContentEntity {
 			Description = dto.Description,
 			Title = dto.Title,
 			SubTitle = dto.SubTitle,
@@ -35,12 +33,12 @@ public class ContentRepository2(DbContext dbContext, IContentService contentServ
 			}
 		}, ct);
 		return new GenericResponse<ContentReadDto>(new ContentReadDto {
-			Id = response.Id,
-			Title = response.Title,
-			SubTitle = response.SubTitle,
-			Description = response.Description,
-			Tags = response.Tags,
-			JsonDetail = response.JsonDetail
+			Id = response.Entity.Id,
+			Title = response.Entity.Title,
+			SubTitle = response.Entity.SubTitle,
+			Description = response.Entity.Description,
+			Tags = response.Entity.Tags,
+			JsonDetail = response.Entity.JsonDetail
 		});
 	}
 
