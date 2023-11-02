@@ -9,7 +9,7 @@ public interface IContentRepository2 {
 
 public class ContentRepository(DbContext dbContext, IMediaRepository mediaRepository) : IContentRepository2 {
 	public async Task<GenericResponse<ContentReadDto>> Create(ContentCreateDto dto, CancellationToken ct) {
-		EntityEntry<ContentEntity> response = await dbContext.AddAsync(new ContentEntity {
+		EntityEntry<ContentEntity> e = await dbContext.AddAsync(new ContentEntity {
 			Description = dto.Description,
 			Title = dto.Title,
 			SubTitle = dto.SubTitle,
@@ -33,34 +33,10 @@ public class ContentRepository(DbContext dbContext, IMediaRepository mediaReposi
 			}
 		}, ct);
 		await dbContext.SaveChangesAsync(ct);
-		return new GenericResponse<ContentReadDto>(new ContentReadDto {
-			Id = response.Entity.Id,
-			Title = response.Entity.Title,
-			SubTitle = response.Entity.SubTitle,
-			Description = response.Entity.Description,
-			Tags = response.Entity.Tags,
-			JsonDetail = response.Entity.JsonDetail
-		});
+		return new GenericResponse<ContentReadDto>(e.Entity.MapReadDto());
 	}
 
-	public GenericResponse<IQueryable<ContentReadDto>> Read() {
-		IQueryable<ContentReadDto> q = dbContext.Set<ContentEntity>().AsNoTracking().Select(x => new ContentReadDto {
-			Id = x.Id,
-			Title = x.Title,
-			SubTitle = x.SubTitle,
-			Description = x.Description,
-			Tags = x.Tags,
-			JsonDetail = x.JsonDetail,
-			Media = x.Media!.Select(y => new MediaReadDto {
-				Id = y.Id,
-				FileName = y.FileName,
-				Order = y.Order,
-				JsonDetail = y.JsonDetail,
-				Tags = y.Tags,
-			})
-		});
-		return new GenericResponse<IQueryable<ContentReadDto>>(q);
-	}
+	public GenericResponse<IQueryable<ContentReadDto>> Read() => new(dbContext.Set<ContentEntity>().AsNoTracking().MapReadDto());
 
 	public async Task<GenericResponse<ContentReadDto?>> Update(ContentUpdateDto dto, CancellationToken ct) {
 		ContentEntity? e = await dbContext.Set<ContentEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id, ct);
@@ -76,14 +52,7 @@ public class ContentRepository(DbContext dbContext, IMediaRepository mediaReposi
 
 		dbContext.Update(e);
 		await dbContext.SaveChangesAsync(ct);
-		return new GenericResponse<ContentReadDto?>(new ContentReadDto {
-			Id = e.Id,
-			Title = e.Title,
-			SubTitle = e.SubTitle,
-			Description = e.Description,
-			Tags = e.Tags,
-			JsonDetail = e.JsonDetail,
-		});
+		return new GenericResponse<ContentReadDto?>(e.MapReadDto());
 	}
 
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
