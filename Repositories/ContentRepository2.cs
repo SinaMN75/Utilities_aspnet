@@ -4,7 +4,7 @@ namespace Utilities_aspnet.Repositories;
 
 public interface IContentRepository2 {
 	Task<GenericResponse<ContentReadDto>> Create(ContentCreateDto dto, CancellationToken ct);
-	GenericResponse<IQueryable<ContentEntity>> Read();
+	GenericResponse<IQueryable<ContentReadDto>> Read();
 	Task<GenericResponse<ContentEntity>> Update(ContentUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 }
@@ -44,8 +44,17 @@ public class ContentRepository2(DbContext dbContext, IContentService contentServ
 		});
 	}
 
-	public GenericResponse<IQueryable<ContentEntity>> Read() {
-		return new GenericResponse<IQueryable<ContentEntity>>(dbContext.Set<ContentEntity>().AsNoTracking().Include(x => x.Media));
+	public GenericResponse<IQueryable<ContentReadDto>> Read() {
+		IQueryable<ContentReadDto> q = dbContext.Set<ContentEntity>().AsNoTracking().Select(x => new ContentReadDto {
+			Id = x.Id,
+			Title = x.Title,
+			SubTitle = x.SubTitle,
+			Description = x.Description,
+			Tags = x.Tags,
+			JsonDetail = x.JsonDetail,
+			Media = x.Media
+		});
+		return new GenericResponse<IQueryable<ContentReadDto>>(q);
 	}
 
 	public async Task<GenericResponse<ContentEntity>> Update(ContentUpdateDto dto, CancellationToken ct) {

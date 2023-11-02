@@ -40,11 +40,11 @@ public class ContentJsonDetail {
 
 public class ContentReadDto {
 	public Guid Id { get; set; }
-	public required string Title { get; set; }
-	public required string SubTitle { get; set; }
-	public required string Description { get; set; }
-	public required List<TagContent> Tags { get; set; } = new();
-	public required ContentJsonDetail JsonDetail { get; set; } = new();
+	public string? Title { get; set; }
+	public string? SubTitle { get; set; }
+	public string? Description { get; set; }
+	public List<TagContent>? Tags { get; set; }
+	public ContentJsonDetail? JsonDetail { get; set; }
 	public IEnumerable<MediaEntity>? Media { get; set; }
 }
 
