@@ -45,7 +45,7 @@ public class ContentReadDto {
 	public string? Description { get; set; }
 	public List<TagContent>? Tags { get; set; }
 	public ContentJsonDetail? JsonDetail { get; set; }
-	public IEnumerable<MediaEntity>? Media { get; set; }
+	public IEnumerable<MediaReadDto>? Media { get; set; }
 }
 
 public class ContentCreateUpdateDto {

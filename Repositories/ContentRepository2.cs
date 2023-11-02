@@ -52,7 +52,13 @@ public class ContentRepository2(DbContext dbContext, IContentService contentServ
 			Description = x.Description,
 			Tags = x.Tags,
 			JsonDetail = x.JsonDetail,
-			Media = x.Media
+			Media = x.Media!.Select(y => new MediaReadDto {
+				Id = y.Id,
+				FileName = y.FileName,
+				Order = y.Order,
+				JsonDetail = y.JsonDetail,
+				Tags = y.Tags,
+			})
 		});
 		return new GenericResponse<IQueryable<ContentReadDto>>(q);
 	}

@@ -5,9 +5,6 @@ public class MediaEntity : BaseEntity {
 	[MaxLength(50)]
 	public string? FileName { get; set; }
 
-	[MaxLength(20)]
-	public string? UseCase { get; set; }
-
 	public int? Order { get; set; }
 
 	[MaxLength(1000)]
@@ -140,4 +137,13 @@ public class UpdateMediaDto {
 	public List<TagMedia>? Tags { get; set; }
 	public List<TagMedia>? RemoveTags { get; set; }
 	public List<TagMedia>? AddTags { get; set; }
+}
+
+public class MediaReadDto {
+	public required Guid Id { get; set; }
+	public required string? FileName { get; set; }
+	public required int? Order { get; set; }
+	public MediaJsonDetail? JsonDetail { get; set; }
+	public List<TagMedia>? Tags { get; set; }
+	public string Url => $"{Server.ServerAddress}/Medias/{FileName}";
 }
