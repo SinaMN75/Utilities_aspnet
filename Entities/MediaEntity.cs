@@ -152,6 +152,6 @@ public static class MediaEntityEx {
 	public static MediaReadDto MapReadDto(this MediaEntity e) =>
 		new() { Id = e.Id, FileName = e.FileName, Order = e.Order, JsonDetail = e.JsonDetail, Tags = e.Tags };
 
-	public static IQueryable<MediaReadDto> MapReadDto(this IQueryable<MediaEntity> e) =>
+	public static IEnumerable<MediaReadDto> MapReadDto(this IEnumerable<MediaEntity>? e) =>
 		e.Select(y => new MediaReadDto { Id = y.Id, FileName = y.FileName, Order = y.Order, JsonDetail = y.JsonDetail, Tags = y.Tags });
 }

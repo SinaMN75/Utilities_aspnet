@@ -1,13 +1,13 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
-public interface IContentRepository2 {
+public interface IContentRepository {
 	Task<GenericResponse<ContentReadDto>> Create(ContentCreateDto dto, CancellationToken ct);
 	GenericResponse<IQueryable<ContentReadDto>> Read();
 	Task<GenericResponse<ContentReadDto?>> Update(ContentUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 }
 
-public class ContentRepository(DbContext dbContext, IMediaRepository mediaRepository) : IContentRepository2 {
+public class ContentRepository(DbContext dbContext, IMediaRepository mediaRepository) : IContentRepository {
 	public async Task<GenericResponse<ContentReadDto>> Create(ContentCreateDto dto, CancellationToken ct) {
 		EntityEntry<ContentEntity> e = await dbContext.AddAsync(new ContentEntity {
 			Description = dto.Description,
