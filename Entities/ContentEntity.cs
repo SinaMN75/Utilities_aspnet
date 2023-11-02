@@ -73,7 +73,7 @@ public class ContentCreateUpdateDto {
 	public List<TagContent>? AddTags { get; set; }
 }
 
-public record ContentCreateDto {
+public class ContentCreateDto {
 	public string Title { get; set; } = "";
 	public string SubTitle { get; set; } = "";
 	public string Description { get; set; } = "";
@@ -95,7 +95,7 @@ public record ContentCreateDto {
 	public List<TagContent> Tags { get; set; } = new();
 }
 
-public record ContentUpdateDto {
+public class ContentUpdateDto {
 	public Guid? Id { get; set; }
 	public string? Title { get; set; }
 	public string? SubTitle { get; set; }
@@ -115,7 +115,7 @@ public record ContentUpdateDto {
 	public string? Address1 { get; set; }
 	public string? Address2 { get; set; }
 	public string? Address3 { get; set; }
-	public List<TagContent> Tags { get; set; } = new();
+	public List<TagContent>? Tags { get; set; }
 	public List<TagContent>? RemoveTags { get; set; }
 	public List<TagContent>? AddTags { get; set; }
 }

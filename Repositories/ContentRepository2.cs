@@ -3,7 +3,7 @@
 public interface IContentRepository2 {
 	Task<GenericResponse<ContentReadDto>> Create(ContentCreateDto dto, CancellationToken ct);
 	GenericResponse<IQueryable<ContentReadDto>> Read();
-	Task<GenericResponse<ContentEntity>> Update(ContentUpdateDto dto, CancellationToken ct);
+	Task<GenericResponse<ContentReadDto?>> Update(ContentUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 }
 
@@ -32,6 +32,7 @@ public class ContentRepository2(DbContext dbContext, IMediaRepository mediaRepos
 				Email2 = dto.Email2
 			}
 		}, ct);
+		await dbContext.SaveChangesAsync(ct);
 		return new GenericResponse<ContentReadDto>(new ContentReadDto {
 			Id = response.Entity.Id,
 			Title = response.Entity.Title,
@@ -61,25 +62,28 @@ public class ContentRepository2(DbContext dbContext, IMediaRepository mediaRepos
 		return new GenericResponse<IQueryable<ContentReadDto>>(q);
 	}
 
-	public async Task<GenericResponse<ContentEntity>> Update(ContentUpdateDto dto, CancellationToken ct) {
-		ContentEntity e = (await dbContext.Set<ContentEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id, ct))!;
+	public async Task<GenericResponse<ContentReadDto?>> Update(ContentUpdateDto dto, CancellationToken ct) {
+		ContentEntity? e = await dbContext.Set<ContentEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id, ct);
+		if (e is null) return new GenericResponse<ContentReadDto?>(null, UtilitiesStatusCodes.NotFound);
 		e.Title = dto.Title ?? e.Title;
 		e.SubTitle = dto.SubTitle ?? e.SubTitle;
 		e.Description = dto.Description ?? e.Description;
 		e.UpdatedAt = DateTime.Now;
 		e.Tags = dto.Tags ?? e.Tags;
 
-		if (dto.RemoveTags.IsNotNullOrEmpty()) {
-			dto.RemoveTags.ForEach(item => e.Tags?.Remove(item));
-		}
-
-		if (dto.AddTags.IsNotNullOrEmpty()) {
-			e.Tags.AddRange(dto.AddTags);
-		}
+		if (dto.RemoveTags.IsNotNullOrEmpty()) dto.RemoveTags!.ForEach(item => e.Tags?.Remove(item));
+		if (dto.AddTags.IsNotNullOrEmpty()) e.Tags!.AddRange(dto.AddTags!);
 
 		dbContext.Update(e);
 		await dbContext.SaveChangesAsync(ct);
-		return new GenericResponse<ContentEntity>(e);
+		return new GenericResponse<ContentReadDto?>(new ContentReadDto {
+			Id = e.Id,
+			Title = e.Title,
+			SubTitle = e.SubTitle,
+			Description = e.Description,
+			Tags = e.Tags,
+			JsonDetail = e.JsonDetail,
+		});
 	}
 
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
