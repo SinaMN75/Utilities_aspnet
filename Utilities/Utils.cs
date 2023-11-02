@@ -84,8 +84,7 @@ public static class StartupExtension {
 		builder.Services.AddScoped<IFormRepository, FormRepository>();
 		builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 		builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
-		builder.Services.AddScoped<IContentRepository, ContentRepository>();
-		builder.Services.AddScoped<IContentRepository2, ContentRepository2>();
+		builder.Services.AddScoped<IContentRepository2, ContentRepository>();
 		builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 		builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
 		builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();

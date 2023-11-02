@@ -119,3 +119,41 @@ public class ContentUpdateDto {
 	public List<TagContent>? RemoveTags { get; set; }
 	public List<TagContent>? AddTags { get; set; }
 }
+
+public static class ContentEntityEx {
+	public static ContentReadDto MapReadDto(this ContentEntity e) {
+		return new ContentReadDto {
+			Id = e.Id,
+			Title = e.Title,
+			SubTitle = e.SubTitle,
+			Description = e.Description,
+			Tags = e.Tags,
+			JsonDetail = e.JsonDetail,
+			Media = e.Media?.Select(x => new MediaReadDto {
+				Id = x.Id,
+				FileName = x.FileName,
+				Order = x.Order,
+				JsonDetail = x.JsonDetail,
+				Tags = x.Tags,
+			})
+		};
+	}
+
+	public static IQueryable<ContentReadDto> MapReadDto(this IQueryable<ContentEntity> e) {
+		return e.Select(x => new ContentReadDto {
+			Id = x.Id,
+			Title = x.Title,
+			SubTitle = x.SubTitle,
+			Description = x.Description,
+			Tags = x.Tags,
+			JsonDetail = x.JsonDetail,
+			Media = x.Media!.Select(y => new MediaReadDto {
+				Id = y.Id,
+				FileName = y.FileName,
+				Order = y.Order,
+				JsonDetail = y.JsonDetail,
+				Tags = y.Tags,
+			})
+		});
+	}
+}
