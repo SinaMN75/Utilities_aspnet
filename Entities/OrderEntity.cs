@@ -81,7 +81,16 @@ public class ReserveCreateUpdateDto {
 }
 
 public class OrderJsonDetail {
+	public List<OrderDetailHistory> OrderDetailHistories { get; set; } = new();
 	public List<ReserveDto> ReservationTimes { get; set; } = new();
+}
+
+public class OrderDetailHistory {
+	public string? ProductId { get; set; }
+	public string? Title { get; set; }
+	public int? Count { get; set; }
+	public long? UnitPrice { get; set; }
+	public long? FinalPrice { get; set; }
 }
 
 public class ReserveDto {

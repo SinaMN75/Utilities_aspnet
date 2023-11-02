@@ -415,7 +415,8 @@ public enum TagOrder {
 	Sent = 408,
 	Conflict = 409,
 	Complete = 410,
-	Private = 501
+	Private = 501,
+	Visible = 601
 }
 
 public enum TagUser {

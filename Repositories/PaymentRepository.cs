@@ -87,6 +87,14 @@ public class PaymentRepository : IPaymentRepository {
 						ProductEntity p = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == item.ProductId))!;
 						p.Stock -= item.Count;
 						_dbContext.Update(p);
+						
+						o.JsonDetail.OrderDetailHistories.Add(new OrderDetailHistory {
+							ProductId = item.ProductId.ToString(),
+							Count = item.Count,
+							Title = (item.Product?.Parent?.Title ?? "") + " " + (item.Product?.Title ?? ""),
+							UnitPrice = item.UnitPrice,
+							FinalPrice = item.FinalPrice
+						});
 					}
 
 				_dbContext.Update(o);
@@ -96,7 +104,7 @@ public class PaymentRepository : IPaymentRepository {
 					Descriptions = $"خرید",
 					RefId = refId,
 					CardNumber = cardNumber,
-					Tags = new List<TagTransaction>() { TagTransaction.Buy },
+					Tags = new List<TagTransaction> { TagTransaction.Buy },
 					UserId = _userId,
 					OrderId = o.Id
 				});
@@ -106,7 +114,7 @@ public class PaymentRepository : IPaymentRepository {
 					Descriptions = $"فروش",
 					RefId = refId,
 					CardNumber = cardNumber,
-					Tags = new List<TagTransaction>() { TagTransaction.Buy },
+					Tags = new List<TagTransaction> { TagTransaction.Buy },
 					UserId = productOwner.Id,
 					OrderId = o.Id
 				});
