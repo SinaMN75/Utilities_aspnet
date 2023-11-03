@@ -36,7 +36,22 @@ public class ContentRepository(DbContext dbContext, IMediaRepository mediaReposi
 		return new GenericResponse<ContentEntity>(e.Entity);
 	}
 
-	public GenericResponse<IQueryable<ContentEntity>> Read() => new(dbContext.Set<ContentEntity>().AsNoTracking());
+	public GenericResponse<IQueryable<ContentEntity>> Read() => new(dbContext.Set<ContentEntity>().AsNoTracking()
+		.Select(x => new ContentEntity {
+			Id = x.Id,
+			Title = x.Title,
+			SubTitle = x.SubTitle,
+			Description = x.Description,
+			Tags = x.Tags,
+			JsonDetail = x.JsonDetail,
+			Media = x.Media!.Select(y => new MediaEntity {
+				Id = y.Id,
+				FileName = y.FileName,
+				Order = y.Order,
+				JsonDetail = y.JsonDetail,
+				Tags = y.Tags
+			}),
+		}));
 
 	public async Task<GenericResponse<ContentEntity?>> Update(ContentUpdateDto dto, CancellationToken ct) {
 		ContentEntity? e = await dbContext.Set<ContentEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id, ct);
