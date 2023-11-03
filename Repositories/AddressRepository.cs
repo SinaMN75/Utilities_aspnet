@@ -2,7 +2,7 @@
 
 public interface IAddressRepository {
 	Task<GenericResponse<AddressEntity?>> Create(AddressCreateDto dto, CancellationToken ct);
-	GenericResponse<IQueryable<AddressEntity>> Filter(AddressFilterDto dto);
+	Task<GenericResponse<IQueryable<AddressEntity>>> Filter(AddressFilterDto dto);
 	Task<GenericResponse<AddressEntity?>> Update(AddressUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse> Delete(Guid addressId, CancellationToken ct);
 }
@@ -11,7 +11,7 @@ public class AddressRepository(DbContext dbContext, IHttpContextAccessor httpCon
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	public async Task<GenericResponse<AddressEntity?>> Create(AddressCreateDto addressDto, CancellationToken ct) {
-		AddressEntity e = new() {
+		EntityEntry<AddressEntity> e = await dbContext.Set<AddressEntity>().AddAsync(new AddressEntity {
 			Address = addressDto.Address,
 			CreatedAt = DateTime.Now,
 			Pelak = addressDto.Pelak,
@@ -20,11 +20,10 @@ public class AddressRepository(DbContext dbContext, IHttpContextAccessor httpCon
 			ReceiverPhoneNumber = addressDto.ReceiverPhoneNumber,
 			Unit = addressDto.Unit,
 			UserId = _userId
-		};
-		await dbContext.Set<AddressEntity>().AddAsync(e, ct);
+		}, ct);
 		await dbContext.SaveChangesAsync(ct);
 		await outputCache.EvictByTagAsync("address", ct);
-		return new GenericResponse<AddressEntity?>(e);
+		return new GenericResponse<AddressEntity?>(e.Entity);
 	}
 
 	public async Task<GenericResponse<AddressEntity?>> Update(AddressUpdateDto dto, CancellationToken ct) {
@@ -54,13 +53,26 @@ public class AddressRepository(DbContext dbContext, IHttpContextAccessor httpCon
 		return new GenericResponse();
 	}
 
-	public GenericResponse<IQueryable<AddressEntity>> Filter(AddressFilterDto dto) {
-		IQueryable<AddressEntity> q = dbContext.Set<AddressEntity>().AsNoTracking();
+	public async Task<GenericResponse<IQueryable<AddressEntity>>> Filter(AddressFilterDto dto) {
+		IQueryable<AddressEntity> q = dbContext.Set<AddressEntity>().AsNoTracking().Select(x => new AddressEntity {
+			Id = x.Id,
+			CreatedAt = x.CreatedAt,
+			UpdatedAt = x.UpdatedAt,
+			ReceiverFullName = x.ReceiverFullName,
+			ReceiverPhoneNumber = x.ReceiverPhoneNumber,
+			Address = x.Address,
+			Pelak = x.Pelak,
+			Unit = x.Unit,
+			PostalCode = x.PostalCode,
+			IsDefault = x.IsDefault,
+			UserId = x.UserId
+		});
+		
 		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(o => o.UserId == dto.UserId);
 
-		int totalCount = q.Count();
+		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
-		return new GenericResponse<IQueryable<AddressEntity>>(q.AsSingleQuery()) {
+		return new GenericResponse<IQueryable<AddressEntity>>(q) {
 			TotalCount = totalCount,
 			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
 			PageSize = dto.PageSize

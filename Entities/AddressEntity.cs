@@ -26,7 +26,6 @@ public class AddressEntity : BaseEntity {
 }
 
 public class AddressCreateDto {
-	public Guid? Id { get; set; }
 	public required string ReceiverFullName { get; set; }
 	public required string ReceiverPhoneNumber { get; set; }
 	public required string Address { get; set; }
