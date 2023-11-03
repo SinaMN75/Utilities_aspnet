@@ -9,7 +9,7 @@ public interface IChatRepository {
 	Task<GenericResponse<GroupChatMessageEntity?>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto);
 	Task<GenericResponse> DeleteGroupChatMessage(Guid id);
 	GenericResponse<IQueryable<GroupChatEntity>> FilterGroupChats(GroupChatFilterDto dto);
-	GenericResponse<IQueryable<GroupChatEntity>> FilterAllGroupChats(GroupChatFilterDto dto);
+	Task<GenericResponse<IQueryable<GroupChatEntity>>> FilterAllGroupChats(GroupChatFilterDto dto);
 	Task<GenericResponse<GroupChatEntity>> ReadGroupChatById(Guid id);
 	GenericResponse<IQueryable<GroupChatMessageEntity>?> ReadGroupChatMessages(Guid id, int pageSize, int pageNumber);
 	Task<GenericResponse> SeenGroupChatMessage(Guid messageId);
@@ -247,9 +247,8 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		};
 	}
 
-	public GenericResponse<IQueryable<GroupChatEntity>> FilterAllGroupChats(GroupChatFilterDto dto) {
+	public async Task<GenericResponse<IQueryable<GroupChatEntity>>> FilterAllGroupChats(GroupChatFilterDto dto) {
 		IQueryable<GroupChatEntity> q = dbContext.Set<GroupChatEntity>();
-
 		if (dto.UsersIds.IsNotNullOrEmpty()) q = q.Where(x => x.Users!.Any(y => y.Id == dto.UsersIds!.FirstOrDefault()));
 		if (dto.ProductsIds.IsNotNullOrEmpty()) q = q.Where(x => x.Products!.Any(y => y.Id == dto.ProductsIds!.FirstOrDefault()));
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => x.Title == dto.Title);
@@ -277,6 +276,8 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 
 		int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
+
+		await DeleteEmptyGroups(q);
 
 		return new GenericResponse<IQueryable<GroupChatEntity>>(q.AsNoTracking()) {
 			TotalCount = totalCount,
@@ -470,5 +471,12 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		EntityEntry<GroupChatEntity> e = await dbContext.Set<GroupChatEntity>().AddAsync(entity);
 		await dbContext.SaveChangesAsync();
 		return new GenericResponse<GroupChatEntity?>(e.Entity);
+	}
+	
+	private async Task DeleteEmptyGroups(IQueryable<GroupChatEntity> q) {
+		foreach (GroupChatEntity groupChatEntity in q)
+			if (groupChatEntity.Users.IsNullOrEmpty())
+				dbContext.Remove(groupChatEntity);
+		await dbContext.SaveChangesAsync();
 	}
 }
