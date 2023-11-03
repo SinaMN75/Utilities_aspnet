@@ -1,14 +1,14 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
 public interface IContentRepository {
-	Task<GenericResponse<ContentReadDto>> Create(ContentCreateDto dto, CancellationToken ct);
-	GenericResponse<IQueryable<ContentReadDto>> Read();
-	Task<GenericResponse<ContentReadDto?>> Update(ContentUpdateDto dto, CancellationToken ct);
+	Task<GenericResponse<ContentEntity>> Create(ContentCreateDto dto, CancellationToken ct);
+	GenericResponse<IQueryable<ContentEntity>> Read();
+	Task<GenericResponse<ContentEntity?>> Update(ContentUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 }
 
 public class ContentRepository(DbContext dbContext, IMediaRepository mediaRepository) : IContentRepository {
-	public async Task<GenericResponse<ContentReadDto>> Create(ContentCreateDto dto, CancellationToken ct) {
+	public async Task<GenericResponse<ContentEntity>> Create(ContentCreateDto dto, CancellationToken ct) {
 		EntityEntry<ContentEntity> e = await dbContext.AddAsync(new ContentEntity {
 			Description = dto.Description,
 			Title = dto.Title,
@@ -33,14 +33,14 @@ public class ContentRepository(DbContext dbContext, IMediaRepository mediaReposi
 			}
 		}, ct);
 		await dbContext.SaveChangesAsync(ct);
-		return new GenericResponse<ContentReadDto>(e.Entity.MapReadDto());
+		return new GenericResponse<ContentEntity>(e.Entity);
 	}
 
-	public GenericResponse<IQueryable<ContentReadDto>> Read() => new(dbContext.Set<ContentEntity>().AsNoTracking().MapReadDto());
+	public GenericResponse<IQueryable<ContentEntity>> Read() => new(dbContext.Set<ContentEntity>().AsNoTracking());
 
-	public async Task<GenericResponse<ContentReadDto?>> Update(ContentUpdateDto dto, CancellationToken ct) {
+	public async Task<GenericResponse<ContentEntity?>> Update(ContentUpdateDto dto, CancellationToken ct) {
 		ContentEntity? e = await dbContext.Set<ContentEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id, ct);
-		if (e is null) return new GenericResponse<ContentReadDto?>(null, UtilitiesStatusCodes.NotFound);
+		if (e is null) return new GenericResponse<ContentEntity?>(null, UtilitiesStatusCodes.NotFound);
 		e.Title = dto.Title ?? e.Title;
 		e.SubTitle = dto.SubTitle ?? e.SubTitle;
 		e.Description = dto.Description ?? e.Description;
@@ -52,7 +52,7 @@ public class ContentRepository(DbContext dbContext, IMediaRepository mediaReposi
 
 		dbContext.Update(e);
 		await dbContext.SaveChangesAsync(ct);
-		return new GenericResponse<ContentReadDto?>(e.MapReadDto());
+		return new GenericResponse<ContentEntity?>(e);
 	}
 
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {

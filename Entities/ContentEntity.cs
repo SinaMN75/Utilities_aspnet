@@ -38,16 +38,6 @@ public class ContentJsonDetail {
 	public string? Address3 { get; set; }
 }
 
-public class ContentReadDto {
-	public Guid Id { get; set; }
-	public string? Title { get; set; }
-	public string? SubTitle { get; set; }
-	public string? Description { get; set; }
-	public List<TagContent>? Tags { get; set; }
-	public ContentJsonDetail? JsonDetail { get; set; }
-	public IEnumerable<MediaReadDto>? Media { get; set; }
-}
-
 public class ContentCreateDto {
 	public string Title { get; set; } = "";
 	public string SubTitle { get; set; } = "";
@@ -93,30 +83,4 @@ public class ContentUpdateDto {
 	public List<TagContent>? Tags { get; set; }
 	public List<TagContent>? RemoveTags { get; set; }
 	public List<TagContent>? AddTags { get; set; }
-}
-
-public static class ContentEntityEx {
-	public static ContentReadDto MapReadDto(this ContentEntity e) {
-		return new ContentReadDto {
-			Id = e.Id,
-			Title = e.Title,
-			SubTitle = e.SubTitle,
-			Description = e.Description,
-			Tags = e.Tags,
-			JsonDetail = e.JsonDetail,
-			Media = e.Media?.Select(y => new MediaReadDto { Id = y.Id, FileName = y.FileName, Order = y.Order, JsonDetail = y.JsonDetail, Tags = y.Tags })
-		};
-	}
-
-	public static IQueryable<ContentReadDto> MapReadDto(this IQueryable<ContentEntity> e) {
-		return e.Select(x => new ContentReadDto {
-			Id = x.Id,
-			Title = x.Title,
-			SubTitle = x.SubTitle,
-			Description = x.Description,
-			Tags = x.Tags,
-			JsonDetail = x.JsonDetail,
-			Media = x.Media!.Select(y => new MediaReadDto { Id = y.Id, FileName = y.FileName, Order = y.Order, JsonDetail = y.JsonDetail, Tags = y.Tags })
-		});
-	}
 }
