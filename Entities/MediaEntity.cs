@@ -2,7 +2,7 @@
 
 [Table("Media")]
 public class MediaEntity : BaseEntity {
-	[MaxLength(50)]
+	[MaxLength(100)]
 	public string? FileName { get; set; }
 
 	public int? Order { get; set; }
