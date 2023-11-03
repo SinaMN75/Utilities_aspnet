@@ -51,7 +51,6 @@ public class EnumDto {
 	public DateTime? DateTime { get; set; }
 	public DateTime? UtcDateTime { get; set; }
 	public IEnumerable<IdTitleDto>? FormFieldType { get; set; }
-	public IEnumerable<IdTitleDto>? TransactionStatuses { get; set; }
 	public IEnumerable<IdTitleDto>? UtilitiesStatusCodes { get; set; }
 	public IEnumerable<IdTitleDto>? Currency { get; set; }
 	public IEnumerable<IdTitleDto>? SeenStatus { get; set; }
@@ -70,7 +69,6 @@ public class EnumDto {
 	public IEnumerable<IdTitleDto>? TagContent { get; set; }
 	public IEnumerable<IdTitleDto>? TagNotification { get; set; }
 	public IEnumerable<IdTitleDto>? TagMedia { get; set; }
-	public IEnumerable<IdTitleDto>? TransactionType { get; set; }
 	public IEnumerable<IdTitleDto>? TagComments { get; set; }
 	public AppSettings? AppSettings { get; set; }
 }
