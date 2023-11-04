@@ -38,10 +38,4 @@ public class ReportCreateUpdateDto {
 	public Guid? GroupChatId { get; set; }
 }
 
-public class ReportFilterDto {
-	public bool? User { get; set; }
-	public bool? Product { get; set; }
-	public bool? Chat { get; set; }
-	public bool? GroupChatMessage { get; set; }
-	public bool? GroupChat { get; set; }
-}
+public class ReportFilterDto : BaseFilterDto;

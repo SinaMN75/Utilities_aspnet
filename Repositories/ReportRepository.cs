@@ -2,7 +2,7 @@ namespace Utilities_aspnet.Repositories;
 
 public interface IReportRepository {
 	Task<GenericResponse<ReportEntity?>> Create(ReportCreateUpdateDto dto);
-	GenericResponse<IQueryable<ReportEntity>> Read(ReportFilterDto dto);
+	GenericResponse<IQueryable<ReportEntity>> Filter(ReportFilterDto dto);
 	Task<GenericResponse<ReportEntity?>> ReadById(Guid id);
 	Task<GenericResponse> Delete(Guid id);
 }
@@ -26,12 +26,66 @@ public class ReportRepository(DbContext context, IHttpContextAccessor httpContex
 		return await ReadById(entity.Id);
 	}
 
-	public GenericResponse<IQueryable<ReportEntity>> Read(ReportFilterDto dto) {
-		IQueryable<ReportEntity> e = context.Set<ReportEntity>().AsNoTracking();
-		if (dto.User == true) e = e.Include(x => x.User).ThenInclude(x => x!.Media);
-		if (dto.Product == true) e = e.Include(x => x.Product).ThenInclude(x => x!.Media);
-		if (dto.GroupChat == true) e = e.Include(x => x.GroupChat);
-		if (dto.GroupChatMessage == true) e = e.Include(x => x.GroupChatMessage);
+	public GenericResponse<IQueryable<ReportEntity>> Filter(ReportFilterDto dto) {
+		IQueryable<ReportEntity> e = context.Set<ReportEntity>().AsNoTracking().Select(x => new ReportEntity {
+			Id = x.Id,
+			CreatedAt = x.CreatedAt,
+			UpdatedAt = x.UpdatedAt,
+			Title = x.Title,
+			Description = x.Description,
+			Comment = new CommentEntity {
+				Id = x.Comment!.Id,
+				Comment = x.Comment.Comment,
+				UserId = x.Comment.UserId,
+				Tags = x.Comment.Tags,
+				JsonDetail = x.Comment.JsonDetail,
+				TargetUserId = x.Comment.TargetUserId,
+				ProductId = x.Comment.ProductId,
+			},
+			Product = new ProductEntity {
+				Id = x.Product!.Id,
+				Title = x.Product.Title,
+				Tags = x.Product.Tags,
+				JsonDetail = x.Product.JsonDetail,
+				ParentId = x.Product.ParentId
+			},
+			User = new UserEntity {
+				Id = x.User!.Id,
+				Tags = x.User.Tags,
+				JsonDetail = x.User.JsonDetail,
+				FirstName = x.User.FirstName,
+				LastName = x.User.LastName,
+				FullName = x.User.FullName,
+				AppUserName = x.User.AppUserName,
+				AppEmail = x.User.AppEmail,
+				AppPhoneNumber = x.User.AppPhoneNumber,
+				Email = x.User.Email,
+				PhoneNumber = x.User.PhoneNumber
+			},
+			CreatorUser = new UserEntity {
+				Id = x.CreatorUser!.Id,
+				Tags = x.CreatorUser.Tags,
+				JsonDetail = x.CreatorUser.JsonDetail,
+				FirstName = x.CreatorUser.FirstName,
+				LastName = x.CreatorUser.LastName,
+				FullName = x.CreatorUser.FullName,
+				AppUserName = x.CreatorUser.AppUserName,
+				AppEmail = x.CreatorUser.AppEmail,
+				AppPhoneNumber = x.CreatorUser.AppPhoneNumber,
+				Email = x.CreatorUser.Email,
+				PhoneNumber = x.CreatorUser.PhoneNumber
+			},
+			GroupChat = new GroupChatEntity {
+				Id = x.GroupChat!.Id,
+				Title = x.GroupChat.Title
+			},
+			GroupChatMessage = new GroupChatMessageEntity {
+				Id = x.GroupChatMessage!.Id,
+				Message = x.GroupChatMessage.Message,
+				UserId = x.GroupChatMessage.UserId,
+				GroupChatId = x.GroupChatMessage.GroupChatId
+			}
+		});
 		return new GenericResponse<IQueryable<ReportEntity>>(e);
 	}
 
