@@ -34,7 +34,7 @@ public class ProductRepository(DbContext dbContext,
 
         TagProduct tagProduct = getTagProduct(dto);
         Tuple<bool, UtilitiesStatusCodes> overUsedCheck =
-            Utils.IsUserOverused(dbContext, _userId, CallerType.CreateProduct, null, tagProduct.HasFlag(TagProduct.None) ? null : tagProduct, appSettings.UsageRulesBeforeUpgrade, appSettings.UsageRulesAfterUpgrade);
+            Utils.IsUserOverused(dbContext, _userId, CallerType.CreateProduct, null, tagProduct.HasFlag(TagProduct.None) ? null : tagProduct, null , appSettings.UsageRulesBeforeUpgrade, appSettings.UsageRulesAfterUpgrade);
         if (overUsedCheck.Item1) return new GenericResponse<ProductEntity?>(null, overUsedCheck.Item2);
 
         if (dto.ProductInsight is not null) dto.ProductInsight.UserId = _userId;
@@ -91,7 +91,7 @@ public class ProductRepository(DbContext dbContext,
 		config.GetSection("AppSettings").Bind(appSettings);
         TagProduct tagProduct = getTagProduct(dto);
         Tuple<bool, UtilitiesStatusCodes> overUsedCheck =
-			Utils.IsUserOverused(dbContext, _userId ?? string.Empty, CallerType.CreateProduct, null, tagProduct, appSettings.UsageRulesBeforeUpgrade , appSettings.UsageRulesAfterUpgrade);
+			Utils.IsUserOverused(dbContext, _userId ?? string.Empty, CallerType.CreateProduct, null, tagProduct, null, appSettings.UsageRulesBeforeUpgrade , appSettings.UsageRulesAfterUpgrade);
 		if (overUsedCheck.Item1) return new GenericResponse<ProductEntity?>(null, overUsedCheck.Item2);
 
 		if (dto.Upload is not null)

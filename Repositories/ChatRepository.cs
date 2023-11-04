@@ -27,7 +27,7 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
 		Tuple<bool, UtilitiesStatusCodes> overUsedCheck =
-			Utils.IsUserOverused(dbContext, _userId ?? string.Empty, CallerType.CreateGroupChat, dto.Type, null, appSettings.UsageRulesBeforeUpgrade , appSettings.UsageRulesAfterUpgrade);
+			Utils.IsUserOverused(dbContext, _userId ?? string.Empty, CallerType.CreateGroupChat, dto.Type, null, null , appSettings.UsageRulesBeforeUpgrade , appSettings.UsageRulesAfterUpgrade);
 		if (overUsedCheck.Item1)
 			return new GenericResponse<GroupChatEntity?>(null, overUsedCheck.Item2);
 
