@@ -150,6 +150,7 @@ public enum CallerType {
 	CreateGroupChat = 100,
 	CreateComment = 101,
 	CreateProduct = 102,
+	SendPost = 103,
 	None = 99999
 }
 
