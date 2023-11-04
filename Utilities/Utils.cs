@@ -3,10 +3,8 @@
 public static class StartupExtension {
 	public static void SetupUtilities<T>(this WebApplicationBuilder builder, string connectionStrings) where T : DbContext {
 		builder.AddUtilitiesServices<T>(connectionStrings);
-
-		IServiceProvider? serviceProvider = builder.Services.BuildServiceProvider().GetService<IServiceProvider>();
-
-		builder.AddUtilitiesSwagger(serviceProvider);
+		
+		builder.AddUtilitiesSwagger(builder.Services.BuildServiceProvider().GetService<IServiceProvider>());
 		builder.AddUtilitiesIdentity();
 
 		builder.Services.Configure<FormOptions>(x => {

@@ -43,10 +43,47 @@ public class TransactionRepository(DbContext dbContext, IOutputCacheStore output
 		return new GenericResponse();
 	}
 
+
 	public GenericResponse<IQueryable<TransactionEntity>> Filter(TransactionFilterDto dto) {
-		IQueryable<TransactionEntity> q = dbContext.Set<TransactionEntity>().Include(x => x.User).Include(x => x.Order).AsNoTracking();
-		if (dto.RefId is not null) q = q.Where(x => x.RefId == dto.RefId);
-		if (dto.UserId is not null) q = q.Where(x => x.UserId == dto.UserId);
+		IQueryable<TransactionEntity> q = dbContext.Set<TransactionEntity>().AsNoTracking().OrderBy(x => x.CreatedAt)
+			.Select(x => new TransactionEntity {
+				Id = x.Id,
+				CreatedAt = x.CreatedAt,
+				UpdatedAt = x.UpdatedAt,
+				Amount = x.Amount,
+				Descriptions = x.Descriptions,
+				RefId = x.RefId,
+				CardNumber = x.CardNumber,
+				Tags = x.Tags,
+				UserId = x.UserId,
+				OrderId = x.OrderId,
+				SubscriptionId = x.SubscriptionId,
+				User = new UserEntity {
+					Id = x.User.Id,
+					FirstName = x.User.FirstName,
+					LastName = x.User.LastName,
+					FullName = x.User.FullName,
+					Tags = x.User.Tags,
+					PhoneNumber = x.User.PhoneNumber,
+					JsonDetail = x.User.JsonDetail,
+					Email = x.User.Email,
+					AppEmail = x.User.AppEmail,
+					AppPhoneNumber = x.User.AppPhoneNumber,
+					AppUserName = x.User.AppUserName
+				},
+				Order = new OrderEntity {
+					Id = x.Order.Id,
+					CreatedAt = x.Order.CreatedAt,
+					UpdatedAt = x.Order.UpdatedAt,
+					JsonDetail = x.Order.JsonDetail,
+					UserId = x.Order.UserId,
+					TotalPrice = x.Order.TotalPrice,
+					ProductOwnerId = x.Order.ProductOwnerId,
+					OrderNumber = x.Order.OrderNumber
+				}
+			});
+		if (dto.RefId.IsNotNullOrEmpty()) q = q.Where(x => x.RefId == dto.RefId);
+		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => x.UserId == dto.UserId);
 		if (dto.Amount is not null) q = q.Where(x => x.Amount == dto.Amount);
 		if (dto.OrderId is not null) q = q.Where(x => x.OrderId == dto.OrderId);
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
