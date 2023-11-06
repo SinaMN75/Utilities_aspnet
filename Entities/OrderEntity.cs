@@ -113,6 +113,7 @@ public class ReserveDto {
 }
 
 public class ReserveChairDto {
+	public required Guid ProductId { get; set; }
 	public required string ChairId { get; set; }
 	public required string SaloonId { get; set; }
 	public required string SectionId { get; set; }
