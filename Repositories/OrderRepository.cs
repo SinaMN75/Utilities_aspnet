@@ -206,9 +206,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 			CreatedAt = DateTime.Now,
 			UpdatedAt = DateTime.Now,
 			ProductOwnerId = p.UserId,
-			JsonDetail = new OrderJsonDetail {
-				ReservationTimes = dto.ReserveDto,
-			},
+			JsonDetail = new OrderJsonDetail { ReservationTimes = dto.ReserveDto },
 			Tags = new List<TagOrder> { TagOrder.Pending, TagOrder.Reserve },
 			UserId = _userId,
 			TotalPrice = totalPrice

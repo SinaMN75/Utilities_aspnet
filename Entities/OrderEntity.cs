@@ -98,8 +98,6 @@ public class ReserveDto {
 	public required Guid ProductId { get; set; }
 	public required DateTime DateFrom { get; set; }
 	public required DateTime DateTo { get; set; }
-	public required DateTime TimeFrom { get; set; }
-	public required DateTime TimeTo { get; set; }
 	public string? UserId { get; set; }
 	public string? UserName { get; set; }
 	public required int MemberCount { get; set; }

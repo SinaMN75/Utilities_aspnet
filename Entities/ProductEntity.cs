@@ -102,6 +102,7 @@ public class ProductJsonDetail {
 	public List<KeyValue>? KeyValues { get; set; }
 	public List<ReservationTime>? ReservationTimes { get; set; }
 	public ReservationSaloon? ReservationSaloon { get; set; }
+	public List<VisitCount> VisitCounts { get; set; }
 }
 
 public class ReservationTime {
@@ -174,6 +175,12 @@ public class VisitProducts : BaseEntity {
 	public string? UserId { get; set; }
 	public ProductEntity? Product { get; set; }
 	public Guid? ProductId { get; set; }
+}
+
+public class VisitCount {
+	public string VisitId { get; set; } = Guid.NewGuid().ToString();
+	public string? UserId { get; set; }
+	public int Count { get; set; } = 1;
 }
 
 public class ProductCreateUpdateDto {
