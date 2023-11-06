@@ -34,8 +34,8 @@ public class PaymentRepository : IPaymentRepository {
 				RestRequest request = new(Method.POST);
 				request.AddParameter("MerchantID", _appSettings.PaymentSettings.Id!);
 				request.AddParameter("Amount", order.TotalPrice!);
-				request.AddParameter("CallbackURL", callbackUrl);
-				IRestResponse response = await new RestClient("https://paymentpol.com/webservice/rest/PaymentRequest").ExecuteAsync(request);
+				request.AddParameter("CallbackURL", callbackUrl); 
+				await new RestClient("https://paymentpol.com/webservice/rest/PaymentRequest").ExecuteAsync(request);
 				break;
 			}
 			case "Zibal": {
@@ -66,9 +66,9 @@ public class PaymentRepository : IPaymentRepository {
 			}
 			case "Zibal": {
 				ZibalVerifyReadDto? i = await PaymentApi.VerifyZibal(new ZibalVerifyCreateDto { Merchant = _appSettings.PaymentSettings.Id!, TrackId = trackId });
-				amount = i.Amount ?? 0;
-				refId = i.RefNumber.ToString();
-				cardNumber = i.CardNumber;
+				amount = i?.Amount ?? 0;
+				refId = i?.RefNumber.ToString() ?? "";
+				cardNumber = i?.CardNumber ?? "";
 				break;
 			}
 		}
@@ -87,7 +87,7 @@ public class PaymentRepository : IPaymentRepository {
 						ProductEntity p = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == item.ProductId))!;
 						p.Stock -= item.Count;
 						_dbContext.Update(p);
-						
+
 						o.JsonDetail.OrderDetailHistories.Add(new OrderDetailHistory {
 							ProductId = item.ProductId.ToString(),
 							Count = item.Count,
