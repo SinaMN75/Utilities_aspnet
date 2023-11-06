@@ -59,7 +59,7 @@ public class TransactionRepository(DbContext dbContext, IOutputCacheStore output
 				OrderId = x.OrderId,
 				SubscriptionId = x.SubscriptionId,
 				User = new UserEntity {
-					Id = x.User.Id,
+					Id = x.User!.Id,
 					FirstName = x.User.FirstName,
 					LastName = x.User.LastName,
 					FullName = x.User.FullName,
@@ -72,7 +72,7 @@ public class TransactionRepository(DbContext dbContext, IOutputCacheStore output
 					AppUserName = x.User.AppUserName
 				},
 				Order = new OrderEntity {
-					Id = x.Order.Id,
+					Id = x.Order!.Id,
 					CreatedAt = x.Order.CreatedAt,
 					UpdatedAt = x.Order.UpdatedAt,
 					JsonDetail = x.Order.JsonDetail,

@@ -102,7 +102,7 @@ public class ProductJsonDetail {
 	public List<KeyValue>? KeyValues { get; set; }
 	public List<ReservationTime>? ReservationTimes { get; set; }
 	public ReservationSaloon? ReservationSaloon { get; set; }
-	public List<VisitCount> VisitCounts { get; set; }
+	public List<VisitCount>? VisitCounts { get; set; }
 }
 
 public class ReservationTime {

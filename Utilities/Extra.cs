@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace Utilities_aspnet.Utilities;
 
 public class GenericResponse<T> : GenericResponse {
@@ -60,12 +58,10 @@ public static partial class StringExtension {
 	private static Random rand = new();
 
 	public static IQueryable<ProductEntity> Shuffle(this IQueryable<ProductEntity> list) {
-		List<ProductEntity>? values = list.ToList();
+		List<ProductEntity> values = list.ToList();
 		for (int i = values.Count - 1; i > 0; i--) {
 			int k = rand.Next(i + 1);
-			ProductEntity value = values[k];
-			values[k] = values[i];
-			values[i] = value;
+			(values[k], values[i]) = (values[i], values[k]);
 		}
 
 		return values.AsQueryable();
@@ -98,7 +94,7 @@ public class Utils {
 		TagProduct? useCaseProduct,
 		int? countProduct,
 		UsageRulesBeforeUpgrade usageRulesBeforeUpgrade,
-        UsageRulesAfterUpgrade usageRulesAfterUpgrade) {
+		UsageRulesAfterUpgrade usageRulesAfterUpgrade) {
 		UserEntity? user = context.Set<UserEntity>().FirstOrDefault(f => f.Id == userId);
 		if (user == null) return new Tuple<bool, UtilitiesStatusCodes>(true, UtilitiesStatusCodes.UserNotFound);
 		try {
@@ -111,71 +107,78 @@ public class Utils {
 							           usageRulesBeforeUpgrade.MaxChatPerHour;
 						else
 							overUsed = context.Set<GroupChatEntity>().Count(w => w.CreatorUserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) >
-                                       usageRulesAfterUpgrade.MaxChatPerHour;
+							           usageRulesAfterUpgrade.MaxChatPerHour;
 					}
 					else {
 						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
 							overUsed = context.Set<GroupChatEntity>().Count(w => w.CreatorUserId == userId) >
-                                       usageRulesBeforeUpgrade.MaxGroupOrChannelPerProfile;
+							           usageRulesBeforeUpgrade.MaxGroupOrChannelPerProfile;
 						else
 							overUsed = false;
 					}
+
 					break;
 				case CallerType.CreateComment:
 					if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
 						overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) >
-                                   usageRulesBeforeUpgrade.MaxCommentPerHour;
+						           usageRulesBeforeUpgrade.MaxCommentPerHour;
 					else
 						overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) >
-                                   usageRulesAfterUpgrade.MaxCommentPerHour;
+						           usageRulesAfterUpgrade.MaxCommentPerHour;
 					break;
 				case CallerType.CreateProduct:
-					if (useCaseProduct.Value.HasFlag(TagProduct.Product))
-					{
+					if (useCaseProduct!.Value.HasFlag(TagProduct.Product)) {
 						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
-							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.Tags.Contains(TagProduct.Product) && w.CreatedAt.Date == DateTime.Today) >
-									   usageRulesBeforeUpgrade.MaxPostPerDay;
+							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.Tags!.Contains(TagProduct.Product) && w.CreatedAt.Date == DateTime.Today) >
+							           usageRulesBeforeUpgrade.MaxPostPerDay;
 						else
 							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.CreatedAt.Date == DateTime.Today) >
-									   usageRulesAfterUpgrade.MaxPostPerDay;
+							           usageRulesAfterUpgrade.MaxPostPerDay;
 					}
-					else if (useCaseProduct.Value.HasFlag(TagProduct.AdHiring) || useCaseProduct.Value.HasFlag(TagProduct.AdProject) || useCaseProduct.Value.HasFlag(TagProduct.AdEmployee))
-					{
+					else if (useCaseProduct.Value.HasFlag(TagProduct.AdHiring) || useCaseProduct.Value.HasFlag(TagProduct.AdProject) ||
+					         useCaseProduct.Value.HasFlag(TagProduct.AdEmployee)) {
 						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
-							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && (w.Tags.Contains(TagProduct.AdEmployee) || w.Tags.Contains(TagProduct.AdHiring) || w.Tags.Contains(TagProduct.AdProject)) && w.CreatedAt.Date == DateTime.Today) >
-									   usageRulesBeforeUpgrade.MaxAdvertismentPerDay;
+							overUsed = context.Set<ProductEntity>().Count(w =>
+								           w.UserId == userId &&
+								           (w.Tags!.Contains(TagProduct.AdEmployee) || w.Tags.Contains(TagProduct.AdHiring) || w.Tags.Contains(TagProduct.AdProject)) &&
+								           w.CreatedAt.Date == DateTime.Today) >
+							           usageRulesBeforeUpgrade.MaxAdvertismentPerDay;
 						else
-							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && (w.Tags.Contains(TagProduct.AdEmployee) || w.Tags.Contains(TagProduct.AdHiring) || w.Tags.Contains(TagProduct.AdProject)) && w.CreatedAt.Date == DateTime.Today) >
-									   usageRulesAfterUpgrade.MaxAdvertismentPerDay;
+							overUsed = context.Set<ProductEntity>().Count(w =>
+								           w.UserId == userId &&
+								           (w.Tags!.Contains(TagProduct.AdEmployee) || w.Tags.Contains(TagProduct.AdHiring) || w.Tags.Contains(TagProduct.AdProject)) &&
+								           w.CreatedAt.Date == DateTime.Today) >
+							           usageRulesAfterUpgrade.MaxAdvertismentPerDay;
 					}
-					else if (useCaseProduct.Value.HasFlag(TagProduct.MicroBlog))
-					{
+					else if (useCaseProduct.Value.HasFlag(TagProduct.MicroBlog)) {
 						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
-							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.Tags.Contains(TagProduct.MicroBlog) && w.CreatedAt.Date == DateTime.Today) >
-									   usageRulesBeforeUpgrade.MaxTweetPerDay;
+							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.Tags!.Contains(TagProduct.MicroBlog) && w.CreatedAt.Date == DateTime.Today) >
+							           usageRulesBeforeUpgrade.MaxTweetPerDay;
 						else
-							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.Tags.Contains(TagProduct.MicroBlog) && w.CreatedAt.Date == DateTime.Today) >
-									   usageRulesAfterUpgrade.MaxTweetPerDay;
+							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.Tags!.Contains(TagProduct.MicroBlog) && w.CreatedAt.Date == DateTime.Today) >
+							           usageRulesAfterUpgrade.MaxTweetPerDay;
 					}
 					else
 						overUsed = false;
+
 					break;
 				case CallerType.SendPost:
-                    if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
-					{
-						IQueryable<GroupChatMessageEntity> groupChatMessages = context.Set<GroupChatMessageEntity>().Where(w => w.UserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1));
+					if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now) {
+						IQueryable<GroupChatMessageEntity> groupChatMessages =
+							context.Set<GroupChatMessageEntity>().Where(w => w.UserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1));
 						IQueryable<ProductEntity> products = context.Set<ProductEntity>().Where(a => groupChatMessages.Any(w => w.Id == a.GroupChatMessageId));
-                        overUsed = products.Count() + countProduct >
-                                                           usageRulesBeforeUpgrade.MaxSendPostPerHour;
-                    }                        
-                    else
-					{
-                        IQueryable<GroupChatMessageEntity> groupChatMessages = context.Set<GroupChatMessageEntity>().Where(w => w.UserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1));
-                        IQueryable<ProductEntity> products = context.Set<ProductEntity>().Where(a => groupChatMessages.Any(w => w.Id == a.GroupChatMessageId));
-                        overUsed = products.Count() + countProduct >
-                                   usageRulesAfterUpgrade.MaxSendPostPerHour;
-                    }
-                    break;
+						overUsed = products.Count() + countProduct >
+						           usageRulesBeforeUpgrade.MaxSendPostPerHour;
+					}
+					else {
+						IQueryable<GroupChatMessageEntity> groupChatMessages =
+							context.Set<GroupChatMessageEntity>().Where(w => w.UserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1));
+						IQueryable<ProductEntity> products = context.Set<ProductEntity>().Where(a => groupChatMessages.Any(w => w.Id == a.GroupChatMessageId));
+						overUsed = products.Count() + countProduct >
+						           usageRulesAfterUpgrade.MaxSendPostPerHour;
+					}
+
+					break;
 				default:
 					overUsed = false;
 					break;

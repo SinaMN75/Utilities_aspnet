@@ -53,7 +53,7 @@ public class CategoryRepository(DbContext context, IOutputCacheStore outputCache
 		if (dto.TitleTr1.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr1!.Contains(dto.TitleTr1!));
 		if (dto.TitleTr2.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr2!.Contains(dto.TitleTr2!));
 		if (dto.ParentId != null) q = q.Where(x => x.ParentId == dto.ParentId);
-		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags!.Contains(y)));
+		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
 
 		q = q.OrderBy(x => x.CreatedAt);
 		if (dto.OrderByCreatedAtDescending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
@@ -124,11 +124,11 @@ public static class CategoryEntityExtension {
 		};
 
 		if (dto.RemoveTags.IsNotNullOrEmpty()) {
-			dto.RemoveTags.ForEach(item => entity.Tags?.Remove(item));
+			dto.RemoveTags?.ForEach(item => entity.Tags.Remove(item));
 		}
 
 		if (dto.AddTags.IsNotNullOrEmpty()) {
-			entity.Tags.AddRange(dto.AddTags);
+			entity.Tags.AddRange(dto.AddTags!);
 		}
 
 		return entity;

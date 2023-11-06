@@ -13,13 +13,13 @@ internal static class Converter {
 
 public class ZibalRequestCreateDto {
 	[JsonProperty("merchant")]
-	public string Merchant { get; set; }
+	public string? Merchant { get; set; }
 
 	[JsonProperty("amount")]
 	public long Amount { get; set; }
 
 	[JsonProperty("callbackUrl")]
-	public string CallbackUrl { get; set; }
+	public string? CallbackUrl { get; set; }
 
 	public static ZibalRequestCreateDto? FromJson(string json) => JsonConvert.DeserializeObject<ZibalRequestCreateDto>(json, Converter.Settings);
 	public static string ToJson(ZibalRequestCreateDto self) => JsonConvert.SerializeObject(self, Converter.Settings);

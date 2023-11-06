@@ -1,6 +1,4 @@
-﻿using RestSharp.Extensions;
-
-namespace Utilities_aspnet.Repositories;
+﻿namespace Utilities_aspnet.Repositories;
 
 public interface ICommentRepository {
 	Task<GenericResponse<CommentEntity?>> Create(CommentCreateUpdateDto dto, CancellationToken ct);
@@ -72,7 +70,6 @@ public class CommentRepository(DbContext dbContext,
 			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
 			PageSize = dto.PageSize
 		};
-		;
 	}
 
 	public async Task<GenericResponse<CommentEntity?>> ReadById(Guid id) {
@@ -94,7 +91,8 @@ public class CommentRepository(DbContext dbContext,
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
 		Tuple<bool, UtilitiesStatusCodes> overUsedCheck =
-			Utils.IsUserOverused(dbContext, _userId ?? string.Empty, CallerType.CreateComment, null, null, null , appSettings.UsageRulesBeforeUpgrade , appSettings.UsageRulesAfterUpgrade);
+			Utils.IsUserOverused(dbContext, _userId ?? string.Empty, CallerType.CreateComment, null, null, null, appSettings.UsageRulesBeforeUpgrade,
+				appSettings.UsageRulesAfterUpgrade);
 		if (overUsedCheck.Item1) return new GenericResponse<CommentEntity?>(null, overUsedCheck.Item2);
 
 		ProductEntity? prdct = await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == dto.ProductId, ct);
@@ -124,34 +122,31 @@ public class CommentRepository(DbContext dbContext,
 			Tags = dto.Tags
 		};
 		await dbContext.AddAsync(comment, ct);
-		try {
-			ProductEntity product = (await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == comment.ProductId, ct))!;
-			product.CommentsCount += 1;
+		ProductEntity product = (await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == comment.ProductId, ct))!;
+		product.CommentsCount += 1;
 
-			if (product.UserId != _userId)
+		if (product.UserId != _userId)
+			await notificationRepository.Create(new NotificationCreateUpdateDto {
+				UserId = product.UserId,
+				Message = dto.Comment ?? "",
+				Title = "Comment",
+				UseCase = "Comment",
+				CreatorUserId = comment.UserId,
+				Link = product.Id.ToString(),
+				ProductId = product.Id
+			});
+		if (dto.UserId != null) {
+			trgtUser!.CommetCount += 1;
+			if (trgtUser.Id != _userId)
 				await notificationRepository.Create(new NotificationCreateUpdateDto {
-					UserId = product.UserId,
+					UserId = trgtUser.Id,
 					Message = dto.Comment ?? "",
 					Title = "Comment",
 					UseCase = "Comment",
 					CreatorUserId = comment.UserId,
 					Link = product.Id.ToString(),
-					ProductId = product.Id
 				});
-			if (dto.UserId != null) {
-				trgtUser.CommetCount += 1;
-				if (trgtUser.Id != _userId)
-					await notificationRepository.Create(new NotificationCreateUpdateDto {
-						UserId = trgtUser.Id,
-						Message = dto.Comment ?? "",
-						Title = "Comment",
-						UseCase = "Comment",
-						CreatorUserId = comment.UserId,
-						Link = product.Id.ToString(),
-					});
-			}
 		}
-		catch { }
 
 		await dbContext.SaveChangesAsync(ct);
 		await outputCache.EvictByTagAsync("comment", ct);
@@ -169,11 +164,11 @@ public class CommentRepository(DbContext dbContext,
 		if (dto.Status.HasValue) comment.Status = dto.Status;
 		if (dto.Tags.IsNotNullOrEmpty()) comment.Tags = dto.Tags;
 		if (dto.RemoveTags.IsNotNullOrEmpty()) {
-			dto.RemoveTags.ForEach(item => comment.Tags?.Remove(item));
+			dto.RemoveTags?.ForEach(item => comment.Tags?.Remove(item));
 		}
 
 		if (dto.AddTags.IsNotNullOrEmpty()) {
-			comment.Tags.AddRange(dto.AddTags);
+			comment.Tags?.AddRange(dto.AddTags!);
 		}
 
 		comment.UpdatedAt = DateTime.Now;

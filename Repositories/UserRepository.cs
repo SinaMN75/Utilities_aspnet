@@ -59,48 +59,48 @@ public class UserRepository(DbContext dbContext,
 
 		if (dto.UserNameExact.IsNotNullOrEmpty()) q = q.Where(x => x.AppUserName == dto.UserNameExact || x.UserName == dto.UserNameExact);
 		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => x.Id == dto.UserId);
-		if (dto.Badge.IsNotNullOrEmpty()) q = q.Where(x => x.Badge!.Contains(dto.Badge));
-		if (dto.Bio.IsNotNullOrEmpty()) q = q.Where(x => x.Bio!.Contains(dto.Bio));
-		if (dto.Email.IsNotNullOrEmpty()) q = q.Where(x => x.Email!.Contains(dto.Email));
+		if (dto.Badge.IsNotNullOrEmpty()) q = q.Where(x => x.Badge!.Contains(dto.Badge!));
+		if (dto.Bio.IsNotNullOrEmpty()) q = q.Where(x => x.Bio!.Contains(dto.Bio!));
+		if (dto.Email.IsNotNullOrEmpty()) q = q.Where(x => x.Email!.Contains(dto.Email!));
 		if (dto.Gender != null) q = q.Where(x => x.Gender == dto.Gender);
-		if (dto.Headline.IsNotNullOrEmpty()) q = q.Where(x => x.Headline!.Contains(dto.Headline));
-		if (dto.JobStatus.IsNotNullOrEmpty()) q = q.Where(x => x.Headline!.Contains(dto.JobStatus));
-		if (dto.Region.IsNotNullOrEmpty()) q = q.Where(x => x.Region!.Contains(dto.Region));
-		if (dto.State.IsNotNullOrEmpty()) q = q.Where(x => x.State!.Contains(dto.State));
-		if (dto.AppEmail.IsNotNullOrEmpty()) q = q.Where(x => x.AppEmail!.Contains(dto.AppEmail));
-		if (dto.FirstName.IsNotNullOrEmpty()) q = q.Where(x => x.FirstName!.Contains(dto.FirstName));
-		if (dto.LastName.IsNotNullOrEmpty()) q = q.Where(x => x.LastName!.Contains(dto.LastName));
-		if (dto.FullName.IsNotNullOrEmpty()) q = q.Where(x => x.FullName!.Contains(dto.FullName));
-		if (dto.PhoneNumber.IsNotNullOrEmpty()) q = q.Where(x => x.PhoneNumber!.Contains(dto.PhoneNumber));
-		if (dto.AppUserName.IsNotNullOrEmpty()) q = q.Where(x => x.AppUserName!.Contains(dto.AppUserName));
-		if (dto.AppPhoneNumber.IsNotNullOrEmpty()) q = q.Where(x => x.AppPhoneNumber!.Contains(dto.AppPhoneNumber));
+		if (dto.Headline.IsNotNullOrEmpty()) q = q.Where(x => x.Headline!.Contains(dto.Headline!));
+		if (dto.JobStatus.IsNotNullOrEmpty()) q = q.Where(x => x.Headline!.Contains(dto.JobStatus!));
+		if (dto.Region.IsNotNullOrEmpty()) q = q.Where(x => x.Region!.Contains(dto.Region!));
+		if (dto.State.IsNotNullOrEmpty()) q = q.Where(x => x.State!.Contains(dto.State!));
+		if (dto.AppEmail.IsNotNullOrEmpty()) q = q.Where(x => x.AppEmail!.Contains(dto.AppEmail!));
+		if (dto.FirstName.IsNotNullOrEmpty()) q = q.Where(x => x.FirstName!.Contains(dto.FirstName!));
+		if (dto.LastName.IsNotNullOrEmpty()) q = q.Where(x => x.LastName!.Contains(dto.LastName!));
+		if (dto.FullName.IsNotNullOrEmpty()) q = q.Where(x => x.FullName!.Contains(dto.FullName!));
+		if (dto.PhoneNumber.IsNotNullOrEmpty()) q = q.Where(x => x.PhoneNumber!.Contains(dto.PhoneNumber!));
+		if (dto.AppUserName.IsNotNullOrEmpty()) q = q.Where(x => x.AppUserName!.Contains(dto.AppUserName!));
+		if (dto.AppPhoneNumber.IsNotNullOrEmpty()) q = q.Where(x => x.AppPhoneNumber!.Contains(dto.AppPhoneNumber!));
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
 		if (dto.NoneOfMyFollowing.IsTrue()) {
 			UserEntity? user = dbContext.Set<UserEntity>().FirstOrDefault(x => x.Id == _userId);
-			string[]? myFollowing = user.FollowingUsers.Split(",");
+			string[] myFollowing = user!.FollowingUsers.Split(",");
 			q = q.Where(x => !myFollowing.Contains(x.Id));
 		}
 
 		if (dto.NoneOfMyFollower.IsTrue()) {
 			UserEntity? user = dbContext.Set<UserEntity>().FirstOrDefault(x => x.Id == _userId);
-			string[]? myFollower = user.FollowedUsers.Split(",");
+			string[] myFollower = user!.FollowedUsers.Split(",");
 			q = q.Where(x => !myFollower.Contains(x.Id));
 		}
 
 		if (dto.Query.IsNotNullOrEmpty())
-			q = q.Where(x => x.FirstName!.Contains(dto.Query) ||
-			                 x.LastName!.Contains(dto.Query) ||
-			                 x.FullName!.Contains(dto.Query) ||
-			                 x.UserName!.Contains(dto.Query) ||
-			                 x.AppUserName!.Contains(dto.Query) ||
-			                 x.AppEmail!.Contains(dto.Query)
+			q = q.Where(x => x.FirstName!.Contains(dto.Query!) ||
+			                 x.LastName!.Contains(dto.Query!) ||
+			                 x.FullName!.Contains(dto.Query!) ||
+			                 x.UserName!.Contains(dto.Query!) ||
+			                 x.AppUserName!.Contains(dto.Query!) ||
+			                 x.AppEmail!.Contains(dto.Query!)
 			);
 
 		if (dto.Categories.IsNotNullOrEmpty()) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
 
-		if (dto.UserIds.IsNotNullOrEmpty()) q = q.Where(x => dto.UserIds.Contains(x.Id));
-		if (dto.PhoneNumbers.IsNotNullOrEmpty()) q = q.Where(x => dto.PhoneNumbers.Contains(x.PhoneNumber));
-		if (dto.UserName.IsNotNullOrEmpty()) q = q.Where(x => (x.AppUserName ?? "").ToLower().Contains(dto.UserName.ToLower()));
+		if (dto.UserIds.IsNotNullOrEmpty()) q = q.Where(x => dto.UserIds!.Contains(x.Id));
+		if (dto.PhoneNumbers.IsNotNullOrEmpty()) q = q.Where(x => dto.PhoneNumbers!.Contains(x.PhoneNumber));
+		if (dto.UserName.IsNotNullOrEmpty()) q = q.Where(x => (x.AppUserName ?? "").ToLower().Contains(dto.UserName!.ToLower()));
 		if (dto.ShowSuspend.IsTrue()) q = q.Where(x => x.Suspend == true);
 
 		if (dto.OrderByUserName.IsTrue()) q = q.OrderBy(x => x.UserName);
@@ -197,7 +197,7 @@ public class UserRepository(DbContext dbContext,
 	}
 
 	public async Task<GenericResponse<UserEntity?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto) {
-		string userAgent = _http!.HttpContext!.Request.Headers?.FirstOrDefault(s => s.Key.ToLower() == "user-agent").Value!;
+		string userAgent = _http!.HttpContext!.Request.Headers.FirstOrDefault(s => s.Key.ToLower() == "user-agent").Value!;
 		string mobile = dto.Mobile.DeleteAdditionsInsteadNumber();
 		mobile = mobile.GetLast(10);
 		mobile = mobile.Insert(0, "0");
@@ -260,7 +260,7 @@ public class UserRepository(DbContext dbContext,
 
 	public async Task<GenericResponse> ToggleBlock(string userId) {
 		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
-		if (user.BlockedUsers.Contains(userId))
+		if (user!.BlockedUsers.Contains(userId))
 			await Update(new UserCreateUpdateDto { Id = user.Id, BlockedUsers = user.BlockedUsers.Replace($",{userId}", "") });
 		else await Update(new UserCreateUpdateDto { Id = user.Id, BlockedUsers = user.BlockedUsers + "," + userId });
 		return new GenericResponse();
@@ -387,11 +387,11 @@ public class UserRepository(DbContext dbContext,
 		}
 
 		if (dto.RemoveTags.IsNotNullOrEmpty()) {
-			dto.RemoveTags.ForEach(item => entity.Tags?.Remove(item));
+			dto.RemoveTags?.ForEach(item => entity.Tags.Remove(item));
 		}
 
 		if (dto.AddTags.IsNotNullOrEmpty()) {
-			entity.Tags.AddRange(dto.AddTags);
+			entity.Tags.AddRange(dto.AddTags!);
 		}
 	}
 

@@ -26,11 +26,11 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 		oldOrder.UpdatedAt = DateTime.Now;
 
 		if (dto.RemoveTags.IsNotNullOrEmpty()) {
-			dto.RemoveTags.ForEach(item => oldOrder.Tags?.Remove(item));
+			dto.RemoveTags?.ForEach(item => oldOrder.Tags.Remove(item));
 		}
 
 		if (dto.AddTags.IsNotNullOrEmpty()) {
-			oldOrder.Tags.AddRange(dto.AddTags);
+			oldOrder.Tags.AddRange(dto.AddTags!);
 		}
 
 		await dbContext.SaveChangesAsync();
@@ -49,7 +49,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 			.Include(x => x.ProductOwner).ThenInclude(x => x!.Media)
 			.OrderBy(x => x.CreatedAt);
 
-		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.Any(y => x.Tags!.Contains(y)));
+		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.Any(y => x.Tags.Contains(y)));
 
 		if (dto.Id.HasValue) q = q.Where(x => x.Id == dto.Id);
 		if (dto.PayNumber.IsNotNullOrEmpty()) q = q.Where(x => (x.PayNumber ?? "").Contains(dto.PayNumber!));
@@ -91,7 +91,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 	public async Task<GenericResponse<OrderEntity?>> CreateUpdateOrderDetail(OrderDetailCreateUpdateDto dto) {
 		ProductEntity p = (await dbContext.Set<ProductEntity>().Include(x => x.User)
 			.FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
-		OrderEntity? o = await dbContext.Set<OrderEntity>().Include(x => x.OrderDetails).ThenInclude(x => x.Product)
+		OrderEntity? o = await dbContext.Set<OrderEntity>().Include(x => x.OrderDetails)!.ThenInclude(x => x.Product)
 			.FirstOrDefaultAsync(x =>
 				x.UserId == _userId && x.Tags.Contains(TagOrder.Pending) &&
 				x.OrderDetails!.Any(y => y.Product!.UserId == p.UserId));
@@ -186,7 +186,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 		}
 		else {
 			o.TotalPrice = 0;
-			foreach (OrderDetailEntity orderDetailEntity in o.OrderDetails)
+			foreach (OrderDetailEntity orderDetailEntity in o.OrderDetails!)
 				o.TotalPrice += orderDetailEntity.FinalPrice;
 			dbContext.Update(o);
 		}

@@ -1,6 +1,4 @@
-﻿using System.Xml;
-
-namespace Utilities_aspnet.Repositories;
+﻿namespace Utilities_aspnet.Repositories;
 
 public interface IChatRepository {
 	Task<GenericResponse<GroupChatEntity?>> CreateGroupChat(GroupChatCreateUpdateDto dto);
@@ -105,8 +103,8 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 	}
 
 	public async Task<GenericResponse> DeleteGroupChat(Guid id) {
-		IQueryable<MediaEntity>? medias = dbContext.Set<MediaEntity>().Where(w => w.GroupChatId == id);
-		if (medias is not null && medias.Any()) dbContext.RemoveRange(medias);
+		IQueryable<MediaEntity> medias = dbContext.Set<MediaEntity>().Where(w => w.GroupChatId == id);
+		if (medias.Any()) dbContext.RemoveRange(medias);
 		await dbContext.SaveChangesAsync();
 		await dbContext.Set<GroupChatEntity>().Include(w => w.GroupChatMessage).Where(x => x.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
@@ -126,8 +124,8 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		if (groupChat != null) {
 			if (groupChat.Type == ChatType.Private) {
 				if (groupChat.Users == null || !groupChat.Users.Any()) return new GenericResponse<GroupChatMessageEntity?>(null, UtilitiesStatusCodes.BadRequest);
-				string? firstUserId = groupChat.Users.First().Id;
-				string? secondUserId = groupChat.Users.Last().Id;
+				string firstUserId = groupChat.Users.First().Id;
+				string secondUserId = groupChat.Users.Last().Id;
 				Tuple<bool, UtilitiesStatusCodes> blockedState = Utils.IsBlockedUser(dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == firstUserId),
 					dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == secondUserId));
 				if (blockedState.Item1)
@@ -174,14 +172,14 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		List<GroupChatEntity> myGroupChats = new();
 
 		foreach (GroupChatEntity? item in e) {
-			int countOfMessage = 0;
+			int countOfMessage;
 			SeenUsers? seenUsers = dbContext.Set<SeenUsers>().FirstOrDefault(w => w.FkGroupChat == item.Id && w.FkUserId == _userId);
 			IQueryable<GroupChatMessageEntity> groupchatMessages = dbContext.Set<GroupChatMessageEntity>().Where(w => w.GroupChatId == item.Id);
 			if (seenUsers is null) {
 				countOfMessage = groupchatMessages.Count();
 			}
 			else {
-				GroupChatMessageEntity lastSeenMessage = (await groupchatMessages.Where(w => w.Id == seenUsers.FkGroupChatMessage.Value).FirstOrDefaultAsync())!;
+				GroupChatMessageEntity lastSeenMessage = (await groupchatMessages.Where(w => w.Id == seenUsers.FkGroupChatMessage!.Value).FirstOrDefaultAsync())!;
 				countOfMessage = await groupchatMessages.Where(w => w.CreatedAt > lastSeenMessage.CreatedAt).CountAsync();
 			}
 
@@ -207,10 +205,10 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 	}
 
 	public async Task<GenericResponse> DeleteGroupChatMessage(Guid id) {
-		IQueryable<MediaEntity>? medias = dbContext.Set<MediaEntity>().Where(w => w.GroupChatMessageId == id);
-		if (medias is not null && medias.Any()) dbContext.RemoveRange(medias);
-		IQueryable<SeenUsers>? seenUsers = dbContext.Set<SeenUsers>().Where(w => w.FkGroupChatMessage == id);
-		if (seenUsers is not null && seenUsers.Any()) dbContext.RemoveRange(seenUsers);
+		IQueryable<MediaEntity> medias = dbContext.Set<MediaEntity>().Where(w => w.GroupChatMessageId == id);
+		if (medias.Any()) dbContext.RemoveRange(medias);
+		IQueryable<SeenUsers> seenUsers = dbContext.Set<SeenUsers>().Where(w => w.FkGroupChatMessage == id);
+		if (seenUsers.Any()) dbContext.RemoveRange(seenUsers);
 		await dbContext.Set<GroupChatMessageEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
 		await dbContext.SaveChangesAsync();
 		return new GenericResponse();

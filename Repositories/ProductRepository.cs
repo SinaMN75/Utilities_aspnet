@@ -57,9 +57,9 @@ public class ProductRepository(DbContext dbContext,
 		if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.Now);
 		q = !dto.ShowWithChildren ? q.Where(x => x.ParentId == null) : q.Include(x => x.Parent);
 
-		List<ProductEntity>? postsThatMyFollowersSeen = new();
+		List<ProductEntity> postsThatMyFollowersSeen = new();
 		if (dto.PostsThatMyFollowersSeen.IsTrue()) {
-			GenericResponse<IQueryable<UserEntity>> myFollower = await followBookMark.GetFollowers(_userId);
+			GenericResponse<IQueryable<UserEntity>> myFollower = await followBookMark.GetFollowers(_userId!);
 			if (myFollower.Result != null && myFollower.Result.Any()) {
 				IQueryable<VisitProducts> productsThatMyFollowerSeen = dbContext.Set<VisitProducts>().Where(w => myFollower.Result.Any(a => a.Id == w.UserId));
 				postsThatMyFollowersSeen = q.Where(x => productsThatMyFollowerSeen.Select(s => s.ProductId).Contains(x.Id)).ToList();
@@ -126,8 +126,8 @@ public class ProductRepository(DbContext dbContext,
 		q = q.Include(x => x.Parent).ThenInclude(x => x!.Media);
 		q = q.Include(x => x.Parent).ThenInclude(x => x!.User).ThenInclude(x => x!.Media);
 
-		if (dto.OrderByPriceAscending.IsTrue()) q = q.Where(w => w.Price.HasValue).OrderBy(o => o.Price.Value);
-		if (dto.OrderByPriceDescending.IsTrue()) q = q.Where(x => x.Price.HasValue).OrderByDescending(x => x.Price.Value);
+		if (dto.OrderByPriceAscending.IsTrue()) q = q.Where(w => w.Price.HasValue).OrderBy(o => o.Price);
+		if (dto.OrderByPriceDescending.IsTrue()) q = q.Where(x => x.Price.HasValue).OrderByDescending(x => x.Price);
 		if (dto.OrderByCreatedDate.IsTrue()) q = q.OrderBy(x => x.CreatedAt);
 		if (dto.OrderByCreatedDateDescending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 
@@ -181,10 +181,10 @@ public class ProductRepository(DbContext dbContext,
 			.FirstOrDefaultAsync(i => i.Id == id, ct);
 		if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound);
 
-		foreach (VisitCount j in i.JsonDetail.VisitCounts) {
+		foreach (VisitCount j in i.JsonDetail.VisitCounts ?? new List<VisitCount>()) {
 			if (j.UserId == _userId) j.Count += 1;
 			else {
-				i.JsonDetail.VisitCounts.Add(new VisitCount { UserId = _userId, Count = 0 });
+				i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId, Count = 0 });
 			}
 		}
 
@@ -280,8 +280,8 @@ public class ProductRepository(DbContext dbContext,
 			dbContext.Remove(product);
 		}
 
-		IQueryable<ReactionEntity>? reactions = dbContext.Set<ReactionEntity>().Where(x => x.ProductId == i.Id);
-		if (reactions != null && reactions.Any()) dbContext.Set<ReactionEntity>().RemoveRange(reactions);
+		IQueryable<ReactionEntity> reactions = dbContext.Set<ReactionEntity>().Where(x => x.ProductId == i.Id);
+		if (reactions.Any()) dbContext.Set<ReactionEntity>().RemoveRange(reactions);
 		dbContext.Remove(i);
 		await dbContext.SaveChangesAsync(ct);
 		return new GenericResponse();
@@ -443,11 +443,11 @@ public static class ProductEntityExtension {
 		}
 
 		if (dto.RemoveTags.IsNotNullOrEmpty()) {
-			dto.RemoveTags.ForEach(item => entity.Tags?.Remove(item));
+			dto.RemoveTags?.ForEach(item => entity.Tags?.Remove(item));
 		}
 
 		if (dto.AddTags.IsNotNullOrEmpty()) {
-			entity.Tags.AddRange(dto.AddTags);
+			entity.Tags?.AddRange(dto.AddTags!);
 		}
 
 		if (dto.ProductInsight is not null) {
