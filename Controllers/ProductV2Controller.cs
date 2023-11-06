@@ -8,11 +8,6 @@ public class ProductV2Controller(IProductRepository repository) : BaseApiControl
 	public async Task<ActionResult<GenericResponse<ProductEntity>>> Create(ProductCreateUpdateDto dto, CancellationToken ct) =>
 		Result(await repository.Create(dto, ct));
 
-	[HttpPost("CreateWithMedia")]
-	[Authorize]
-	public async Task<ActionResult<GenericResponse<ProductEntity>>> CreateWithMedia([FromForm] ProductCreateUpdateDto dto, CancellationToken ct) =>
-		Result(await repository.CreateWithFiles(dto, ct));
-
 	[Authorize]
 	[AllowAnonymous]
 	[HttpPost("Filter")]

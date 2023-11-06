@@ -1,10 +1,7 @@
-using Utilities_aspnet.Utilities;
-
 namespace Utilities_aspnet.Repositories;
 
 public interface IProductRepository {
 	Task<GenericResponse<ProductEntity?>> Create(ProductCreateUpdateDto dto, CancellationToken ct);
-	Task<GenericResponse<ProductEntity?>> CreateWithFiles(ProductCreateUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse<IQueryable<ProductEntity>>> Filter(ProductFilterDto dto);
 	Task<GenericResponse<ProductEntity?>> ReadById(Guid id, CancellationToken ct);
 	Task<GenericResponse<ProductEntity>> Update(ProductCreateUpdateDto dto, CancellationToken ct);
@@ -27,71 +24,9 @@ public class ProductRepository(DbContext dbContext,
 	: IProductRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
-	public async Task<GenericResponse<ProductEntity?>> Create(ProductCreateUpdateDto dto, CancellationToken ct)
-    {
-        AppSettings appSettings = new();
-        config.GetSection("AppSettings").Bind(appSettings);
-
-        if (dto.ProductInsight is not null) dto.ProductInsight.UserId = _userId;
-
-        ProductEntity e = await new ProductEntity().FillData(dto, dbContext);
-        e.UserId = _userId;
-        e.CreatedAt = DateTime.Now;
-
-        EntityEntry<ProductEntity> i = await dbContext.Set<ProductEntity>().AddAsync(e, ct);
-        await dbContext.SaveChangesAsync(ct);
-
-        if (dto.Children is not null)
-        {
-            foreach (ProductCreateUpdateDto childDto in dto.Children)
-            {
-                if (childDto.Id is not null) await Update(childDto, ct);
-                else
-                {
-                    childDto.ParentId = i.Entity.Id;
-                    await Create(childDto, ct);
-                }
-            }
-        }
-
-        if (dto.Form is not null) await formRepository.CreateForm(new FormCreateDto { ProductId = i.Entity.Id, Form = dto.Form });
-
-        return new GenericResponse<ProductEntity?>(i.Entity);
-    }
-
-    private static TagProduct getTagProduct(ProductCreateUpdateDto dto)
-    {
-		try
-		{
-            List<TagProduct>? tags = dto.Tags;
-            dto?.RemoveTags?.ForEach(f => tags?.Remove(f));
-            if (dto?.AddTags?.Any() ?? false) tags?.AddRange(dto.AddTags);
-            TagProduct tagProduct = TagProduct.None;
-            if (tags.Contains(TagProduct.Product)) tagProduct = TagProduct.Product;
-            else if (tags.Contains(TagProduct.MicroBlog)) tagProduct = TagProduct.MicroBlog;
-            else if (tags.Contains(TagProduct.AdEmployee)) tagProduct = TagProduct.AdEmployee;
-            else if (tags.Contains(TagProduct.AdHiring)) tagProduct = TagProduct.AdHiring;
-            else if (tags.Contains(TagProduct.AdProject)) tagProduct = TagProduct.AdProject;
-            else tagProduct = TagProduct.None;
-            return tagProduct;
-        }
-        catch (Exception)
-		{
-            return TagProduct.None;
-        }
-    }
-
-    public async Task<GenericResponse<ProductEntity?>> CreateWithFiles(ProductCreateUpdateDto dto, CancellationToken ct) {
+	public async Task<GenericResponse<ProductEntity?>> Create(ProductCreateUpdateDto dto, CancellationToken ct) {
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
-        TagProduct tagProduct = getTagProduct(dto);
-        Tuple<bool, UtilitiesStatusCodes> overUsedCheck =
-			Utils.IsUserOverused(dbContext, _userId ?? string.Empty, CallerType.CreateProduct, null, tagProduct, null, appSettings.UsageRulesBeforeUpgrade , appSettings.UsageRulesAfterUpgrade);
-		if (overUsedCheck.Item1) return new GenericResponse<ProductEntity?>(null, overUsedCheck.Item2);
-
-		if (dto.Upload is not null)
-			foreach (UploadDto uploadDto in dto.Upload)
-				await mediaRepository.Upload(uploadDto);
 
 		if (dto.ProductInsight is not null) dto.ProductInsight.UserId = _userId;
 
@@ -101,6 +36,18 @@ public class ProductRepository(DbContext dbContext,
 
 		EntityEntry<ProductEntity> i = await dbContext.Set<ProductEntity>().AddAsync(e, ct);
 		await dbContext.SaveChangesAsync(ct);
+
+		if (dto.Children is not null) {
+			foreach (ProductCreateUpdateDto childDto in dto.Children) {
+				if (childDto.Id is not null) await Update(childDto, ct);
+				else {
+					childDto.ParentId = i.Entity.Id;
+					await Create(childDto, ct);
+				}
+			}
+		}
+
+		if (dto.Form is not null) await formRepository.CreateForm(new FormCreateDto { ProductId = i.Entity.Id, Form = dto.Form });
 
 		return new GenericResponse<ProductEntity?>(i.Entity);
 	}
@@ -233,6 +180,13 @@ public class ProductRepository(DbContext dbContext,
 			.Include(i => i.Parent).ThenInclude(i => i!.User).ThenInclude(i => i!.Media)
 			.FirstOrDefaultAsync(i => i.Id == id, ct);
 		if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound);
+
+		foreach (VisitCount j in i.JsonDetail.VisitCounts) {
+			if (j.UserId == _userId) j.Count += 1;
+			else {
+				i.JsonDetail.VisitCounts.Add(new VisitCount { UserId = _userId, Count = 0 });
+			}
+		}
 
 		if (_userId.IsNotNullOrEmpty()) {
 			UserEntity? user = await dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == _userId, ct);
