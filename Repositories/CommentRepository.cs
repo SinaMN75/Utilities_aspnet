@@ -94,7 +94,7 @@ public class CommentRepository(DbContext dbContext,
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
 		Tuple<bool, UtilitiesStatusCodes> overUsedCheck =
-			Utils.IsUserOverused(dbContext, _userId ?? string.Empty, CallerType.CreateComment, null, null, appSettings.UsageRules);
+			Utils.IsUserOverused(dbContext, _userId ?? string.Empty, CallerType.CreateComment, null, null, null , appSettings.UsageRulesBeforeUpgrade , appSettings.UsageRulesAfterUpgrade);
 		if (overUsedCheck.Item1) return new GenericResponse<CommentEntity?>(null, overUsedCheck.Item2);
 
 		ProductEntity? prdct = await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == dto.ProductId, ct);

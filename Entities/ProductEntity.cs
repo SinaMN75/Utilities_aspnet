@@ -38,6 +38,8 @@ public class ProductEntity : BaseEntity {
 
 	public ProductEntity? Parent { get; set; }
 	public Guid? ParentId { get; set; }
+	public GroupChatMessageEntity? GroupChatMessageEntity { get; set; }
+	public Guid? GroupChatMessageId { get; set; }
 
 	[InverseProperty("Parent")]
 	public IEnumerable<ProductEntity>? Children { get; set; }

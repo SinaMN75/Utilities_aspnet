@@ -1,3 +1,5 @@
+using Utilities_aspnet.Utilities;
+
 namespace Utilities_aspnet.Repositories;
 
 public interface IProductRepository {
@@ -25,42 +27,71 @@ public class ProductRepository(DbContext dbContext,
 	: IProductRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
-	public async Task<GenericResponse<ProductEntity?>> Create(ProductCreateUpdateDto dto, CancellationToken ct) {
+	public async Task<GenericResponse<ProductEntity?>> Create(ProductCreateUpdateDto dto, CancellationToken ct)
+    {
+        AppSettings appSettings = new();
+        config.GetSection("AppSettings").Bind(appSettings);
+
+        TagProduct tagProduct = getTagProduct(dto);
+        Tuple<bool, UtilitiesStatusCodes> overUsedCheck =
+            Utils.IsUserOverused(dbContext, _userId, CallerType.CreateProduct, null, tagProduct.HasFlag(TagProduct.None) ? null : tagProduct, null , appSettings.UsageRulesBeforeUpgrade, appSettings.UsageRulesAfterUpgrade);
+        if (overUsedCheck.Item1) return new GenericResponse<ProductEntity?>(null, overUsedCheck.Item2);
+
+        if (dto.ProductInsight is not null) dto.ProductInsight.UserId = _userId;
+
+        ProductEntity e = await new ProductEntity().FillData(dto, dbContext);
+        e.UserId = _userId;
+        e.CreatedAt = DateTime.Now;
+
+        EntityEntry<ProductEntity> i = await dbContext.Set<ProductEntity>().AddAsync(e, ct);
+        await dbContext.SaveChangesAsync(ct);
+
+        if (dto.Children is not null)
+        {
+            foreach (ProductCreateUpdateDto childDto in dto.Children)
+            {
+                if (childDto.Id is not null) await Update(childDto, ct);
+                else
+                {
+                    childDto.ParentId = i.Entity.Id;
+                    await Create(childDto, ct);
+                }
+            }
+        }
+
+        if (dto.Form is not null) await formRepository.CreateForm(new FormCreateDto { ProductId = i.Entity.Id, Form = dto.Form });
+
+        return new GenericResponse<ProductEntity?>(i.Entity);
+    }
+
+    private static TagProduct getTagProduct(ProductCreateUpdateDto dto)
+    {
+		try
+		{
+            var tags = dto.Tags;
+            dto?.RemoveTags?.ForEach(f => tags?.Remove(f));
+            if (dto?.AddTags?.Any() ?? false) tags?.AddRange(dto.AddTags);
+            TagProduct tagProduct = TagProduct.None;
+            if (tags.Contains(TagProduct.Product)) tagProduct = TagProduct.Product;
+            else if (tags.Contains(TagProduct.MicroBlog)) tagProduct = TagProduct.MicroBlog;
+            else if (tags.Contains(TagProduct.AdEmployee)) tagProduct = TagProduct.AdEmployee;
+            else if (tags.Contains(TagProduct.AdHiring)) tagProduct = TagProduct.AdHiring;
+            else if (tags.Contains(TagProduct.AdProject)) tagProduct = TagProduct.AdProject;
+            else tagProduct = TagProduct.None;
+            return tagProduct;
+        }
+        catch (Exception)
+		{
+            return TagProduct.None;
+        }
+    }
+
+    public async Task<GenericResponse<ProductEntity?>> CreateWithFiles(ProductCreateUpdateDto dto, CancellationToken ct) {
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
-		Tuple<bool, UtilitiesStatusCodes> overUsedCheck =
-			Utils.IsUserOverused(dbContext, _userId, CallerType.CreateProduct, null, dto.UseCase, appSettings.UsageRules);
-		if (overUsedCheck.Item1) return new GenericResponse<ProductEntity?>(null, overUsedCheck.Item2);
-
-		if (dto.ProductInsight is not null) dto.ProductInsight.UserId = _userId;
-
-		ProductEntity e = await new ProductEntity().FillData(dto, dbContext);
-		e.UserId = _userId;
-		e.CreatedAt = DateTime.Now;
-
-		EntityEntry<ProductEntity> i = await dbContext.Set<ProductEntity>().AddAsync(e, ct);
-		await dbContext.SaveChangesAsync(ct);
-
-		if (dto.Children is not null) {
-			foreach (ProductCreateUpdateDto childDto in dto.Children) {
-				if (childDto.Id is not null) await Update(childDto, ct);
-				else {
-					childDto.ParentId = i.Entity.Id;
-					await Create(childDto, ct);
-				}
-			}
-		}
-
-		if (dto.Form is not null) await formRepository.CreateForm(new FormCreateDto { ProductId = i.Entity.Id, Form = dto.Form });
-
-		return new GenericResponse<ProductEntity?>(i.Entity);
-	}
-
-	public async Task<GenericResponse<ProductEntity?>> CreateWithFiles(ProductCreateUpdateDto dto, CancellationToken ct) {
-		AppSettings appSettings = new();
-		config.GetSection("AppSettings").Bind(appSettings);
-		Tuple<bool, UtilitiesStatusCodes> overUsedCheck =
-			Utils.IsUserOverused(dbContext, _userId ?? string.Empty, CallerType.CreateProduct, null, dto.UseCase, appSettings.UsageRules);
+        TagProduct tagProduct = getTagProduct(dto);
+        Tuple<bool, UtilitiesStatusCodes> overUsedCheck =
+			Utils.IsUserOverused(dbContext, _userId ?? string.Empty, CallerType.CreateProduct, null, tagProduct, null, appSettings.UsageRulesBeforeUpgrade , appSettings.UsageRulesAfterUpgrade);
 		if (overUsedCheck.Item1) return new GenericResponse<ProductEntity?>(null, overUsedCheck.Item2);
 
 		if (dto.Upload is not null)

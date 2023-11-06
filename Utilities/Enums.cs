@@ -144,6 +144,7 @@ public enum CallerType {
 	CreateGroupChat = 100,
 	CreateComment = 101,
 	CreateProduct = 102,
+	SendPost = 103,
 	None = 99999
 }
 
@@ -391,7 +392,8 @@ public enum TagProduct {
 	Deleted = 304,
 	NotAccepted = 305,
 	Special = 401,
-	Private = 501
+	Private = 501,
+	None = 502
 }
 
 public enum TagOrder {
