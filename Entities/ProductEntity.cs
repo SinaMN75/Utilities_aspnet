@@ -127,7 +127,7 @@ public class ReservationChair {
 public class ReservationChairSection {
 	public string SectionId { get; set; } = Guid.NewGuid().ToString();
 	public string? Title { get; set; }
-	public List<ReservationChair> ReservationRows { get; set; }
+	public List<ReservationChair>? ReservationRows { get; set; }
 }
 
 public class ReservationSaloon {
