@@ -139,24 +139,6 @@ public class ReservationSaloon {
 	public List<ReservationChairSection> ReservationChairSections = new();
 }
 
-public class ReservationDays {
-	public string ReserveId { get; set; } = Guid.NewGuid().ToString();
-	public DateTime? DateFrom { get; set; }
-	public DateTime? DateTo { get; set; }
-	public List<ReservationHours> Times { get; set; } = new();
-	public long? Price { get; set; }
-	public long? PriceForAnyExtra { get; set; }
-	public int? MaxMemberAllowed { get; set; }
-	public int? MaxExtraMemberAllowed { get; set; }
-}
-
-public class ReservationHours {
-	public DateTime? TimeFrom { get; set; }
-	public DateTime? TimeTo { get; set; }
-	public string? ReservedByUserId { get; set; }
-	public string? ReservedByUserName { get; set; }
-}
-
 [Table("ProductsInsight")]
 public class ProductInsight : BaseEntity {
 	public ReactionEntity? Reaction { get; set; }

@@ -32,6 +32,7 @@ public class AppSettingsRepository(IConfiguration config, DbContext dbContext) :
 				TagOrder = EnumExtension.GetValues<TagOrder>(),
 				TagCategory = EnumExtension.GetValues<TagCategory>(),
 				TagComments = EnumExtension.GetValues<TagComment>(),
+				TagPayment = EnumExtension.GetValues<TagPayment>(),
 				AppSettings = appSettings
 			}
 		);
