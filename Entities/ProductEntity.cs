@@ -99,6 +99,7 @@ public class ProductJsonDetail {
 	public Reaction? UserReaction { get; set; }
 	public List<KeyValue>? KeyValues { get; set; }
 	public List<ReservationTime>? ReservationTimes { get; set; }
+	public ReservationSaloon? ReservationSaloon { get; set; }
 }
 
 public class ReservationTime {
@@ -111,6 +112,28 @@ public class ReservationTime {
 	public int? MaxExtraMemberAllowed { get; set; }
 	public string? ReservedByUserId { get; set; }
 	public string? ReservedByUserName { get; set; }
+}
+
+public class ReservationChair {
+	public string ChairId { get; set; } = Guid.NewGuid().ToString();
+	public long? Price { get; set; }
+	public string? ReservedByUserId { get; set; }
+	public string? ReservedByUserName { get; set; }
+	public TagReservationChair? Tag { get; set; }
+}
+
+public class ReservationChairSection {
+	public string SectionId { get; set; } = Guid.NewGuid().ToString();
+	public string? Title { get; set; }
+	public List<ReservationChair> ReservationRows = new();
+	public List<ReservationChair> ReservationColumns = new();
+}
+
+public class ReservationSaloon {
+	public string SaloonId { get; set; } = Guid.NewGuid().ToString();
+	public DateTime? StartDate { get; set; }
+	public DateTime? EndDate { get; set; }
+	public List<ReservationChairSection> ReservationChairSections = new();
 }
 
 public class ReservationDays {
@@ -215,6 +238,7 @@ public class ProductCreateUpdateDto {
 	public IEnumerable<FormTitleDto>? Form { get; set; }
 	public IEnumerable<ProductCreateUpdateDto>? Children { get; set; }
 	public List<ReservationTime>? ReservationTimes { get; set; }
+	public ReservationSaloon? ReservationSaloon { get; set; }
 }
 
 public class ProductFilterDto : BaseFilterDto {

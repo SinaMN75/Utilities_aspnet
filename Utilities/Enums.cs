@@ -461,4 +461,11 @@ public enum TagPayment {
 	PaySubscription = 103
 }
 
+public enum TagReservationChair {
+	Blank = 101,
+	NotAvailable = 102,
+	Free = 103,
+	Reserved = 104
+}
+
 public enum TagNotification { }
