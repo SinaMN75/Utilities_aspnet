@@ -163,15 +163,15 @@ public class Utils {
 				case CallerType.SendPost:
                     if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
 					{
-						var groupChatMessages = context.Set<GroupChatMessageEntity>().Where(w => w.UserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1));
-						var products = context.Set<ProductEntity>().Where(a => groupChatMessages.Any(w => w.Id == a.GroupChatMessageId));
+						IQueryable<GroupChatMessageEntity> groupChatMessages = context.Set<GroupChatMessageEntity>().Where(w => w.UserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1));
+						IQueryable<ProductEntity> products = context.Set<ProductEntity>().Where(a => groupChatMessages.Any(w => w.Id == a.GroupChatMessageId));
                         overUsed = products.Count() + countProduct >
                                                            usageRulesBeforeUpgrade.MaxSendPostPerHour;
                     }                        
                     else
 					{
-                        var groupChatMessages = context.Set<GroupChatMessageEntity>().Where(w => w.UserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1));
-                        var products = context.Set<ProductEntity>().Where(a => groupChatMessages.Any(w => w.Id == a.GroupChatMessageId));
+                        IQueryable<GroupChatMessageEntity> groupChatMessages = context.Set<GroupChatMessageEntity>().Where(w => w.UserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1));
+                        IQueryable<ProductEntity> products = context.Set<ProductEntity>().Where(a => groupChatMessages.Any(w => w.Id == a.GroupChatMessageId));
                         overUsed = products.Count() + countProduct >
                                    usageRulesAfterUpgrade.MaxSendPostPerHour;
                     }
