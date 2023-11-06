@@ -32,11 +32,6 @@ public class ProductRepository(DbContext dbContext,
         AppSettings appSettings = new();
         config.GetSection("AppSettings").Bind(appSettings);
 
-        TagProduct tagProduct = getTagProduct(dto);
-        Tuple<bool, UtilitiesStatusCodes> overUsedCheck =
-            Utils.IsUserOverused(dbContext, _userId, CallerType.CreateProduct, null, tagProduct.HasFlag(TagProduct.None) ? null : tagProduct, null , appSettings.UsageRulesBeforeUpgrade, appSettings.UsageRulesAfterUpgrade);
-        if (overUsedCheck.Item1) return new GenericResponse<ProductEntity?>(null, overUsedCheck.Item2);
-
         if (dto.ProductInsight is not null) dto.ProductInsight.UserId = _userId;
 
         ProductEntity e = await new ProductEntity().FillData(dto, dbContext);
