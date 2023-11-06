@@ -10,7 +10,6 @@ public class GroupChatEntity : BaseEntity {
 
 	public ChatType? Type { get; set; }
 
-	[MaxLength(1000)]
 	public GroupChatJsonDetail JsonDetail { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }

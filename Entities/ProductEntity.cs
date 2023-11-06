@@ -47,7 +47,6 @@ public class ProductEntity : BaseEntity {
 	public string? UserId { get; set; }
 	public UserEntity? User { get; set; }
 
-	[MaxLength(1000)]
 	public ProductJsonDetail JsonDetail { get; set; } = new();
 
 	[MaxLength(100)]
