@@ -127,14 +127,14 @@ public class ReservationChair {
 public class ReservationChairSection {
 	public string SectionId { get; set; } = Guid.NewGuid().ToString();
 	public string? Title { get; set; }
-	public List<ReservationChair> ReservationRows = new();
+	public List<ReservationChair> ReservationRows { get; set; }
 }
 
 public class ReservationSaloon {
 	public string SaloonId { get; set; } = Guid.NewGuid().ToString();
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
-	public List<ReservationChairSection> ReservationChairSections = new();
+	public List<ReservationChairSection>? ReservationChairSections { get; set; }
 }
 
 [Table("ProductsInsight")]
