@@ -12,7 +12,8 @@ public static class Seeder {
 			b.OwnsMany(_ => _.KeyValues);
 			b.OwnsMany(_ => _.ReservationTimes);
 			b.OwnsMany(_ => _.VisitCounts);
-			b.OwnsOne(_ => _.ReservationSaloon);
+			b.OwnsOne(_ => _.ReservationSaloon).OwnsMany(_ => _.ReservationChairSections).OwnsMany(p => p.ReservationColumns);
+			b.OwnsOne(_ => _.ReservationSaloon).OwnsMany(_ => _.ReservationChairSections).OwnsMany(p => p.ReservationRows);
 		});
 		builder.Entity<CommentEntity>().OwnsOne(e => e.JsonDetail, b => {
 			b.ToJson();
@@ -21,6 +22,7 @@ public static class Seeder {
 		builder.Entity<OrderEntity>().OwnsOne(e => e.JsonDetail, b => {
 			b.ToJson();
 			b.OwnsMany(_ => _.ReservationTimes);
+			b.OwnsMany(_ => _.ReserveChairs);
 			b.OwnsMany(_ => _.OrderDetailHistories);
 		});
 	}

@@ -80,9 +80,15 @@ public class ReserveCreateUpdateDto {
 	public required List<ReserveDto> ReserveDto { get; set; }
 }
 
+public class ReserveChairCreateUpdateDto {
+	public required Guid ProductId { get; set; }
+	public required List<ReserveChairDto> ReserveChair { get; set; }
+}
+
 public class OrderJsonDetail {
 	public List<OrderDetailHistory> OrderDetailHistories { get; set; } = new();
 	public List<ReserveDto> ReservationTimes { get; set; } = new();
+	public List<ReserveChairDto> ReserveChairs { get; set; } = new();
 }
 
 public class OrderDetailHistory {
@@ -104,6 +110,17 @@ public class ReserveDto {
 	public required int ExtraMemberCount { get; set; }
 	public required long Price { get; set; }
 	public required long PriceForAnyExtra { get; set; }
+}
+
+public class ReserveChairDto {
+	public required string ChairId { get; set; }
+	public required string SaloonId { get; set; }
+	public required string SectionId { get; set; }
+	public required DateTime DateFrom { get; set; }
+	public required DateTime DateTo { get; set; }
+	public string? UserId { get; set; }
+	public string? UserName { get; set; }
+	public required long Price { get; set; }
 }
 
 public class ApplyDiscountCodeOnOrderDto {
