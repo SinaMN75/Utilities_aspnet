@@ -87,6 +87,7 @@ public class EnumDto {
 	public IEnumerable<IdTitleDto>? TagMedia { get; set; }
 	public IEnumerable<IdTitleDto>? TagComments { get; set; }
 	public IEnumerable<IdTitleDto>? TagPayment { get; set; }
+	public IEnumerable<IdTitleDto>? TagReservationChair { get; set; }
 	public AppSettings? AppSettings { get; set; }
 }
 
