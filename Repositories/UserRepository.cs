@@ -27,9 +27,66 @@ public class UserRepository(DbContext dbContext,
 
 	public async Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null) {
 		bool isUserId = Guid.TryParse(idOrUserName, out _);
-		UserEntity? entity = await dbContext.Set<UserEntity>()
-			.Include(u => u.Media)
-			.Include(u => u.Categories)!.ThenInclude(u => u.Media)
+		UserEntity? entity = await dbContext.Set<UserEntity>().AsNoTracking()
+			.Select(x => new UserEntity {
+				Id = x.Id,
+				FirstName = x.FirstName,
+				LastName = x.LastName,
+				FullName = x.FullName,
+				Headline = x.Headline,
+				Bio = x.Bio,
+				AppUserName = x.AppUserName,
+				AppPhoneNumber = x.AppPhoneNumber,
+				UserName = x.UserName,
+				PhoneNumber = x.PhoneNumber,
+				AppEmail = x.AppEmail,
+				Email = x.Email,
+				Region = x.Region,
+				State = x.State,
+				Badge = x.Badge,
+				JobStatus = x.JobStatus,
+				UserAgent = x.UserAgent,
+				MutedChats = x.MutedChats,
+				Gender = x.Gender,
+				Wallet = x.Wallet,
+				Point = x.Point,
+				Birthdate = x.Birthdate,
+				CreatedAt = x.CreatedAt,
+				UpdatedAt = x.UpdatedAt,
+				IsOnline = x.IsOnline,
+				Suspend = x.Suspend,
+				IsPrivate = x.IsPrivate,
+				ExpireUpgradeAccount = x.ExpireUpgradeAccount,
+				AgeCategory = x.AgeCategory,
+				CommetCount = x.CommetCount,
+				JsonDetail = x.JsonDetail,
+				Tags = x.Tags,
+				Media = x.Media!.Select(y => new MediaEntity {
+					Id = y.Id,
+					FileName = y.FileName,
+					Order = y.Order,
+					JsonDetail = y.JsonDetail,
+					Tags = y.Tags
+				}),
+				Categories = x.Categories!.Select(y => new CategoryEntity {
+					Id = y.Id,
+					CreatedAt = y.CreatedAt,
+					UpdatedAt = y.UpdatedAt,
+					Title = y.Title,
+					TitleTr1 = y.TitleTr1,
+					TitleTr2 = y.TitleTr2,
+					Order = y.Order,
+					JsonDetail = y.JsonDetail,
+					Tags = y.Tags,
+					Media = x.Media!.Select(z => new MediaEntity {
+						Id = z.Id,
+						FileName = z.FileName,
+						Order = z.Order,
+						JsonDetail = z.JsonDetail,
+						Tags = z.Tags
+					})
+				})
+			})
 			.FirstOrDefaultAsync(u => isUserId ? u.Id == idOrUserName : u.UserName == idOrUserName);
 
 		if (entity == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
