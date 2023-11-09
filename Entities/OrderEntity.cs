@@ -82,13 +82,14 @@ public class ReserveCreateUpdateDto {
 
 public class ReserveChairCreateUpdateDto {
 	public required Guid ProductId { get; set; }
-	public required List<ReserveChairDto> ReserveChair { get; set; }
+	public required List<string> SeatsId { get; set; }
 }
 
 public class OrderJsonDetail {
+	public string? ProductId { get; set; }
 	public List<OrderDetailHistory> OrderDetailHistories { get; set; } = new();
 	public List<ReserveDto> ReservationTimes { get; set; } = new();
-	public List<ReserveChairDto> ReserveChairs { get; set; } = new();
+	public List<Seat> Seats { get; set; } = new();
 }
 
 public class OrderDetailHistory {

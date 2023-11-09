@@ -171,10 +171,10 @@ public class PaymentRepository : IPaymentRepository {
 				}
 				
 				if (o.JsonDetail.ReservationTimes.IsNotNullOrEmpty()) {
-					ProductEntity p = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == o.JsonDetail.ReserveChairs.First().ProductId))!;
+					ProductEntity p = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == Guid.Parse(o.JsonDetail.ProductId)))!;
 
-					foreach (ReserveChairDto reserveDto in o.JsonDetail.ReserveChairs) {
-						p.JsonDetail.ReservationTimes!.FirstOrDefault(x => x.ReserveId == reserveDto.ChairId)!.ReservedByUserId = _userId;
+					foreach (Seat reserveDto in o.JsonDetail.Seats) {
+						p.JsonDetail.ReservationTimes!.FirstOrDefault(x => x.ReserveId == reserveDto.SeatId)!.ReservedByUserId = _userId;
 						_dbContext.Set<ProductEntity>().Update(p);
 					}
 				}

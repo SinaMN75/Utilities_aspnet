@@ -100,9 +100,26 @@ public class ProductJsonDetail {
 	public Reaction? UserReaction { get; set; }
 	public List<KeyValue>? KeyValues { get; set; }
 	public List<ReservationTime>? ReservationTimes { get; set; }
-	public ReservationSaloon? ReservationSaloon { get; set; }
+	// public ReservationSaloon? ReservationSaloon { get; set; }
 	public List<VisitCount>? VisitCounts { get; set; }
+	public List<Seat>? Seats { get; set; }
 }
+
+public class Seat {
+	public string? SeatId { get; set; } = Guid.NewGuid().ToString();
+	public string ProductId { get; set; } = Guid.NewGuid().ToString();
+	public string? Title { get; set; }
+	public string? Description { get; set; }
+	public string? Date { get; set; }
+	public string? Sans { get; set; }
+	public string? Salon { get; set; }
+	public int? Row { get; set; }
+	public int? Column { get; set; }
+	public long? Price { get; set; }
+	public string? ReservedByUserId { get; set; }
+	public string? ReservedByUserName { get; set; }
+	public TagReservationChair? Tag { get; set; }
+} 
 
 public class ReservationTime {
 	public string ReserveId { get; set; } = Guid.NewGuid().ToString();
@@ -116,26 +133,26 @@ public class ReservationTime {
 	public string? ReservedByUserName { get; set; }
 }
 
-public class ReservationChair {
-	public string ChairId { get; set; } = Guid.NewGuid().ToString();
-	public long? Price { get; set; }
-	public string? ReservedByUserId { get; set; }
-	public string? ReservedByUserName { get; set; }
-	public TagReservationChair? Tag { get; set; }
-}
-
-public class ReservationChairSection {
-	public string SectionId { get; set; } = Guid.NewGuid().ToString();
-	public string? Title { get; set; }
-	public List<ReservationChair>? ReservationRows { get; set; }
-}
-
-public class ReservationSaloon {
-	public string SaloonId { get; set; } = Guid.NewGuid().ToString();
-	public DateTime? StartDate { get; set; }
-	public DateTime? EndDate { get; set; }
-	public List<ReservationChairSection>? ReservationChairSections { get; set; }
-}
+// public class ReservationChair {
+// 	public string ChairId { get; set; } = Guid.NewGuid().ToString();
+// 	public long? Price { get; set; }
+// 	public string? ReservedByUserId { get; set; }
+// 	public string? ReservedByUserName { get; set; }
+// 	public TagReservationChair? Tag { get; set; }
+// }
+//
+// public class ReservationChairSection {
+// 	public string SectionId { get; set; } = Guid.NewGuid().ToString();
+// 	public string? Title { get; set; }
+// 	public List<ReservationChair>? ReservationRows { get; set; }
+// }
+//
+// public class ReservationSaloon {
+// 	public string SaloonId { get; set; } = Guid.NewGuid().ToString();
+// 	public DateTime? StartDate { get; set; }
+// 	public DateTime? EndDate { get; set; }
+// 	public List<ReservationChairSection>? ReservationChairSections { get; set; }
+// }
 
 [Table("ProductsInsight")]
 public class ProductInsight : BaseEntity {
@@ -227,7 +244,8 @@ public class ProductCreateUpdateDto {
 	public IEnumerable<FormTitleDto>? Form { get; set; }
 	public IEnumerable<ProductCreateUpdateDto>? Children { get; set; }
 	public List<ReservationTime>? ReservationTimes { get; set; }
-	public ReservationSaloon? ReservationSaloon { get; set; }
+	// public ReservationSaloon? ReservationSaloon { get; set; }
+	public List<Seat>? Seats { get; set; }
 }
 
 public class ProductFilterDto : BaseFilterDto {

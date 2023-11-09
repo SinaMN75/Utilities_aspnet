@@ -220,9 +220,16 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 
 	public async Task<GenericResponse<OrderEntity?>> CreateChairReservationOrder(ReserveChairCreateUpdateDto dto) {
 		ProductEntity p = (await dbContext.Set<ProductEntity>().Include(x => x.User).FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
+		
+		List<Seat> seats = new();
+		
+		foreach (string s in dto.SeatsId) {
+			seats.Add(p.JsonDetail.Seats.FirstOrDefault(x => x.SeatId == s));
+		}
+		
 		long totalPrice = 0;
-		foreach (ReserveChairDto reserveDto in dto.ReserveChair) {
-			totalPrice += reserveDto.Price;
+		foreach (Seat seat in seats) {
+			totalPrice += seat.Price ?? 0;
 		}
 
 		OrderEntity e = new() {
@@ -230,7 +237,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 			CreatedAt = DateTime.Now,
 			UpdatedAt = DateTime.Now,
 			ProductOwnerId = p.UserId,
-			JsonDetail = new OrderJsonDetail { ReserveChairs = dto.ReserveChair },
+			JsonDetail = new OrderJsonDetail { Seats = seats, ProductId = dto.ProductId.ToString()},
 			Tags = new List<TagOrder> { TagOrder.Pending, TagOrder.Reserve },
 			UserId = _userId,
 			TotalPrice = totalPrice
