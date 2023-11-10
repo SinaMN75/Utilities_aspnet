@@ -187,6 +187,7 @@ public class ProductRepository(DbContext dbContext,
 		if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound);
 
 		if (i.JsonDetail.VisitCounts.IsNullOrEmpty()) i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId ?? "", Count = 0 });
+		else
 			foreach (VisitCount j in i.JsonDetail.VisitCounts ?? new List<VisitCount>()) {
 				if (j.UserId == _userId) j.Count += 1;
 				else {
