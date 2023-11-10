@@ -100,14 +100,12 @@ public class ProductJsonDetail {
 	public Reaction? UserReaction { get; set; }
 	public List<KeyValue>? KeyValues { get; set; }
 	public List<ReservationTime>? ReservationTimes { get; set; }
-	// public ReservationSaloon? ReservationSaloon { get; set; }
 	public List<VisitCount>? VisitCounts { get; set; }
 	public List<Seat>? Seats { get; set; }
 }
 
 public class Seat {
-	public string? SeatId { get; set; } = Guid.NewGuid().ToString();
-	public string? ProductId { get; set; } = Guid.NewGuid().ToString();
+	public string? ChairId { get; set; } = Guid.NewGuid().ToString();
 	public string? Title { get; set; }
 	public string? Description { get; set; }
 	public string? Date { get; set; }

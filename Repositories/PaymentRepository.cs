@@ -174,7 +174,7 @@ public class PaymentRepository : IPaymentRepository {
 					ProductEntity p = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == Guid.Parse(o.JsonDetail.ProductId)))!;
 
 					foreach (Seat reserveDto in o.JsonDetail.Seats) {
-						p.JsonDetail.ReservationTimes!.FirstOrDefault(x => x.ReserveId == reserveDto.SeatId)!.ReservedByUserId = _userId;
+						p.JsonDetail.ReservationTimes!.FirstOrDefault(x => x.ReserveId == reserveDto.ChairId)!.ReservedByUserId = _userId;
 						_dbContext.Set<ProductEntity>().Update(p);
 					}
 				}
