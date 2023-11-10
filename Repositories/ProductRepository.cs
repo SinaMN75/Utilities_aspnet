@@ -372,7 +372,7 @@ public class ProductRepository(DbContext dbContext,
     {
         try
         {
-            var tags = dto.Tags;
+            List<TagProduct>? tags = dto.Tags;
             dto?.RemoveTags?.ForEach(f => tags?.Remove(f));
             if (dto?.AddTags?.Any() ?? false) tags?.AddRange(dto.AddTags);
             TagProduct tagProduct = TagProduct.None;

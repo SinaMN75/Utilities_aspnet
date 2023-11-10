@@ -107,7 +107,7 @@ public class ProductJsonDetail {
 
 public class Seat {
 	public string? SeatId { get; set; } = Guid.NewGuid().ToString();
-	public string ProductId { get; set; } = Guid.NewGuid().ToString();
+	public string? ProductId { get; set; } = Guid.NewGuid().ToString();
 	public string? Title { get; set; }
 	public string? Description { get; set; }
 	public string? Date { get; set; }
