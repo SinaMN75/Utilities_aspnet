@@ -28,12 +28,12 @@ public class ProductRepository(DbContext dbContext,
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
 
-        //TagProduct tagProduct = getTagProduct(dto);
-        //Tuple<bool, UtilitiesStatusCodes> overUsedCheck =
-        //    Utils.IsUserOverused(dbContext, _userId, CallerType.CreateProduct, null, tagProduct.HasFlag(TagProduct.None) ? null : tagProduct, null, appSettings.UsageRulesBeforeUpgrade, appSettings.UsageRulesAfterUpgrade);
-        //if (overUsedCheck.Item1) return new GenericResponse<ProductEntity?>(null, overUsedCheck.Item2);
+		//TagProduct tagProduct = getTagProduct(dto);
+		//Tuple<bool, UtilitiesStatusCodes> overUsedCheck =
+		//    Utils.IsUserOverused(dbContext, _userId, CallerType.CreateProduct, null, tagProduct.HasFlag(TagProduct.None) ? null : tagProduct, null, appSettings.UsageRulesBeforeUpgrade, appSettings.UsageRulesAfterUpgrade);
+		//if (overUsedCheck.Item1) return new GenericResponse<ProductEntity?>(null, overUsedCheck.Item2);
 
-        if (dto.ProductInsight is not null) dto.ProductInsight.UserId = _userId;
+		if (dto.ProductInsight is not null) dto.ProductInsight.UserId = _userId;
 
 		ProductEntity e = await new ProductEntity().FillData(dto, dbContext);
 		e.UserId = _userId;
@@ -186,12 +186,13 @@ public class ProductRepository(DbContext dbContext,
 			.FirstOrDefaultAsync(i => i.Id == id, ct);
 		if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound);
 
-		foreach (VisitCount j in i.JsonDetail.VisitCounts ?? new List<VisitCount>()) {
-			if (j.UserId == _userId) j.Count += 1;
-			else {
-				i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId, Count = 0 });
+		if (i.JsonDetail.VisitCounts.IsNullOrEmpty()) i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId ?? "", Count = 0 });
+			foreach (VisitCount j in i.JsonDetail.VisitCounts ?? new List<VisitCount>()) {
+				if (j.UserId == _userId) j.Count += 1;
+				else {
+					i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId, Count = 0 });
+				}
 			}
-		}
 
 		if (_userId.IsNotNullOrEmpty()) {
 			UserEntity? user = await dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == _userId, ct);
@@ -368,27 +369,24 @@ public class ProductRepository(DbContext dbContext,
 		return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(result.AsQueryable());
 	}
 
-    private static TagProduct getTagProduct(ProductCreateUpdateDto dto)
-    {
-        try
-        {
-            List<TagProduct>? tags = dto.Tags;
-            dto?.RemoveTags?.ForEach(f => tags?.Remove(f));
-            if (dto?.AddTags?.Any() ?? false) tags?.AddRange(dto.AddTags);
-            TagProduct tagProduct = TagProduct.None;
-            if (tags.Contains(TagProduct.Product)) tagProduct = TagProduct.Product;
-            else if (tags.Contains(TagProduct.MicroBlog)) tagProduct = TagProduct.MicroBlog;
-            else if (tags.Contains(TagProduct.AdEmployee)) tagProduct = TagProduct.AdEmployee;
-            else if (tags.Contains(TagProduct.AdHiring)) tagProduct = TagProduct.AdHiring;
-            else if (tags.Contains(TagProduct.AdProject)) tagProduct = TagProduct.AdProject;
-            else tagProduct = TagProduct.None;
-            return tagProduct;
-        }
-        catch (Exception)
-        {
-            return TagProduct.None;
-        }
-    }
+	private static TagProduct getTagProduct(ProductCreateUpdateDto dto) {
+		try {
+			List<TagProduct>? tags = dto.Tags;
+			dto?.RemoveTags?.ForEach(f => tags?.Remove(f));
+			if (dto?.AddTags?.Any() ?? false) tags?.AddRange(dto.AddTags);
+			TagProduct tagProduct = TagProduct.None;
+			if (tags.Contains(TagProduct.Product)) tagProduct = TagProduct.Product;
+			else if (tags.Contains(TagProduct.MicroBlog)) tagProduct = TagProduct.MicroBlog;
+			else if (tags.Contains(TagProduct.AdEmployee)) tagProduct = TagProduct.AdEmployee;
+			else if (tags.Contains(TagProduct.AdHiring)) tagProduct = TagProduct.AdHiring;
+			else if (tags.Contains(TagProduct.AdProject)) tagProduct = TagProduct.AdProject;
+			else tagProduct = TagProduct.None;
+			return tagProduct;
+		}
+		catch (Exception) {
+			return TagProduct.None;
+		}
+	}
 }
 
 public static class ProductEntityExtension {
