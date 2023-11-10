@@ -5,7 +5,7 @@ public interface IChatRepository {
 	Task<GenericResponse<GroupChatEntity?>> UpdateGroupChat(GroupChatCreateUpdateDto dto);
 	Task<GenericResponse> DeleteGroupChat(Guid id);
 	Task<GenericResponse<GroupChatMessageEntity?>> CreateGroupChatMessage(GroupChatMessageCreateUpdateDto dto);
-	Task<GenericResponse<IQueryable<GroupChatEntity>?>> ReadMyGroupChats();
+	Task<GenericResponse<IEnumerable<GroupChatEntity>?>> ReadMyGroupChats();
 	Task<GenericResponse<GroupChatMessageEntity?>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto);
 	Task<GenericResponse> DeleteGroupChatMessage(Guid id);
 	GenericResponse<IQueryable<GroupChatEntity>> FilterGroupChats(GroupChatFilterDto dto);
@@ -25,7 +25,8 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
 		Tuple<bool, UtilitiesStatusCodes> overUsedCheck =
-			Utils.IsUserOverused(dbContext, _userId ?? string.Empty, CallerType.CreateGroupChat, dto.Type, null, null , appSettings.UsageRulesBeforeUpgrade , appSettings.UsageRulesAfterUpgrade);
+			Utils.IsUserOverused(dbContext, _userId ?? string.Empty, CallerType.CreateGroupChat, dto.Type, null, null, appSettings.UsageRulesBeforeUpgrade,
+				appSettings.UsageRulesAfterUpgrade);
 		if (overUsedCheck.Item1)
 			return new GenericResponse<GroupChatEntity?>(null, overUsedCheck.Item2);
 
@@ -114,13 +115,14 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		List<ProductEntity?> products = new();
 		foreach (Guid id in dto.Products ?? new List<Guid>()) products.Add(await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id));
 
-        AppSettings appSettings = new();
-        config.GetSection("AppSettings").Bind(appSettings);
-        Tuple<bool, UtilitiesStatusCodes> overUsedCheck =
-            Utils.IsUserOverused(dbContext, _userId ?? string.Empty, CallerType.SendPost, null, null, products.Count, appSettings.UsageRulesBeforeUpgrade, appSettings.UsageRulesAfterUpgrade);
-        if (overUsedCheck.Item1) return new GenericResponse<GroupChatMessageEntity?>(null, overUsedCheck.Item2);
+		AppSettings appSettings = new();
+		config.GetSection("AppSettings").Bind(appSettings);
+		Tuple<bool, UtilitiesStatusCodes> overUsedCheck =
+			Utils.IsUserOverused(dbContext, _userId ?? string.Empty, CallerType.SendPost, null, null, products.Count, appSettings.UsageRulesBeforeUpgrade,
+				appSettings.UsageRulesAfterUpgrade);
+		if (overUsedCheck.Item1) return new GenericResponse<GroupChatMessageEntity?>(null, overUsedCheck.Item2);
 
-        GroupChatEntity? groupChat = await dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(f => f.Id == dto.GroupChatId);
+		GroupChatEntity? groupChat = await dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(f => f.Id == dto.GroupChatId);
 		if (groupChat != null) {
 			if (groupChat.Type == ChatType.Private) {
 				if (groupChat.Users == null || !groupChat.Users.Any()) return new GenericResponse<GroupChatMessageEntity?>(null, UtilitiesStatusCodes.BadRequest);
@@ -151,21 +153,22 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		return new GenericResponse<GroupChatMessageEntity?>(e.Entity);
 	}
 
-	public async Task<GenericResponse<IQueryable<GroupChatEntity>?>> ReadMyGroupChats() {
-		List<GroupChatEntity> e = await dbContext.Set<GroupChatEntity>().AsNoTracking()
+	public async Task<GenericResponse<IEnumerable<GroupChatEntity>?>> ReadMyGroupChats() {
+		await DeleteEmptyGroups();
+		List<GroupChatEntity> e = await dbContext.Set<GroupChatEntity>()
 			.Where(x => x.Users!.Any(y => y.Id == _userId))
 			.Include(x => x.Users)!.ThenInclude(x => x.Media)
 			.Include(x => x.Media)
 			.Include(x => x.GroupChatMessage!.OrderByDescending(y => y.CreatedAt).Take(1)).ThenInclude(x => x.Media)
 			.ToListAsync();
-
+		
 		foreach (GroupChatEntity groupChatEntity in e.Where(groupChatEntity => groupChatEntity.Type == ChatType.Private))
 			if (groupChatEntity.Users!.First().Id == _userId) {
-				UserEntity u = (await dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == groupChatEntity.Users!.Last().Id))!;
+				UserEntity u = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == groupChatEntity.Users!.Last().Id))!;
 				groupChatEntity.Title = u.AppUserName;
 			}
 			else {
-				UserEntity u = (await dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == groupChatEntity.Users!.First().Id))!;
+				UserEntity u = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == groupChatEntity.Users!.First().Id))!;
 				groupChatEntity.Title = u.AppUserName;
 			}
 
@@ -187,7 +190,7 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 			myGroupChats.Add(item);
 		}
 
-		return new GenericResponse<IQueryable<GroupChatEntity>?>(myGroupChats.AsQueryable());
+		return new GenericResponse<IEnumerable<GroupChatEntity>?>(myGroupChats);
 	}
 
 	public async Task<GenericResponse<GroupChatMessageEntity?>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto) {
@@ -254,6 +257,7 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 	}
 
 	public async Task<GenericResponse<IQueryable<GroupChatEntity>>> FilterAllGroupChats(GroupChatFilterDto dto) {
+		await DeleteEmptyGroups();
 		IQueryable<GroupChatEntity> q = dbContext.Set<GroupChatEntity>();
 		if (dto.UsersIds.IsNotNullOrEmpty()) q = q.Where(x => x.Users!.Any(y => y.Id == dto.UsersIds!.FirstOrDefault()));
 		if (dto.ProductsIds.IsNotNullOrEmpty()) q = q.Where(x => x.Products!.Any(y => y.Id == dto.ProductsIds!.FirstOrDefault()));
@@ -282,9 +286,7 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 
 		int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
-
-		await DeleteEmptyGroups(q);
-
+		
 		return new GenericResponse<IQueryable<GroupChatEntity>>(q.AsNoTracking()) {
 			TotalCount = totalCount,
 			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
@@ -478,9 +480,10 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		await dbContext.SaveChangesAsync();
 		return new GenericResponse<GroupChatEntity?>(e.Entity);
 	}
-	
-	private async Task DeleteEmptyGroups(IQueryable<GroupChatEntity> q) {
-		foreach (GroupChatEntity groupChatEntity in q)
+
+	private async Task DeleteEmptyGroups() {
+		IQueryable<GroupChatEntity> list = dbContext.Set<GroupChatEntity>().Include(x => x.GroupChatMessage);
+		foreach (GroupChatEntity groupChatEntity in list)
 			if (groupChatEntity.Users.IsNullOrEmpty())
 				dbContext.Remove(groupChatEntity);
 		await dbContext.SaveChangesAsync();
