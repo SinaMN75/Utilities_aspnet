@@ -364,14 +364,8 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 	}
 
 	public async Task<GenericResponse> SeenGroupChatMessage(Guid messageId) {
-		GroupChatMessageEntity? groupMessageChat = await dbContext.Set<GroupChatMessageEntity>().Where(e => e.Id == messageId).FirstOrDefaultAsync();
-		if (groupMessageChat is null)
-			return new GenericResponse(UtilitiesStatusCodes.NotFound, "GroupChatMessage Not Found!");
-
-		GroupChatEntity? groupChat = await dbContext.Set<GroupChatEntity>().Where(w => w.Id == groupMessageChat.GroupChatId).FirstOrDefaultAsync();
-		if (groupChat is null)
-			return new GenericResponse(UtilitiesStatusCodes.NotFound, "GroupChate Not Found!");
-
+		GroupChatMessageEntity message = (await dbContext.Set<GroupChatMessageEntity>().Where(e => e.Id == messageId).FirstOrDefaultAsync())!;
+		GroupChatEntity groupChat = (await dbContext.Set<GroupChatEntity>().Where(w => w.Id == message.GroupChatId).FirstOrDefaultAsync())!;
 		SeenUsers? seenUsers = await dbContext.Set<SeenUsers>().Where(w => w.FkGroupChat == groupChat.Id && w.FkUserId == _userId).FirstOrDefaultAsync();
 
 		if (seenUsers is null) {
@@ -385,7 +379,7 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		else {
 			GroupChatMessageEntity? lastMessageSeen =
 				await dbContext.Set<GroupChatMessageEntity>().FirstOrDefaultAsync(f => f.Id == seenUsers.FkGroupChatMessage);
-			if (lastMessageSeen?.CreatedAt > groupMessageChat.CreatedAt || seenUsers.FkGroupChatMessage == messageId) return new GenericResponse();
+			if (lastMessageSeen?.CreatedAt > message.CreatedAt || seenUsers.FkGroupChatMessage == messageId) return new GenericResponse();
 
 			seenUsers.FkGroupChatMessage = messageId;
 			dbContext.Update(seenUsers);
