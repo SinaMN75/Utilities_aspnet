@@ -2,21 +2,17 @@
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class ReportController(IReportRepository repository) : BaseApiController {
 	[HttpPost("Filter")]
-	public ActionResult<GenericResponse<IEnumerable<ReportEntity>>> Filter(ReportFilterDto parameters) => Result(repository.Filter(parameters));
+	public ActionResult<GenericResponse<IEnumerable<ReportEntity>>> Filter() => Result(repository.Filter());
 
-	[HttpGet]
-	public ActionResult<GenericResponse<IEnumerable<ReportEntity>>> Read([FromQuery] ReportFilterDto parameters) => Result(repository.Filter(parameters));
-
-	[HttpGet("{id:guid}")]
+	[HttpGet("{id}")]
 	public async Task<ActionResult<GenericResponse<ReportEntity>>> ReadById(Guid id) => Result(await repository.ReadById(id));
 
 	[HttpPost]
-	[Authorize]
 	public async Task<ActionResult<GenericResponse<ReportEntity?>>> Create(ReportCreateUpdateDto parameters) => Result(await repository.Create(parameters));
 
 	[HttpDelete]
-	[Authorize]
 	public async Task<ActionResult<GenericResponse>> Delete(Guid id) => Result(await repository.Delete(id));
 }

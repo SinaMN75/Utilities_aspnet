@@ -2,7 +2,7 @@ namespace Utilities_aspnet.Repositories;
 
 public interface IReportRepository {
 	Task<GenericResponse<ReportEntity?>> Create(ReportCreateUpdateDto dto);
-	GenericResponse<IQueryable<ReportEntity>> Filter(ReportFilterDto dto);
+	GenericResponse<IQueryable<ReportEntity>> Filter();
 	Task<GenericResponse<ReportEntity?>> ReadById(Guid id);
 	Task<GenericResponse> Delete(Guid id);
 }
@@ -26,7 +26,7 @@ public class ReportRepository(DbContext context, IHttpContextAccessor httpContex
 		return await ReadById(entity.Id);
 	}
 
-	public GenericResponse<IQueryable<ReportEntity>> Filter(ReportFilterDto dto) {
+	public GenericResponse<IQueryable<ReportEntity>> Filter() {
 		IQueryable<ReportEntity> e = context.Set<ReportEntity>().AsNoTracking().Select(x => new ReportEntity {
 			Id = x.Id,
 			CreatedAt = x.CreatedAt,

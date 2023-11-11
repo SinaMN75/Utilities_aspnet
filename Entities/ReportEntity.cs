@@ -37,5 +37,3 @@ public class ReportCreateUpdateDto {
 	public Guid? GroupChatMessageId { get; set; }
 	public Guid? GroupChatId { get; set; }
 }
-
-public class ReportFilterDto : BaseFilterDto;
