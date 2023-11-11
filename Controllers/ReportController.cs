@@ -11,7 +11,7 @@ public class ReportController(IReportRepository repository) : BaseApiController 
 	public async Task<ActionResult<GenericResponse<ReportEntity>>> ReadById(Guid id) => Result(await repository.ReadById(id));
 
 	[HttpPost]
-	public async Task<ActionResult<GenericResponse<ReportEntity?>>> Create(ReportCreateUpdateDto parameters) => Result(await repository.Create(parameters));
+	public async Task<ActionResult<GenericResponse<ReportEntity?>>> Create(ReportCreateUpdateDto dto) => Result(await repository.Create(dto));
 
 	[HttpDelete]
 	public async Task<ActionResult<GenericResponse>> Delete(Guid id) => Result(await repository.Delete(id));
