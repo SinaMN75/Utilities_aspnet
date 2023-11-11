@@ -11,6 +11,8 @@ public class ContentEntity : BaseEntity {
 	[MaxLength(5000)]
 	public string? Description { get; set; }
 
+	public DateTime? DeletedAt { get; set; }
+
 	[MaxLength(100)]
 	public List<TagContent>? Tags { get; set; } = new();
 
@@ -79,6 +81,7 @@ public class ContentUpdateDto {
 	public string? Address1 { get; set; }
 	public string? Address2 { get; set; }
 	public string? Address3 { get; set; }
+	public DateTime? DeletedAt { get; set; }
 	public List<TagContent>? Tags { get; set; }
 	public List<TagContent>? RemoveTags { get; set; }
 	public List<TagContent>? AddTags { get; set; }

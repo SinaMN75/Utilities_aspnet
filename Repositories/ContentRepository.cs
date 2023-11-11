@@ -43,6 +43,7 @@ public class ContentRepository(DbContext dbContext, IMediaRepository mediaReposi
 			SubTitle = x.SubTitle,
 			Description = x.Description,
 			Tags = x.Tags,
+			DeletedAt = x.DeletedAt,
 			JsonDetail = x.JsonDetail,
 			Media = x.Media!.Select(y => new MediaEntity {
 				Id = y.Id,
@@ -50,7 +51,7 @@ public class ContentRepository(DbContext dbContext, IMediaRepository mediaReposi
 				Order = y.Order,
 				JsonDetail = y.JsonDetail,
 				Tags = y.Tags
-			}),
+			})
 		}));
 
 	public async Task<GenericResponse<ContentEntity?>> Update(ContentUpdateDto dto, CancellationToken ct) {
@@ -61,6 +62,8 @@ public class ContentRepository(DbContext dbContext, IMediaRepository mediaReposi
 		e.Description = dto.Description ?? e.Description;
 		e.UpdatedAt = DateTime.Now;
 		e.Tags = dto.Tags ?? e.Tags;
+		e.Tags = dto.Tags ?? e.Tags;
+		e.DeletedAt = dto.DeletedAt ?? e.DeletedAt;
 
 		if (dto.RemoveTags.IsNotNullOrEmpty()) dto.RemoveTags!.ForEach(item => e.Tags?.Remove(item));
 		if (dto.AddTags.IsNotNullOrEmpty()) e.Tags!.AddRange(dto.AddTags!);
