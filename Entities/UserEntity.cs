@@ -139,6 +139,7 @@ public class UserJsonDetail {
 	public string? Color { get; set; }
 	public string? Code { get; set; }
 	public string? ShebaNumber { get; set; }
+	public string? Address { get; set; }
 	public DateTime? Boosted { get; set; }
 	public long? DeliveryPrice1 { get; set; }
 	public long? DeliveryPrice2 { get; set; }
@@ -225,6 +226,7 @@ public class UserCreateUpdateDto {
 	public IEnumerable<Guid>? Categories { get; set; }
 	public string? Code { get; set; }
 	public string? ShebaNumber { get; set; }
+	public string? Address { get; set; }
 	public List<TagUser>? Tags { get; set; }
 	public List<TagUser>? RemoveTags { get; set; }
 	public List<TagUser>? AddTags { get; set; }
