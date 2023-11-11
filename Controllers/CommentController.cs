@@ -20,12 +20,8 @@ public class CommentController(ICommentRepository commentRepository) : BaseApiCo
 	public async Task<ActionResult<GenericResponse>> Create(CommentCreateUpdateDto parameter, CancellationToken ct) =>
 		Result(await commentRepository.Create(parameter, ct));
 
-	[HttpGet]
-	[OutputCache(PolicyName = "24h")]
-	public ActionResult<GenericResponse<CommentEntity>> Read(CommentFilterDto dto) => Result(commentRepository.Filter(dto));
-
 	[HttpPost("Filter")]
-	public ActionResult<GenericResponse<CommentEntity>> Filter(CommentFilterDto dto) => Result(commentRepository.Filter(dto));
+	public async Task<ActionResult<GenericResponse<CommentEntity>>> Filter(CommentFilterDto dto) => Result(await commentRepository.Filter(dto));
 
 	[HttpPost("AddReactionToComment/{commentId:guid}/{reaction}")]
 	[Authorize]

@@ -6,7 +6,7 @@ public interface ICommentRepository {
 	Task<GenericResponse<CommentEntity?>> ReadById(Guid id);
 	GenericResponse<IQueryable<CommentEntity>?> ReadByProductId(Guid id);
 	GenericResponse<IQueryable<CommentEntity>?> ReadByUserId(string id);
-	GenericResponse<IQueryable<CommentEntity>?> Filter(CommentFilterDto dto);
+	Task<GenericResponse<IQueryable<CommentEntity>?>> Filter(CommentFilterDto dto);
 	Task<GenericResponse<CommentEntity?>> Update(Guid id, CommentCreateUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 }
@@ -44,16 +44,8 @@ public class CommentRepository(DbContext dbContext,
 		return new GenericResponse<IQueryable<CommentEntity>?>(comment);
 	}
 
-	public GenericResponse<IQueryable<CommentEntity>?> Filter(CommentFilterDto dto) {
-		IQueryable<CommentEntity> q = dbContext.Set<CommentEntity>();
-
-		q = q.Include(x => x.User).ThenInclude(x => x!.Media)
-			.Include(x => x.Media)
-			.Include(x => x.TargetUser)
-			.Include(x => x.Product).ThenInclude(x => x!.Media)
-			.Include(x => x.Children)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
-			.OrderByDescending(x => x.CreatedAt)
-			.AsNoTracking();
+	public async Task<GenericResponse<IQueryable<CommentEntity>?>> Filter(CommentFilterDto dto) {
+		IQueryable<CommentEntity> q = dbContext.Set<CommentEntity>().AsNoTracking();
 
 		if (dto.ProductId is not null) q = q.Where(x => x.ProductId == dto.ProductId);
 		if (dto.Status is not null) q = q.Where(x => x.Status == dto.Status);
@@ -62,7 +54,14 @@ public class CommentRepository(DbContext dbContext,
 		if (dto.Tags is not null) q = q.Where(x => dto.Tags!.All(y => x.Tags!.Contains(y)));
 		if (dto.TargetUserId is not null) q = q.Where(x => x.TargetUserId == dto.TargetUserId);
 
-		int totalCount = q.Count();
+		q = q.Include(x => x.User).ThenInclude(x => x!.Media)
+			.Include(x => x.Media)
+			.Include(x => x.TargetUser)
+			.Include(x => x.Product).ThenInclude(x => x!.Media)
+			.Include(x => x.Children)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
+			.OrderByDescending(x => x.CreatedAt);
+
+		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
 		return new GenericResponse<IQueryable<CommentEntity>?>(q) {
