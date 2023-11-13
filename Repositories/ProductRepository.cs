@@ -19,8 +19,8 @@ public class ProductRepository(DbContext dbContext,
 		IConfiguration config,
 		IPromotionRepository promotionRepository,
 		IFollowBookmarkRepository followBookMark,
-		ICommentRepository commentRepository,
-		IFormRepository formRepository)
+		ICommentRepository commentRepository
+		)
 	: IProductRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
@@ -51,9 +51,7 @@ public class ProductRepository(DbContext dbContext,
 				}
 			}
 		}
-
-		if (dto.Form is not null) await formRepository.CreateForm(new FormCreateDto { ProductId = i.Entity.Id, Form = dto.Form });
-
+		
 		return new GenericResponse<ProductEntity?>(i.Entity);
 	}
 
@@ -98,8 +96,6 @@ public class ProductRepository(DbContext dbContext,
 		if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(x => x.Children);
 		if (dto.ShowComments.IsTrue()) q = q.Include(i => i.Comments!.Where(x => x.Parent == null));
 		if (dto.ShowCategoryMedia.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.Media);
-		if (dto.ShowForms.IsTrue()) q = q.Include(i => i.Forms);
-		if (dto.ShowFormFields.IsTrue()) q = q.Include(i => i.Forms)!.ThenInclude(i => i.FormField);
 		if (dto.ShowMedia.IsTrue()) q = q.Include(i => i.Media);
 		if (dto.ShowVisitProducts.IsTrue()) q = q.Include(i => i.VisitProducts);
 		if (dto.OrderByVotes.IsTrue()) q = q.OrderBy(x => x.VoteCount);
@@ -175,7 +171,6 @@ public class ProductRepository(DbContext dbContext,
 			.Include(i => i.Categories)!.ThenInclude(x => x.Media)
 			.Include(i => i.User).ThenInclude(x => x!.Media)
 			.Include(i => i.User).ThenInclude(x => x!.Categories)
-			.Include(i => i.Forms)!.ThenInclude(x => x.FormField)
 			.Include(i => i.VisitProducts)!.ThenInclude(i => i.User)
 			.Include(i => i.ProductInsights)
 			.Include(i => i.Parent).ThenInclude(i => i!.Categories)
@@ -376,7 +371,7 @@ public class ProductRepository(DbContext dbContext,
 			dto?.RemoveTags?.ForEach(f => tags?.Remove(f));
 			if (dto?.AddTags?.Any() ?? false) tags?.AddRange(dto.AddTags);
 			TagProduct tagProduct = TagProduct.None;
-			if (tags.Contains(TagProduct.Product)) tagProduct = TagProduct.Product;
+			if (tags!.Contains(TagProduct.Product)) tagProduct = TagProduct.Product;
 			else if (tags.Contains(TagProduct.MicroBlog)) tagProduct = TagProduct.MicroBlog;
 			else if (tags.Contains(TagProduct.AdEmployee)) tagProduct = TagProduct.AdEmployee;
 			else if (tags.Contains(TagProduct.AdHiring)) tagProduct = TagProduct.AdHiring;

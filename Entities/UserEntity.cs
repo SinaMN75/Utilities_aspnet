@@ -81,10 +81,6 @@ public class UserEntity {
 	[JsonIgnore]
 	public IEnumerable<ReactionEntity>? Reactions { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public IEnumerable<FormEntity>? FormBuilders { get; set; }
-
 	[MaxLength(50)]
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]

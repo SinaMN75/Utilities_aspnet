@@ -42,10 +42,6 @@ public class CategoryEntity : BaseEntity {
 
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
-	public IEnumerable<FormEntity>? FormFields { get; set; }
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
 	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
 }
 

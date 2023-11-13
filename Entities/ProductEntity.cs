@@ -53,7 +53,6 @@ public class ProductEntity : BaseEntity {
 	public List<TagProduct>? Tags { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
-	public IEnumerable<FormEntity>? Forms { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
 	public IEnumerable<ProductInsight>? ProductInsights { get; set; }
 	public IEnumerable<VisitProducts>? VisitProducts { get; set; }
@@ -239,7 +238,6 @@ public class ProductCreateUpdateDto {
 	public IEnumerable<Guid>? Categories { get; set; }
 	public IEnumerable<string>? Teams { get; set; }
 	public IEnumerable<UploadDto>? Upload { get; set; }
-	public IEnumerable<FormTitleDto>? Form { get; set; }
 	public IEnumerable<ProductCreateUpdateDto>? Children { get; set; }
 	public List<ReservationTime>? ReservationTimes { get; set; }
 	// public ReservationSaloon? ReservationSaloon { get; set; }

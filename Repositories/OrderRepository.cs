@@ -224,7 +224,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 		List<Seat> seats = new();
 		
 		foreach (string s in dto.SeatsId) {
-			seats.Add(p.JsonDetail.Seats.FirstOrDefault(x => x.ChairId == s));
+			seats.Add(p.JsonDetail.Seats!.FirstOrDefault(x => x.ChairId == s)!);
 		}
 		
 		long totalPrice = 0;
