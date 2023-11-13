@@ -107,6 +107,7 @@ public class Seat {
 	public int? Row { get; set; }
 	public int? Column { get; set; }
 	public long? Price { get; set; }
+	public int? Gender { get; set; }
 	public string? ReservedByUserId { get; set; }
 	public string? ReservedByUserName { get; set; }
 	public TagReservationChair? Tag { get; set; }

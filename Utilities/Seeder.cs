@@ -12,7 +12,7 @@ public static class Seeder {
 			b.OwnsMany(_ => _.KeyValues);
 			b.OwnsMany(_ => _.ReservationTimes);
 			b.OwnsMany(_ => _.VisitCounts);
-			b.OwnsOne(_ => _.Seats);
+			b.OwnsMany(_ => _.Seats);
 		});
 		builder.Entity<CommentEntity>().OwnsOne(e => e.JsonDetail, b => {
 			b.ToJson();
