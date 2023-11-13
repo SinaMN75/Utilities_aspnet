@@ -98,10 +98,10 @@ public class ProductJsonDetail {
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
 	public Reaction? UserReaction { get; set; }
-	public List<KeyValue>? KeyValues { get; set; }
-	public List<ReservationTime>? ReservationTimes { get; set; }
-	public List<VisitCount>? VisitCounts { get; set; }
-	public List<Seat>? Seats { get; set; }
+	public List<KeyValue>? KeyValues { get; set; } = new();
+	public List<ReservationTime>? ReservationTimes { get; set; } = new();
+	public List<VisitCount>? VisitCounts { get; set; } = new();
+	public List<Seat>? Seats { get; set; } = new();
 }
 
 public class Seat {

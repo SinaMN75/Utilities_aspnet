@@ -186,7 +186,7 @@ public class ProductRepository(DbContext dbContext,
 			.FirstOrDefaultAsync(i => i.Id == id, ct);
 		if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound);
 
-		if (i.JsonDetail.VisitCounts.IsNullOrEmpty()) i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId ?? "", Count = 0 });
+		if (i.JsonDetail.VisitCounts.IsNullOrEmpty()) i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId ?? "", Count = 1 });
 		else
 			foreach (VisitCount j in i.JsonDetail.VisitCounts ?? new List<VisitCount>()) {
 				if (j.UserId == _userId) j.Count += 1;
@@ -196,7 +196,7 @@ public class ProductRepository(DbContext dbContext,
 			}
 
 		if (_userId.IsNotNullOrEmpty()) {
-			UserEntity? user = await dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == _userId, ct);
+			UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId, ct);
 			if (!user!.VisitedProducts.Contains(i.Id.ToString()))
 				await userRepository.Update(new UserCreateUpdateDto { Id = _userId, VisitedProducts = user.VisitedProducts + "," + i.Id });
 
