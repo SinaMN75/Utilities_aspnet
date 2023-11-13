@@ -20,7 +20,7 @@ public class ProductRepository(DbContext dbContext,
 		IPromotionRepository promotionRepository,
 		IFollowBookmarkRepository followBookMark,
 		ICommentRepository commentRepository
-		)
+	)
 	: IProductRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
@@ -51,7 +51,7 @@ public class ProductRepository(DbContext dbContext,
 				}
 			}
 		}
-		
+
 		return new GenericResponse<ProductEntity?>(i.Entity);
 	}
 
@@ -178,8 +178,7 @@ public class ProductRepository(DbContext dbContext,
 			.FirstOrDefaultAsync(i => i.Id == id, ct);
 		if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound);
 
-		try {
-			if (i.JsonDetail.VisitCounts.IsNullOrEmpty()) i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId ?? "", Count = 1 });
+			if (i.JsonDetail.VisitCounts is null) i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId ?? "", Count = 1 });
 			else
 				foreach (VisitCount j in i.JsonDetail.VisitCounts ?? new List<VisitCount>()) {
 					if (j.UserId == _userId) j.Count += 1;
@@ -187,8 +186,6 @@ public class ProductRepository(DbContext dbContext,
 						i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId, Count = 0 });
 					}
 				}
-		}
-		catch (Exception) { }
 
 		if (_userId.IsNotNullOrEmpty()) {
 			UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId, ct);
