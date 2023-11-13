@@ -472,9 +472,11 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 	}
 
 	private async Task DeleteEmptyGroups() {
-		IQueryable<GroupChatEntity> list = dbContext.Set<GroupChatEntity>().Include(x => x.GroupChatMessage);
+		IQueryable<GroupChatEntity> list = dbContext.Set<GroupChatEntity>()
+			.Include(x => x.Users)
+			.Include(x => x.GroupChatMessage);
 		foreach (GroupChatEntity groupChatEntity in list)
-			if (groupChatEntity.Users.IsNullOrEmpty())
+			if (groupChatEntity.Users.IsNullOrEmpty() || groupChatEntity.GroupChatMessage.IsNullOrEmpty())
 				dbContext.Remove(groupChatEntity);
 		await dbContext.SaveChangesAsync();
 	}
