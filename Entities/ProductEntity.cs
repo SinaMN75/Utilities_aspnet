@@ -257,8 +257,6 @@ public class ProductFilterDto : BaseFilterDto {
 	public bool? IsBookmarked { get; set; }
 	public bool? HasDiscount { get; set; }
 	public bool? ShowMedia { get; set; } = false;
-	public bool? ShowForms { get; set; } = false;
-	public bool? ShowFormFields { get; set; } = false;
 	public bool? ShowCategories { get; set; } = false;
 	public bool? ShowVisitProducts { get; set; } = false;
 	public bool? ShowCreator { get; set; } = false;
