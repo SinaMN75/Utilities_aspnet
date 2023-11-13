@@ -71,8 +71,8 @@ public class TransactionRepository(DbContext dbContext, IOutputCacheStore output
 					AppPhoneNumber = x.User.AppPhoneNumber,
 					AppUserName = x.User.AppUserName
 				},
-				Order = new OrderEntity {
-					Id = x.Order!.Id,
+				Order = x.Order != null ? new OrderEntity {
+					Id = x.Order.Id,
 					CreatedAt = x.Order.CreatedAt,
 					UpdatedAt = x.Order.UpdatedAt,
 					JsonDetail = x.Order.JsonDetail,
@@ -80,7 +80,7 @@ public class TransactionRepository(DbContext dbContext, IOutputCacheStore output
 					TotalPrice = x.Order.TotalPrice,
 					ProductOwnerId = x.Order.ProductOwnerId,
 					OrderNumber = x.Order.OrderNumber
-				}
+				} : x.Order
 			});
 		if (dto.RefId.IsNotNullOrEmpty()) q = q.Where(x => x.RefId == dto.RefId);
 		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => x.UserId == dto.UserId);
@@ -88,6 +88,6 @@ public class TransactionRepository(DbContext dbContext, IOutputCacheStore output
 		if (dto.OrderId is not null) q = q.Where(x => x.OrderId == dto.OrderId);
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
 
-		return new GenericResponse<IQueryable<TransactionEntity>>(q.AsNoTracking());
+		return new GenericResponse<IQueryable<TransactionEntity>>(q.AsSingleQuery());
 	}
 }
