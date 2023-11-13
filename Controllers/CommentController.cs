@@ -3,11 +3,11 @@
 [ApiController]
 [Route("api/[controller]")]
 public class CommentController(ICommentRepository commentRepository) : BaseApiController {
-	[HttpGet("{id:guid}")]
+	[HttpGet("{id}")]
 	[OutputCache(PolicyName = "24h")]
 	public async Task<ActionResult<GenericResponse<CommentEntity>>> ReadById(Guid id) => Result(await commentRepository.ReadById(id));
 
-	[HttpGet("ReadByProductId/{id:guid}")]
+	[HttpGet("ReadByProductId/{id}")]
 	[OutputCache(PolicyName = "24h")]
 	public ActionResult<GenericResponse<IQueryable<CommentEntity>?>> ReadByProductId(Guid id) => Result(commentRepository.ReadByProductId(id));
 
@@ -23,7 +23,7 @@ public class CommentController(ICommentRepository commentRepository) : BaseApiCo
 	[HttpPost("Filter")]
 	public async Task<ActionResult<GenericResponse<CommentEntity>>> Filter(CommentFilterDto dto) => Result(await commentRepository.Filter(dto));
 
-	[HttpPost("AddReactionToComment/{commentId:guid}/{reaction}")]
+	[HttpPost("AddReactionToComment/{commentId}/{reaction}")]
 	[Authorize]
 	public async Task<ActionResult<GenericResponse>> AddReactionToComment(Guid commentId, Reaction reaction, CancellationToken ct) =>
 		Result(await commentRepository.AddReactionToComment(commentId, reaction, ct));

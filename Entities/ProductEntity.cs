@@ -11,12 +11,6 @@ public class ProductEntity : BaseEntity {
 	[MaxLength(2000)]
 	public string? Description { get; set; }
 
-	[MaxLength(20)]
-	public string? UseCase { get; set; }
-
-	[MaxLength(20)]
-	public string? Type { get; set; }
-
 	[MaxLength(100)]
 	public string? State { get; set; }
 
@@ -189,11 +183,9 @@ public class ProductCreateUpdateDto {
 	public string? Link { get; set; }
 	public string? Website { get; set; }
 	public string? Email { get; set; }
-	public string? Type { get; set; }
 	public string? Type1 { get; set; }
 	public string? Type2 { get; set; }
 	public string? Unit { get; set; }
-	public string? UseCase { get; set; }
 	public string? KeyValue { get; set; }
 	public string? State { get; set; }
 	public string? Color { get; set; }
@@ -240,7 +232,6 @@ public class ProductCreateUpdateDto {
 	public IEnumerable<UploadDto>? Upload { get; set; }
 	public IEnumerable<ProductCreateUpdateDto>? Children { get; set; }
 	public List<ReservationTime>? ReservationTimes { get; set; }
-	// public ReservationSaloon? ReservationSaloon { get; set; }
 	public List<Seat>? Seats { get; set; }
 }
 
@@ -248,8 +239,6 @@ public class ProductFilterDto : BaseFilterDto {
 	public string? Title { get; set; }
 	public string? Subtitle { get; set; }
 	public string? Description { get; set; }
-	public string? Type { get; set; }
-	public string? UseCase { get; set; }
 	public string? State { get; set; }
 	public long? StartPriceRange { get; set; }
 	public long? EndPriceRange { get; set; }

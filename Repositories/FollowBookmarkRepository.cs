@@ -93,14 +93,12 @@ public class FollowBookmarkRepository(DbContext dbContext,
 			GenericResponse<IQueryable<NotificationEntity>> notification = notificationRepository.Filter(new NotificationFilterDto {
 				UserId = parameters.UserId,
 				CreatorUserId = _userId,
-				UseCase = "Follow"
 			});
 			if (notification.Result.IsNullOrEmpty())
 				await notificationRepository.Create(new NotificationCreateUpdateDto {
 					UserId = parameters.UserId,
 					Message = "You are being followed by " + myUser.UserName,
 					Title = "Follow",
-					UseCase = "Follow",
 					CreatorUserId = _userId
 				});
 		}

@@ -16,7 +16,7 @@ public class DiscountController(IDiscountRepository repository) : BaseApiControl
 	[Authorize]
 	public async Task<ActionResult<GenericResponse<DiscountEntity>>> Update(DiscountEntity dto) => Result(await repository.Update(dto));
 
-	[HttpDelete("{id:guid}")]
+	[HttpDelete("{id}")]
 	[Authorize]
 	public async Task<IActionResult> Delete(Guid id) => Result(await repository.Delete(id));
 

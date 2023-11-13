@@ -71,9 +71,7 @@ public class ProductRepository(DbContext dbContext,
 
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
 		if (dto.Subtitle.IsNotNullOrEmpty()) q = q.Where(x => (x.Subtitle ?? "").Contains(dto.Subtitle!));
-		if (dto.Type.IsNotNullOrEmpty()) q = q.Where(x => (x.Type ?? "").Contains(dto.Type!));
 		if (dto.Description.IsNotNullOrEmpty()) q = q.Where(x => (x.Description ?? "").Contains(dto.Description!));
-		if (dto.UseCase.IsNotNullOrEmpty()) q = q.Where(x => x.UseCase!.Contains(dto.UseCase!));
 		if (dto.State.IsNotNullOrEmpty()) q = q.Where(x => x.State == dto.State);
 		if (dto.StartPriceRange.HasValue) q = q.Where(x => x.Price >= dto.StartPriceRange);
 		if (dto.Currency.HasValue) q = q.Where(x => x.Currency == dto.Currency);
@@ -103,7 +101,6 @@ public class ProductRepository(DbContext dbContext,
 		if (dto.OrderByAtoZ.IsTrue()) q = q.OrderBy(x => x.Title);
 		if (dto.OrderByZtoA.IsTrue()) q = q.OrderByDescending(x => x.Title);
 		if (dto.OrderByAgeCategory.IsTrue()) q = q.OrderBy(o => o.AgeCategory);
-		if (dto.OrderByMostUsedHashtag.IsTrue()) q = q.OrderBy(o => o.Categories!.Count(c => c.UseCase!.ToLower() == "tag"));
 		if (dto.OrderByCategory.IsTrue())
 			q = q.AsEnumerable().OrderBy(o => o.Categories != null && o.Categories.Any()
 				? o.Categories.OrderBy(op => op.Title)
@@ -389,12 +386,10 @@ public static class ProductEntityExtension {
 	public static async Task<ProductEntity> FillData(this ProductEntity entity, ProductCreateUpdateDto dto, DbContext context) {
 		entity.Title = dto.Title ?? entity.Title;
 		entity.Subtitle = dto.Subtitle ?? entity.Subtitle;
-		entity.Type = dto.Type ?? entity.Type;
 		entity.State = dto.State ?? entity.State;
 		entity.DiscountPrice = dto.DiscountPrice ?? entity.DiscountPrice;
 		entity.DiscountPercent = dto.DiscountPercent ?? entity.DiscountPercent;
 		entity.Description = dto.Description ?? entity.Description;
-		entity.UseCase = dto.UseCase ?? entity.UseCase;
 		entity.Price = dto.Price ?? entity.Price;
 		entity.Stock = dto.Stock ?? entity.Stock;
 		entity.CommentsCount = dto.CommentsCount ?? entity.CommentsCount;

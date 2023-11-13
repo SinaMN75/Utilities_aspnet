@@ -10,13 +10,13 @@ public class OrderController(IOrderRepository repository) : BaseApiController {
 	[HttpPost("Filter")]
 	public async Task<ActionResult<GenericResponse<IEnumerable<OrderEntity>>>> Filter(OrderFilterDto dto) => Result(await repository.Filter(dto));
 
-	[HttpGet("{id:guid}")]
+	[HttpGet("{id}")]
 	public async Task<ActionResult<GenericResponse<OrderEntity>>> ReadById(Guid id) => Result(await repository.ReadById(id));
 
 	[HttpPost("Vote")]
 	public async Task<ActionResult<GenericResponse>> Vote(OrderVoteDto dto) => Result(await repository.Vote(dto));
 
-	[HttpDelete("{id:guid}")]
+	[HttpDelete("{id}")]
 	public async Task<ActionResult<GenericResponse<OrderEntity>>> Delete(Guid id) => Result(await repository.Delete(id));
 
 	[HttpPost("CreateUpdateOrderDetail")]

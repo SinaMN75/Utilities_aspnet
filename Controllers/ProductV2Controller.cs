@@ -20,7 +20,7 @@ public class ProductV2Controller(IProductRepository repository) : BaseApiControl
 
 	[Authorize]
 	[AllowAnonymous]
-	[HttpGet("{id:guid}")]
+	[HttpGet("{id}")]
 	public async Task<ActionResult<GenericResponse<ProductEntity>>> ReadById(Guid id, CancellationToken ct) => Result(await repository.ReadById(id, ct));
 
 	[HttpPut]
@@ -28,7 +28,7 @@ public class ProductV2Controller(IProductRepository repository) : BaseApiControl
 	public async Task<ActionResult<GenericResponse<ProductEntity>>> Update(ProductCreateUpdateDto dto, CancellationToken ct) =>
 		Result(await repository.Update(dto, ct));
 
-	[HttpDelete("{id:guid}")]
+	[HttpDelete("{id}")]
 	[Authorize]
 	public async Task<IActionResult> Delete(Guid id, CancellationToken ct) => Result(await repository.Delete(id, ct));
 
@@ -36,7 +36,7 @@ public class ProductV2Controller(IProductRepository repository) : BaseApiControl
 	[Authorize]
 	public async Task<ActionResult<GenericResponse>> CreateReaction(ReactionCreateUpdateDto dto) => Result(await repository.CreateReaction(dto));
 
-	[HttpGet("ReadReactions/{id:guid}")]
+	[HttpGet("ReadReactions/{id}")]
 	[Authorize]
 	public ActionResult<GenericResponse<IQueryable<ReactionEntity>>> ReadReactionsById(Guid id) => Result(repository.ReadReactionsById(id));
 
@@ -44,7 +44,7 @@ public class ProductV2Controller(IProductRepository repository) : BaseApiControl
 	[Authorize]
 	public ActionResult<GenericResponse<IQueryable<ReactionEntity>>> FilterReaction(ReactionFilterDto dto) => Result(repository.FilterReaction(dto));
 
-	[HttpGet("GetMyCustomersPerProduct/{id:guid}")]
+	[HttpGet("GetMyCustomersPerProduct/{id}")]
 	[Authorize]
 	public async Task<ActionResult<GenericResponse<IQueryable<CustomersPaymentPerProduct>?>>> GetMyCustomersPerProduct(Guid id) =>
 		Result(await repository.GetMyCustomersPerProduct(id));

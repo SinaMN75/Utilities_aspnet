@@ -55,12 +55,12 @@ public static partial class StringExtension {
 	[GeneratedRegex(@"^[^@\s]+@[^@\s]+\.(com|net|org|gov)$", RegexOptions.IgnoreCase, "en-US")]
 	private static partial Regex MyRegex();
 
-	private static Random rand = new();
+	private static readonly Random Rand = new();
 
 	public static IQueryable<ProductEntity> Shuffle(this IQueryable<ProductEntity> list) {
 		List<ProductEntity> values = list.ToList();
 		for (int i = values.Count - 1; i > 0; i--) {
-			int k = rand.Next(i + 1);
+			int k = Rand.Next(i + 1);
 			(values[k], values[i]) = (values[i], values[k]);
 		}
 
@@ -72,15 +72,14 @@ public class Utils {
 	public static Tuple<bool, UtilitiesStatusCodes> IsBlockedUser(UserEntity? reciever, UserEntity? sender) {
 		bool isBlocked = false;
 		UtilitiesStatusCodes utilCode = UtilitiesStatusCodes.Success;
-		if (reciever is not null && sender is not null) {
-			if (reciever.BlockedUsers.IsNotNullOrEmpty()) {
-				isBlocked = reciever.BlockedUsers.Contains(sender.Id);
-				if (isBlocked) utilCode = UtilitiesStatusCodes.UserSenderBlocked;
-			}
-			else if (sender.BlockedUsers.IsNotNullOrEmpty() && !isBlocked) {
-				isBlocked = sender.BlockedUsers.Contains(reciever.Id);
-				if (isBlocked) utilCode = UtilitiesStatusCodes.UserRecieverBlocked;
-			}
+		if (reciever is null || sender is null) return new Tuple<bool, UtilitiesStatusCodes>(isBlocked, utilCode);
+		if (reciever.BlockedUsers.IsNotNullOrEmpty()) {
+			isBlocked = reciever.BlockedUsers.Contains(sender.Id);
+			if (isBlocked) utilCode = UtilitiesStatusCodes.UserSenderBlocked;
+		}
+		else if (sender.BlockedUsers.IsNotNullOrEmpty() && !isBlocked) {
+			isBlocked = sender.BlockedUsers.Contains(reciever.Id);
+			if (isBlocked) utilCode = UtilitiesStatusCodes.UserRecieverBlocked;
 		}
 
 		return new Tuple<bool, UtilitiesStatusCodes>(isBlocked, utilCode);

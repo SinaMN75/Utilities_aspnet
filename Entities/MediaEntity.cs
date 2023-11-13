@@ -103,7 +103,6 @@ public class MediaJsonDetail {
 
 public class UploadDto {
 	public int? Order { get; set; }
-	public string? UseCase { get; set; }
 	public string? UserId { get; set; }
 	public string? Title { get; set; }
 	public string? Size { get; set; }
@@ -126,7 +125,6 @@ public class UploadDto {
 }
 
 public class UpdateMediaDto {
-	public string? UseCase { get; set; }
 	public string? Title { get; set; }
 	public string? Size { get; set; }
 	public string? Time { get; set; }

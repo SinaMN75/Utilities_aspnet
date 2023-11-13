@@ -48,8 +48,6 @@ public class CategoryRepository(DbContext context, IOutputCacheStore outputCache
 
 		q = dto.ShowByChildren.IsTrue() ? q.Where(x => x.ParentId != null) : q.Where(x => x.ParentId == null);
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => x.Title!.Contains(dto.Title!));
-		if (dto.Type.IsNotNullOrEmpty()) q = q.Where(x => x.Type!.Contains(dto.Type!));
-		if (dto.UseCase.IsNotNullOrEmpty()) q = q.Where(x => x.UseCase!.Contains(dto.UseCase!));
 		if (dto.TitleTr1.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr1!.Contains(dto.TitleTr1!));
 		if (dto.TitleTr2.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr2!.Contains(dto.TitleTr2!));
 		if (dto.ParentId != null) q = q.Where(x => x.ParentId == dto.ParentId);
@@ -102,9 +100,7 @@ public static class CategoryEntityExtension {
 		entity.Title = dto.Title ?? entity.Title;
 		entity.TitleTr1 = dto.TitleTr1 ?? entity.TitleTr1;
 		entity.TitleTr2 = dto.TitleTr2 ?? entity.TitleTr2;
-		entity.UseCase = dto.UseCase ?? entity.UseCase;
 		entity.UpdatedAt = DateTime.Now;
-		entity.Type = dto.Type ?? entity.Type;
 		entity.Order = dto.Order ?? entity.Order;
 		entity.ParentId = dto.ParentId ?? entity.ParentId;
 		entity.Tags = dto.Tags ?? entity.Tags;

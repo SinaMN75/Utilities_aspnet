@@ -65,7 +65,7 @@ public class UserEntity {
 	public bool IsPrivate { get; set; } = true;
 	public DateTime? ExpireUpgradeAccount { get; set; }
 	public AgeCategory? AgeCategory { get; set; }
-	public int CommetCount { get; set; } = 0;
+	public int CommentCount { get; set; }
 	public UserJsonDetail JsonDetail { get; set; } = new();
 
 	public List<TagUser> Tags { get; set; } = new();
@@ -196,7 +196,6 @@ public class UserCreateUpdateDto {
 	public long? DeliveryPrice1 { get; set; }
 	public long? DeliveryPrice2 { get; set; }
 	public long? DeliveryPrice3 { get; set; }
-	public List<string>? AccessLevel { get; set; }
 	public double? Point { get; set; } = 0;
 	public bool? Suspend { get; set; }
 	public string? Instagram { get; set; }

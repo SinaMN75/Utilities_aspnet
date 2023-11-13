@@ -18,7 +18,7 @@ public class ChatController(IChatRepository repository) : BaseApiController {
 	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> UpdateGroupChat(GroupChatCreateUpdateDto dto) =>
 		Result(await repository.UpdateGroupChat(dto));
 
-	[HttpDelete("DeleteGroupChat/{id:guid}")]
+	[HttpDelete("DeleteGroupChat/{id}")]
 	public async Task<ActionResult<GenericResponse>> DeleteGroupChat(Guid id) => Result(await repository.DeleteGroupChat(id));
 
 	[HttpPost("CreateGroupChatMessage")]
@@ -28,28 +28,28 @@ public class ChatController(IChatRepository repository) : BaseApiController {
 	[HttpGet("ReadMyGroupChats")]
 	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> ReadMyGroupChats() => Result(await repository.ReadMyGroupChats());
 
-	[HttpGet("ReadGroupChatMessages/{id:guid}")]
+	[HttpGet("ReadGroupChatMessages/{id}")]
 	public ActionResult<GenericResponse<GroupChatMessageEntity?>> ReadGroupChatMessages(
 		Guid id,
 		[FromQuery] int pageSize = 100,
 		[FromQuery] int pageNumber = 1) => Result(repository.ReadGroupChatMessages(id, pageSize, pageNumber));
 
-	[HttpPost("SeenGroupChatMessage/{id:guid}")]
+	[HttpPost("SeenGroupChatMessage/{id}")]
 	public async Task<ActionResult<GenericResponse>> SeenGroupChatMesDeleteGroupChatsage(Guid id) => Result(await repository.SeenGroupChatMessage(id));
 
-	[HttpGet("ReadGroupChatById/{id:guid}")]
+	[HttpGet("ReadGroupChatById/{id}")]
 	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> ReadGroupChatById(Guid id) => Result(await repository.ReadGroupChatById(id));
 
 	[HttpPut("UpdateGroupChatMessage")]
 	public async Task<ActionResult<GenericResponse<GroupChatMessageEntity?>>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto) =>
 		Result(await repository.UpdateGroupChatMessage(dto));
 
-	[HttpDelete("DeleteGroupChatMessage/{id:guid}")]
+	[HttpDelete("DeleteGroupChatMessage/{id}")]
 	public async Task<ActionResult<GenericResponse>> DeleteGroupChatMessage(Guid id) => Result(await repository.DeleteGroupChatMessage(id));
 
-	[HttpPost("ExitFromGroup/{id:guid}")]
+	[HttpPost("ExitFromGroup/{id}")]
 	public async Task<ActionResult<GenericResponse>> ExitFromGroup(Guid id) => Result(await repository.ExitFromGroup(id));
 
-	[HttpPost("Mute/{id:guid}")]
+	[HttpPost("Mute/{id}")]
 	public async Task<ActionResult<GenericResponse>> Mute(Guid id) => Result(await repository.Mute(id));
 }

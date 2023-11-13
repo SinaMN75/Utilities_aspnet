@@ -137,10 +137,8 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 
 		GroupChatMessageEntity entity = new() {
 			Message = dto.Message,
-			Type = dto.Type,
 			CreatedAt = DateTime.Now,
 			UpdatedAt = DateTime.Now,
-			UseCase = dto.UseCase,
 			GroupChatId = dto.GroupChatId,
 			ParentId = dto.ParentId,
 			UserId = _userId,
@@ -198,9 +196,7 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 			.FirstOrDefaultAsync(x => x.Id == dto.Id))!;
 
 		e.Message = dto.Message ?? e.Message;
-		e.Type = dto.Type ?? e.Type;
 		e.UpdatedAt = DateTime.Now;
-		e.UseCase = dto.UseCase ?? e.UseCase;
 
 		EntityEntry<GroupChatMessageEntity> entity = dbContext.Set<GroupChatMessageEntity>().Update(e);
 		await dbContext.SaveChangesAsync();

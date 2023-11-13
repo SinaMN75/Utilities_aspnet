@@ -8,12 +8,12 @@ public class PromotionController(IPromotionRepository repository) : BaseApiContr
 	public async Task<ActionResult<GenericResponse<PromotionEntity?>>> CreatePromotion(CreateUpdatePromotionDto dto) =>
 		Result(await repository.CreatePromotion(dto));
 
-	[HttpGet("GetPromotionTrackingInformation/{id:guid}")]
+	[HttpGet("GetPromotionTrackingInformation/{id}")]
 	[Authorize]
 	public async Task<ActionResult<GenericResponse<PromotionDetail?>>> GetPromotionTrackingInformation(Guid id) =>
 		Result(await repository.GetPromotionTrackingInformation(id));
 
-	[HttpGet("ReadById/{id:guid}")]
+	[HttpGet("ReadById/{id}")]
 	[Authorize]
 	public async Task<ActionResult<GenericResponse<PromotionEntity?>>> ReadById(Guid id) => Result(await repository.ReadById(id));
 }

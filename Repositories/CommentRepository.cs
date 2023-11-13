@@ -129,19 +129,17 @@ public class CommentRepository(DbContext dbContext,
 				UserId = product.UserId,
 				Message = dto.Comment ?? "",
 				Title = "Comment",
-				UseCase = "Comment",
 				CreatorUserId = comment.UserId,
 				Link = product.Id.ToString(),
 				ProductId = product.Id
 			});
 		if (dto.UserId != null) {
-			trgtUser!.CommetCount += 1;
+			trgtUser!.CommentCount += 1;
 			if (trgtUser.Id != _userId)
 				await notificationRepository.Create(new NotificationCreateUpdateDto {
 					UserId = trgtUser.Id,
 					Message = dto.Comment ?? "",
 					Title = "Comment",
-					UseCase = "Comment",
 					CreatorUserId = comment.UserId,
 					Link = product.Id.ToString(),
 				});

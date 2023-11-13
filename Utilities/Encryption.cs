@@ -10,11 +10,10 @@ public class Encryption {
 	public static bool ValidateMd5HashData(string inputData, string storedHashData) {
 		byte[] tmpNewHash = MD5.HashData(Encoding.ASCII.GetBytes(inputData));
 		bool bEqual = false;
-		if (tmpNewHash.Length == storedHashData.Length) {
-			int i = 0;
-			while (i < tmpNewHash.Length && tmpNewHash[i] == storedHashData[i]) i += 1;
-			if (i == tmpNewHash.Length) bEqual = true;
-		}
+		if (tmpNewHash.Length != storedHashData.Length) return bEqual;
+		int i = 0;
+		while (i < tmpNewHash.Length && tmpNewHash[i] == storedHashData[i]) i += 1;
+		if (i == tmpNewHash.Length) bEqual = true;
 
 		return bEqual;
 	}

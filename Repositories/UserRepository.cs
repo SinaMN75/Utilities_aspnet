@@ -58,7 +58,7 @@ public class UserRepository(DbContext dbContext,
 				IsPrivate = x.IsPrivate,
 				ExpireUpgradeAccount = x.ExpireUpgradeAccount,
 				AgeCategory = x.AgeCategory,
-				CommetCount = x.CommetCount,
+				CommentCount = x.CommentCount,
 				JsonDetail = x.JsonDetail,
 				Tags = x.Tags,
 				Media = x.Media!.Select(y => new MediaEntity {
@@ -457,7 +457,7 @@ public class UserRepository(DbContext dbContext,
 		UserId = userId,
 		Amount = amount,
 		Descriptions = description,
-		Tags = new List<TagTransaction>() { TagTransaction.WalletToWallet }
+		Tags = new List<TagTransaction> { TagTransaction.WalletToWallet }
 	};
 
 	private async Task<bool> SendOtp(string userId) {

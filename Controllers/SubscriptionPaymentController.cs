@@ -17,7 +17,7 @@ public class SubscriptionPaymentController(ISubscriptionPaymentRepository subscr
 	public async Task<ActionResult<GenericResponse<SubscriptionPaymentEntity>>> Update(SubscriptionPaymentCreateUpdateDto dto, CancellationToken ct) =>
 		Result(await subscriptionPaymentRepository.Update(dto, ct));
 
-	[HttpDelete("{id:guid}")]
+	[HttpDelete("{id}")]
 	[Authorize]
 	public async Task<IActionResult> Delete(Guid id, CancellationToken ct) => Result(await subscriptionPaymentRepository.Delete(id, ct));
 }

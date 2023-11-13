@@ -36,12 +36,6 @@ public class GroupChatMessageEntity : BaseEntity {
 	[MaxLength(2000)]
 	public string? Message { get; set; }
 
-	[MaxLength(50)]
-	public string? Type { get; set; }
-
-	[MaxLength(50)]
-	public string? UseCase { get; set; }
-
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
 	public GroupChatEntity? GroupChat { get; set; }
@@ -145,8 +139,6 @@ public class GroupChatCreateUpdateDto {
 public class GroupChatMessageCreateUpdateDto {
 	public Guid? Id { get; set; }
 	public string? Message { get; set; }
-	public string? Type { get; set; }
-	public string? UseCase { get; set; }
 	public Guid? ForwardedMessageId { get; set; }
 	public Guid? GroupChatId { get; set; }
 	public Guid? ParentId { get; set; }

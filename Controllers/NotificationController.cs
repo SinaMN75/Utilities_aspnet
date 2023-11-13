@@ -9,7 +9,7 @@ public class NotificationController(INotificationRepository repository) : BaseAp
 	public ActionResult<GenericResponse<IQueryable<NotificationEntity>>> Read() => Result(repository.Read());
 
 	[Authorize]
-	[HttpGet("{id:guid}")]
+	[HttpGet("{id}")]
 	public async Task<ActionResult<GenericResponse<IQueryable<NotificationEntity>>>> ReadById(Guid id) => Result(await repository.ReadById(id));
 
 	[Authorize]

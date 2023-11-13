@@ -36,7 +36,6 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
 		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => (x.UserId ?? "").Contains(dto.UserId!));
 		if (dto.CreatorUserId.IsNotNullOrEmpty()) q = q.Where(x => (x.CreatorUserId ?? "").Contains(dto.CreatorUserId!));
-		if (dto.UseCase.IsNotNullOrEmpty()) q = q.Where(x => (x.UseCase ?? "").Contains(dto.UseCase!));
 		if (dto.Message.IsNotNullOrEmpty()) q = q.Where(x => (x.Message ?? "").Contains(dto.Message!));
 		// این شرط قبلا یجور دیگه بود اینکلود نمیکرد ، من این کلود اش رو نوشتم بعد تاریخ 27 شهریور کامنتش کردم چون فرزاد مشکل داشت باهاش ، میزیتو چک شود
 		//if (dto.Tags.IsNotNullOrEmpty())
@@ -84,7 +83,6 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 
 	public async Task<GenericResponse> Create(NotificationCreateUpdateDto model) {
 		NotificationEntity notification = new() {
-			UseCase = model.UseCase,
 			Link = model.Link,
 			Message = model.Message,
 			Title = model.Title,

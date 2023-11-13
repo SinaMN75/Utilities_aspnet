@@ -11,12 +11,6 @@ public class CategoryEntity : BaseEntity {
 	[MaxLength(100)]
 	public string? TitleTr2 { get; set; }
 
-	[MaxLength(20)]
-	public string? UseCase { get; set; }
-
-	[MaxLength(20)]
-	public string? Type { get; set; }
-
 	public int? Order { get; set; }
 
 	public CategoryJsonDetail JsonDetail { get; set; } = new();
@@ -69,8 +63,6 @@ public class CategoryCreateUpdateDto {
 	public string? Subtitle { get; set; }
 	public string? Color { get; set; }
 	public string? Link { get; set; }
-	public string? UseCase { get; set; }
-	public string? Type { get; set; }
 	public double? Latitude { get; set; }
 	public double? Longitude { get; set; }
 	public long? Price { get; set; }
@@ -92,8 +84,6 @@ public class CategoryFilterDto : BaseFilterDto {
 	public string? Title { get; set; }
 	public string? TitleTr1 { get; set; }
 	public string? TitleTr2 { get; set; }
-	public string? UseCase { get; set; }
-	public string? Type { get; set; }
 	public List<TagCategory>? Tags { get; set; }
 	public Guid? ParentId { get; set; }
 	public bool? ShowByChildren { get; set; }

@@ -11,9 +11,6 @@ public class NotificationEntity : BaseEntity {
 	[MaxLength(500)]
 	public string? Link { get; set; }
 
-	[MaxLength(20)]
-	public string? UseCase { get; set; }
-
 	[MaxLength(100)]
 	public List<TagNotification>? Tags { get; set; } = new();
 
@@ -42,7 +39,6 @@ public class NotificationCreateUpdateDto {
 	public string? CreatorUserId { get; set; }
 	public string? Message { get; set; }
 	public string? Link { get; set; }
-	public string? UseCase { get; set; }
 	public Guid? ProductId { get; set; }
 	public List<TagNotification>? Tags { get; set; }
 	public List<TagNotification>? RemoveTags { get; set; }
@@ -54,6 +50,5 @@ public class NotificationFilterDto : BaseFilterDto {
 	public string? UserId { get; set; }
 	public string? CreatorUserId { get; set; }
 	public string? Message { get; set; }
-	public string? UseCase { get; set; }
 	public List<TagNotification>? Tags { get; set; }
 }

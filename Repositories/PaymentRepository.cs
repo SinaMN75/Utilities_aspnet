@@ -186,7 +186,7 @@ public class PaymentRepository : IPaymentRepository {
 					Descriptions = $"خرید",
 					RefId = refId,
 					CardNumber = cardNumber,
-					Tags = new List<TagTransaction>() { TagTransaction.Buy },
+					Tags = new List<TagTransaction> { TagTransaction.Buy },
 					UserId = _userId,
 					OrderId = o.Id
 				});
@@ -196,7 +196,7 @@ public class PaymentRepository : IPaymentRepository {
 					Descriptions = $"فروش",
 					RefId = refId,
 					CardNumber = cardNumber,
-					Tags = new List<TagTransaction>() { TagTransaction.Buy },
+					Tags = new List<TagTransaction> { TagTransaction.Buy },
 					UserId = productOwner.Id,
 					OrderId = o.Id
 				});
