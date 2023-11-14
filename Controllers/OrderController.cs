@@ -25,5 +25,9 @@ public class OrderController(IOrderRepository repository) : BaseApiController {
 	
 	[HttpPost("CreateReservationOrder")]
 	public async Task<ActionResult<GenericResponse<OrderEntity>>> CreateReservationOrder(ReserveCreateUpdateDto dto) =>
-		Result(await repository.CreateReservationOrder(dto));	
+		Result(await repository.CreateReservationOrder(dto));		
+	
+	[HttpPost("CreateChairReservationOrder")]
+	public async Task<ActionResult<GenericResponse<OrderEntity>>> CreateChairReservationOrder(ReserveChairCreateUpdateDto dto) =>
+		Result(await repository.CreateChairReservationOrder(dto));	
 }
