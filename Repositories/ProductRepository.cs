@@ -73,6 +73,7 @@ public class ProductRepository(DbContext dbContext,
 		if (dto.Subtitle.IsNotNullOrEmpty()) q = q.Where(x => (x.Subtitle ?? "").Contains(dto.Subtitle!));
 		if (dto.Description.IsNotNullOrEmpty()) q = q.Where(x => (x.Description ?? "").Contains(dto.Description!));
 		if (dto.State.IsNotNullOrEmpty()) q = q.Where(x => x.State == dto.State);
+		if (dto.Region.IsNotNullOrEmpty()) q = q.Where(x => x.Region == dto.Region);
 		if (dto.StartPriceRange.HasValue) q = q.Where(x => x.Price >= dto.StartPriceRange);
 		if (dto.Currency.HasValue) q = q.Where(x => x.Currency == dto.Currency);
 		if (dto.HasDiscount.IsTrue()) q = q.Where(x => x.DiscountPercent != null || x.DiscountPrice != null);
@@ -223,8 +224,8 @@ public class ProductRepository(DbContext dbContext,
 
 		i.Orders = completeOrder.OrderByDescending(x => x.TotalPrice);
 
-		ReactionEntity? reaction = await dbContext.Set<ReactionEntity>().FirstOrDefaultAsync(f => f.ProductId == i.Id);
-		if (reaction is not null) i.JsonDetail.UserReaction = reaction.Reaction.HasValue ? reaction.Reaction.Value : null;
+		ReactionEntity? reaction = await dbContext.Set<ReactionEntity>().FirstOrDefaultAsync(f => f.ProductId == i.Id, ct);
+		if (reaction is not null) i.JsonDetail.UserReaction = reaction.Reaction;
 
 		await promotionRepository.UserSeened(i.Id);
 		return new GenericResponse<ProductEntity?>(i);
@@ -387,6 +388,7 @@ public static class ProductEntityExtension {
 		entity.Title = dto.Title ?? entity.Title;
 		entity.Subtitle = dto.Subtitle ?? entity.Subtitle;
 		entity.State = dto.State ?? entity.State;
+		entity.Region = dto.Region ?? entity.Region;
 		entity.DiscountPrice = dto.DiscountPrice ?? entity.DiscountPrice;
 		entity.DiscountPercent = dto.DiscountPercent ?? entity.DiscountPercent;
 		entity.Description = dto.Description ?? entity.Description;

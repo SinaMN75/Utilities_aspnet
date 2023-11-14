@@ -13,6 +13,9 @@ public class ProductEntity : BaseEntity {
 
 	[MaxLength(100)]
 	public string? State { get; set; }
+	
+	[MaxLength(100)]
+	public string? Region { get; set; }
 
 	public DateTime Boosted { get; set; }
 	public int? Stock { get; set; }
@@ -168,6 +171,7 @@ public class ProductCreateUpdateDto {
 	public string? Unit { get; set; }
 	public string? KeyValue { get; set; }
 	public string? State { get; set; }
+	public string? Region { get; set; }
 	public string? Color { get; set; }
 	public string? AdminMessage { get; set; }
 	public double? Latitude { get; set; }
@@ -220,6 +224,7 @@ public class ProductFilterDto : BaseFilterDto {
 	public string? Subtitle { get; set; }
 	public string? Description { get; set; }
 	public string? State { get; set; }
+	public string? Region { get; set; }
 	public long? StartPriceRange { get; set; }
 	public long? EndPriceRange { get; set; }
 	public bool? IsFollowing { get; set; }
