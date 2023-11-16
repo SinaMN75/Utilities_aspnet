@@ -224,9 +224,6 @@ public class ProductRepository(DbContext dbContext,
 
 		i.Orders = completeOrder.OrderByDescending(x => x.TotalPrice);
 
-		ReactionEntity? reaction = await dbContext.Set<ReactionEntity>().FirstOrDefaultAsync(f => f.ProductId == i.Id, ct);
-		if (reaction is not null) i.JsonDetail.UserReaction = reaction.Reaction;
-
 		await promotionRepository.UserSeened(i.Id);
 		return new GenericResponse<ProductEntity?>(i);
 	}

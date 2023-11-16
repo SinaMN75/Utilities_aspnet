@@ -93,7 +93,6 @@ public class ProductJsonDetail {
 	public int? ShippingTime { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
-	public Reaction? UserReaction { get; set; }
 	public List<KeyValue>? KeyValues { get; set; } = new();
 	public List<ReservationTime>? ReservationTimes { get; set; } = new();
 	public List<VisitCount>? VisitCounts { get; set; } = new();
