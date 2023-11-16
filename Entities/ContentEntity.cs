@@ -3,7 +3,7 @@ namespace Utilities_aspnet.Entities;
 [Table("Contents")]
 public class ContentEntity : BaseEntity {
 	[MaxLength(100)]
-	public string? Title { get; set; }
+	public required string Title { get; set; }
 
 	[MaxLength(100)]
 	public string? SubTitle { get; set; }
@@ -14,9 +14,9 @@ public class ContentEntity : BaseEntity {
 	public DateTime? DeletedAt { get; set; }
 
 	[MaxLength(100)]
-	public List<TagContent>? Tags { get; set; } = new();
+	public required List<TagContent> Tags { get; set; } = new();
 
-	public ContentJsonDetail JsonDetail { get; set; } = new();
+	public required ContentJsonDetail JsonDetail { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 }

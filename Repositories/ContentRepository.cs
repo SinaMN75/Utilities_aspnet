@@ -62,11 +62,24 @@ public class ContentRepository(DbContext dbContext, IMediaRepository mediaReposi
 		e.Description = dto.Description ?? e.Description;
 		e.UpdatedAt = DateTime.Now;
 		e.Tags = dto.Tags ?? e.Tags;
-		e.Tags = dto.Tags ?? e.Tags;
 		e.DeletedAt = dto.DeletedAt ?? e.DeletedAt;
+		e.JsonDetail.Address1 = dto.Address1 ?? e.JsonDetail.Address1;
+		e.JsonDetail.Address2 = dto.Address2 ?? e.JsonDetail.Address2;
+		e.JsonDetail.Address3 = dto.Address3 ?? e.JsonDetail.Address3;
+		e.JsonDetail.Telegram = dto.Telegram ?? e.JsonDetail.Telegram;
+		e.JsonDetail.Instagram = dto.Instagram ?? e.JsonDetail.Instagram;
+		e.JsonDetail.WhatsApp = dto.WhatsApp ?? e.JsonDetail.WhatsApp;
+		e.JsonDetail.Dribble = dto.Dribble ?? e.JsonDetail.Dribble;
+		e.JsonDetail.Pinterest = dto.Pinterest ?? e.JsonDetail.Pinterest;
+		e.JsonDetail.PhoneNumber1 = dto.PhoneNumber1 ?? e.JsonDetail.PhoneNumber1;
+		e.JsonDetail.PhoneNumber2 = dto.PhoneNumber2 ?? e.JsonDetail.PhoneNumber2;
+		e.JsonDetail.LinkedIn = dto.LinkedIn ?? e.JsonDetail.LinkedIn;
+		e.JsonDetail.SoundCloud = dto.SoundCloud ?? e.JsonDetail.SoundCloud;
+		e.JsonDetail.Email1 = dto.Email1 ?? e.JsonDetail.Email1;
+		e.JsonDetail.Email2 = dto.Email2 ?? e.JsonDetail.Email2;
 
-		if (dto.RemoveTags.IsNotNullOrEmpty()) dto.RemoveTags!.ForEach(item => e.Tags?.Remove(item));
-		if (dto.AddTags.IsNotNullOrEmpty()) e.Tags!.AddRange(dto.AddTags!);
+		if (dto.RemoveTags.IsNotNullOrEmpty()) dto.RemoveTags!.ForEach(item => e.Tags.Remove(item));
+		if (dto.AddTags.IsNotNullOrEmpty()) e.Tags.AddRange(dto.AddTags!);
 
 		dbContext.Update(e);
 		await dbContext.SaveChangesAsync(ct);
