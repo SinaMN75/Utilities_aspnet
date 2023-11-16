@@ -274,6 +274,8 @@ public enum TagContent {
 	HomeBannerSmall1 = 107,
 	HomeBannerSmall2 = 108,
 	ContactInfo = 109,
+	SmallDetail1 = 110,
+	SmallDetail2 = 111
 }
 
 public enum TagComment {
