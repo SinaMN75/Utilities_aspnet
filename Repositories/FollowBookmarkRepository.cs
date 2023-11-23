@@ -92,7 +92,7 @@ public class FollowBookmarkRepository(DbContext dbContext,
 		try {
 			GenericResponse<IQueryable<NotificationEntity>> notification = notificationRepository.Filter(new NotificationFilterDto {
 				UserId = parameters.UserId,
-				CreatorUserId = _userId,
+				CreatorUserId = _userId
 			});
 			if (notification.Result.IsNullOrEmpty())
 				await notificationRepository.Create(new NotificationCreateUpdateDto {

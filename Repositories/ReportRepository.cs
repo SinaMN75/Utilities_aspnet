@@ -40,7 +40,7 @@ public class ReportRepository(DbContext context, IHttpContextAccessor httpContex
 				Tags = x.Comment.Tags,
 				JsonDetail = x.Comment.JsonDetail,
 				TargetUserId = x.Comment.TargetUserId,
-				ProductId = x.Comment.ProductId,
+				ProductId = x.Comment.ProductId
 			},
 			Product = new ProductEntity {
 				Id = x.Product!.Id,

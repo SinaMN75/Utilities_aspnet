@@ -30,7 +30,7 @@ public class ArvanStorageRepository : IArvanStorageRepository {
 			Objects = new List<KeyVersion> {
 				new() { Key = "Item1" },
 				// Versioned item
-				new() { Key = "Item2", VersionId = "Rej8CiBxcZKVK81cLr39j27Y5FVXghDK", },
+				new() { Key = "Item2", VersionId = "Rej8CiBxcZKVK81cLr39j27Y5FVXghDK" },
 				// Item in subdirectory
 				new() { Key = "Logs/error.txt" }
 			}
@@ -72,7 +72,7 @@ public class ArvanStorageRepository : IArvanStorageRepository {
 
 	public async Task ListingObjectsAsync(IAmazonS3 client, string bucketName) {
 		try {
-			ListObjectsRequest? request = new() { BucketName = bucketName, MaxKeys = 5, };
+			ListObjectsRequest? request = new() { BucketName = bucketName, MaxKeys = 5 };
 
 			do {
 				ListObjectsResponse response = await client.ListObjectsAsync(request);
@@ -101,7 +101,7 @@ public class ArvanStorageRepository : IArvanStorageRepository {
 		try {
 			GetObjectRequest request = new() {
 				BucketName = bucketName,
-				Key = keyName,
+				Key = keyName
 			};
 
 			using GetObjectResponse response = await client.GetObjectAsync(request);
@@ -133,7 +133,7 @@ public class ArvanStorageRepository : IArvanStorageRepository {
 		List<UploadPartResponse> uploadResponses = new();
 
 		// Setup information required to initiate the multipart upload.
-		InitiateMultipartUploadRequest initiateRequest = new() { BucketName = bucketName, Key = keyName, };
+		InitiateMultipartUploadRequest initiateRequest = new() { BucketName = bucketName, Key = keyName };
 
 		// Initiate the upload.
 		InitiateMultipartUploadResponse initResponse = await client.InitiateMultipartUploadAsync(initiateRequest);
@@ -154,7 +154,7 @@ public class ArvanStorageRepository : IArvanStorageRepository {
 					PartNumber = i,
 					PartSize = partSize,
 					FilePosition = filePosition,
-					FilePath = filePath,
+					FilePath = filePath
 				};
 
 				// Upload a part and add the response to our list.
@@ -167,7 +167,7 @@ public class ArvanStorageRepository : IArvanStorageRepository {
 			CompleteMultipartUploadRequest completeRequest = new() {
 				BucketName = bucketName,
 				Key = keyName,
-				UploadId = initResponse.UploadId,
+				UploadId = initResponse.UploadId
 			};
 			completeRequest.AddPartETags(uploadResponses);
 
@@ -183,7 +183,7 @@ public class ArvanStorageRepository : IArvanStorageRepository {
 			AbortMultipartUploadRequest abortMPURequest = new() {
 				BucketName = bucketName,
 				Key = keyName,
-				UploadId = initResponse.UploadId,
+				UploadId = initResponse.UploadId
 			};
 			await client.AbortMultipartUploadAsync(abortMPURequest);
 		}
@@ -215,7 +215,7 @@ public class ArvanStorageRepository : IArvanStorageRepository {
 
 	public async Task DeleteBucketTaggingAsync(IAmazonS3 client, string bucketName) {
 		try {
-			DeleteBucketTaggingRequest request = new() { BucketName = bucketName, };
+			DeleteBucketTaggingRequest request = new() { BucketName = bucketName };
 			DeleteBucketTaggingResponse response = await client.DeleteBucketTaggingAsync(request);
 			Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
 			Console.WriteLine($"Bucket tagging successfully deleted from {bucketName} bucket");
@@ -254,7 +254,7 @@ public class ArvanStorageRepository : IArvanStorageRepository {
 	private static async Task GetBucketTagsAsync(IAmazonS3 client, string bucketName) {
 		try {
 			GetBucketTaggingRequest request = new() {
-				BucketName = bucketName,
+				BucketName = bucketName
 			};
 
 			GetBucketTaggingResponse response = await client.GetBucketTaggingAsync(request);
@@ -272,7 +272,7 @@ public class ArvanStorageRepository : IArvanStorageRepository {
 	private static async Task GetBucketVersioningAsync(IAmazonS3 client, string bucketName) {
 		try {
 			GetBucketVersioningResponse response = await client.GetBucketVersioningAsync(new GetBucketVersioningRequest {
-				BucketName = bucketName,
+				BucketName = bucketName
 			});
 
 			Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
@@ -307,7 +307,7 @@ public class ArvanStorageRepository : IArvanStorageRepository {
 		try {
 			PutACLResponse response = await client.PutACLAsync(new PutACLRequest {
 				BucketName = bucketName,
-				CannedACL = acl == "private" ? S3CannedACL.Private : S3CannedACL.PublicRead, // S3CannedACL.PublicRead or S3CannedACL.Private
+				CannedACL = acl == "private" ? S3CannedACL.Private : S3CannedACL.PublicRead // S3CannedACL.PublicRead or S3CannedACL.Private
 			});
 
 			Console.WriteLine($"Access-list {acl} added to {bucketName} bucket");
@@ -322,7 +322,7 @@ public class ArvanStorageRepository : IArvanStorageRepository {
 
 	private static async Task GetBucketAclAsync(IAmazonS3 client, string bucketName) {
 		try {
-			GetACLResponse response = await client.GetACLAsync(new GetACLRequest { BucketName = bucketName, });
+			GetACLResponse response = await client.GetACLAsync(new GetACLRequest { BucketName = bucketName });
 
 			Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
 		}
@@ -335,7 +335,7 @@ public class ArvanStorageRepository : IArvanStorageRepository {
 	}
 
 	private static async Task DeleteBucketPolicy(IAmazonS3 client, string bucketName) {
-		DeleteBucketPolicyRequest deleteRequest = new() { BucketName = bucketName, };
+		DeleteBucketPolicyRequest deleteRequest = new() { BucketName = bucketName };
 		object policy = await client.DeleteBucketPolicyAsync(deleteRequest);
 
 		foreach (PropertyInfo prop in policy.GetType().GetProperties()) {

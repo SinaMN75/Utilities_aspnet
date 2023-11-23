@@ -3,8 +3,8 @@ namespace Utilities_aspnet.Controllers;
 [ApiController]
 [Route("api/user")]
 public class UserController(IUserRepository repository) : BaseApiController {
-	[HttpPost("Register")]
-	public async Task<ActionResult<GenericResponse>> Register(RegisterDto dto) => Result(await repository.Register(dto));
+	[HttpPost]
+	public async Task<ActionResult<GenericResponse>> Create(UserCreateUpdateDto dto) => Result(await repository.Create(dto));
 
 	[HttpPost("LoginWithPassword")]
 	public async Task<ActionResult<GenericResponse>> LoginWithPassword(LoginWithPasswordDto dto) => Result(await repository.LoginWithPassword(dto));

@@ -50,7 +50,7 @@ public class AppSettingsRepository(IConfiguration config, DbContext dbContext) :
 			Address = await dbContext.Set<AddressEntity>().AsNoTracking().CountAsync(),
 			ReleasedProducts = await dbContext.Set<ProductEntity>().AsNoTracking().Where(x => x.Tags!.Contains(TagProduct.Released)).CountAsync(),
 			InQueueProducts = await dbContext.Set<ProductEntity>().AsNoTracking().Where(x => x.Tags!.Contains(TagProduct.InQueue)).CountAsync(),
-			NotAcceptedProducts = await dbContext.Set<ProductEntity>().AsNoTracking().Where(x => x.Tags!.Contains(TagProduct.NotAccepted)).CountAsync(),
+			NotAcceptedProducts = await dbContext.Set<ProductEntity>().AsNoTracking().Where(x => x.Tags!.Contains(TagProduct.NotAccepted)).CountAsync()
 		};
 		return new GenericResponse<DashboardReadDto>(dto);
 	}

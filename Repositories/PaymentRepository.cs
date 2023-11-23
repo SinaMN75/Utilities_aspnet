@@ -42,7 +42,7 @@ public class PaymentRepository : IPaymentRepository {
 				ZibalRequestReadDto? zibalRequestReadDto = await PaymentApi.PayZibal(new ZibalRequestCreateDto {
 					Merchant = _appSettings.PaymentSettings.Id!,
 					Amount = long.Parse(order.TotalPrice!.ToString()!),
-					CallbackUrl = callbackUrl,
+					CallbackUrl = callbackUrl
 				});
 				return new GenericResponse<string?>(zibalRequestReadDto?.Result == 100
 					? $"https://gateway.zibal.ir/start/{zibalRequestReadDto.TrackId}"
@@ -131,7 +131,7 @@ public class PaymentRepository : IPaymentRepository {
 			}
 			case 103: {
 				await PaymentApi.VerifyZibal(new ZibalVerifyCreateDto {
-					Merchant = _appSettings.PaymentSettings.Id!, TrackId = trackId,
+					Merchant = _appSettings.PaymentSettings.Id!, TrackId = trackId
 				});
 				break;
 			}
@@ -213,7 +213,7 @@ public class PaymentRepository : IPaymentRepository {
 			}
 			case 103: {
 				await PaymentApi.VerifyZibal(new ZibalVerifyCreateDto {
-					Merchant = _appSettings.PaymentSettings.Id!, TrackId = trackId,
+					Merchant = _appSettings.PaymentSettings.Id!, TrackId = trackId
 				});
 				break;
 			}
@@ -236,7 +236,7 @@ public class PaymentRepository : IPaymentRepository {
 				ZibalRequestReadDto? zibalRequestReadDto = await PaymentApi.PayZibal(new ZibalRequestCreateDto {
 					Merchant = _appSettings.PaymentSettings.Id!,
 					Amount = amount,
-					CallbackUrl = callbackUrl,
+					CallbackUrl = callbackUrl
 				});
 				return new GenericResponse<string>(zibalRequestReadDto?.Result == 100
 					? $"https://gateway.zibal.ir/start/{zibalRequestReadDto.TrackId}"

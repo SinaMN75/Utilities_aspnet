@@ -141,7 +141,7 @@ public class CommentRepository(DbContext dbContext,
 					Message = dto.Comment ?? "",
 					Title = "Comment",
 					CreatorUserId = comment.UserId,
-					Link = product.Id.ToString(),
+					Link = product.Id.ToString()
 				});
 		}
 

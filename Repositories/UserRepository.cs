@@ -7,7 +7,7 @@ public interface IUserRepository {
 	Task<GenericResponse<UserEntity?>> GetTokenForTest(string? mobile);
 	Task<GenericResponse<UserEntity?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto);
 	Task<GenericResponse<UserEntity?>> VerifyCodeForLogin(VerifyMobileForLoginDto dto);
-	Task<GenericResponse<UserEntity?>> Register(RegisterDto dto);
+	Task<GenericResponse<UserEntity?>> Create(UserCreateUpdateDto dto);
 	Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model);
 	Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList();
 	Task<GenericResponse> ToggleBlock(string userId);
@@ -219,37 +219,26 @@ public class UserRepository(DbContext dbContext,
 		return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result);
 	}
 
-	public async Task<GenericResponse<UserEntity?>> Register(RegisterDto dto) {
+	public async Task<GenericResponse<UserEntity?>> Create(UserCreateUpdateDto dto) {
 		UserEntity? model = await dbContext.Set<UserEntity>()
 			.FirstOrDefaultAsync(x => x.UserName == dto.UserName || x.Email == dto.Email || x.PhoneNumber == dto.PhoneNumber);
 		if (model != null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.UserAlreadyExist);
 
 		UserEntity user = new() {
-			Email = dto.Email ?? "",
-			UserName = dto.UserName ?? dto.Email ?? dto.PhoneNumber,
-			PhoneNumber = dto.PhoneNumber,
-			FullName = "",
 			Wallet = 0,
 			Suspend = false,
-			Password = dto.Password,
-			FirstName = dto.FirstName,
-			LastName = dto.LastName,
-			CreatedAt = DateTime.Now,
-			JsonDetail = dto.JsonDetail = new UserJsonDetail(),
+			CreatedAt = DateTime.Now
 		};
 
+		await FillUserData(dto, user);
+
+		user.UserName = dto.UserName ?? dto.Email ?? dto.PhoneNumber;
+		
 		await dbContext.AddAsync(user);
 		await dbContext.SaveChangesAsync();
 
 		JwtSecurityToken token = CreateToken(user);
-
-		if (dto.SendSms) {
-			if (dto.Email != null && dto.Email.IsEmail()) { }
-			else {
-				await SendOtp(user.Id);
-			}
-		}
-
+		
 		return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result);
 	}
 
@@ -277,7 +266,7 @@ public class UserRepository(DbContext dbContext,
 			PhoneNumber = mobile,
 			UserName = mobile,
 			CreatedAt = DateTime.Now,
-			UserAgent = userAgent,
+			UserAgent = userAgent
 		};
 
 		await dbContext.AddAsync(user);
@@ -389,6 +378,8 @@ public class UserRepository(DbContext dbContext,
 		entity.FullName = dto.FullName ?? entity.FullName;
 		entity.Bio = dto.Bio ?? entity.Bio;
 		entity.AppUserName = dto.AppUserName ?? entity.AppUserName;
+		entity.UserName = dto.UserName ?? entity.UserName;
+		entity.PhoneNumber = dto.PhoneNumber ?? entity.PhoneNumber;
 		entity.AppEmail = dto.AppEmail ?? entity.AppEmail;
 		entity.Region = dto.Region ?? entity.Region;
 		entity.Suspend = dto.Suspend ?? entity.Suspend;
@@ -433,7 +424,7 @@ public class UserRepository(DbContext dbContext,
 			Code = dto.Code ?? entity.JsonDetail.Code,
 			DeliveryPrice1 = dto.DeliveryPrice1 ?? entity.JsonDetail.DeliveryPrice1,
 			DeliveryPrice2 = dto.DeliveryPrice2 ?? entity.JsonDetail.DeliveryPrice2,
-			DeliveryPrice3 = dto.DeliveryPrice3 ?? entity.JsonDetail.DeliveryPrice3,
+			DeliveryPrice3 = dto.DeliveryPrice3 ?? entity.JsonDetail.DeliveryPrice3
 		};
 
 		if (dto.Categories.IsNotNullOrEmpty()) {
