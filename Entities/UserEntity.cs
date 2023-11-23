@@ -136,6 +136,7 @@ public class UserJsonDetail {
 	public string? Code { get; set; }
 	public string? ShebaNumber { get; set; }
 	public string? Address { get; set; }
+	public string? FcmToken { get; set; }
 	public DateTime? Boosted { get; set; }
 	public long? DeliveryPrice1 { get; set; }
 	public long? DeliveryPrice2 { get; set; }
@@ -192,6 +193,7 @@ public class UserCreateUpdateDto {
 	public string? BookmarkedProducts { get; set; }
 	public string? FollowedUsers { get; set; }
 	public string? FollowingUsers { get; set; }
+	public string? FcmToken { get; set; }
 	public string? BlockedUsers { get; set; }
 	public long? Wallet { get; set; }
 	public long? DeliveryPrice1 { get; set; }
