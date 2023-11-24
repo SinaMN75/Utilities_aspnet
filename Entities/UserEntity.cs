@@ -157,6 +157,7 @@ public class VerifyMobileForLoginDto {
 	public string? LastName { get; set; }
 	public string? UserName { get; set; }
 	public string? Instagram { get; set; }
+	public string? FcmToken { get; set; }
 }
 
 public class RegisterDto {

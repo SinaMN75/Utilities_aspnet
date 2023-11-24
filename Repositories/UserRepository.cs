@@ -285,6 +285,7 @@ public class UserRepository(DbContext dbContext,
 		user.LastName = dto.LastName ?? user.LastName;
 		user.AppUserName = dto.UserName ?? user.AppUserName;
 		user.JsonDetail.Instagram = dto.Instagram ?? user.JsonDetail.Instagram;
+		user.JsonDetail.FcmToken = dto.FcmToken ?? user.JsonDetail.FcmToken;
 
 		dbContext.Update(user);
 
