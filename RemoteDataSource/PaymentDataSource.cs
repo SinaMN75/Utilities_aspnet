@@ -1,6 +1,6 @@
 namespace Utilities_aspnet.RemoteDataSource;
 
-public static class PaymentApi {
+public static class PaymentDataSource {
 	public static async Task<ZibalRequestReadDto?> PayZibal(ZibalRequestCreateDto dto) {
 		RestRequest requestRequest = new("https://gateway.zibal.ir/v1/request", Method.POST);
 		requestRequest.AddJsonBody(ZibalRequestCreateDto.ToJson(new ZibalRequestCreateDto {

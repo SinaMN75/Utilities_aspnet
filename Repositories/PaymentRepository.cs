@@ -39,7 +39,7 @@ public class PaymentRepository : IPaymentRepository {
 				break;
 			}
 			case "Zibal": {
-				ZibalRequestReadDto? zibalRequestReadDto = await PaymentApi.PayZibal(new ZibalRequestCreateDto {
+				ZibalRequestReadDto? zibalRequestReadDto = await PaymentDataSource.PayZibal(new ZibalRequestCreateDto {
 					Merchant = _appSettings.PaymentSettings.Id!,
 					Amount = long.Parse(order.TotalPrice!.ToString()!),
 					CallbackUrl = callbackUrl
@@ -65,7 +65,7 @@ public class PaymentRepository : IPaymentRepository {
 				break;
 			}
 			case "Zibal": {
-				ZibalVerifyReadDto? i = await PaymentApi.VerifyZibal(new ZibalVerifyCreateDto { Merchant = _appSettings.PaymentSettings.Id!, TrackId = trackId });
+				ZibalVerifyReadDto? i = await PaymentDataSource.VerifyZibal(new ZibalVerifyCreateDto { Merchant = _appSettings.PaymentSettings.Id!, TrackId = trackId });
 				amount = i?.Amount ?? 0;
 				refId = i?.RefNumber.ToString() ?? "";
 				cardNumber = i?.CardNumber ?? "";
@@ -130,7 +130,7 @@ public class PaymentRepository : IPaymentRepository {
 				break;
 			}
 			case 103: {
-				await PaymentApi.VerifyZibal(new ZibalVerifyCreateDto {
+				await PaymentDataSource.VerifyZibal(new ZibalVerifyCreateDto {
 					Merchant = _appSettings.PaymentSettings.Id!, TrackId = trackId
 				});
 				break;
@@ -212,7 +212,7 @@ public class PaymentRepository : IPaymentRepository {
 				break;
 			}
 			case 103: {
-				await PaymentApi.VerifyZibal(new ZibalVerifyCreateDto {
+				await PaymentDataSource.VerifyZibal(new ZibalVerifyCreateDto {
 					Merchant = _appSettings.PaymentSettings.Id!, TrackId = trackId
 				});
 				break;
@@ -233,7 +233,7 @@ public class PaymentRepository : IPaymentRepository {
 				break;
 			}
 			case "Zibal": {
-				ZibalRequestReadDto? zibalRequestReadDto = await PaymentApi.PayZibal(new ZibalRequestCreateDto {
+				ZibalRequestReadDto? zibalRequestReadDto = await PaymentDataSource.PayZibal(new ZibalRequestCreateDto {
 					Merchant = _appSettings.PaymentSettings.Id!,
 					Amount = amount,
 					CallbackUrl = callbackUrl

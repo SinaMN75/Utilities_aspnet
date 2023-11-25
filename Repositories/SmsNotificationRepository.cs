@@ -1,4 +1,6 @@
-﻿namespace Utilities_aspnet.Repositories;
+﻿using Utilities_aspnet.RemoteDataSource;
+
+namespace Utilities_aspnet.Repositories;
 
 public interface ISmsNotificationRepository {
 	void SendSms(string mobileNumber, string message);
@@ -69,6 +71,16 @@ public class SmsNotificationRepository(IConfiguration config) : ISmsNotification
 				};
 				request.AddJsonBody(body);
 				await new RestClient("https://api.pushe.co/v2/messaging/notifications/").ExecuteAsync(request);
+				break;
+			}
+			case "firebase": {
+				await FirebaseDataSource.SendFCMNotification(new FirebaseFcmNotificationCreateDto {
+					ServerKey = setting.ServerKey!,
+					FcmToken = setting.Token!,
+					Title = dto.Title,
+					Body = dto.Content,
+					TargetUserIds = dto.UserIds
+				});
 				break;
 			}
 		}
