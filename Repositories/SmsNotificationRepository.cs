@@ -75,8 +75,8 @@ public class SmsNotificationRepository(IConfiguration config) : ISmsNotification
 			}
 			case "firebase": {
 				await FirebaseDataSource.SendFCMNotification(new FirebaseFcmNotificationCreateDto {
-					ServerKey = setting.ServerKey!,
-					FcmToken = setting.Token!,
+					ServerKey = setting.Token!,
+					FcmToken = dto.FcmToken!,
 					Title = dto.Title,
 					Body = dto.Content,
 					TargetUserIds = dto.UserIds
@@ -96,4 +96,5 @@ public class NotificationCreateDto {
 	public string BigContent { get; set; } = "";
 	public string Url { get; set; } = "";
 	public string ActionType { get; set; } = "U";
+	public string? FcmToken { get; set; }
 }

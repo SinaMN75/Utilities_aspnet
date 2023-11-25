@@ -55,7 +55,6 @@ public class PaymentSettings {
 public class PushNotificationSetting {
 	public string? Provider { get; set; }
 	public string? Token { get; set; }
-	public string? ServerKey { get; set; }
 	public string? AppId { get; set; }
 }
 
