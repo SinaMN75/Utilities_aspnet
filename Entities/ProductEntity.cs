@@ -212,7 +212,6 @@ public class ProductCreateUpdateDto {
 
 	public IEnumerable<Guid>? Categories { get; set; }
 	public IEnumerable<string>? Teams { get; set; }
-	public IEnumerable<UploadDto>? Upload { get; set; }
 	public IEnumerable<ProductCreateUpdateDto>? Children { get; set; }
 	public List<ReservationTime>? ReservationTimes { get; set; }
 	public List<Seat>? Seats { get; set; }
