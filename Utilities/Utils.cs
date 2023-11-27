@@ -1,9 +1,12 @@
 ﻿namespace Utilities_aspnet.Utilities;
 
 public static class StartupExtension {
-	public static void SetupUtilities<T>(this WebApplicationBuilder builder, string connectionStrings) where T : DbContext {
-		builder.AddUtilitiesServices<T>(connectionStrings);
-		
+	public static void SetupUtilities<T>(this WebApplicationBuilder builder,
+		string connectionStrings,
+		UtilitiesDatabaseType databaseType = UtilitiesDatabaseType.SqlServer
+	) where T : DbContext {
+		builder.AddUtilitiesServices<T>(connectionStrings, databaseType);
+
 		builder.AddUtilitiesSwagger(builder.Services.BuildServiceProvider().GetService<IServiceProvider>());
 		builder.AddUtilitiesIdentity();
 
@@ -15,7 +18,10 @@ public static class StartupExtension {
 		builder.Services.Configure<IISServerOptions>(options => options.MaxRequestBodySize = int.MaxValue);
 	}
 
-	private static void AddUtilitiesServices<T>(this WebApplicationBuilder builder, string connectionStrings) where T : DbContext {
+	private static void AddUtilitiesServices<T>(this WebApplicationBuilder builder,
+		string connectionStrings,
+		UtilitiesDatabaseType databaseType
+	) where T : DbContext {
 		builder.Services.AddOptions();
 		builder.Services.AddOutputCache(x => {
 			x.AddPolicy("24h", new OutputCachePolicy(TimeSpan.FromHours(24), new List<string> { "content", "category", "address", "comment", "transaction" }));
@@ -48,10 +54,22 @@ public static class StartupExtension {
 		builder.Services.AddScoped<DbContext, T>();
 
 		builder.Services.AddDbContextPool<T>(options => {
-			options.UseSqlServer(connectionStrings, o => {
-				o.EnableRetryOnFailure(maxRetryCount: 2, maxRetryDelay: TimeSpan.FromSeconds(1), errorNumbersToAdd: new int[] { });
-				o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-			});
+			switch (databaseType) {
+				case UtilitiesDatabaseType.SqlServer:
+					options.UseSqlServer(connectionStrings, o => {
+						o.EnableRetryOnFailure(maxRetryCount: 2, maxRetryDelay: TimeSpan.FromSeconds(1), errorNumbersToAdd: new int[] { });
+						o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+					});
+					break;
+				case UtilitiesDatabaseType.Postgres:
+					options.UseNpgsql(connectionStrings, o => {
+						o.EnableRetryOnFailure(maxRetryCount:2);
+						o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+					});
+					break;
+				default:
+					throw new ArgumentOutOfRangeException(nameof(databaseType), databaseType, null);
+			}
 		});
 
 		builder.Services.AddMemoryCache();

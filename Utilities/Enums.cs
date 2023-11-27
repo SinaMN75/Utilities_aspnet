@@ -9,6 +9,11 @@ public static class UtilitiesStatusCodesExtension {
 	public static int Value(this UtilitiesStatusCodes statusCode) => (int)statusCode;
 }
 
+public enum UtilitiesDatabaseType {
+	SqlServer = 100,
+	Postgres = 101
+}
+
 public enum UtilitiesStatusCodes {
 	Success = 200,
 	BadRequest = 400,
