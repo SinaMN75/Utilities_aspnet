@@ -227,7 +227,7 @@ public class UserRepository(DbContext dbContext,
 		UserEntity user = new() {
 			Wallet = 0,
 			Suspend = false,
-			CreatedAt = DateTime.Now
+			CreatedAt = DateTime.UtcNow
 		};
 
 		await FillUserData(dto, user);
@@ -265,7 +265,7 @@ public class UserRepository(DbContext dbContext,
 		UserEntity user = new() {
 			PhoneNumber = mobile,
 			UserName = mobile,
-			CreatedAt = DateTime.Now,
+			CreatedAt = DateTime.UtcNow,
 			UserAgent = userAgent
 		};
 
@@ -367,7 +367,7 @@ public class UserRepository(DbContext dbContext,
 			issuer: "https://SinaMN75.com,BetterSoft1234",
 			audience: "https://SinaMN75.com,BetterSoft1234",
 			claims: claims,
-			expires: DateTime.Now.AddDays(365),
+			expires: DateTime.UtcNow.AddDays(365),
 			signingCredentials: creds
 		);
 		return token;
@@ -399,7 +399,7 @@ public class UserRepository(DbContext dbContext,
 		entity.BlockedUsers = dto.BlockedUsers ?? entity.BlockedUsers;
 		entity.Badge = dto.Badge ?? entity.Badge;
 		entity.JobStatus = dto.JobStatus ?? entity.JobStatus;
-		entity.UpdatedAt = DateTime.Now;
+		entity.UpdatedAt = DateTime.UtcNow;
 		entity.IsOnline = dto.IsOnline ?? entity.IsOnline;
 		entity.ExpireUpgradeAccount = dto.ExpireUpgradeAccount ?? entity.ExpireUpgradeAccount;
 		entity.AgeCategory = dto.AgeCategory ?? entity.AgeCategory;

@@ -46,7 +46,7 @@ public class DiscountRepository(DbContext dbContext, IHttpContextAccessor httpCo
 		e.Code = dto.Code;
 		e.StartDate = dto.StartDate;
 		e.EndDate = dto.EndDate;
-		e.UpdatedAt = DateTime.Now;
+		e.UpdatedAt = DateTime.UtcNow;
 		await dbContext.SaveChangesAsync();
 		return new GenericResponse<DiscountEntity?>(e);
 	}

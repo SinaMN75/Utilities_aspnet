@@ -20,7 +20,7 @@ public class SubscriptionPaymentRepository(DbContext dbContext, IHttpContextAcce
 		SubscriptionPaymentEntity e = new() {
 			PromotionId = dto.PromotionId,
 			UserId = _userId,
-			CreatedAt = DateTime.Now,
+			CreatedAt = DateTime.UtcNow,
 			SubscriptionType = promotionEntity != null ? SubscriptionType.Promotion : SubscriptionType.UpgradeAccount,
 			Tag = TagOrder.Pending
 		};
@@ -65,7 +65,7 @@ public static class SubscriptionPaymentEntityExtension {
 		entity.Tag = dto.Tag ?? entity.Tag;
 		entity.SubscriptionType = dto.SubscriptionType ?? entity.SubscriptionType;
 		entity.Amount = dto.Amount ?? entity.Amount;
-		entity.UpdatedAt = DateTime.Now;
+		entity.UpdatedAt = DateTime.UtcNow;
 		entity.Description = dto.Description ?? entity.Description;
 		return entity;
 	}

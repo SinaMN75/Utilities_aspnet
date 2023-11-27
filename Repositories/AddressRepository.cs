@@ -13,7 +13,7 @@ public class AddressRepository(DbContext dbContext, IHttpContextAccessor httpCon
 	public async Task<GenericResponse<AddressEntity?>> Create(AddressCreateDto addressDto, CancellationToken ct) {
 		EntityEntry<AddressEntity> e = await dbContext.Set<AddressEntity>().AddAsync(new AddressEntity {
 			Address = addressDto.Address,
-			CreatedAt = DateTime.Now,
+			CreatedAt = DateTime.UtcNow,
 			Pelak = addressDto.Pelak,
 			PostalCode = addressDto.PostalCode,
 			ReceiverFullName = addressDto.ReceiverFullName,
@@ -28,7 +28,7 @@ public class AddressRepository(DbContext dbContext, IHttpContextAccessor httpCon
 
 	public async Task<GenericResponse<AddressEntity?>> Update(AddressUpdateDto dto, CancellationToken ct) {
 		AddressEntity e = (await dbContext.Set<AddressEntity>().FirstOrDefaultAsync(f => f.Id == dto.Id, ct))!;
-		if (dto.PostalCode.IsNotNullOrEmpty()) e.UpdatedAt = DateTime.Now;
+		if (dto.PostalCode.IsNotNullOrEmpty()) e.UpdatedAt = DateTime.UtcNow;
 		if (dto.PostalCode.IsNotNullOrEmpty()) e.PostalCode = dto.PostalCode!;
 		if (dto.Pelak.IsNotNullOrEmpty()) e.Pelak = dto.Pelak!;
 		if (dto.Unit.IsNotNullOrEmpty()) e.Unit = dto.Unit!;

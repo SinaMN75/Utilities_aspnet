@@ -101,15 +101,15 @@ public class Utils {
 			switch (type ?? CallerType.None) {
 				case CallerType.CreateGroupChat:
 					if (chatType == ChatType.Private) {
-						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
-							overUsed = context.Set<GroupChatEntity>().Count(w => w.CreatorUserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) >
+						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.UtcNow)
+							overUsed = context.Set<GroupChatEntity>().Count(w => w.CreatorUserId == userId && w.CreatedAt > DateTime.UtcNow.AddHours(-1)) >
 							           usageRulesBeforeUpgrade.MaxChatPerHour;
 						else
-							overUsed = context.Set<GroupChatEntity>().Count(w => w.CreatorUserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) >
+							overUsed = context.Set<GroupChatEntity>().Count(w => w.CreatorUserId == userId && w.CreatedAt > DateTime.UtcNow.AddHours(-1)) >
 							           usageRulesAfterUpgrade.MaxChatPerHour;
 					}
 					else {
-						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
+						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.UtcNow)
 							overUsed = context.Set<GroupChatEntity>().Count(w => w.CreatorUserId == userId) >
 							           usageRulesBeforeUpgrade.MaxGroupOrChannelPerProfile;
 						else
@@ -118,16 +118,16 @@ public class Utils {
 
 					break;
 				case CallerType.CreateComment:
-					if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
-						overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) >
+					if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.UtcNow)
+						overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt > DateTime.UtcNow.AddHours(-1)) >
 						           usageRulesBeforeUpgrade.MaxCommentPerHour;
 					else
-						overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1)) >
+						overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt > DateTime.UtcNow.AddHours(-1)) >
 						           usageRulesAfterUpgrade.MaxCommentPerHour;
 					break;
 				case CallerType.CreateProduct:
 					if (useCaseProduct!.Value.HasFlag(TagProduct.Product)) {
-						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
+						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.UtcNow)
 							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.Tags!.Contains(TagProduct.Product) && w.CreatedAt.Date == DateTime.Today) >
 							           usageRulesBeforeUpgrade.MaxPostPerDay;
 						else
@@ -136,7 +136,7 @@ public class Utils {
 					}
 					else if (useCaseProduct.Value.HasFlag(TagProduct.AdHiring) || useCaseProduct.Value.HasFlag(TagProduct.AdProject) ||
 					         useCaseProduct.Value.HasFlag(TagProduct.AdEmployee)) {
-						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
+						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.UtcNow)
 							overUsed = context.Set<ProductEntity>().Count(w =>
 								           w.UserId == userId &&
 								           (w.Tags!.Contains(TagProduct.AdEmployee) || w.Tags.Contains(TagProduct.AdHiring) || w.Tags.Contains(TagProduct.AdProject)) &&
@@ -150,7 +150,7 @@ public class Utils {
 							           usageRulesAfterUpgrade.MaxAdvertismentPerDay;
 					}
 					else if (useCaseProduct.Value.HasFlag(TagProduct.MicroBlog)) {
-						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now)
+						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.UtcNow)
 							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.Tags!.Contains(TagProduct.MicroBlog) && w.CreatedAt.Date == DateTime.Today) >
 							           usageRulesBeforeUpgrade.MaxTweetPerDay;
 						else
@@ -162,16 +162,16 @@ public class Utils {
 
 					break;
 				case CallerType.SendPost:
-					if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.Now) {
+					if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.UtcNow) {
 						IQueryable<GroupChatMessageEntity> groupChatMessages =
-							context.Set<GroupChatMessageEntity>().Where(w => w.UserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1));
+							context.Set<GroupChatMessageEntity>().Where(w => w.UserId == userId && w.CreatedAt > DateTime.UtcNow.AddHours(-1));
 						IQueryable<ProductEntity> products = context.Set<ProductEntity>().Where(a => groupChatMessages.Any(w => w.Id == a.GroupChatMessageId));
 						overUsed = products.Count() + countProduct >
 						           usageRulesBeforeUpgrade.MaxSendPostPerHour;
 					}
 					else {
 						IQueryable<GroupChatMessageEntity> groupChatMessages =
-							context.Set<GroupChatMessageEntity>().Where(w => w.UserId == userId && w.CreatedAt > DateTime.Now.AddHours(-1));
+							context.Set<GroupChatMessageEntity>().Where(w => w.UserId == userId && w.CreatedAt > DateTime.UtcNow.AddHours(-1));
 						IQueryable<ProductEntity> products = context.Set<ProductEntity>().Where(a => groupChatMessages.Any(w => w.Id == a.GroupChatMessageId));
 						overUsed = products.Count() + countProduct >
 						           usageRulesAfterUpgrade.MaxSendPostPerHour;

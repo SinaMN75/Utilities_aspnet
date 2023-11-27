@@ -60,7 +60,7 @@ public class ContentRepository(DbContext dbContext, IMediaRepository mediaReposi
 		e.Title = dto.Title ?? e.Title;
 		e.SubTitle = dto.SubTitle ?? e.SubTitle;
 		e.Description = dto.Description ?? e.Description;
-		e.UpdatedAt = DateTime.Now;
+		e.UpdatedAt = DateTime.UtcNow;
 		e.Tags = dto.Tags ?? e.Tags;
 		e.DeletedAt = dto.DeletedAt ?? e.DeletedAt;
 		e.JsonDetail.Address1 = dto.Address1 ?? e.JsonDetail.Address1;

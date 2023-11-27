@@ -100,7 +100,7 @@ public static class CategoryEntityExtension {
 		entity.Title = dto.Title ?? entity.Title;
 		entity.TitleTr1 = dto.TitleTr1 ?? entity.TitleTr1;
 		entity.TitleTr2 = dto.TitleTr2 ?? entity.TitleTr2;
-		entity.UpdatedAt = DateTime.Now;
+		entity.UpdatedAt = DateTime.UtcNow;
 		entity.Order = dto.Order ?? entity.Order;
 		entity.ParentId = dto.ParentId ?? entity.ParentId;
 		entity.Tags = dto.Tags ?? entity.Tags;

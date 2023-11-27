@@ -88,7 +88,7 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 
 		e.Title = dto.Title ?? e.Title;
 		e.Type = dto.Type ?? e.Type;
-		e.UpdatedAt = DateTime.Now;
+		e.UpdatedAt = DateTime.UtcNow;
 
 		e.JsonDetail = new GroupChatJsonDetail {
 			Department = dto.Department ?? e.JsonDetail.Department,
@@ -137,8 +137,8 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 
 		GroupChatMessageEntity entity = new() {
 			Message = dto.Message,
-			CreatedAt = DateTime.Now,
-			UpdatedAt = DateTime.Now,
+			CreatedAt = DateTime.UtcNow,
+			UpdatedAt = DateTime.UtcNow,
 			GroupChatId = dto.GroupChatId,
 			ParentId = dto.ParentId,
 			UserId = _userId,
@@ -196,7 +196,7 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 			.FirstOrDefaultAsync(x => x.Id == dto.Id))!;
 
 		e.Message = dto.Message ?? e.Message;
-		e.UpdatedAt = DateTime.Now;
+		e.UpdatedAt = DateTime.UtcNow;
 
 		EntityEntry<GroupChatMessageEntity> entity = dbContext.Set<GroupChatMessageEntity>().Update(e);
 		await dbContext.SaveChangesAsync();
@@ -366,7 +366,7 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 
 		if (seenUsers is null) {
 			await dbContext.Set<SeenUsers>().AddAsync(new SeenUsers {
-				CreatedAt = DateTime.Now,
+				CreatedAt = DateTime.UtcNow,
 				FkGroupChat = groupChat.Id,
 				FkUserId = _userId,
 				FkGroupChatMessage = messageId
@@ -439,8 +439,8 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 		GroupChatEntity entity = new() {
 			Title = dto.Title,
 			Type = dto.Type,
-			CreatedAt = DateTime.Now,
-			UpdatedAt = DateTime.Now,
+			CreatedAt = DateTime.UtcNow,
+			UpdatedAt = DateTime.UtcNow,
 			CreatorUserId = _userId!,
 			Users = users,
 			Products = products,
@@ -464,7 +464,7 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 			entity.Categories = listCategory;
 		}
 
-		if (entity.Type == ChatType.PublicChannel) entity.JsonDetail.Boosted = DateTime.Now;
+		if (entity.Type == ChatType.PublicChannel) entity.JsonDetail.Boosted = DateTime.UtcNow;
 
 		EntityEntry<GroupChatEntity> e = await dbContext.Set<GroupChatEntity>().AddAsync(entity);
 		await dbContext.SaveChangesAsync();

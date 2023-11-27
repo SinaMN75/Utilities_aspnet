@@ -23,7 +23,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 		oldOrder.Tags = dto.Tags ?? oldOrder.Tags;
 		oldOrder.DiscountCode = dto.DiscountCode ?? oldOrder.DiscountCode;
 		oldOrder.AddressId = dto.AddressId ?? oldOrder.AddressId;
-		oldOrder.UpdatedAt = DateTime.Now;
+		oldOrder.UpdatedAt = DateTime.UtcNow;
 
 		if (dto.RemoveTags.IsNotNullOrEmpty()) {
 			dto.RemoveTags?.ForEach(item => oldOrder.Tags.Remove(item));
@@ -104,9 +104,9 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 				Tags = new List<TagOrder> { TagOrder.Pending },
 				UserId = _userId,
 				SendPrice = p.User!.JsonDetail.DeliveryPrice1,
-				CreatedAt = DateTime.Now,
+				CreatedAt = DateTime.UtcNow,
 				ProductOwnerId = p.UserId,
-				UpdatedAt = DateTime.Now
+				UpdatedAt = DateTime.UtcNow
 			});
 
 			EntityEntry<OrderDetailEntity> orderDetailEntity = await dbContext.Set<OrderDetailEntity>().AddAsync(
@@ -116,8 +116,8 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 					ProductId = dto.ProductId,
 					UnitPrice = p.Price,
 					FinalPrice = dto.Count * p.Price,
-					CreatedAt = DateTime.Now,
-					UpdatedAt = DateTime.Now
+					CreatedAt = DateTime.UtcNow,
+					UpdatedAt = DateTime.UtcNow
 				});
 			orderEntity.Entity.TotalPrice = orderDetailEntity.Entity.FinalPrice;
 
@@ -130,10 +130,10 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 				OrderNumber = new Random().Next(10000, 99999),
 				Tags = new List<TagOrder> { TagOrder.Pending },
 				UserId = _userId,
-				CreatedAt = DateTime.Now,
+				CreatedAt = DateTime.UtcNow,
 				ProductOwnerId = p.UserId,
 				SendPrice = p.User!.JsonDetail.DeliveryPrice1,
-				UpdatedAt = DateTime.Now
+				UpdatedAt = DateTime.UtcNow
 			});
 
 			EntityEntry<OrderDetailEntity> orderDetailEntity = await dbContext.Set<OrderDetailEntity>().AddAsync(
@@ -143,8 +143,8 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 					ProductId = dto.ProductId,
 					UnitPrice = p.Price,
 					FinalPrice = dto.Count * p.Price,
-					CreatedAt = DateTime.Now,
-					UpdatedAt = DateTime.Now
+					CreatedAt = DateTime.UtcNow,
+					UpdatedAt = DateTime.UtcNow
 				});
 			orderEntity.Entity.TotalPrice = orderDetailEntity.Entity.FinalPrice;
 
@@ -163,8 +163,8 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 						ProductId = dto.ProductId,
 						UnitPrice = p.Price,
 						FinalPrice = dto.Count * p.Price,
-						CreatedAt = DateTime.Now,
-						UpdatedAt = DateTime.Now
+						CreatedAt = DateTime.UtcNow,
+						UpdatedAt = DateTime.UtcNow
 					});
 				await dbContext.Set<OrderDetailEntity>().AddAsync(orderDetailEntity.Entity);
 			}
@@ -204,8 +204,8 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 
 		OrderEntity e = new() {
 			OrderNumber = new Random().Next(10000, 99999),
-			CreatedAt = DateTime.Now,
-			UpdatedAt = DateTime.Now,
+			CreatedAt = DateTime.UtcNow,
+			UpdatedAt = DateTime.UtcNow,
 			ProductOwnerId = p.UserId,
 			JsonDetail = new OrderJsonDetail { ReservationTimes = dto.ReserveDto },
 			Tags = new List<TagOrder> { TagOrder.Pending, TagOrder.Reserve },
@@ -234,8 +234,8 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 
 		OrderEntity e = new() {
 			OrderNumber = new Random().Next(10000, 99999),
-			CreatedAt = DateTime.Now,
-			UpdatedAt = DateTime.Now,
+			CreatedAt = DateTime.UtcNow,
+			UpdatedAt = DateTime.UtcNow,
 			ProductOwnerId = p.UserId,
 			JsonDetail = new OrderJsonDetail { Seats = seats, ProductId = dto.ProductId.ToString()},
 			Tags = new List<TagOrder> { TagOrder.Pending, TagOrder.Reserve },
@@ -254,7 +254,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 		DiscountEntity? d = await dbContext.Set<DiscountEntity>()
 			.FirstOrDefaultAsync(x => x.Code == dto.Code && x.UserId == o.UserId);
 		if (d is null) return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.InvalidDiscountCode);
-		if (d.StartDate >= DateTime.Now || d.EndDate <= DateTime.Now || d.NumberUses <= 0)
+		if (d.StartDate >= DateTime.UtcNow || d.EndDate <= DateTime.UtcNow || d.NumberUses <= 0)
 			return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.InvalidDiscountCode);
 
 		o.DiscountCode = d.Code;

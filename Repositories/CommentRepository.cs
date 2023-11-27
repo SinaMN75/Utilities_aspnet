@@ -109,8 +109,8 @@ public class CommentRepository(DbContext dbContext,
 		}
 
 		CommentEntity comment = new() {
-			CreatedAt = DateTime.Now,
-			UpdatedAt = DateTime.Now,
+			CreatedAt = DateTime.UtcNow,
+			UpdatedAt = DateTime.UtcNow,
 			Comment = dto.Comment,
 			ProductId = dto.ProductId,
 			TargetUserId = dto.UserId,
@@ -168,7 +168,7 @@ public class CommentRepository(DbContext dbContext,
 			comment.Tags?.AddRange(dto.AddTags!);
 		}
 
-		comment.UpdatedAt = DateTime.Now;
+		comment.UpdatedAt = DateTime.UtcNow;
 		dbContext.Set<CommentEntity>().Update(comment);
 		await dbContext.SaveChangesAsync(ct);
 		await outputCache.EvictByTagAsync("comment", ct);

@@ -10,7 +10,7 @@ public class AppSettingsRepository(IConfiguration config, DbContext dbContext) :
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
 		return new GenericResponse<EnumDto>(new EnumDto {
-				DateTime = DateTime.Now,
+				DateTime = DateTime.UtcNow,
 				UtcDateTime = DateTime.UtcNow,
 				UtilitiesStatusCodes = EnumExtension.GetValues<UtilitiesStatusCodes>(),
 				Currency = EnumExtension.GetValues<Currency>(),

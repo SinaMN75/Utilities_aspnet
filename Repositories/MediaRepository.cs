@@ -38,7 +38,7 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext) : IMe
 					ChatId = model.ChatId,
 					CommentId = model.CommentId,
 					BookmarkId = model.BookmarkId,
-					CreatedAt = DateTime.Now,
+					CreatedAt = DateTime.UtcNow,
 					Order = model.Order,
 					NotificationId = model.NotificationId,
 					GroupChatId = model.GroupChatId,
@@ -67,7 +67,7 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext) : IMe
 				         CategoryId = model.CategoryId,
 				         ChatId = model.ChatId,
 				         CommentId = model.CommentId,
-				         CreatedAt = DateTime.Now,
+				         CreatedAt = DateTime.UtcNow,
 				         NotificationId = model.NotificationId,
 				         Order = model.Order,
 				         Tags = model.Tags,
@@ -121,7 +121,7 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext) : IMe
 		media.JsonDetail.Time = model.Time ?? media.JsonDetail.Time;
 		media.JsonDetail.Artist = model.Artist ?? media.JsonDetail.Artist;
 		media.JsonDetail.Album = model.Album ?? media.JsonDetail.Album;
-		media.UpdatedAt = DateTime.Now;
+		media.UpdatedAt = DateTime.UtcNow;
 		media.Tags = model.Tags ?? media.Tags;
 		media.Order = model.Order ?? media.Order;
 

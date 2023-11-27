@@ -21,7 +21,7 @@ public class PromotionRepository(DbContext dbContext,
 			return new GenericResponse<PromotionEntity?>(null, UtilitiesStatusCodes.BadRequest);
 
 		promotion = new PromotionEntity {
-			CreatedAt = DateTime.Now,
+			CreatedAt = DateTime.UtcNow,
 			ProductId = dto.ProductId,
 			GroupChatId = dto.GroupChatId,
 			CategoryId = dto.CategoryId,
@@ -37,25 +37,25 @@ public class PromotionRepository(DbContext dbContext,
 
 		ProductEntity? product = await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == dto.ProductId);
 		if (product is not null) {
-			product.Boosted = DateTime.Now;
+			product.Boosted = DateTime.UtcNow;
 			dbContext.Update(product);
 		}
 
 		GroupChatEntity? groupChat = await dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(f => f.Id == dto.GroupChatId);
 		if (groupChat is not null) {
-			groupChat.JsonDetail.Boosted = DateTime.Now;
+			groupChat.JsonDetail.Boosted = DateTime.UtcNow;
 			dbContext.Update(groupChat);
 		}
 
 		CategoryEntity? category = await dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(f => f.Id == dto.CategoryId);
 		if (category is not null) {
-			category.JsonDetail.Boosted = DateTime.Now;
+			category.JsonDetail.Boosted = DateTime.UtcNow;
 			dbContext.Update(category);
 		}
 
 		UserEntity? userEntity = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == dto.UserId);
 		if (userEntity is not null) {
-			userEntity.JsonDetail.Boosted = DateTime.Now;
+			userEntity.JsonDetail.Boosted = DateTime.UtcNow;
 			dbContext.Update(userEntity);
 		}
 
@@ -70,7 +70,7 @@ public class PromotionRepository(DbContext dbContext,
 			.FirstOrDefaultAsync(f => f.ProductId == id || f.GroupChatId == id || f.CategoryId == id || f.UserPromotedId == id.ToString());
 		if (promotion is null) return new GenericResponse<PromotionDetail?>(null, UtilitiesStatusCodes.NotFound);
 
-		TimeSpan timeDifference = DateTime.Now - promotion.CreatedAt;
+		TimeSpan timeDifference = DateTime.UtcNow - promotion.CreatedAt;
 		double hoursPassed = timeDifference.TotalHours;
 
 		string[]? usersId = promotion.Users.IsNotNullOrEmpty() ? promotion.Users!.Split(",") : null;

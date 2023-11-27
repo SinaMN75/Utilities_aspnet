@@ -88,8 +88,8 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 			Title = model.Title,
 			UserId = model.UserId,
 			CreatorUserId = model.CreatorUserId,
-			CreatedAt = DateTime.Now,
-			UpdatedAt = DateTime.Now,
+			CreatedAt = DateTime.UtcNow,
+			UpdatedAt = DateTime.UtcNow,
 			Tags = model.Tags,
 			Visited = false
 		};

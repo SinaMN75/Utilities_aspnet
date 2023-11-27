@@ -37,7 +37,7 @@ public class ProductRepository(DbContext dbContext,
 
 		ProductEntity e = await new ProductEntity().FillData(dto, dbContext);
 		e.UserId = _userId;
-		e.CreatedAt = DateTime.Now;
+		e.CreatedAt = DateTime.UtcNow;
 
 		EntityEntry<ProductEntity> i = await dbContext.Set<ProductEntity>().AddAsync(e, ct);
 		await dbContext.SaveChangesAsync(ct);
@@ -57,7 +57,7 @@ public class ProductRepository(DbContext dbContext,
 
 	public async Task<GenericResponse<IQueryable<ProductEntity>>> Filter(ProductFilterDto dto) {
 		IQueryable<ProductEntity> q = dbContext.Set<ProductEntity>().AsNoTracking();
-		if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.Now);
+		if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.UtcNow);
 		q = !dto.ShowWithChildren ? q.Where(x => x.ParentId == null) : q.Include(x => x.Parent);
 
 		List<ProductEntity> postsThatMyFollowersSeen = new();
@@ -195,7 +195,7 @@ public class ProductRepository(DbContext dbContext,
 
 			VisitProducts? vp = await dbContext.Set<VisitProducts>().FirstOrDefaultAsync(a => a.UserId == user.Id && a.ProductId == i.Id, ct);
 			if (vp is null) {
-				VisitProducts visitProduct = new() { CreatedAt = DateTime.Now, ProductId = i.Id, UserId = user.Id };
+				VisitProducts visitProduct = new() { CreatedAt = DateTime.UtcNow, ProductId = i.Id, UserId = user.Id };
 				await dbContext.Set<VisitProducts>().AddAsync(visitProduct, ct);
 				if (string.IsNullOrEmpty(i.SeenUsers)) i.SeenUsers = user.Id;
 				else i.SeenUsers = i.SeenUsers + "," + user.Id;
@@ -288,7 +288,7 @@ public class ProductRepository(DbContext dbContext,
 		ReactionEntity? reaction = await dbContext.Set<ReactionEntity>().FirstOrDefaultAsync(f => f.UserId == _userId && f.ProductId == dto.ProductId);
 		if (reaction?.Reaction == null) {
 			reaction = new ReactionEntity {
-				CreatedAt = DateTime.Now,
+				CreatedAt = DateTime.UtcNow,
 				ProductId = dto.ProductId,
 				Reaction = dto.Reaction,
 				UserId = _userId
@@ -301,7 +301,7 @@ public class ProductRepository(DbContext dbContext,
 		//}
 		else {
 			reaction.Reaction = dto.Reaction;
-			reaction.UpdatedAt = DateTime.Now;
+			reaction.UpdatedAt = DateTime.UtcNow;
 			dbContext.Update(reaction);
 		}
 
@@ -396,7 +396,7 @@ public static class ProductEntityExtension {
 		entity.ExpireDate = dto.ExpireDate ?? entity.ExpireDate;
 		entity.AgeCategory = dto.AgeCategory ?? entity.AgeCategory;
 		entity.Boosted = dto.Boosted ?? entity.Boosted;
-		entity.UpdatedAt = DateTime.Now;
+		entity.UpdatedAt = DateTime.UtcNow;
 		entity.Tags = dto.Tags ?? entity.Tags;
 		entity.JsonDetail = new ProductJsonDetail {
 			Details = dto.Details ?? entity.JsonDetail.Details,
@@ -477,13 +477,13 @@ public static class ProductEntityExtension {
 					pI = new ProductInsight {
 						UserId = e.Id,
 						Reaction = pInsight.Reaction,
-						UpdatedAt = DateTime.Now
+						UpdatedAt = DateTime.UtcNow
 					};
 				else
 					pI = new ProductInsight {
 						UserId = e.Id,
 						Reaction = pInsight.Reaction,
-						CreatedAt = DateTime.Now
+						CreatedAt = DateTime.UtcNow
 					};
 				await context.Set<ProductInsight>().AddAsync(pI);
 				productInsights.Add(pI);

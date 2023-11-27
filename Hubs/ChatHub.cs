@@ -10,7 +10,7 @@ public class ChatHub(DbContext db, IHostEnvironment hostingEnvironment) : Hub {
 	private readonly string _uploadsFolder = Path.Combine(hostingEnvironment.ContentRootPath, "intranet");
 
 	public override async Task OnConnectedAsync() {
-		string fileName = Path.Combine(_uploadsFolder, $"OnConnected - {DateTime.Now:yyyy-MM-dd-hh-mm-ss}");
+		string fileName = Path.Combine(_uploadsFolder, $"OnConnected - {DateTime.UtcNow:yyyy-MM-dd-hh-mm-ss}");
 		FileInfo log = new(fileName);
 		await using StreamWriter sw = log.CreateText();
 		await sw.WriteLineAsync("onConnect Started");
@@ -30,7 +30,7 @@ public class ChatHub(DbContext db, IHostEnvironment hostingEnvironment) : Hub {
 	}
 
 	public override async Task OnDisconnectedAsync(Exception? exception) {
-		string fileName = Path.Combine(_uploadsFolder, $"OnConnected - {DateTime.Now:yyyy-MM-dd-hh-mm-ss}");
+		string fileName = Path.Combine(_uploadsFolder, $"OnConnected - {DateTime.UtcNow:yyyy-MM-dd-hh-mm-ss}");
 		FileInfo log = new(fileName);
 		await using StreamWriter sw = log.CreateText();
 		await sw.WriteLineAsync("disconnected Started");
@@ -50,7 +50,7 @@ public class ChatHub(DbContext db, IHostEnvironment hostingEnvironment) : Hub {
 	}
 
 	public async Task SendMessageToReceiver(string sender, string receiver, string message) {
-		string fileName = Path.Combine(_uploadsFolder, $"send message - {DateTime.Now:yyyy-MM-dd-hh-mm-ss}");
+		string fileName = Path.Combine(_uploadsFolder, $"send message - {DateTime.UtcNow:yyyy-MM-dd-hh-mm-ss}");
 		FileInfo log = new(fileName);
 		await using StreamWriter sw = log.CreateText();
 		await sw.WriteLineAsync($"sender : {sender}, reviever: {receiver} message :{message}");
@@ -76,7 +76,7 @@ public class ChatHub(DbContext db, IHostEnvironment hostingEnvironment) : Hub {
 	///     4 = none
 	/// </summary>
 	public async Task SendingState(string sender, string receiver, int type) {
-		string fileName = Path.Combine(_uploadsFolder, $"sending state - {DateTime.Now:yyyy-MM-dd-hh-mm-ss}");
+		string fileName = Path.Combine(_uploadsFolder, $"sending state - {DateTime.UtcNow:yyyy-MM-dd-hh-mm-ss}");
 		FileInfo log = new(fileName);
 		await using StreamWriter sw = log.CreateText();
 		await sw.WriteLineAsync($"sender : {sender}, reviever: {receiver} type :{type}");
