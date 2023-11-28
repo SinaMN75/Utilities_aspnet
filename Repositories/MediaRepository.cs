@@ -2,7 +2,8 @@
 
 public interface IMediaRepository {
 	Task<GenericResponse<IEnumerable<MediaEntity>?>> Upload(UploadDto model);
-	Task<GenericResponse<MediaEntity?>> UpdateMedia(Guid id, UpdateMediaDto model);
+	Task<GenericResponse<IEnumerable<MediaEntity>?>> Filter(MediaFilterDto dto);
+	Task<GenericResponse<MediaEntity?>> Update(Guid id, UpdateMediaDto model);
 	Task<GenericResponse> Delete(Guid id);
 	Task DeleteMedia(IEnumerable<MediaEntity?>? media);
 }
@@ -88,6 +89,19 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext) : IMe
 		return new GenericResponse<IEnumerable<MediaEntity>?>(medias);
 	}
 
+	public async Task<GenericResponse<IEnumerable<MediaEntity>?>> Filter(MediaFilterDto dto) {
+		IQueryable<MediaEntity> q = dbContext.Set<MediaEntity>().AsNoTracking();
+		
+		int totalCount = await q.CountAsync();
+		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
+		
+		return new GenericResponse<IEnumerable<MediaEntity>?>(q) {
+			TotalCount = totalCount,
+			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
+			PageSize = dto.PageSize
+		};
+	}
+
 	public async Task<GenericResponse> Delete(Guid id) {
 		MediaEntity? media = await dbContext.Set<MediaEntity>().FirstOrDefaultAsync(x => x.Id == id);
 		if (media == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
@@ -111,7 +125,7 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext) : IMe
 		}
 	}
 
-	public async Task<GenericResponse<MediaEntity?>> UpdateMedia(Guid id, UpdateMediaDto model) {
+	public async Task<GenericResponse<MediaEntity?>> Update(Guid id, UpdateMediaDto model) {
 		MediaEntity? media = await dbContext.Set<MediaEntity>().FirstOrDefaultAsync(x => x.Id == id);
 		if (media is null)
 			throw new Exception("media is not found");

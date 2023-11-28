@@ -136,3 +136,4 @@ public class UpdateMediaDto {
 	public List<TagMedia>? AddTags { get; set; }
 }
 
+public class MediaFilterDto : BaseFilterDto;
