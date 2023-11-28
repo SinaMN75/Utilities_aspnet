@@ -12,6 +12,11 @@ public class CategoryController(ICategoryRepository repository) : BaseApiControl
 	[Authorize]
 	public async Task<ActionResult<GenericResponse<IEnumerable<CategoryEntity>>>> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto, CancellationToken ct) =>
 		Result(await repository.BulkCreate(dto, ct));
+	
+	[HttpPost("ImportFromExcel")]
+	[Authorize]
+	public async Task<ActionResult<GenericResponse<IEnumerable<CategoryEntity>>>> ImportFromExcel(IFormFile file, CancellationToken ct) =>
+		Result(await repository.ImportFromExcel(file, ct));
 
 	[HttpGet]
 	[OutputCache(PolicyName = "24h")]

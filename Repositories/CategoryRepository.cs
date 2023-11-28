@@ -1,8 +1,11 @@
-﻿namespace Utilities_aspnet.Repositories;
+﻿using OfficeOpenXml;
+
+namespace Utilities_aspnet.Repositories;
 
 public interface ICategoryRepository {
 	public Task<GenericResponse<CategoryEntity>> Create(CategoryCreateUpdateDto dto, CancellationToken ct);
 	public Task<GenericResponse<IEnumerable<CategoryEntity>>> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto, CancellationToken ct);
+	public Task<GenericResponse<IEnumerable<CategoryEntity>>> ImportFromExcel(IFormFile file, CancellationToken ct);
 	public GenericResponse<IEnumerable<CategoryEntity>> Filter(CategoryFilterDto dto);
 	public Task<GenericResponse<CategoryEntity?>> Update(CategoryCreateUpdateDto dto, CancellationToken ct);
 	public Task<GenericResponse> Delete(Guid id, CancellationToken ct);
@@ -41,6 +44,27 @@ public class CategoryRepository(DbContext context, IOutputCacheStore outputCache
 		}
 
 		return new GenericResponse<IEnumerable<CategoryEntity>>(list);
+	}
+
+	public async Task<GenericResponse<IEnumerable<CategoryEntity>>> ImportFromExcel(IFormFile file, CancellationToken ct) {
+		List<CategoryCreateUpdateDto> list = new();
+		using MemoryStream stream = new();
+		await file.CopyToAsync(stream, ct);
+		using ExcelPackage package = new(stream);
+		ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+		int rowCount = worksheet.Dimension.Rows;
+		for (int i = 2; i < rowCount; i++) {
+			list.Add(new CategoryCreateUpdateDto {
+				Id = Guid.Parse(worksheet.Cells[i, 1].Value.ToString()!),
+				Title = worksheet.Cells[i, 2].Value.ToString(),
+				TitleTr1 = worksheet.Cells[i, 3].Value.ToString(),
+				ParentId = (worksheet.Cells[i, 1].Value.ToString() ?? "").Length <= 5 ? null : Guid.Parse(worksheet.Cells[i, 1].Value.ToString()!),
+			});
+		}
+
+		GenericResponse<IEnumerable<CategoryEntity>> createdCategories = await BulkCreate(list, ct);
+		
+		return createdCategories;
 	}
 
 	public GenericResponse<IEnumerable<CategoryEntity>> Filter(CategoryFilterDto dto) {
