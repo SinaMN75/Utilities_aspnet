@@ -65,6 +65,7 @@ public class OrderCreateUpdateDto {
 	public string? DiscountCode { get; set; }
 	public DateTime? ReceivedDate { get; set; }
 	public Guid? AddressId { get; set; }
+	public string? RefCode { get; set; }
 	public List<TagOrder>? Tags { get; set; }
 	public List<TagOrder>? RemoveTags { get; set; }
 	public List<TagOrder>? AddTags { get; set; }
@@ -87,6 +88,7 @@ public class ReserveChairCreateUpdateDto {
 
 public class OrderJsonDetail {
 	public string? ProductId { get; set; }
+	public string? RefCode { get; set; }
 	public List<OrderDetailHistory> OrderDetailHistories { get; set; } = new();
 	public List<ReserveDto> ReservationTimes { get; set; } = new();
 	public List<Seat> Seats { get; set; } = new();

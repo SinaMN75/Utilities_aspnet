@@ -16,26 +16,23 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	public async Task<GenericResponse<OrderEntity?>> Update(OrderCreateUpdateDto dto) {
-		OrderEntity oldOrder = (await dbContext.Set<OrderEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id))!;
+		OrderEntity e = (await dbContext.Set<OrderEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id))!;
 
-		oldOrder.Description = dto.Description ?? oldOrder.Description;
-		oldOrder.ReceivedDate = dto.ReceivedDate ?? oldOrder.ReceivedDate;
-		oldOrder.Tags = dto.Tags ?? oldOrder.Tags;
-		oldOrder.DiscountCode = dto.DiscountCode ?? oldOrder.DiscountCode;
-		oldOrder.AddressId = dto.AddressId ?? oldOrder.AddressId;
-		oldOrder.UpdatedAt = DateTime.UtcNow;
+		e.Description = dto.Description ?? e.Description;
+		e.ReceivedDate = dto.ReceivedDate ?? e.ReceivedDate;
+		e.Tags = dto.Tags ?? e.Tags;
+		e.DiscountCode = dto.DiscountCode ?? e.DiscountCode;
+		e.AddressId = dto.AddressId ?? e.AddressId;
+		e.JsonDetail.RefCode = dto.RefCode ?? e.JsonDetail.RefCode;
+		e.UpdatedAt = DateTime.UtcNow;
 
-		if (dto.RemoveTags.IsNotNullOrEmpty()) {
-			dto.RemoveTags?.ForEach(item => oldOrder.Tags.Remove(item));
-		}
+		if (dto.RemoveTags.IsNotNullOrEmpty()) dto.RemoveTags?.ForEach(item => e.Tags.Remove(item));
 
-		if (dto.AddTags.IsNotNullOrEmpty()) {
-			oldOrder.Tags.AddRange(dto.AddTags!);
-		}
+		if (dto.AddTags.IsNotNullOrEmpty()) e.Tags.AddRange(dto.AddTags!);
 
 		await dbContext.SaveChangesAsync();
 
-		return new GenericResponse<OrderEntity?>(oldOrder);
+		return new GenericResponse<OrderEntity?>(e);
 	}
 
 	public async Task<GenericResponse<IEnumerable<OrderEntity>>> Filter(OrderFilterDto dto) {
