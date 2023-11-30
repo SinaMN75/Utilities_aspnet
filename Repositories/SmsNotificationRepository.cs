@@ -3,12 +3,17 @@
 namespace Utilities_aspnet.Repositories;
 
 public interface ISmsNotificationRepository {
-	Task<GenericResponse> SendSms(string mobileNumber, string param1, string? param2 = null, string? param3 = null);
+	Task<GenericResponse> SendSms(string mobileNumber, string? template, string param1, string? param2 = null, string? param3 = null);
 	public Task<GenericResponse> SendNotification(NotificationCreateDto dto);
 }
 
 public class SmsNotificationRepository(IConfiguration config) : ISmsNotificationRepository {
-	public async Task<GenericResponse> SendSms(string mobileNumber, string param1, string? param2 = null, string? param3 = null) {
+	public async Task<GenericResponse> SendSms(string mobileNumber,
+		string param1,
+		string? template = null,
+		string? param2 = null,
+		string? param3 = null
+	) {
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
 		SmsPanelSettings smsSetting = appSettings.SmsPanelSettings;
@@ -45,7 +50,7 @@ public class SmsNotificationRepository(IConfiguration config) : ISmsNotification
 				request.AddParameter("token", param1);
 				if (param2 != null) request.AddParameter("token2", param2);
 				if (param3 != null) request.AddParameter("token3", param3);
-				request.AddParameter("template", smsSetting.PatternCode!);
+				request.AddParameter("template", template ?? smsSetting.PatternCode!);
 				await new RestClient($"https://api.kavenegar.com/v1/{smsSetting.SmsApiKey}/verify/lookup.json").ExecuteAsync(request);
 				break;
 			}
