@@ -3,12 +3,12 @@
 namespace Utilities_aspnet.Repositories;
 
 public interface ISmsNotificationRepository {
-	void SendSms(string mobileNumber, string message);
+	Task<GenericResponse> SendSms(string mobileNumber, string param1, string? param2 = null, string? param3 = null);
 	public Task<GenericResponse> SendNotification(NotificationCreateDto dto);
 }
 
 public class SmsNotificationRepository(IConfiguration config) : ISmsNotificationRepository {
-	public async void SendSms(string mobileNumber, string message) {
+	public async Task<GenericResponse> SendSms(string mobileNumber, string param1, string? param2 = null, string? param3 = null) {
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
 		SmsPanelSettings smsSetting = appSettings.SmsPanelSettings;
@@ -20,7 +20,9 @@ public class SmsNotificationRepository(IConfiguration config) : ISmsNotification
 				request.AddParameter("receptor", mobileNumber);
 				request.AddParameter("type", 1);
 				request.AddParameter("template", smsSetting.PatternCode!);
-				request.AddParameter("param1", message);
+				request.AddParameter("param1", param1);
+				if (param2 != null) request.AddParameter("param2", param2);
+				if (param3 != null) request.AddParameter("param3", param3);
 				await new RestClient("https://api.ghasedak.me/v2/verification/send/simple").ExecuteAsync(request);
 				break;
 			}
@@ -32,7 +34,7 @@ public class SmsNotificationRepository(IConfiguration config) : ISmsNotification
 				                    ",\"fromNum\" : \"03000505\"" +
 				                    ",\"toNum\": \"" + mobileNumber + "\"" +
 				                    ",\"patternCode\": \"" + smsSetting.PatternCode + "\"" +
-				                    ",\"inputData\" : [{\"verification-code\": \"" + message + "\"}]}");
+				                    ",\"inputData\" : [{\"verification-code\": \"" + param1 + "\"}]}");
 				await new RestClient("http://ippanel.com/api/select").ExecuteAsync(request);
 				break;
 			}
@@ -40,12 +42,16 @@ public class SmsNotificationRepository(IConfiguration config) : ISmsNotification
 				RestRequest request = new(Method.POST);
 				request.AddHeader("apikey", smsSetting.SmsApiKey!);
 				request.AddParameter("receptor", mobileNumber);
-				request.AddParameter("token", message);
+				request.AddParameter("token", param1);
+				if (param2 != null) request.AddParameter("token2", param2);
+				if (param3 != null) request.AddParameter("token3", param3);
 				request.AddParameter("template", smsSetting.PatternCode!);
 				await new RestClient($"https://api.kavenegar.com/v1/{smsSetting.SmsApiKey}/verify/lookup.json").ExecuteAsync(request);
 				break;
 			}
 		}
+
+		return new GenericResponse();
 	}
 
 	public async Task<GenericResponse> SendNotification(NotificationCreateDto dto) {
