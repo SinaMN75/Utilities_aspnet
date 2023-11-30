@@ -423,6 +423,7 @@ public enum TagOrder {
 	Sent = 408,
 	Conflict = 409,
 	Complete = 410,
+	Cancelled = 411,
 	Private = 501,
 	Visible = 601
 }
