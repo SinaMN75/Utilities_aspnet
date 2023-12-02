@@ -1,6 +1,4 @@
-﻿using Utilities_aspnet.RemoteDataSource;
-
-namespace Utilities_aspnet.Repositories;
+﻿namespace Utilities_aspnet.Repositories;
 
 public interface IPaymentRepository {
 	Task<GenericResponse<string>> IncreaseWalletBalance(long amount);

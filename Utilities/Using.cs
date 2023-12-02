@@ -42,5 +42,13 @@ global using Newtonsoft.Json.Serialization;
 global using RestSharp;
 global using Swashbuckle.AspNetCore.SwaggerUI;
 global using System.Reflection;
+global using Utilities_aspnet.RemoteDataSource;
+global using System.Globalization;
+global using Newtonsoft.Json.Converters;
+global using Amazon.Runtime;
+global using Amazon.S3;
+global using Amazon.S3.Model;
+global using Amazon.S3.Util;
+global using Microsoft.Extensions.Hosting;
 
 #endregion

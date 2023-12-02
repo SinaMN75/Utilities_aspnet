@@ -1,10 +1,4 @@
-﻿#region
-
-using Microsoft.Extensions.Hosting;
-
-#endregion
-
-namespace Utilities_aspnet.Hubs;
+﻿namespace Utilities_aspnet.Hubs;
 
 public class ChatHub(DbContext db, IHostEnvironment hostingEnvironment) : Hub {
 	private readonly string _uploadsFolder = Path.Combine(hostingEnvironment.ContentRootPath, "intranet");

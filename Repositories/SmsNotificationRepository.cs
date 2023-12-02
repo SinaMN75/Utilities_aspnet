@@ -1,6 +1,4 @@
-﻿using Utilities_aspnet.RemoteDataSource;
-
-namespace Utilities_aspnet.Repositories;
+﻿namespace Utilities_aspnet.Repositories;
 
 public interface ISmsNotificationRepository {
 	Task<GenericResponse> SendSms(string mobileNumber, string param1, string? param2 = null, string? param3 = null, string? template = null);
