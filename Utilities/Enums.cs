@@ -161,7 +161,7 @@ public enum WithdrawState {
 
 public enum DisplayType {
 	None = 100,
-	Exploer = 101,
+	Explore = 101,
 	Channels = 102
 }
 
@@ -172,13 +172,13 @@ public enum TagTransaction {
 	Sell = 104,
 	Recharge = 105,
 	WalletToWallet = 106,
+	Return = 107,
 	Pending = 200,
 	Fail = 201,
 	Success = 202,
 	WithdrawAccepted = 301,
 	WithdrawRejected = 302,
-	WithdrawRequested = 302
-	
+	WithdrawRequested = 303,
 }
 
 public enum TagCategory {

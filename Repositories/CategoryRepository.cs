@@ -54,6 +54,7 @@ public class CategoryRepository(DbContext context, IOutputCacheStore outputCache
 				TitleTr1 = worksheet.Cells[i, 3].Value.ToString(),
 				ParentId = (worksheet.Cells[i, 1].Value.ToString() ?? "").Length <= 5 ? null : Guid.Parse(worksheet.Cells[i, 1].Value.ToString()!),
 				Tags = new List<TagCategory>() { TagCategory.Category },
+				IsUnique = false,
 			});
 		}
 
