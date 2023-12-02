@@ -18,22 +18,16 @@ public class CategoryRepository(DbContext context, IOutputCacheStore outputCache
 		CategoryEntity i = entity.FillData(dto);
 		await outputCache.EvictByTagAsync("category", ct);
 		if (dto.IsUnique) {
-			CategoryEntity? exists =
-				await context.Set<CategoryEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Title == dto.Title, ct);
-			if (exists == null) {
-				await context.AddAsync(i, ct);
-				await context.SaveChangesAsync(ct);
-				return new GenericResponse<CategoryEntity>(i);
-			}
-
-			return new GenericResponse<CategoryEntity>(exists);
-		}
-
-		{
+			CategoryEntity? exists = await context.Set<CategoryEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Title == dto.Title, ct);
+			if (exists != null) return new GenericResponse<CategoryEntity>(exists);
 			await context.AddAsync(i, ct);
 			await context.SaveChangesAsync(ct);
 			return new GenericResponse<CategoryEntity>(i);
 		}
+
+		await context.AddAsync(i, ct);
+		await context.SaveChangesAsync(ct);
+		return new GenericResponse<CategoryEntity>(i);
 	}
 
 	public async Task<GenericResponse<IEnumerable<CategoryEntity>>> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto, CancellationToken ct) {
