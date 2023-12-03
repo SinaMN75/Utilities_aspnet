@@ -74,7 +74,6 @@ public static class StartupExtension {
 
 		builder.Services.AddMemoryCache();
 		builder.Services.AddHttpContextAccessor();
-		builder.Services.AddSignalR();
 		builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 		builder.Services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")));
 		builder.Services.AddControllersWithViews(option => option.EnableEndpointRouting = false).AddNewtonsoftJson(options => {
@@ -172,7 +171,6 @@ public static class StartupExtension {
 		app.UseAuthentication();
 		app.UseAuthorization();
 
-		app.MapHub<ChatHub>("/hubs/ChatHub");
 		//Encrypt/Decrypt
 		//app.UseMiddleware<EncryptionMiddleware>();
 		//Encrypt/Decrypt
