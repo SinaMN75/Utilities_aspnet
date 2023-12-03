@@ -80,7 +80,6 @@ public static class StartupExtension {
 			builder.Services.AddStackExchangeRedisCache(options => { options.Configuration = redisConnectionString; });
 		}
 
-		builder.Services.AddMemoryCache();
 		builder.Services.AddHttpContextAccessor();
 		builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 		builder.Services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")));

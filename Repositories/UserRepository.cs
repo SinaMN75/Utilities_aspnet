@@ -1,4 +1,6 @@
-﻿namespace Utilities_aspnet.Repositories;
+﻿using Microsoft.Extensions.Caching.Distributed;
+
+namespace Utilities_aspnet.Repositories;
 
 public interface IUserRepository {
 	GenericResponse<IQueryable<UserEntity>> Filter(UserFilterDto dto);
@@ -16,11 +18,13 @@ public interface IUserRepository {
 	Task<GenericResponse> Authorize(AuthorizeUserDto dto);
 }
 
-public class UserRepository(DbContext dbContext,
+public class UserRepository(
+		DbContext dbContext,
 		ISmsNotificationRepository sms,
 		IHttpContextAccessor httpContextAccessor,
 		ITransactionRepository transactionRepository,
-		IMemoryCache memoryCache)
+		IDistributedCache cache
+	)
 	: IUserRepository {
 	private readonly IHttpContextAccessor? _http = httpContextAccessor;
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
@@ -233,12 +237,12 @@ public class UserRepository(DbContext dbContext,
 		await FillUserData(dto, user);
 
 		user.UserName = dto.UserName ?? dto.Email ?? dto.PhoneNumber;
-		
+
 		await dbContext.AddAsync(user);
 		await dbContext.SaveChangesAsync();
 
 		JwtSecurityToken token = CreateToken(user);
-		
+
 		return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result);
 	}
 
@@ -292,7 +296,7 @@ public class UserRepository(DbContext dbContext,
 		await dbContext.SaveChangesAsync();
 		JwtSecurityToken token = CreateToken(user);
 
-		return dto.VerificationCode == "1375" || dto.VerificationCode == memoryCache.Get<string>(user.Id)
+		return dto.VerificationCode == "1375" || dto.VerificationCode == await cache.GetStringData(user.Id)
 			? new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result)
 			: new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.WrongVerificationCode);
 	}
@@ -455,16 +459,16 @@ public class UserRepository(DbContext dbContext,
 	};
 
 	private async Task<bool> SendOtp(string userId) {
-		if (memoryCache.Get<string>(userId) != null) return false;
+		if (await cache.GetStringAsync(userId) != null) return false;
 
 		string newOtp = Random.Shared.Next(1000, 9999).ToString();
-		memoryCache.GetOrCreate<string>(userId, entry => {
-			entry.Value = newOtp;
-			entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(120);
-			return newOtp;
-		});
+		string? cachedData = await cache.GetStringAsync(userId);
+		if (cachedData.IsNullOrEmpty()) {
+			await cache.SetStringData(userId, newOtp, TimeSpan.FromSeconds(120));
+		}
+
 		UserEntity? user = await ReadByIdMinimal(userId);
-		sms.SendSms(user?.PhoneNumber!, newOtp);
+		await sms.SendSms(user?.PhoneNumber!, newOtp);
 		await dbContext.SaveChangesAsync();
 		return true;
 	}
