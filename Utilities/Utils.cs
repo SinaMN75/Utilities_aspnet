@@ -1,11 +1,13 @@
 ﻿namespace Utilities_aspnet.Utilities;
 
 public static class StartupExtension {
-	public static void SetupUtilities<T>(this WebApplicationBuilder builder,
+	public static void SetupUtilities<T>(
+		this WebApplicationBuilder builder,
 		string connectionStrings,
-		UtilitiesDatabaseType databaseType = UtilitiesDatabaseType.SqlServer
+		UtilitiesDatabaseType databaseType = UtilitiesDatabaseType.SqlServer,
+		string? redisConnectionString = null
 	) where T : DbContext {
-		builder.AddUtilitiesServices<T>(connectionStrings, databaseType);
+		builder.AddUtilitiesServices<T>(connectionStrings, databaseType, redisConnectionString);
 
 		builder.AddUtilitiesSwagger(builder.Services.BuildServiceProvider().GetService<IServiceProvider>());
 		builder.AddUtilitiesIdentity();
@@ -18,9 +20,11 @@ public static class StartupExtension {
 		builder.Services.Configure<IISServerOptions>(options => options.MaxRequestBodySize = int.MaxValue);
 	}
 
-	private static void AddUtilitiesServices<T>(this WebApplicationBuilder builder,
+	private static void AddUtilitiesServices<T>(
+		this WebApplicationBuilder builder,
 		string connectionStrings,
-		UtilitiesDatabaseType databaseType
+		UtilitiesDatabaseType databaseType,
+		string? redisConnectionString
 	) where T : DbContext {
 		builder.Services.AddOptions();
 		builder.Services.AddOutputCache(x => {
@@ -63,7 +67,7 @@ public static class StartupExtension {
 					break;
 				case UtilitiesDatabaseType.Postgres:
 					options.UseNpgsql(connectionStrings, o => {
-						o.EnableRetryOnFailure(maxRetryCount:2);
+						o.EnableRetryOnFailure(maxRetryCount: 2);
 						o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
 					});
 					break;
@@ -71,6 +75,10 @@ public static class StartupExtension {
 					throw new ArgumentOutOfRangeException(nameof(databaseType), databaseType, null);
 			}
 		});
+
+		if (redisConnectionString is not null) {
+			builder.Services.AddStackExchangeRedisCache(options => { options.Configuration = redisConnectionString; });
+		}
 
 		builder.Services.AddMemoryCache();
 		builder.Services.AddHttpContextAccessor();
