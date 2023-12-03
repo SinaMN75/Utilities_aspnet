@@ -13,9 +13,12 @@ public class ProductEntity : BaseEntity {
 
 	[MaxLength(100)]
 	public string? State { get; set; }
-	
+
 	[MaxLength(100)]
 	public string? Region { get; set; }
+
+	public double? Latitude { get; set; }
+	public double? Longitude { get; set; }
 
 	public DateTime Boosted { get; set; }
 	public int? Stock { get; set; }
@@ -76,11 +79,9 @@ public class ProductJsonDetail {
 	public string? Type1 { get; set; }
 	public string? Type2 { get; set; }
 	public string? Color { get; set; }
-	public double? Latitude { get; set; }
 	public string? AdminMessage { get; set; }
 	public int? ResponseTime { get; set; }
 	public int? OnTimeDelivery { get; set; }
-	public double? Longitude { get; set; }
 	public int? Length { get; set; }
 	public int? Width { get; set; }
 	public int? Height { get; set; }
@@ -113,7 +114,7 @@ public class Seat {
 	public string? ReservedByUserId { get; set; }
 	public string? ReservedByUserName { get; set; }
 	public TagReservationChair? Tag { get; set; }
-} 
+}
 
 public class ReservationTime {
 	public string ReserveId { get; set; } = Guid.NewGuid().ToString();

@@ -398,6 +398,8 @@ public static class ProductEntityExtension {
 		entity.Boosted = dto.Boosted ?? entity.Boosted;
 		entity.UpdatedAt = DateTime.UtcNow;
 		entity.Tags = dto.Tags ?? entity.Tags;
+		entity.Latitude = dto.Latitude ?? entity.Latitude;
+		entity.Longitude = dto.Longitude ?? entity.Longitude;
 		entity.JsonDetail = new ProductJsonDetail {
 			Details = dto.Details ?? entity.JsonDetail.Details,
 			Color = dto.Color ?? entity.JsonDetail.Color,
@@ -407,8 +409,6 @@ public static class ProductEntityExtension {
 			Link = dto.Link ?? entity.JsonDetail.Link,
 			Website = dto.Website ?? entity.JsonDetail.Website,
 			Email = dto.Email ?? entity.JsonDetail.Email,
-			Longitude = dto.Longitude ?? entity.JsonDetail.Longitude,
-			Latitude = dto.Latitude ?? entity.JsonDetail.Latitude,
 			ResponseTime = dto.ResponseTime ?? entity.JsonDetail.ResponseTime,
 			OnTimeDelivery = dto.OnTimeDelivery ?? entity.JsonDetail.OnTimeDelivery,
 			Length = dto.Length ?? entity.JsonDetail.Length,
