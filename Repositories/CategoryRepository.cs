@@ -5,7 +5,7 @@ namespace Utilities_aspnet.Repositories;
 public interface ICategoryRepository {
 	public Task<GenericResponse<CategoryEntity>> Create(CategoryCreateUpdateDto dto, CancellationToken ct);
 	public Task<GenericResponse<IEnumerable<CategoryEntity>>> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto, CancellationToken ct);
-	public Task<GenericResponse<IEnumerable<CategoryEntity>>> ImportFromExcel(IFormFile file, CancellationToken ct);
+	public Task<GenericResponse> ImportFromExcel(IFormFile file, CancellationToken ct);
 	public GenericResponse<IEnumerable<CategoryEntity>> Filter(CategoryFilterDto dto);
 	public Task<GenericResponse<CategoryEntity?>> Update(CategoryCreateUpdateDto dto, CancellationToken ct);
 	public Task<GenericResponse> Delete(Guid id, CancellationToken ct);
@@ -40,7 +40,7 @@ public class CategoryRepository(DbContext context, IOutputCacheStore outputCache
 		return new GenericResponse<IEnumerable<CategoryEntity>>(list);
 	}
 
-	public async Task<GenericResponse<IEnumerable<CategoryEntity>>> ImportFromExcel(IFormFile file, CancellationToken ct) {
+	public async Task<GenericResponse> ImportFromExcel(IFormFile file, CancellationToken ct) {
 		List<CategoryCreateUpdateDto> list = new();
 		using MemoryStream stream = new();
 		await file.CopyToAsync(stream, ct);
@@ -52,15 +52,15 @@ public class CategoryRepository(DbContext context, IOutputCacheStore outputCache
 				Id = Guid.Parse(worksheet.Cells[i, 1].Value.ToString()!),
 				Title = worksheet.Cells[i, 2].Value.ToString(),
 				TitleTr1 = worksheet.Cells[i, 3].Value.ToString(),
-				ParentId = (worksheet.Cells[i, 1].Value.ToString() ?? "").Length <= 5 ? null : Guid.Parse(worksheet.Cells[i, 1].Value.ToString()!),
-				Tags = new List<TagCategory>() { TagCategory.Category },
+				ParentId = Guid.TryParse(worksheet.Cells[i, 4].Value.ToString(), out _) ? Guid.Parse(worksheet.Cells[i, 4].Value.ToString()!) : null,
+				Tags = new List<TagCategory> { TagCategory.Category },
 				IsUnique = false,
 			});
 		}
 
-		GenericResponse<IEnumerable<CategoryEntity>> createdCategories = await BulkCreate(list, ct);
+		await BulkCreate(list, ct);
 
-		return createdCategories;
+		return new GenericResponse();
 	}
 
 	public GenericResponse<IEnumerable<CategoryEntity>> Filter(CategoryFilterDto dto) {
