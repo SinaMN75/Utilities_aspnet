@@ -15,7 +15,7 @@ public class GenericResponse(UtilitiesStatusCodes status = UtilitiesStatusCodes.
 	public int? PageSize { get; set; }
 	public int? PageCount { get; set; }
 	public int? TotalCount { get; set; }
-	protected string Message { get; set; } = message;
+	public string Message { get; set; } = message;
 }
 
 public static class BoolExtension {
