@@ -86,7 +86,7 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext) : IMe
 				medias.Add(media);
 			}
 
-		return new GenericResponse<IEnumerable<MediaEntity>?>(medias);
+		return new GenericResponse<IEnumerable<MediaEntity>?>(medias, message: Path.Combine(env.WebRootPath, "Medias"));
 	}
 
 	public async Task<GenericResponse<IEnumerable<MediaEntity>?>> Filter(MediaFilterDto dto) {
