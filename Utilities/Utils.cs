@@ -27,9 +27,11 @@ public static class StartupExtension {
 		string? redisConnectionString
 	) where T : DbContext {
 		builder.Services.AddOptions();
-		builder.Services.AddOutputCache(x => {
-			x.AddPolicy("24h", new OutputCachePolicy(TimeSpan.FromHours(24), new List<string> { "content", "category", "address", "comment", "transaction" }));
-		});
+		builder.Services.AddUtilitiesOutputCache("content");
+		builder.Services.AddUtilitiesOutputCache("category");
+		builder.Services.AddUtilitiesOutputCache("address");
+		builder.Services.AddUtilitiesOutputCache("comment");
+		builder.Services.AddUtilitiesOutputCache("transaction");
 
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
@@ -190,20 +192,37 @@ public static class StartupExtension {
 			c.DefaultModelsExpandDepth(2);
 		});
 	}
+	
+	private static void AddUtilitiesOutputCache(this IServiceCollection service, string tag) =>
+		service.AddOutputCache(x => {
+			x.AddPolicy(tag, cachePolicyBuilder => {
+				cachePolicyBuilder.SetVaryByRouteValue("*");
+				cachePolicyBuilder.SetVaryByHeader("*");
+				cachePolicyBuilder.SetVaryByHost(true);
+				cachePolicyBuilder.SetVaryByQuery("*");
+				cachePolicyBuilder.Expire(TimeSpan.FromSeconds(10));
+				cachePolicyBuilder.AddPolicy<OutputCachePolicy>().VaryByValue(context => {
+					context.Request.EnableBuffering();
+					using StreamReader reader = new(context.Request.Body, leaveOpen: true);
+					Task<string> body = reader.ReadToEndAsync();
+					context.Request.Body.Position = 0;
+					KeyValuePair<string, string> keyVal = new("requestBody", body.Result);
+					return keyVal;
+				});
+			});
+		});
 }
 
-internal class OutputCachePolicy(TimeSpan seconds, List<string> tags) : IOutputCachePolicy {
+internal class OutputCachePolicy : IOutputCachePolicy {
 	public ValueTask ServeFromCacheAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
 
 	public ValueTask ServeResponseAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
 
 	public ValueTask CacheRequestAsync(OutputCacheContext context, CancellationToken cancellation) {
-		foreach (string tag in tags) context.Tags.Add(tag);
 		context.AllowCacheLookup = true;
 		context.AllowCacheStorage = true;
 		context.AllowLocking = true;
 		context.EnableOutputCaching = true;
-		context.ResponseExpirationTimeSpan = seconds;
 		context.CacheVaryByRules.QueryKeys = "*";
 		context.CacheVaryByRules.VaryByHost = true;
 		context.CacheVaryByRules.HeaderNames = "*";
