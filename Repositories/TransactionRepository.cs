@@ -7,7 +7,7 @@ public interface ITransactionRepository {
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 }
 
-public class TransactionRepository(DbContext dbContext, IOutputCacheStore outputCache) : ITransactionRepository {
+public class TransactionRepository(DbContext dbContext) : ITransactionRepository {
 
 	public async Task<GenericResponse<TransactionEntity>> Create(TransactionCreateDto dto, CancellationToken ct) {
 		TransactionEntity e = new() {
@@ -22,7 +22,6 @@ public class TransactionRepository(DbContext dbContext, IOutputCacheStore output
 		};
 		await dbContext.Set<TransactionEntity>().AddAsync(e, ct);
 		await dbContext.SaveChangesAsync(ct);
-		await outputCache.EvictByTagAsync("transaction", ct);
 		return new GenericResponse<TransactionEntity>(e);
 	}
 

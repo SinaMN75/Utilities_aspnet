@@ -15,8 +15,8 @@ public class CommentRepository(DbContext dbContext,
 		IHttpContextAccessor httpContextAccessor,
 		INotificationRepository notificationRepository,
 		IConfiguration config,
-		IMediaRepository mediaRepository,
-		IOutputCacheStore outputCache)
+		IMediaRepository mediaRepository
+		)
 	: ICommentRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
@@ -146,7 +146,6 @@ public class CommentRepository(DbContext dbContext,
 		}
 
 		await dbContext.SaveChangesAsync(ct);
-		await outputCache.EvictByTagAsync("comment", ct);
 		return await ReadById(comment.Id);
 	}
 
@@ -171,7 +170,6 @@ public class CommentRepository(DbContext dbContext,
 		comment.UpdatedAt = DateTime.UtcNow;
 		dbContext.Set<CommentEntity>().Update(comment);
 		await dbContext.SaveChangesAsync(ct);
-		await outputCache.EvictByTagAsync("comment", ct);
 		return await ReadById(comment.Id);
 	}
 
@@ -182,7 +180,6 @@ public class CommentRepository(DbContext dbContext,
 		foreach (CommentEntity i in comment.Children!) await Delete(i.Id, ct);
 		dbContext.Set<CommentEntity>().Remove(comment);
 		await dbContext.SaveChangesAsync(ct);
-		await outputCache.EvictByTagAsync("comment", ct);
 		return new GenericResponse();
 	}
 
@@ -200,7 +197,6 @@ public class CommentRepository(DbContext dbContext,
 		else
 			comment.JsonDetail.Reacts.Remove(oldReaction);
 		await dbContext.SaveChangesAsync(ct);
-		await outputCache.EvictByTagAsync("comment", ct);
 		return new GenericResponse();
 	}
 }

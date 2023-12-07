@@ -7,7 +7,7 @@ public interface IAddressRepository {
 	Task<GenericResponse> Delete(Guid addressId, CancellationToken ct);
 }
 
-public class AddressRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IOutputCacheStore outputCache) : IAddressRepository {
+public class AddressRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) : IAddressRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	public async Task<GenericResponse<AddressEntity?>> Create(AddressCreateDto addressDto, CancellationToken ct) {
@@ -22,7 +22,6 @@ public class AddressRepository(DbContext dbContext, IHttpContextAccessor httpCon
 			UserId = _userId
 		}, ct);
 		await dbContext.SaveChangesAsync(ct);
-		await outputCache.EvictByTagAsync("address", ct);
 		return new GenericResponse<AddressEntity?>(e.Entity);
 	}
 
@@ -43,13 +42,11 @@ public class AddressRepository(DbContext dbContext, IHttpContextAccessor httpCon
 
 		dbContext.Update(e);
 		await dbContext.SaveChangesAsync(ct);
-		await outputCache.EvictByTagAsync("address", ct);
 		return new GenericResponse<AddressEntity?>(e);
 	}
 
 	public async Task<GenericResponse> Delete(Guid addressId, CancellationToken ct) {
 		await dbContext.Set<AddressEntity>().Where(f => f.Id == addressId).ExecuteDeleteAsync(ct);
-		await outputCache.EvictByTagAsync("address", ct);
 		return new GenericResponse();
 	}
 

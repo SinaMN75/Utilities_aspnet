@@ -11,12 +11,11 @@ public interface ICategoryRepository {
 	public Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 }
 
-public class CategoryRepository(DbContext context, IOutputCacheStore outputCache, IMediaRepository mediaRepository) : ICategoryRepository {
+public class CategoryRepository(DbContext context, IMediaRepository mediaRepository) : ICategoryRepository {
 	public async Task<GenericResponse<CategoryEntity>> Create(CategoryCreateUpdateDto dto, CancellationToken ct) {
 		CategoryEntity entity = new();
 		if (dto.Id is not null) entity.Id = (Guid)dto.Id;
 		CategoryEntity i = entity.FillData(dto);
-		await outputCache.EvictByTagAsync("category", ct);
 		if (dto.IsUnique) {
 			CategoryEntity? exists = await context.Set<CategoryEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Title == dto.Title, ct);
 			if (exists != null) return new GenericResponse<CategoryEntity>(exists);
@@ -101,7 +100,6 @@ public class CategoryRepository(DbContext context, IOutputCacheStore outputCache
 		context.Remove(i);
 		await mediaRepository.DeleteMedia(i.Media);
 		await context.SaveChangesAsync(ct);
-		await outputCache.EvictByTagAsync("category", ct);
 		return new GenericResponse();
 	}
 
@@ -110,7 +108,6 @@ public class CategoryRepository(DbContext context, IOutputCacheStore outputCache
 		if (entity == null) return new GenericResponse<CategoryEntity?>(null, UtilitiesStatusCodes.NotFound);
 		entity.FillData(dto);
 		await context.SaveChangesAsync(ct);
-		await outputCache.EvictByTagAsync("category", ct);
 		return new GenericResponse<CategoryEntity?>(entity);
 	}
 }

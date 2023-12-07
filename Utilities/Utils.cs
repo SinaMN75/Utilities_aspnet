@@ -27,11 +27,12 @@ public static class StartupExtension {
 		string? redisConnectionString
 	) where T : DbContext {
 		builder.Services.AddOptions();
-		builder.Services.AddUtilitiesOutputCache("content", false);
-		builder.Services.AddUtilitiesOutputCache("category", false);
-		builder.Services.AddUtilitiesOutputCache("address");
-		builder.Services.AddUtilitiesOutputCache("comment");
-		builder.Services.AddUtilitiesOutputCache("transaction");
+		builder.Services.AddUtilitiesOutputCache("appSetting", TimeSpan.FromHours(24), false);
+		builder.Services.AddUtilitiesOutputCache("content", TimeSpan.FromHours(24), false);
+		builder.Services.AddUtilitiesOutputCache("category", TimeSpan.FromHours(1), false);
+		builder.Services.AddUtilitiesOutputCache("address", TimeSpan.FromHours(1));
+		builder.Services.AddUtilitiesOutputCache("comment",TimeSpan.FromHours(1));
+		builder.Services.AddUtilitiesOutputCache("transaction", TimeSpan.FromMinutes(1));
 
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
@@ -193,7 +194,7 @@ public static class StartupExtension {
 		});
 	}
 
-	private static void AddUtilitiesOutputCache(this IServiceCollection service, string tag, bool varyByHeaders = true) =>
+	private static void AddUtilitiesOutputCache(this IServiceCollection service, string tag, TimeSpan expire, bool varyByHeaders = true) =>
 		service.AddOutputCache(x => {
 			x.AddPolicy(tag, cachePolicyBuilder => {
 				cachePolicyBuilder.SetVaryByRouteValue("*");
@@ -201,7 +202,7 @@ public static class StartupExtension {
 					cachePolicyBuilder.SetVaryByHeader("*");
 				cachePolicyBuilder.SetVaryByHost(true);
 				cachePolicyBuilder.SetVaryByQuery("*");
-				cachePolicyBuilder.Expire(TimeSpan.FromMinutes(60));
+				cachePolicyBuilder.Expire(expire);
 				cachePolicyBuilder.AddPolicy<OutputCachePolicy>().VaryByValue(context => {
 					context.Request.EnableBuffering();
 					using StreamReader reader = new(context.Request.Body, leaveOpen: true);
