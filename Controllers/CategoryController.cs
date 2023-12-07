@@ -19,7 +19,6 @@ public class CategoryController(ICategoryRepository repository) : BaseApiControl
 		Result(await repository.ImportFromExcel(file, ct));
 
 	[HttpGet]
-	[OutputCache(PolicyName = "24h")]
 	public ActionResult<GenericResponse<IQueryable<CategoryEntity>>> Read([FromQuery] CategoryFilterDto dto) => Result(repository.Filter(dto));
 
 	[HttpPost("Filter")]

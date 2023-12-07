@@ -4,15 +4,12 @@
 [Route("api/[controller]")]
 public class CommentController(ICommentRepository commentRepository) : BaseApiController {
 	[HttpGet("{id}")]
-	[OutputCache(PolicyName = "24h")]
 	public async Task<ActionResult<GenericResponse<CommentEntity>>> ReadById(Guid id) => Result(await commentRepository.ReadById(id));
 
 	[HttpGet("ReadByProductId/{id}")]
-	[OutputCache(PolicyName = "24h")]
 	public ActionResult<GenericResponse<IQueryable<CommentEntity>?>> ReadByProductId(Guid id) => Result(commentRepository.ReadByProductId(id));
 
 	[HttpGet("ReadByUserId/{id}")]
-	[OutputCache(PolicyName = "24h")]
 	public ActionResult<GenericResponse<IQueryable<CommentEntity>?>> ReadByUserId(string id) => Result(commentRepository.ReadByUserId(id));
 
 	[HttpPost]
