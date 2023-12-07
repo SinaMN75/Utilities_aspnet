@@ -27,8 +27,8 @@ public static class StartupExtension {
 		string? redisConnectionString
 	) where T : DbContext {
 		builder.Services.AddOptions();
-		builder.Services.AddUtilitiesOutputCache("content");
-		builder.Services.AddUtilitiesOutputCache("category");
+		builder.Services.AddUtilitiesOutputCache("content", false);
+		builder.Services.AddUtilitiesOutputCache("category", false);
 		builder.Services.AddUtilitiesOutputCache("address");
 		builder.Services.AddUtilitiesOutputCache("comment");
 		builder.Services.AddUtilitiesOutputCache("transaction");
@@ -192,15 +192,16 @@ public static class StartupExtension {
 			c.DefaultModelsExpandDepth(2);
 		});
 	}
-	
-	private static void AddUtilitiesOutputCache(this IServiceCollection service, string tag) =>
+
+	private static void AddUtilitiesOutputCache(this IServiceCollection service, string tag, bool varyByHeaders = true) =>
 		service.AddOutputCache(x => {
 			x.AddPolicy(tag, cachePolicyBuilder => {
 				cachePolicyBuilder.SetVaryByRouteValue("*");
-				cachePolicyBuilder.SetVaryByHeader("*");
+				if (varyByHeaders)
+					cachePolicyBuilder.SetVaryByHeader("*");
 				cachePolicyBuilder.SetVaryByHost(true);
 				cachePolicyBuilder.SetVaryByQuery("*");
-				cachePolicyBuilder.Expire(TimeSpan.FromSeconds(10));
+				cachePolicyBuilder.Expire(TimeSpan.FromMinutes(60));
 				cachePolicyBuilder.AddPolicy<OutputCachePolicy>().VaryByValue(context => {
 					context.Request.EnableBuffering();
 					using StreamReader reader = new(context.Request.Body, leaveOpen: true);
@@ -215,17 +216,6 @@ public static class StartupExtension {
 
 internal class OutputCachePolicy : IOutputCachePolicy {
 	public ValueTask ServeFromCacheAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
-
 	public ValueTask ServeResponseAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
-
-	public ValueTask CacheRequestAsync(OutputCacheContext context, CancellationToken cancellation) {
-		context.AllowCacheLookup = true;
-		context.AllowCacheStorage = true;
-		context.AllowLocking = true;
-		context.EnableOutputCaching = true;
-		context.CacheVaryByRules.QueryKeys = "*";
-		context.CacheVaryByRules.VaryByHost = true;
-		context.CacheVaryByRules.HeaderNames = "*";
-		return ValueTask.CompletedTask;
-	}
+	public ValueTask CacheRequestAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
 }
