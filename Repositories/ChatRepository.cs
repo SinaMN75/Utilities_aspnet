@@ -131,17 +131,14 @@ public class ChatRepository(
 				appSettings.UsageRulesAfterUpgrade);
 		if (overUsedCheck.Item1) return new GenericResponse<GroupChatMessageEntity?>(null, overUsedCheck.Item2);
 
-		GroupChatEntity? groupChat = await dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(f => f.Id == dto.GroupChatId);
-		if (groupChat != null) {
-			if (groupChat.Type == ChatType.Private) {
-				if (groupChat.Users == null || !groupChat.Users.Any()) return new GenericResponse<GroupChatMessageEntity?>(null, UtilitiesStatusCodes.BadRequest);
-				string firstUserId = groupChat.Users.First().Id;
-				string secondUserId = groupChat.Users.Last().Id;
-				Tuple<bool, UtilitiesStatusCodes> blockedState = Utils.IsBlockedUser(dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == firstUserId),
-					dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == secondUserId));
-				if (blockedState.Item1)
-					return new GenericResponse<GroupChatMessageEntity?>(null, blockedState.Item2);
-			}
+		GroupChatEntity groupChat = (await dbContext.Set<GroupChatEntity>()
+			.Include(x => x.Users)
+			.FirstOrDefaultAsync(f => f.Id == dto.GroupChatId))!;
+		if (groupChat.Type == ChatType.Private) {
+			Tuple<bool, UtilitiesStatusCodes> blockedState = Utils.IsBlockedUser(dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == groupChat.Users!.First().Id),
+				dbContext.Set<UserEntity>().FirstOrDefault(w => w.Id == groupChat.Users!.Last().Id));
+			if (blockedState.Item1)
+				return new GenericResponse<GroupChatMessageEntity?>(null, blockedState.Item2);
 		}
 
 		GroupChatMessageEntity entity = new() {
