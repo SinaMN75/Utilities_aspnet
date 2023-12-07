@@ -17,8 +17,13 @@ public interface IChatRepository {
 	Task<GenericResponse> Mute(Guid id);
 }
 
-public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IConfiguration config, IPromotionRepository promotionRepository)
-	: IChatRepository {
+public class ChatRepository(
+	DbContext dbContext,
+	IHttpContextAccessor httpContextAccessor,
+	IConfiguration config,
+	IPromotionRepository promotionRepository,
+	IMediaRepository mediaRepository
+) : IChatRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	public async Task<GenericResponse<GroupChatEntity?>> CreateGroupChat(GroupChatCreateUpdateDto dto) {
@@ -104,10 +109,14 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 	}
 
 	public async Task<GenericResponse> DeleteGroupChat(Guid id) {
-		IQueryable<MediaEntity> medias = dbContext.Set<MediaEntity>().Where(w => w.GroupChatId == id);
-		if (medias.Any()) dbContext.RemoveRange(medias);
+		GroupChatEntity e = (await dbContext.Set<GroupChatEntity>()
+			.Include(w => w.GroupChatMessage)
+			.Include(x => x.Media)
+			.FirstOrDefaultAsync(x => x.Id == id))!;
+		await mediaRepository.DeleteMedia(e.Media);
+		dbContext.Set<GroupChatMessageEntity>().RemoveRange(e.GroupChatMessage!);
+		dbContext.Set<GroupChatEntity>().Remove(e);
 		await dbContext.SaveChangesAsync();
-		await dbContext.Set<GroupChatEntity>().Include(w => w.GroupChatMessage).Where(x => x.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
 	}
 
@@ -159,7 +168,7 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 			.Include(x => x.Media)
 			.Include(x => x.GroupChatMessage!.OrderByDescending(y => y.CreatedAt).Take(1)).ThenInclude(x => x.Media)
 			.ToListAsync();
-		
+
 		foreach (GroupChatEntity groupChatEntity in e.Where(groupChatEntity => groupChatEntity.Type == ChatType.Private))
 			if (groupChatEntity.Users!.First().Id == _userId) {
 				UserEntity u = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == groupChatEntity.Users!.Last().Id))!;
@@ -282,7 +291,7 @@ public class ChatRepository(DbContext dbContext, IHttpContextAccessor httpContex
 
 		int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
-		
+
 		return new GenericResponse<IQueryable<GroupChatEntity>>(q.AsNoTracking()) {
 			TotalCount = totalCount,
 			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
