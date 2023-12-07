@@ -44,7 +44,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 			.ThenInclude(x => x!.Media)
 			.Include(x => x.User).ThenInclude(x => x!.Media)
 			.Include(x => x.ProductOwner).ThenInclude(x => x!.Media)
-			.OrderBy(x => x.CreatedAt);
+			.OrderByDescending(x => x.CreatedAt);
 
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.Any(y => x.Tags.Contains(y)));
 
