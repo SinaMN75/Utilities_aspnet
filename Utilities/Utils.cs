@@ -31,7 +31,7 @@ public static class StartupExtension {
 		builder.Services.AddUtilitiesOutputCache("content", TimeSpan.FromHours(24), false);
 		builder.Services.AddUtilitiesOutputCache("category", TimeSpan.FromHours(1), false);
 		builder.Services.AddUtilitiesOutputCache("address", TimeSpan.FromHours(1));
-		builder.Services.AddUtilitiesOutputCache("comment",TimeSpan.FromHours(1));
+		builder.Services.AddUtilitiesOutputCache("comment", TimeSpan.FromHours(1));
 		builder.Services.AddUtilitiesOutputCache("transaction", TimeSpan.FromMinutes(1));
 
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
@@ -117,8 +117,7 @@ public static class StartupExtension {
 		builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
 		builder.Services.AddScoped<ISubscriptionPaymentRepository, SubscriptionPaymentRepository>();
 		builder.Services.AddScoped<IAppSettingsRepository, AppSettingsRepository>();
-		builder.Services.AddScoped<IS3Repository, S3Repository>();
-		builder.Services.AddScoped<IArvanStorageRepository, ArvanStorageRepository>();
+		builder.Services.AddScoped<IAmazonS3Repository, AmazonS3Repository>();
 	}
 
 	private static void AddUtilitiesSwagger(this WebApplicationBuilder builder, IServiceProvider? serviceProvider) {

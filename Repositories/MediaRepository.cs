@@ -57,7 +57,7 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext) : IMe
 				await dbContext.Set<MediaEntity>().AddAsync(media);
 				await dbContext.SaveChangesAsync();
 				medias.Add(media);
-				SaveMedia(file, name);
+				string path = SaveMedia(file, name);
 			}
 
 		if (model.Links != null)
@@ -91,10 +91,10 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext) : IMe
 
 	public async Task<GenericResponse<IEnumerable<MediaEntity>?>> Filter(MediaFilterDto dto) {
 		IQueryable<MediaEntity> q = dbContext.Set<MediaEntity>().AsNoTracking();
-		
+
 		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
-		
+
 		return new GenericResponse<IEnumerable<MediaEntity>?>(q) {
 			TotalCount = totalCount,
 			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
@@ -153,26 +153,22 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext) : IMe
 		return new GenericResponse<MediaEntity?>(media);
 	}
 
-	public void SaveMedia(IFormFile image, string name) {
+	private string SaveMedia(IFormFile image, string name) {
 		string webRoot = env.WebRootPath;
 		string path = Path.Combine(webRoot, "Medias", name);
 		string uploadDir = Path.Combine(webRoot, "Medias");
 		if (!Directory.Exists(uploadDir))
 			Directory.CreateDirectory(uploadDir);
 		try {
-			try {
-				File.Delete(path);
-			}
-			catch (Exception ex) {
-				throw new ArgumentException("Exception in SaveMedia- Delete! " + ex.Message);
-			}
-
-			using FileStream stream = new(path, FileMode.Create);
-			image.CopyTo(stream);
+			File.Delete(path);
 		}
 		catch (Exception ex) {
-			File.Copy(Path.Combine(webRoot, "Medias", "null.png"), path);
-			throw new ArgumentException("Exception in SaveMedia- NullPath! " + ex.Message);
+			throw new ArgumentException("Exception in SaveMedia- Delete! " + ex.Message);
 		}
+
+		using FileStream stream = new(path, FileMode.Create);
+		image.CopyTo(stream);
+
+		return path;
 	}
 }
