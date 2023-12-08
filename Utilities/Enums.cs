@@ -20,6 +20,7 @@ public enum UtilitiesStatusCodes {
 	UnAuthorized = 401,
 	Forbidden = 403,
 	NotFound = 404,
+	Conflict = 409,
 	Unhandled = 900,
 	WrongVerificationCode = 601,
 	MaximumLimitReached = 602,
@@ -36,7 +37,8 @@ public enum UtilitiesStatusCodes {
 	Overused = 615,
 	MoreThanAllowedMoney = 616,
 	WrongPassword = 617,
-	InvalidDiscountCode = 618
+	InvalidDiscountCode = 618,
+	S3Error = 619
 }
 
 public enum TagFormField {

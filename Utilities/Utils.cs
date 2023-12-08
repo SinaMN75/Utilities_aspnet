@@ -117,6 +117,8 @@ public static class StartupExtension {
 		builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
 		builder.Services.AddScoped<ISubscriptionPaymentRepository, SubscriptionPaymentRepository>();
 		builder.Services.AddScoped<IAppSettingsRepository, AppSettingsRepository>();
+		builder.Services.AddScoped<IS3Repository, S3Repository>();
+		builder.Services.AddScoped<IArvanStorageRepository, ArvanStorageRepository>();
 	}
 
 	private static void AddUtilitiesSwagger(this WebApplicationBuilder builder, IServiceProvider? serviceProvider) {
