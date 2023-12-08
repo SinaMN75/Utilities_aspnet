@@ -15,6 +15,28 @@ public class MediaEntity : BaseEntity {
 	[NotMapped]
 	public string Url => $"{Server.ServerAddress}/Medias/{FileName}";
 
+	[NotMapped]
+	public string S3Url {
+		get {
+			try {
+				AmazonS3Settings amazonS3Settings = AppSettings.GetCurrentSettings().AmazonS3Settings;
+				if (!(amazonS3Settings.UseS3 ?? false)) return "";
+				GetPreSignedUrlRequest getPreSignedUrlRequest = new() {
+					BucketName = amazonS3Settings.DefaultBucket,
+					Key = FileName,
+					Expires = DateTime.UtcNow.AddDays(1),
+					Verb = HttpVerb.GET
+				};
+				return new AmazonS3Client(
+					new BasicAWSCredentials(amazonS3Settings.AccessKey, amazonS3Settings.SecretKey),
+					new AmazonS3Config { ServiceURL = amazonS3Settings.Url }).GetPreSignedURL(getPreSignedUrlRequest);
+			}
+			catch {
+				return "";
+			}
+		}
+	}
+
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
 	public ContentEntity? Content { get; set; }

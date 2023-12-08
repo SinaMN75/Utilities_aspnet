@@ -1,5 +1,35 @@
 ﻿namespace Utilities_aspnet.Entities;
 
+// public class AppSettings {
+// 	private static AppSettings _appSettings;
+//
+// 	public string appSettingValue { get; set; }
+//
+// 	public static string AppSetting(string Key) {
+// 		_appSettings = GetCurrentSettings(Key);
+// 		return _appSettings.appSettingValue;
+// 	}
+//
+// 	public ConfigHelper(IConfiguration config, string Key) {
+// 		appSettingValue = config.GetValue<string>(Key);
+// 	}
+//
+// 	public static AppSettings GetCurrentSettings(string Key) {
+// 		IConfigurationBuilder builder = new ConfigurationBuilder()
+// 			.SetBasePath(Directory.GetCurrentDirectory())
+// 			.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+// 			.AddEnvironmentVariables();
+//
+// 		IConfigurationRoot configuration = builder.Build();
+//
+// 		AppSettings appSettings = new();
+// 		configuration.GetSection("AppSettings").Bind(appSettings);
+// 		// ConfigHelper settings = new(configuration.GetSection("AppSettings").GetSection(""), Key);
+//
+// 		return appSettings;
+// 	}
+// }
+
 public class AppSettings {
 	public SmsPanelSettings SmsPanelSettings { get; set; } = null!;
 	public PaymentSettings PaymentSettings { get; set; } = null!;
@@ -17,6 +47,20 @@ public class AppSettings {
 	public string? AndroidDownloadLink2 { get; set; }
 	public string? IosDownloadLink1 { get; set; }
 	public string? IosDownloadLink2 { get; set; }
+
+	public static AppSettings GetCurrentSettings() {
+		IConfigurationBuilder builder = new ConfigurationBuilder()
+			.SetBasePath(Directory.GetCurrentDirectory())
+			.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+			.AddEnvironmentVariables();
+
+		IConfigurationRoot configuration = builder.Build();
+
+		AppSettings appSettings = new();
+		configuration.GetSection("AppSettings").Bind(appSettings);
+
+		return appSettings;
+	}
 }
 
 public class SmsPanelSettings {
@@ -32,10 +76,10 @@ public class AmazonS3Settings {
 	public string? AccessKey { get; set; }
 	public string? SecretKey { get; set; }
 	public string? Url { get; set; }
+	public string? DefaultBucket { get; set; }
 }
 
-public class UsageRulesBeforeUpgrade
-{
+public class UsageRulesBeforeUpgrade {
 	public int MaxPostPerDay { get; set; }
 	public int MaxTweetPerDay { get; set; }
 	public int MaxAdvertismentPerDay { get; set; }
@@ -44,15 +88,15 @@ public class UsageRulesBeforeUpgrade
 	public int MaxCommentPerHour { get; set; }
 	public int MaxChatPerHour { get; set; }
 }
-public class UsageRulesAfterUpgrade
-{
-    public int MaxPostPerDay { get; set; }
-    public int MaxTweetPerDay { get; set; }
-    public int MaxAdvertismentPerDay { get; set; }
-    public int MaxGroupOrChannelPerProfile { get; set; }
-    public int MaxSendPostPerHour { get; set; }
-    public int MaxCommentPerHour { get; set; }
-    public int MaxChatPerHour { get; set; }
+
+public class UsageRulesAfterUpgrade {
+	public int MaxPostPerDay { get; set; }
+	public int MaxTweetPerDay { get; set; }
+	public int MaxAdvertismentPerDay { get; set; }
+	public int MaxGroupOrChannelPerProfile { get; set; }
+	public int MaxSendPostPerHour { get; set; }
+	public int MaxCommentPerHour { get; set; }
+	public int MaxChatPerHour { get; set; }
 }
 
 public class PaymentSettings {

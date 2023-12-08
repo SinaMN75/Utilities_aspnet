@@ -8,7 +8,7 @@ public interface IMediaRepository {
 	Task DeleteMedia(IEnumerable<MediaEntity?>? media);
 }
 
-public class MediaRepository(IWebHostEnvironment env, DbContext dbContext) : IMediaRepository {
+public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmazonS3Repository arvanStorageRepository) : IMediaRepository {
 	public async Task<GenericResponse<IEnumerable<MediaEntity>?>> Upload(UploadDto model) {
 		List<MediaEntity> medias = new();
 
@@ -58,6 +58,9 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext) : IMe
 				await dbContext.SaveChangesAsync();
 				medias.Add(media);
 				string path = SaveMedia(file, name);
+				AmazonS3Settings amazonS3Settings = AppSettings.GetCurrentSettings().AmazonS3Settings;
+				if (amazonS3Settings.UseS3 ?? false)
+					await arvanStorageRepository.UploadObjectFromFileAsync(amazonS3Settings.DefaultBucket!, name, path);
 			}
 
 		if (model.Links != null)
