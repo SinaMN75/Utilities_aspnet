@@ -11,11 +11,16 @@ public interface IAmazonS3Repository {
 	Task DeleteObjects(string bucketName);
 }
 
-public class AmazonS3Repository : IAmazonS3Repository {
-	private static readonly IAmazonS3 Authenticate =
-		new AmazonS3Client(
-			new BasicAWSCredentials("9236ce6e-ee60-4e1c-8485-dcae1366f45c", "27c91a47b8d8f50b922863c2637870376858c27bb1417000a9a95fb62f995866"),
-			new AmazonS3Config { ServiceURL = "https://s3.ir-thr-at1.arvanstorage.ir/" });
+public class AmazonS3Repository(IConfiguration config) : IAmazonS3Repository {
+	private IAmazonS3 Authenticate() {
+		AppSettings appSettings = new();
+		config.GetSection("AppSettings").Bind(appSettings);
+		AmazonS3Settings amazonS3Settings = appSettings.AmazonS3Settings;
+		return new AmazonS3Client(
+			new BasicAWSCredentials(amazonS3Settings.AccessKey, amazonS3Settings.SecretKey),
+			new AmazonS3Config { ServiceURL = amazonS3Settings.Url });
+	}
+
 
 	public async Task DeleteObjects(string bucketName) {
 		DeleteObjectsRequest request = new() {
@@ -27,7 +32,7 @@ public class AmazonS3Repository : IAmazonS3Repository {
 			]
 		};
 		try {
-			await Authenticate.DeleteObjectsAsync(request);
+			await Authenticate().DeleteObjectsAsync(request);
 
 			Console.WriteLine($"Objects successfully deleted from {bucketName} bucket");
 		}
@@ -48,7 +53,7 @@ public class AmazonS3Repository : IAmazonS3Repository {
 			};
 
 			// Submit the request
-			DeleteObjectsResponse response = await Authenticate.DeleteObjectsAsync(request);
+			DeleteObjectsResponse response = await Authenticate().DeleteObjectsAsync(request);
 
 			Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
 			Console.WriteLine($"Object {objectName} successfully deleted from {bucketName} bucket");
@@ -66,7 +71,7 @@ public class AmazonS3Repository : IAmazonS3Repository {
 			ListObjectsRequest? request = new() { BucketName = bucketName, MaxKeys = 5 };
 
 			do {
-				ListObjectsResponse response = await Authenticate.ListObjectsAsync(request);
+				ListObjectsResponse response = await Authenticate().ListObjectsAsync(request);
 
 				// Process the response.
 				response.S3Objects.ForEach(obj => Console.WriteLine($"{obj.Key,-35}{obj.LastModified.ToShortDateString(),10}{obj.Size,10}"));
@@ -95,7 +100,7 @@ public class AmazonS3Repository : IAmazonS3Repository {
 				Key = keyName
 			};
 
-			using GetObjectResponse response = await Authenticate.GetObjectAsync(request);
+			using GetObjectResponse response = await Authenticate().GetObjectAsync(request);
 			await using Stream responseStream = response.ResponseStream;
 			using StreamReader reader = new(responseStream);
 			// Assume you have "title" as medata added to the object.
@@ -127,7 +132,7 @@ public class AmazonS3Repository : IAmazonS3Repository {
 		InitiateMultipartUploadRequest initiateRequest = new() { BucketName = bucketName, Key = keyName };
 
 		// Initiate the upload.
-		InitiateMultipartUploadResponse initResponse = await Authenticate.InitiateMultipartUploadAsync(initiateRequest);
+		InitiateMultipartUploadResponse initResponse = await Authenticate().InitiateMultipartUploadAsync(initiateRequest);
 
 		// Upload parts.
 		long contentLength = new FileInfo(filePath).Length;
@@ -149,7 +154,7 @@ public class AmazonS3Repository : IAmazonS3Repository {
 				};
 
 				// Upload a part and add the response to our list.
-				uploadResponses.Add(await Authenticate.UploadPartAsync(uploadRequest));
+				uploadResponses.Add(await Authenticate().UploadPartAsync(uploadRequest));
 
 				filePosition += partSize;
 			}
@@ -163,7 +168,7 @@ public class AmazonS3Repository : IAmazonS3Repository {
 			completeRequest.AddPartETags(uploadResponses);
 
 			// Complete the upload.
-			CompleteMultipartUploadResponse completeUploadResponse = await Authenticate.CompleteMultipartUploadAsync(completeRequest);
+			CompleteMultipartUploadResponse completeUploadResponse = await Authenticate().CompleteMultipartUploadAsync(completeRequest);
 
 			Console.WriteLine($"Object {keyName} added to {bucketName} bucket");
 		}
@@ -176,7 +181,7 @@ public class AmazonS3Repository : IAmazonS3Repository {
 				Key = keyName,
 				UploadId = initResponse.UploadId
 			};
-			await Authenticate.AbortMultipartUploadAsync(abortMPURequest);
+			await Authenticate().AbortMultipartUploadAsync(abortMPURequest);
 		}
 	}
 
@@ -186,7 +191,7 @@ public class AmazonS3Repository : IAmazonS3Repository {
 
 			putRequest.Metadata.Add("x-amz-meta-title", "someTitle");
 
-			PutObjectResponse response = await Authenticate.PutObjectAsync(putRequest);
+			PutObjectResponse response = await Authenticate().PutObjectAsync(putRequest);
 
 			foreach (PropertyInfo prop in response.GetType().GetProperties()) {
 				Console.WriteLine($"{prop.Name}: {prop.GetValue(response, null)}");
@@ -202,7 +207,7 @@ public class AmazonS3Repository : IAmazonS3Repository {
 	public async Task DeleteBucketTaggingAsync(string bucketName) {
 		try {
 			DeleteBucketTaggingRequest request = new() { BucketName = bucketName };
-			DeleteBucketTaggingResponse response = await Authenticate.DeleteBucketTaggingAsync(request);
+			DeleteBucketTaggingResponse response = await Authenticate().DeleteBucketTaggingAsync(request);
 			Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
 			Console.WriteLine($"Bucket tagging successfully deleted from {bucketName} bucket");
 		}
@@ -221,7 +226,7 @@ public class AmazonS3Repository : IAmazonS3Repository {
 				new Tag { Key = "Key2", Value = "Value2" }
 			};
 
-			PutBucketTaggingResponse response = await Authenticate.PutBucketTaggingAsync(bucketName, tagList);
+			PutBucketTaggingResponse response = await Authenticate().PutBucketTaggingAsync(bucketName, tagList);
 
 			foreach (PropertyInfo prop in response.GetType().GetProperties()) {
 				Console.WriteLine($"{prop.Name}: {prop.GetValue(response, null)}");
@@ -243,7 +248,7 @@ public class AmazonS3Repository : IAmazonS3Repository {
 				BucketName = bucketName
 			};
 
-			GetBucketTaggingResponse response = await Authenticate.GetBucketTaggingAsync(request);
+			GetBucketTaggingResponse response = await Authenticate().GetBucketTaggingAsync(request);
 
 			Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
 		}
@@ -257,7 +262,7 @@ public class AmazonS3Repository : IAmazonS3Repository {
 
 	private async Task GetBucketVersioningAsync(string bucketName) {
 		try {
-			GetBucketVersioningResponse response = await Authenticate.GetBucketVersioningAsync(new GetBucketVersioningRequest {
+			GetBucketVersioningResponse response = await Authenticate().GetBucketVersioningAsync(new GetBucketVersioningRequest {
 				BucketName = bucketName
 			});
 
@@ -273,7 +278,7 @@ public class AmazonS3Repository : IAmazonS3Repository {
 
 	private async Task EnableBucketVersioningAsync(string bucketName) {
 		try {
-			PutBucketVersioningResponse response = await Authenticate.PutBucketVersioningAsync(new PutBucketVersioningRequest {
+			PutBucketVersioningResponse response = await Authenticate().PutBucketVersioningAsync(new PutBucketVersioningRequest {
 				BucketName = bucketName,
 				VersioningConfig = new S3BucketVersioningConfig { Status = VersionStatus.Enabled }
 			});
@@ -291,7 +296,7 @@ public class AmazonS3Repository : IAmazonS3Repository {
 	private async Task PutBucketAclAsync(string bucketName, string acl = "public-read") {
 		//acl = public-read OR private
 		try {
-			PutACLResponse response = await Authenticate.PutACLAsync(new PutACLRequest {
+			PutACLResponse response = await Authenticate().PutACLAsync(new PutACLRequest {
 				BucketName = bucketName,
 				CannedACL = acl == "private" ? S3CannedACL.Private : S3CannedACL.PublicRead // S3CannedACL.PublicRead or S3CannedACL.Private
 			});
@@ -308,7 +313,7 @@ public class AmazonS3Repository : IAmazonS3Repository {
 
 	private async Task GetBucketAclAsync(string bucketName) {
 		try {
-			GetACLResponse response = await Authenticate.GetACLAsync(new GetACLRequest { BucketName = bucketName });
+			GetACLResponse response = await Authenticate().GetACLAsync(new GetACLRequest { BucketName = bucketName });
 
 			Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
 		}
@@ -322,7 +327,7 @@ public class AmazonS3Repository : IAmazonS3Repository {
 
 	private async Task DeleteBucketPolicy(string bucketName) {
 		DeleteBucketPolicyRequest deleteRequest = new() { BucketName = bucketName };
-		object policy = await Authenticate.DeleteBucketPolicyAsync(deleteRequest);
+		object policy = await Authenticate().DeleteBucketPolicyAsync(deleteRequest);
 
 		foreach (PropertyInfo prop in policy.GetType().GetProperties()) {
 			Console.WriteLine($"{prop.Name}: {prop.GetValue(policy, null)}");
@@ -342,7 +347,7 @@ public class AmazonS3Repository : IAmazonS3Repository {
           }]}";
 
 		PutBucketPolicyRequest putRequest = new() { BucketName = bucketName, Policy = newPolicy };
-		object policy = await Authenticate.PutBucketPolicyAsync(putRequest);
+		object policy = await Authenticate().PutBucketPolicyAsync(putRequest);
 		foreach (PropertyInfo prop in policy.GetType().GetProperties()) {
 			Console.WriteLine($"{prop.Name}: {prop.GetValue(policy, null)}");
 		}
@@ -352,7 +357,7 @@ public class AmazonS3Repository : IAmazonS3Repository {
 
 	private async Task GetBucketPolicyStatus(string bucketName) {
 		try {
-			GetBucketPolicyStatusResponse response = await Authenticate.GetBucketPolicyStatusAsync(new GetBucketPolicyStatusRequest { BucketName = bucketName });
+			GetBucketPolicyStatusResponse response = await Authenticate().GetBucketPolicyStatusAsync(new GetBucketPolicyStatusRequest { BucketName = bucketName });
 			Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
 		}
 		catch (AmazonS3Exception amazonS3Exception) {
@@ -365,7 +370,7 @@ public class AmazonS3Repository : IAmazonS3Repository {
 
 	private async Task GetBucketPolicy(string bucketName) {
 		GetBucketPolicyRequest getRequest = new() { BucketName = bucketName };
-		object policy = await Authenticate.GetBucketPolicyAsync(getRequest);
+		object policy = await Authenticate().GetBucketPolicyAsync(getRequest);
 
 		foreach (PropertyInfo prop in policy.GetType().GetProperties()) {
 			Console.WriteLine($"{prop.Name}: {prop.GetValue(policy, null)}");
@@ -375,20 +380,20 @@ public class AmazonS3Repository : IAmazonS3Repository {
 	private async Task CreateBucket(string bucketName) {
 		try {
 			PutBucketRequest putBucketRequest = new() { BucketName = bucketName, UseClientRegion = true };
-			PutBucketResponse? putBucketResponse = await Authenticate.PutBucketAsync(putBucketRequest);
+			PutBucketResponse? putBucketResponse = await Authenticate().PutBucketAsync(putBucketRequest);
 		}
 		catch (AmazonS3Exception ex) {
 			Console.WriteLine($"Error creating bucket: '{ex.Message}'");
 		}
 	}
 
-	private Task<bool> CheckBucketExist(string bucketName) => AmazonS3Util.DoesS3BucketExistV2Async(Authenticate, bucketName);
+	private Task<bool> CheckBucketExist(string bucketName) => AmazonS3Util.DoesS3BucketExistV2Async(Authenticate(), bucketName);
 
-	private Task<ListBucketsResponse> GetBuckets() => Authenticate.ListBucketsAsync();
+	private Task<ListBucketsResponse> GetBuckets() => Authenticate().ListBucketsAsync();
 
 	private async Task<bool> DeleteBucket(string bucketName) {
 		try {
-			DeleteBucketResponse? deleteResponse = await Authenticate.DeleteBucketAsync(bucketName);
+			DeleteBucketResponse? deleteResponse = await Authenticate().DeleteBucketAsync(bucketName);
 			Console.WriteLine($"\nResult: {deleteResponse.HttpStatusCode.ToString()}");
 			return true;
 		}

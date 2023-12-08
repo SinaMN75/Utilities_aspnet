@@ -6,6 +6,7 @@ public class AppSettings {
 	public PushNotificationSetting PushNotificationSetting { get; set; } = null!;
 	public UsageRulesBeforeUpgrade UsageRulesBeforeUpgrade { get; set; } = null!;
 	public UsageRulesAfterUpgrade UsageRulesAfterUpgrade { get; set; } = null!;
+	public AmazonS3Settings AmazonS3Settings { get; set; } = null!;
 	public int? WithdrawalLimit { get; set; }
 	public int? WithdrawalTimeLimit { get; set; }
 	public string? AndroidMinimumVersion { get; set; }
@@ -24,6 +25,13 @@ public class SmsPanelSettings {
 	public string? SmsApiKey { get; set; }
 	public string? SmsSecret { get; set; }
 	public string? PatternCode { get; set; }
+}
+
+public class AmazonS3Settings {
+	public bool? UseS3 { get; set; }
+	public string? AccessKey { get; set; }
+	public string? SecretKey { get; set; }
+	public string? Url { get; set; }
 }
 
 public class UsageRulesBeforeUpgrade
