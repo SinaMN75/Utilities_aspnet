@@ -2,10 +2,9 @@ namespace Utilities_aspnet.Repositories;
 
 public interface IAmazonS3Repository {
 	Task UploadObjectFromFileAsync(string bucketName, string objectName, string filePath);
-	Task PutBucketTagsAsync(string bucketName);
-	Task DeleteBucketTaggingAsync(string bucketName);
 	Task UploadObjectAsync(string bucketName, string keyName, string filePath);
 	Task ReadObjectDataAsync(string bucketName, string keyName);
+	string? GeneratePreSignedUrl(string bucketName, string keyName);
 	Task ListingObjectsAsync(string bucketName);
 	Task DeleteObject(string bucketName, string objectName);
 	Task DeleteObjects(string bucketName);
@@ -64,6 +63,21 @@ public class AmazonS3Repository(IConfiguration config) : IAmazonS3Repository {
 		catch (Exception e) {
 			Console.WriteLine("Exception: " + e);
 		}
+	}
+
+	public string? GeneratePreSignedUrl(string bucketName, string objectName) {
+		try {
+			GetPreSignedUrlRequest getPreSignedUrlRequest = new() { BucketName = bucketName, Key = objectName, Verb = HttpVerb.GET };
+			return Authenticate().GetPreSignedURL(getPreSignedUrlRequest);
+		}
+		catch (AmazonS3Exception amazonS3Exception) {
+			Console.WriteLine("An AmazonS3Exception was thrown. Exception: " + amazonS3Exception);
+		}
+		catch (Exception e) {
+			Console.WriteLine("Exception: " + e);
+		}
+
+		return null;
 	}
 
 	public async Task ListingObjectsAsync(string bucketName) {
@@ -201,205 +215,6 @@ public class AmazonS3Repository(IConfiguration config) : IAmazonS3Repository {
 		}
 		catch (AmazonS3Exception e) {
 			Console.WriteLine($"Error: {e.Message}");
-		}
-	}
-
-	public async Task DeleteBucketTaggingAsync(string bucketName) {
-		try {
-			DeleteBucketTaggingRequest request = new() { BucketName = bucketName };
-			DeleteBucketTaggingResponse response = await Authenticate().DeleteBucketTaggingAsync(request);
-			Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
-			Console.WriteLine($"Bucket tagging successfully deleted from {bucketName} bucket");
-		}
-		catch (AmazonS3Exception amazonS3Exception) {
-			Console.WriteLine("An AmazonS3Exception was thrown. Exception: " + amazonS3Exception);
-		}
-		catch (Exception e) {
-			Console.WriteLine("Exception: " + e);
-		}
-	}
-
-	public async Task PutBucketTagsAsync(string bucketName) {
-		try {
-			List<Tag> tagList = new() {
-				new Tag { Key = "Key1", Value = "Value1" },
-				new Tag { Key = "Key2", Value = "Value2" }
-			};
-
-			PutBucketTaggingResponse response = await Authenticate().PutBucketTaggingAsync(bucketName, tagList);
-
-			foreach (PropertyInfo prop in response.GetType().GetProperties()) {
-				Console.WriteLine($"{prop.Name}: {prop.GetValue(response, null)}");
-			}
-
-			Console.WriteLine($"Tags added to {bucketName} bucket");
-		}
-		catch (AmazonS3Exception amazonS3Exception) {
-			Console.WriteLine("An AmazonS3Exception was thrown. Exception: " + amazonS3Exception);
-		}
-		catch (Exception e) {
-			Console.WriteLine("Exception: " + e);
-		}
-	}
-
-	private async Task GetBucketTagsAsync(string bucketName) {
-		try {
-			GetBucketTaggingRequest request = new() {
-				BucketName = bucketName
-			};
-
-			GetBucketTaggingResponse response = await Authenticate().GetBucketTaggingAsync(request);
-
-			Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
-		}
-		catch (AmazonS3Exception amazonS3Exception) {
-			Console.WriteLine("An AmazonS3Exception was thrown. Exception: " + amazonS3Exception);
-		}
-		catch (Exception e) {
-			Console.WriteLine("Exception: " + e);
-		}
-	}
-
-	private async Task GetBucketVersioningAsync(string bucketName) {
-		try {
-			GetBucketVersioningResponse response = await Authenticate().GetBucketVersioningAsync(new GetBucketVersioningRequest {
-				BucketName = bucketName
-			});
-
-			Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
-		}
-		catch (AmazonS3Exception amazonS3Exception) {
-			Console.WriteLine("An AmazonS3Exception was thrown. Exception: " + amazonS3Exception);
-		}
-		catch (Exception e) {
-			Console.WriteLine("Exception: " + e);
-		}
-	}
-
-	private async Task EnableBucketVersioningAsync(string bucketName) {
-		try {
-			PutBucketVersioningResponse response = await Authenticate().PutBucketVersioningAsync(new PutBucketVersioningRequest {
-				BucketName = bucketName,
-				VersioningConfig = new S3BucketVersioningConfig { Status = VersionStatus.Enabled }
-			});
-
-			Console.WriteLine($"Versioning enabled in {bucketName} bucket");
-		}
-		catch (AmazonS3Exception amazonS3Exception) {
-			Console.WriteLine("An AmazonS3Exception was thrown. Exception: " + amazonS3Exception);
-		}
-		catch (Exception e) {
-			Console.WriteLine("Exception: " + e);
-		}
-	}
-
-	private async Task PutBucketAclAsync(string bucketName, string acl = "public-read") {
-		//acl = public-read OR private
-		try {
-			PutACLResponse response = await Authenticate().PutACLAsync(new PutACLRequest {
-				BucketName = bucketName,
-				CannedACL = acl == "private" ? S3CannedACL.Private : S3CannedACL.PublicRead // S3CannedACL.PublicRead or S3CannedACL.Private
-			});
-
-			Console.WriteLine($"Access-list {acl} added to {bucketName} bucket");
-		}
-		catch (AmazonS3Exception amazonS3Exception) {
-			Console.WriteLine("An AmazonS3Exception was thrown. Exception: " + amazonS3Exception);
-		}
-		catch (Exception e) {
-			Console.WriteLine("Exception: " + e);
-		}
-	}
-
-	private async Task GetBucketAclAsync(string bucketName) {
-		try {
-			GetACLResponse response = await Authenticate().GetACLAsync(new GetACLRequest { BucketName = bucketName });
-
-			Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
-		}
-		catch (AmazonS3Exception amazonS3Exception) {
-			Console.WriteLine("An AmazonS3Exception was thrown. Exception: " + amazonS3Exception);
-		}
-		catch (Exception e) {
-			Console.WriteLine("Exception: " + e);
-		}
-	}
-
-	private async Task DeleteBucketPolicy(string bucketName) {
-		DeleteBucketPolicyRequest deleteRequest = new() { BucketName = bucketName };
-		object policy = await Authenticate().DeleteBucketPolicyAsync(deleteRequest);
-
-		foreach (PropertyInfo prop in policy.GetType().GetProperties()) {
-			Console.WriteLine($"{prop.Name}: {prop.GetValue(policy, null)}");
-		}
-
-		Console.WriteLine($"Policy successfully deleted from {bucketName} bucket");
-	}
-
-	private async Task PutBucketPolicy(string bucketName) {
-		const string newPolicy = @"{
-              ""Statement"":[{
-              ""Sid"":""PolicyName"",
-              ""Effect"":""Allow"",
-              ""Principal"": { ""AWS"": ""*"" },
-              ""Action"":[""s3:PutObject"",""s3:GetObject""],
-              ""Resource"":[""arn:aws:s3:::rezvani/user_*""]
-          }]}";
-
-		PutBucketPolicyRequest putRequest = new() { BucketName = bucketName, Policy = newPolicy };
-		object policy = await Authenticate().PutBucketPolicyAsync(putRequest);
-		foreach (PropertyInfo prop in policy.GetType().GetProperties()) {
-			Console.WriteLine($"{prop.Name}: {prop.GetValue(policy, null)}");
-		}
-
-		Console.WriteLine($"Policy successfully added to {bucketName} bucket");
-	}
-
-	private async Task GetBucketPolicyStatus(string bucketName) {
-		try {
-			GetBucketPolicyStatusResponse response = await Authenticate().GetBucketPolicyStatusAsync(new GetBucketPolicyStatusRequest { BucketName = bucketName });
-			Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
-		}
-		catch (AmazonS3Exception amazonS3Exception) {
-			Console.WriteLine("An AmazonS3Exception was thrown. Exception: " + amazonS3Exception);
-		}
-		catch (Exception e) {
-			Console.WriteLine("Exception: " + e);
-		}
-	}
-
-	private async Task GetBucketPolicy(string bucketName) {
-		GetBucketPolicyRequest getRequest = new() { BucketName = bucketName };
-		object policy = await Authenticate().GetBucketPolicyAsync(getRequest);
-
-		foreach (PropertyInfo prop in policy.GetType().GetProperties()) {
-			Console.WriteLine($"{prop.Name}: {prop.GetValue(policy, null)}");
-		}
-	}
-
-	private async Task CreateBucket(string bucketName) {
-		try {
-			PutBucketRequest putBucketRequest = new() { BucketName = bucketName, UseClientRegion = true };
-			PutBucketResponse? putBucketResponse = await Authenticate().PutBucketAsync(putBucketRequest);
-		}
-		catch (AmazonS3Exception ex) {
-			Console.WriteLine($"Error creating bucket: '{ex.Message}'");
-		}
-	}
-
-	private Task<bool> CheckBucketExist(string bucketName) => AmazonS3Util.DoesS3BucketExistV2Async(Authenticate(), bucketName);
-
-	private Task<ListBucketsResponse> GetBuckets() => Authenticate().ListBucketsAsync();
-
-	private async Task<bool> DeleteBucket(string bucketName) {
-		try {
-			DeleteBucketResponse? deleteResponse = await Authenticate().DeleteBucketAsync(bucketName);
-			Console.WriteLine($"\nResult: {deleteResponse.HttpStatusCode.ToString()}");
-			return true;
-		}
-		catch (AmazonS3Exception ex) {
-			Console.WriteLine($"Error: {ex.Message}");
-			return false;
 		}
 	}
 }
