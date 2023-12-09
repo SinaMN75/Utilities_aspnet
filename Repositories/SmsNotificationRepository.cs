@@ -1,17 +1,17 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
 public interface ISmsNotificationRepository {
-	Task<GenericResponse> SendSms(string mobileNumber, string param1, string? param2 = null, string? param3 = null, string? template = null);
+	Task<GenericResponse> SendSms(string mobileNumber, string template, string param1, string? param2 = null, string? param3 = null);
 	public Task<GenericResponse> SendNotification(NotificationCreateDto dto);
 }
 
 public class SmsNotificationRepository(IConfiguration config) : ISmsNotificationRepository {
 	public async Task<GenericResponse> SendSms(
 		string mobileNumber,
+		string template,
 		string param1,
 		string? param2 = null,
-		string? param3 = null,
-		string? template = null
+		string? param3 = null
 	) {
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);

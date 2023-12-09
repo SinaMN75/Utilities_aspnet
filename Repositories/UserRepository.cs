@@ -19,12 +19,12 @@ public interface IUserRepository {
 }
 
 public class UserRepository(
-		DbContext dbContext,
-		ISmsNotificationRepository sms,
-		IHttpContextAccessor httpContextAccessor,
-		ITransactionRepository transactionRepository,
-		IDistributedCache cache
-	)
+	DbContext dbContext,
+	ISmsNotificationRepository sms,
+	IHttpContextAccessor httpContextAccessor,
+	ITransactionRepository transactionRepository,
+	IDistributedCache cache
+)
 	: IUserRepository {
 	private readonly IHttpContextAccessor? _http = httpContextAccessor;
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
@@ -468,7 +468,7 @@ public class UserRepository(
 		}
 
 		UserEntity? user = await ReadByIdMinimal(userId);
-		await sms.SendSms(user?.PhoneNumber!, newOtp);
+		await sms.SendSms(user?.PhoneNumber!, AppSettings.GetCurrentSettings().SmsPanelSettings.PatternCode!, newOtp);
 		await dbContext.SaveChangesAsync();
 		return true;
 	}

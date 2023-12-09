@@ -8,7 +8,7 @@ public class MailSmsNotificationController(ISmsNotificationRepository repository
 
 	[HttpPost("SendOtpSms")]
 	public async Task<ActionResult<GenericResponse>> SendOtpSms(SendOtpSmsDto dto) =>
-		Result(await repository.SendSms(dto.MobileNumber, dto.Param1, dto.Template, dto.Param2, dto.Param3));
+		Result(await repository.SendSms(dto.MobileNumber, dto.Template, dto.Param1, dto.Param2, dto.Param3));
 }
 
 public class SendOtpSmsDto {
