@@ -48,7 +48,7 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 		int rowCount = worksheet.Dimension.Rows;
 		for (int i = 2; i < rowCount; i++) {
 			list.Add(new CategoryCreateUpdateDto {
-				Id = Guid.Parse(worksheet.Cells[i, 1].Value.ToString()!),
+				Id = Guid.TryParse(worksheet.Cells[i, 0].Value.ToString(), out _) ? Guid.Parse(worksheet.Cells[i, 0].Value.ToString()!) : null,
 				Title = worksheet.Cells[i, 2].Value.ToString(),
 				TitleTr1 = worksheet.Cells[i, 3].Value.ToString(),
 				ParentId = Guid.TryParse(worksheet.Cells[i, 4].Value.ToString(), out _) ? Guid.Parse(worksheet.Cells[i, 4].Value.ToString()!) : null,
