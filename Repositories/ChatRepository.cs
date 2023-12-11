@@ -8,7 +8,7 @@ public interface IChatRepository {
 	Task<GenericResponse<IEnumerable<GroupChatEntity>?>> ReadMyGroupChats();
 	Task<GenericResponse<GroupChatMessageEntity?>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto);
 	Task<GenericResponse> DeleteGroupChatMessage(Guid id);
-	GenericResponse<IQueryable<GroupChatEntity>> FilterGroupChats(GroupChatFilterDto dto);
+	Task<GenericResponse<IQueryable<GroupChatEntity>>> FilterGroupChats(GroupChatFilterDto dto);
 	Task<GenericResponse<IQueryable<GroupChatEntity>>> FilterAllGroupChats(GroupChatFilterDto dto);
 	Task<GenericResponse<GroupChatEntity>> ReadGroupChatById(Guid id);
 	GenericResponse<IQueryable<GroupChatMessageEntity>?> ReadGroupChatMessages(Guid id, int pageSize, int pageNumber);
@@ -219,12 +219,12 @@ public class ChatRepository(
 		return new GenericResponse();
 	}
 
-	public GenericResponse<IQueryable<GroupChatEntity>> FilterGroupChats(GroupChatFilterDto dto) {
-		IQueryable<GroupChatEntity> q = dbContext.Set<GroupChatEntity>()
-			.Where(x => x.Users!.Any(y => y.Id == _userId));
+	public async Task<GenericResponse<IQueryable<GroupChatEntity>>> FilterGroupChats(GroupChatFilterDto dto) {
+		await DeleteEmptyGroups();
+		IQueryable<GroupChatEntity> q = dbContext.Set<GroupChatEntity>().AsNoTracking();
 
-		if (dto.UsersIds.IsNotNullOrEmpty()) q = q.Where(x => x.Users!.Any(y => y.Id == dto.UsersIds!.FirstOrDefault()));
-		if (dto.ProductsIds.IsNotNullOrEmpty()) q = q.Where(x => x.Products!.Any(y => y.Id == dto.ProductsIds!.FirstOrDefault()));
+		if (dto.UsersIds.IsNotNullOrEmpty()) q = q.Where(x => x.Users!.Any(y => dto.UsersIds!.Contains(y.Id)));
+		if (dto.ProductsIds.IsNotNullOrEmpty()) q = q.Where(x => x.Products!.Any(y => dto.ProductsIds!.Contains(y.Id)));
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => x.Title == dto.Title);
 		if (dto.Description.IsNotNullOrEmpty()) q = q.Where(x => x.JsonDetail.Description == dto.Description);
 		if (dto.Type.HasValue) q = q.Where(x => x.Type == dto.Type);
