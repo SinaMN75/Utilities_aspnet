@@ -10,58 +10,57 @@ public interface IMediaRepository {
 
 public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmazonS3Repository amazonS3Repository) : IMediaRepository {
 	public async Task<GenericResponse<IEnumerable<MediaEntity>?>> Upload(UploadDto model) {
-		List<MediaEntity> medias = new();
+		List<MediaEntity> medias = [];
 
-		if (model.Files != null)
-			foreach (IFormFile file in model.Files) {
-				List<string> allowedExtensions = new() { ".png", ".gif", ".jpg", ".jpeg", ".mp4", ".mp3", ".pdf", ".aac", ".apk", ".zip", ".rar" };
-				if (!allowedExtensions.Contains(Path.GetExtension(file.FileName.ToLower())))
-					return new GenericResponse<IEnumerable<MediaEntity>?>(null, UtilitiesStatusCodes.BadRequest);
+		if (model.File is not null) {
+			List<string> allowedExtensions = [".png", ".gif", ".jpg", ".jpeg", ".mp4", ".mp3", ".pdf", ".aac", ".apk", ".zip", ".rar"];
+			if (!allowedExtensions.Contains(Path.GetExtension(model.File!.FileName.ToLower())))
+				return new GenericResponse<IEnumerable<MediaEntity>?>(null, UtilitiesStatusCodes.BadRequest);
 
-				string folderName = "";
-				if (model.UserId.IsNotNullOrEmpty()) folderName = "users/";
-				else if (model.ProductId.IsNotNullOrEmpty()) folderName = "products/";
-				else if (model.ContentId.IsNotNullOrEmpty()) folderName = "contents/";
-				else if (model.CategoryId.IsNotNullOrEmpty()) folderName = "categories/";
-				else if (model.ChatId.IsNotNullOrEmpty()) folderName = "chats/";
-				else if (model.CommentId.IsNotNullOrEmpty()) folderName = "comments/";
-				else if (model.BookmarkId.IsNotNullOrEmpty()) folderName = "bookmarks/";
-				else if (model.NotificationId.IsNotNullOrEmpty()) folderName = "notifications/";
-				else if (model.GroupChatId.IsNotNullOrEmpty()) folderName = "groupChats/";
-				else if (model.GroupChatMessageId.IsNotNullOrEmpty()) folderName = "groupChatMessages/";
-				string name = $"{folderName}{Guid.NewGuid() + Path.GetExtension(file.FileName)}";
-				MediaEntity media = new() {
-					FileName = name,
-					UserId = model.UserId.IsNotNullOrEmpty() ? model.UserId : null,
-					ProductId = model.UserId.IsNotNullOrEmpty() ? model.ProductId : null,
-					ContentId = model.UserId.IsNotNullOrEmpty() ? model.ContentId : null,
-					CategoryId = model.UserId.IsNotNullOrEmpty() ? model.CategoryId : null,
-					ChatId = model.UserId.IsNotNullOrEmpty() ? model.ChatId : null,
-					CommentId = model.UserId.IsNotNullOrEmpty() ? model.CommentId : null,
-					BookmarkId = model.UserId.IsNotNullOrEmpty() ? model.BookmarkId : null,
-					CreatedAt = DateTime.UtcNow,
-					Order = model.Order,
-					NotificationId = model.NotificationId,
-					GroupChatId = model.GroupChatId,
-					GroupChatMessageId = model.GroupChatMessageId,
-					Tags = model.Tags,
-					JsonDetail = {
-						Title = model.Title,
-						IsPrivate = model.PrivacyType,
-						Size = model.Size,
-						Time = model.Time,
-						Artist = model.Artist,
-						Album = model.Album
-					}
-				};
-				await dbContext.Set<MediaEntity>().AddAsync(media);
-				await dbContext.SaveChangesAsync();
-				medias.Add(media);
-				string path = SaveMedia(file, name);
-				AmazonS3Settings amazonS3Settings = AppSettings.GetCurrentSettings().AmazonS3Settings;
-				if (amazonS3Settings.UseS3 ?? false)
-					await amazonS3Repository.UploadObjectFromFileAsync(amazonS3Settings.DefaultBucket!, name, path);
-			}
+			string folderName = "";
+			if (model.UserId.IsNotNullOrEmpty()) folderName = "users/";
+			else if (model.ProductId.IsNotNullOrEmpty()) folderName = "products/";
+			else if (model.ContentId.IsNotNullOrEmpty()) folderName = "contents/";
+			else if (model.CategoryId.IsNotNullOrEmpty()) folderName = "categories/";
+			else if (model.ChatId.IsNotNullOrEmpty()) folderName = "chats/";
+			else if (model.CommentId.IsNotNullOrEmpty()) folderName = "comments/";
+			else if (model.BookmarkId.IsNotNullOrEmpty()) folderName = "bookmarks/";
+			else if (model.NotificationId.IsNotNullOrEmpty()) folderName = "notifications/";
+			else if (model.GroupChatId.IsNotNullOrEmpty()) folderName = "groupChats/";
+			else if (model.GroupChatMessageId.IsNotNullOrEmpty()) folderName = "groupChatMessages/";
+			string name = $"{folderName}{Guid.NewGuid() + Path.GetExtension(model.File.FileName)}";
+			MediaEntity media = new() {
+				FileName = name,
+				UserId = model.UserId.IsNotNullOrEmpty() ? model.UserId : null,
+				ProductId = model.UserId.IsNotNullOrEmpty() ? model.ProductId : null,
+				ContentId = model.UserId.IsNotNullOrEmpty() ? model.ContentId : null,
+				CategoryId = model.UserId.IsNotNullOrEmpty() ? model.CategoryId : null,
+				ChatId = model.UserId.IsNotNullOrEmpty() ? model.ChatId : null,
+				CommentId = model.UserId.IsNotNullOrEmpty() ? model.CommentId : null,
+				BookmarkId = model.UserId.IsNotNullOrEmpty() ? model.BookmarkId : null,
+				CreatedAt = DateTime.UtcNow,
+				Order = model.Order,
+				NotificationId = model.NotificationId,
+				GroupChatId = model.GroupChatId,
+				GroupChatMessageId = model.GroupChatMessageId,
+				Tags = model.Tags,
+				JsonDetail = {
+					Title = model.Title,
+					IsPrivate = model.PrivacyType,
+					Size = model.Size,
+					Time = model.Time,
+					Artist = model.Artist,
+					Album = model.Album
+				}
+			};
+			await dbContext.Set<MediaEntity>().AddAsync(media);
+			await dbContext.SaveChangesAsync();
+			medias.Add(media);
+			string path = SaveMedia(model.File, name);
+			AmazonS3Settings amazonS3Settings = AppSettings.GetCurrentSettings().AmazonS3Settings;
+			if (amazonS3Settings.UseS3 ?? false)
+				await amazonS3Repository.UploadObjectFromFileAsync(amazonS3Settings.DefaultBucket!, name, path);
+		}
 
 		if (model.Links != null)
 			foreach (MediaEntity media in model.Links.Select(_ => new MediaEntity {

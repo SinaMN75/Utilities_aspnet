@@ -142,7 +142,7 @@ public class UploadDto {
 	public Guid? GroupChatMessageId { get; set; }
 	public Guid? BookmarkId { get; set; }
 	public IEnumerable<string>? Links { get; set; }
-	public IEnumerable<IFormFile>? Files { get; set; }
+	public IFormFile? File { get; set; }
 	public List<TagMedia>? Tags { get; set; }
 }
 
