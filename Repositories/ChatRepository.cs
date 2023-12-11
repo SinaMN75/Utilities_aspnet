@@ -475,13 +475,13 @@ public class ChatRepository(
 	}
 	
 	private async Task DeleteEmptyGroups() {
-		IQueryable<GroupChatEntity> list = dbContext.Set<GroupChatEntity>()
-			.Where(x => x.Type != ChatType.Private)
-			.Include(x => x.Users)
-			.Include(x => x.GroupChatMessage);
-		foreach (GroupChatEntity groupChatEntity in list)
-			if (groupChatEntity.Users.IsNullOrEmpty() || groupChatEntity.GroupChatMessage.IsNullOrEmpty() || groupChatEntity.Type == ChatType.Private)
-				dbContext.Remove(groupChatEntity);
-		await dbContext.SaveChangesAsync();
+		// IQueryable<GroupChatEntity> list = dbContext.Set<GroupChatEntity>()
+		// 	.Where(x => x.Type != ChatType.Private)
+		// 	.Include(x => x.Users)
+		// 	.Include(x => x.GroupChatMessage);
+		// foreach (GroupChatEntity groupChatEntity in list)
+		// 	if ((groupChatEntity.Users.IsNullOrEmpty() || groupChatEntity.GroupChatMessage.IsNullOrEmpty()) && groupChatEntity.Type == ChatType.Private)
+		// 		dbContext.Remove(groupChatEntity);
+		// await dbContext.SaveChangesAsync();
 	}
 }
