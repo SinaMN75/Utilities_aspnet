@@ -9,7 +9,7 @@ public class ChatController(IChatRepository repository) : BaseApiController {
 		Result(await repository.CreateGroupChat(dto));
 
 	[HttpPost("FilterGroupChat")]
-	public ActionResult<GenericResponse<GroupChatEntity?>> FilterGroupChat(GroupChatFilterDto dto) => Result(repository.FilterGroupChats(dto));
+	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> FilterGroupChat(GroupChatFilterDto dto) => Result(await repository.FilterGroupChats(dto));
 
 	[HttpPost("FilterAllGroupChat")]
 	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> FilterAllGroupChat(GroupChatFilterDto dto) => Result(await repository.FilterAllGroupChats(dto));
