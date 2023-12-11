@@ -357,14 +357,14 @@ public class UserRepository(
 	}
 
 	private static JwtSecurityToken CreateToken(UserEntity user) {
-		List<Claim> claims = new() {
+		List<Claim> claims = [
 			new Claim(JwtRegisteredClaimNames.Sub, user.Id),
 			new Claim(ClaimTypes.NameIdentifier, user.Id),
 			new Claim(ClaimTypes.Name, user.Id),
 			new Claim(ClaimTypes.Email, user.Email ?? user.Id),
 			new Claim(ClaimTypes.MobilePhone, user.PhoneNumber ?? user.Id),
 			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-		};
+		];
 		SymmetricSecurityKey key = new("https://SinaMN75.com,BetterSoft1234"u8.ToArray());
 		SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha256);
 		JwtSecurityToken token = new(
@@ -433,7 +433,7 @@ public class UserRepository(
 		};
 
 		if (dto.Categories.IsNotNullOrEmpty()) {
-			List<CategoryEntity> list = new();
+			List<CategoryEntity> list = [];
 			foreach (Guid item in dto.Categories!) {
 				CategoryEntity? e = await dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item);
 				if (e != null) list.Add(e);
@@ -455,7 +455,7 @@ public class UserRepository(
 		UserId = userId,
 		Amount = amount,
 		Descriptions = description,
-		Tags = new List<TagTransaction> { TagTransaction.WalletToWallet }
+		Tags = [TagTransaction.WalletToWallet]
 	};
 
 	private async Task<bool> SendOtp(string userId) {

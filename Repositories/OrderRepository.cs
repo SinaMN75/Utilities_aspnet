@@ -98,7 +98,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 		if (o is null) {
 			EntityEntry<OrderEntity> orderEntity = await dbContext.Set<OrderEntity>().AddAsync(new OrderEntity {
 				OrderNumber = new Random().Next(10000, 99999),
-				Tags = new List<TagOrder> { TagOrder.Pending },
+				Tags = [TagOrder.Pending],
 				UserId = _userId,
 				SendPrice = p.User!.JsonDetail.DeliveryPrice1,
 				CreatedAt = DateTime.UtcNow,
@@ -125,7 +125,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 		if (o.OrderDetails != null && o.OrderDetails.Any(x => p.UserId != x.Product?.UserId)) {
 			EntityEntry<OrderEntity> orderEntity = await dbContext.Set<OrderEntity>().AddAsync(new OrderEntity {
 				OrderNumber = new Random().Next(10000, 99999),
-				Tags = new List<TagOrder> { TagOrder.Pending },
+				Tags = [TagOrder.Pending],
 				UserId = _userId,
 				CreatedAt = DateTime.UtcNow,
 				ProductOwnerId = p.UserId,
@@ -205,7 +205,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 			UpdatedAt = DateTime.UtcNow,
 			ProductOwnerId = p.UserId,
 			JsonDetail = new OrderJsonDetail { ReservationTimes = dto.ReserveDto },
-			Tags = new List<TagOrder> { TagOrder.Pending, TagOrder.Reserve },
+			Tags = [TagOrder.Pending, TagOrder.Reserve],
 			UserId = _userId,
 			TotalPrice = totalPrice
 		};
@@ -218,7 +218,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 	public async Task<GenericResponse<OrderEntity?>> CreateChairReservationOrder(ReserveChairCreateUpdateDto dto) {
 		ProductEntity p = (await dbContext.Set<ProductEntity>().Include(x => x.User).FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
 		
-		List<Seat> seats = new();
+		List<Seat> seats = [];
 		
 		foreach (string s in dto.SeatsId) {
 			seats.Add(p.JsonDetail.Seats!.FirstOrDefault(x => x.ChairId == s)!);
@@ -235,7 +235,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 			UpdatedAt = DateTime.UtcNow,
 			ProductOwnerId = p.UserId,
 			JsonDetail = new OrderJsonDetail { Seats = seats, ProductId = dto.ProductId.ToString()},
-			Tags = new List<TagOrder> { TagOrder.Pending, TagOrder.Reserve },
+			Tags = [TagOrder.Pending, TagOrder.Reserve],
 			UserId = _userId,
 			TotalPrice = totalPrice
 		};

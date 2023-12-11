@@ -48,7 +48,7 @@ public class AmazonS3Repository(IConfiguration config) : IAmazonS3Repository {
 			// Create the request
 			DeleteObjectsRequest request = new() {
 				BucketName = bucketName,
-				Objects = new List<KeyVersion> { new() { Key = objectName, VersionId = null } }
+				Objects = [new() { Key = objectName, VersionId = null }]
 			};
 
 			// Submit the request
@@ -140,7 +140,7 @@ public class AmazonS3Repository(IConfiguration config) : IAmazonS3Repository {
 
 	public async Task UploadObjectAsync(string bucketName, string keyName, string filePath) {
 		// Create list to store upload part responses.
-		List<UploadPartResponse> uploadResponses = new();
+		List<UploadPartResponse> uploadResponses = [];
 
 		// Setup information required to initiate the multipart upload.
 		InitiateMultipartUploadRequest initiateRequest = new() { BucketName = bucketName, Key = keyName };
