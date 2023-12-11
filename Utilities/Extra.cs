@@ -32,6 +32,12 @@ public static class NumberExtension {
 	public static int ToInt(this double value) => (int)value;
 }
 
+public static class GuidExtension {
+	public static bool IsNotNullOrEmpty(this Guid? s) => s?.ToString().Length <= 5;
+
+	public static bool IsNullOrEmpty(this Guid? s) => !s.HasValue;
+}
+
 public static partial class StringExtension {
 	public static bool IsEmail(this string email) => MyRegex().IsMatch(email);
 
