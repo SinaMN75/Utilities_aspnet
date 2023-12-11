@@ -160,21 +160,9 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 	}
 
 	private string SaveMedia(IFormFile image, string name) {
-		string webRoot = env.WebRootPath;
-		string path = Path.Combine(webRoot, "Medias", name);
-		string uploadDir = Path.Combine(webRoot, "Medias");
-		if (!Directory.Exists(uploadDir))
-			Directory.CreateDirectory(uploadDir);
-		try {
-			File.Delete(path);
-		}
-		catch (Exception ex) {
-			throw new ArgumentException("Exception in SaveMedia- Delete! " + ex.Message);
-		}
-
+		string path = Path.Combine(env.WebRootPath, "Medias", name);
 		using FileStream stream = new(path, FileMode.Create);
 		image.CopyTo(stream);
-
 		return path;
 	}
 }
