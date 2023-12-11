@@ -477,7 +477,8 @@ public class ChatRepository(
 	private async Task DeleteEmptyGroups() {
 		IQueryable<GroupChatEntity> list = dbContext.Set<GroupChatEntity>()
 			.Include(x => x.Users)
-			.Include(x => x.GroupChatMessage);
+			.Include(x => x.GroupChatMessage)
+			.Where(x => x.Type != ChatType.Private);
 		foreach (GroupChatEntity groupChatEntity in list)
 			if (groupChatEntity.Users.IsNullOrEmpty() || groupChatEntity.GroupChatMessage.IsNullOrEmpty())
 				dbContext.Remove(groupChatEntity);
