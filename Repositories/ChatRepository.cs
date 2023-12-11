@@ -480,7 +480,7 @@ public class ChatRepository(
 			.Include(x => x.GroupChatMessage)
 			.Where(x => x.Type != ChatType.Private);
 		foreach (GroupChatEntity groupChatEntity in list)
-			if (groupChatEntity.Users.IsNullOrEmpty() || groupChatEntity.GroupChatMessage.IsNullOrEmpty())
+			if (groupChatEntity.Users.IsNullOrEmpty() || groupChatEntity.GroupChatMessage.IsNullOrEmpty() || groupChatEntity.Type != ChatType.Private)
 				dbContext.Remove(groupChatEntity);
 		await dbContext.SaveChangesAsync();
 	}
