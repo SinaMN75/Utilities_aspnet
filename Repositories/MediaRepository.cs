@@ -18,16 +18,16 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 				return new GenericResponse<IEnumerable<MediaEntity>?>(null, UtilitiesStatusCodes.BadRequest);
 
 			string folderName = "";
-			if (model.UserId.IsNotNullOrEmpty()) folderName = "users/";
-			else if (model.ProductId.IsNotNullOrEmpty()) folderName = "products/";
-			else if (model.ContentId.IsNotNullOrEmpty()) folderName = "contents/";
-			else if (model.CategoryId.IsNotNullOrEmpty()) folderName = "categories/";
-			else if (model.ChatId.IsNotNullOrEmpty()) folderName = "chats/";
-			else if (model.CommentId.IsNotNullOrEmpty()) folderName = "comments/";
-			else if (model.BookmarkId.IsNotNullOrEmpty()) folderName = "bookmarks/";
-			else if (model.NotificationId.IsNotNullOrEmpty()) folderName = "notifications/";
-			else if (model.GroupChatId.IsNotNullOrEmpty()) folderName = "groupChats/";
-			else if (model.GroupChatMessageId.IsNotNullOrEmpty()) folderName = "groupChatMessages/";
+			if (model.UserId is not null) folderName = "users/";
+			else if (model.ProductId is not null) folderName = "products/";
+			else if (model.ContentId is not null) folderName = "contents/";
+			else if (model.CategoryId is not null) folderName = "categories/";
+			else if (model.ChatId is not null) folderName = "chats/";
+			else if (model.CommentId is not null) folderName = "comments/";
+			else if (model.BookmarkId is not null) folderName = "bookmarks/";
+			else if (model.NotificationId is not null) folderName = "notifications/";
+			else if (model.GroupChatId is not null) folderName = "groupChats/";
+			else if (model.GroupChatMessageId is not null) folderName = "groupChatMessages/";
 			string name = $"{folderName}{Guid.NewGuid() + Path.GetExtension(model.File.FileName)}";
 			MediaEntity media = new() {
 				FileName = name,
@@ -160,9 +160,20 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 	}
 
 	private string SaveMedia(IFormFile image, string name) {
-		string path = Path.Combine(env.WebRootPath, "Medias", name);
+		string webRoot = env.WebRootPath;
+		string path = Path.Combine(webRoot, "Medias", name);
+		string uploadDir = Path.Combine(webRoot, "Medias");
+		if (!Directory.Exists(uploadDir)) Directory.CreateDirectory(uploadDir);
+		try {
+			File.Delete(path);
+		}
+		catch (Exception ex) {
+			throw new ArgumentException("Exception in SaveMedia- Delete! " + ex.Message);
+		}
+
 		using FileStream stream = new(path, FileMode.Create);
 		image.CopyTo(stream);
+
 		return path;
 	}
 }
