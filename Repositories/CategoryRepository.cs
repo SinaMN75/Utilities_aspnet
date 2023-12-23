@@ -78,8 +78,7 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 		if (dto.OrderByOrderDescending.IsTrue()) q = q.OrderByDescending(x => x.Order);
 		if (dto.OrderByCreatedAtDescending.IsTrue()) q = q.OrderByDescending(x => x.Order);
 
-		// if (dto.ShowMedia.IsTrue())
-			q = q.Include(x => x.Media);
+		if (dto.ShowMedia.IsTrue()) q = q.Include(x => x.Media);
 
 		int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
