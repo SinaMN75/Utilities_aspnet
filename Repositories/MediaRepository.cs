@@ -27,7 +27,7 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 			else if (model.BookmarkId is not null) folderName = "bookmarks/";
 			else if (model.NotificationId is not null) folderName = "notifications/";
 			else if (model.GroupChatId is not null) folderName = "groupChats/";
-			else if (model.GroupChatMessageId is not null) folderName = "groupChatMessages/";
+			else if (model.GroupChatMessageId is not null) folderName = "groupChatsMessages/";
 			string name = $"{folderName}{Guid.NewGuid() + Path.GetExtension(model.File.FileName)}";
 			MediaEntity media = new() {
 				FileName = name,
