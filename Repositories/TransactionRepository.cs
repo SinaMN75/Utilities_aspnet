@@ -16,7 +16,7 @@ public class TransactionRepository(DbContext dbContext) : ITransactionRepository
 			RefId = dto.RefId,
 			CardNumber = dto.CardNumber,
 			Tags = dto.Tags,
-			UserId = dto.UserId,
+			BuyerId = dto.UserId,
 			OrderId = dto.OrderId,
 			SubscriptionId = dto.SubscriptionId
 		};
@@ -54,21 +54,21 @@ public class TransactionRepository(DbContext dbContext) : ITransactionRepository
 				RefId = x.RefId,
 				CardNumber = x.CardNumber,
 				Tags = x.Tags,
-				UserId = x.UserId,
+				BuyerId = x.BuyerId,
 				OrderId = x.OrderId,
 				SubscriptionId = x.SubscriptionId,
-				User = new UserEntity {
-					Id = x.User!.Id,
-					FirstName = x.User.FirstName,
-					LastName = x.User.LastName,
-					FullName = x.User.FullName,
-					Tags = x.User.Tags,
-					PhoneNumber = x.User.PhoneNumber,
-					JsonDetail = x.User.JsonDetail,
-					Email = x.User.Email,
-					AppEmail = x.User.AppEmail,
-					AppPhoneNumber = x.User.AppPhoneNumber,
-					AppUserName = x.User.AppUserName
+				Buyer = new UserEntity {
+					Id = x.Buyer!.Id,
+					FirstName = x.Buyer.FirstName,
+					LastName = x.Buyer.LastName,
+					FullName = x.Buyer.FullName,
+					Tags = x.Buyer.Tags,
+					PhoneNumber = x.Buyer.PhoneNumber,
+					JsonDetail = x.Buyer.JsonDetail,
+					Email = x.Buyer.Email,
+					AppEmail = x.Buyer.AppEmail,
+					AppPhoneNumber = x.Buyer.AppPhoneNumber,
+					AppUserName = x.Buyer.AppUserName
 				},
 				Order = x.Order != null ? new OrderEntity {
 					Id = x.Order.Id,
@@ -82,7 +82,7 @@ public class TransactionRepository(DbContext dbContext) : ITransactionRepository
 				} : x.Order
 			});
 		if (dto.RefId.IsNotNullOrEmpty()) q = q.Where(x => x.RefId == dto.RefId);
-		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => x.UserId == dto.UserId);
+		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => x.BuyerId == dto.UserId);
 		if (dto.Amount is not null) q = q.Where(x => x.Amount == dto.Amount);
 		if (dto.OrderId is not null) q = q.Where(x => x.OrderId == dto.OrderId);
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));

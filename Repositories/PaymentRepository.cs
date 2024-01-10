@@ -103,7 +103,7 @@ public class PaymentRepository : IPaymentRepository {
 					RefId = refId,
 					CardNumber = cardNumber,
 					Tags = [TagTransaction.Buy],
-					UserId = _userId,
+					BuyerId = _userId,
 					OrderId = o.Id
 				});
 
@@ -113,7 +113,7 @@ public class PaymentRepository : IPaymentRepository {
 					RefId = refId,
 					CardNumber = cardNumber,
 					Tags = [TagTransaction.Buy],
-					UserId = productOwner.Id,
+					BuyerId = productOwner.Id,
 					OrderId = o.Id
 				});
 
@@ -185,7 +185,7 @@ public class PaymentRepository : IPaymentRepository {
 					RefId = refId,
 					CardNumber = cardNumber,
 					Tags = [TagTransaction.Buy],
-					UserId = _userId,
+					BuyerId = _userId,
 					OrderId = o.Id
 				});
 
@@ -195,7 +195,7 @@ public class PaymentRepository : IPaymentRepository {
 					RefId = refId,
 					CardNumber = cardNumber,
 					Tags = [TagTransaction.Buy],
-					UserId = productOwner.Id,
+					BuyerId = productOwner.Id,
 					OrderId = o.Id
 				});
 

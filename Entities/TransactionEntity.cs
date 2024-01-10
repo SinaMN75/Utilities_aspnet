@@ -15,10 +15,17 @@ public class TransactionEntity : BaseEntity {
 
 	[MaxLength(100)]
 	public List<TagTransaction> Tags { get; set; } = new();
+	
+	public UserEntity? Buyer { get; set; }
 
-	public UserEntity? User { get; set; }
-	public string? UserId { get; set; }
+	[ForeignKey(nameof(Buyer))]
+	public string? BuyerId { get; set; }
 
+	public UserEntity? Seller { get; set; }
+
+	[ForeignKey(nameof(Seller))]
+	public string? SellerId { get; set; }
+	
 	public OrderEntity? Order { get; set; }
 	public Guid? OrderId { get; set; }
 
