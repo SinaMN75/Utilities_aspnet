@@ -12,7 +12,7 @@ public interface IOrderRepository {
 	Task<GenericResponse<OrderEntity?>> ApplyDiscountCode(ApplyDiscountCodeOnOrderDto dto);
 }
 
-public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) : IOrderRepository {
+public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IConfiguration config) : IOrderRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	public async Task<GenericResponse<OrderEntity?>> Update(OrderCreateUpdateDto dto) {
@@ -217,13 +217,13 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 
 	public async Task<GenericResponse<OrderEntity?>> CreateChairReservationOrder(ReserveChairCreateUpdateDto dto) {
 		ProductEntity p = (await dbContext.Set<ProductEntity>().Include(x => x.User).FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
-		
+
 		List<Seat> seats = [];
-		
+
 		foreach (string s in dto.SeatsId) {
 			seats.Add(p.JsonDetail.Seats!.FirstOrDefault(x => x.ChairId == s)!);
 		}
-		
+
 		long totalPrice = 0;
 		foreach (Seat seat in seats) {
 			totalPrice += seat.Price ?? 0;
@@ -234,7 +234,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 			CreatedAt = DateTime.UtcNow,
 			UpdatedAt = DateTime.UtcNow,
 			ProductOwnerId = p.UserId,
-			JsonDetail = new OrderJsonDetail { Seats = seats, ProductId = dto.ProductId.ToString()},
+			JsonDetail = new OrderJsonDetail { Seats = seats, ProductId = dto.ProductId.ToString() },
 			Tags = [TagOrder.Pending, TagOrder.Reserve],
 			UserId = _userId,
 			TotalPrice = totalPrice
@@ -284,10 +284,10 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 
 	private async Task UpdateCartPrices() {
 		List<OrderEntity> q = await dbContext.Set<OrderEntity>()
-			.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product)
-			.Include(x => x.ProductOwner)
 			.Where(x => x.Tags.Contains(TagOrder.Pending))
 			.Where(x => !x.Tags.Contains(TagOrder.Reserve))
+			.Include(x => x.OrderDetails)!.ThenInclude(x => x.Product)
+			.Include(x => x.ProductOwner)
 			.ToListAsync();
 
 		foreach (OrderEntity orderEntity in q) {
@@ -297,8 +297,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 			await dbContext.SaveChangesAsync();
 
 			foreach (OrderDetailEntity orderEntityOrderDetail in orderEntity.OrderDetails!) {
-				orderEntityOrderDetail.FinalPrice =
-					orderEntityOrderDetail.Product!.Price * orderEntityOrderDetail.Count;
+				orderEntityOrderDetail.FinalPrice = orderEntityOrderDetail.Product!.Price * orderEntityOrderDetail.Count;
 				dbContext.Set<OrderDetailEntity>().Update(orderEntityOrderDetail);
 				await dbContext.SaveChangesAsync();
 			}
