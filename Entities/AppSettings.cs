@@ -1,38 +1,9 @@
 ﻿namespace Utilities_aspnet.Entities;
 
-// public class AppSettings {
-// 	private static AppSettings _appSettings;
-//
-// 	public string appSettingValue { get; set; }
-//
-// 	public static string AppSetting(string Key) {
-// 		_appSettings = GetCurrentSettings(Key);
-// 		return _appSettings.appSettingValue;
-// 	}
-//
-// 	public ConfigHelper(IConfiguration config, string Key) {
-// 		appSettingValue = config.GetValue<string>(Key);
-// 	}
-//
-// 	public static AppSettings GetCurrentSettings(string Key) {
-// 		IConfigurationBuilder builder = new ConfigurationBuilder()
-// 			.SetBasePath(Directory.GetCurrentDirectory())
-// 			.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-// 			.AddEnvironmentVariables();
-//
-// 		IConfigurationRoot configuration = builder.Build();
-//
-// 		AppSettings appSettings = new();
-// 		configuration.GetSection("AppSettings").Bind(appSettings);
-// 		// ConfigHelper settings = new(configuration.GetSection("AppSettings").GetSection(""), Key);
-//
-// 		return appSettings;
-// 	}
-// }
-
 public class AppSettings {
 	public SmsPanelSettings SmsPanelSettings { get; set; } = null!;
 	public PaymentSettings PaymentSettings { get; set; } = null!;
+	public OrderSettings OrderSettings { get; set; } = null!;
 	public PushNotificationSetting PushNotificationSetting { get; set; } = null!;
 	public UsageRulesBeforeUpgrade UsageRulesBeforeUpgrade { get; set; } = null!;
 	public UsageRulesAfterUpgrade UsageRulesAfterUpgrade { get; set; } = null!;
@@ -49,18 +20,18 @@ public class AppSettings {
 	public string? IosDownloadLink2 { get; set; }
 
 	public static AppSettings GetCurrentSettings() {
-		IConfigurationBuilder builder = new ConfigurationBuilder()
+		AppSettings appSettings = new();
+		new ConfigurationBuilder()
 			.SetBasePath(Directory.GetCurrentDirectory())
 			.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-			.AddEnvironmentVariables();
-
-		IConfigurationRoot configuration = builder.Build();
-
-		AppSettings appSettings = new();
-		configuration.GetSection("AppSettings").Bind(appSettings);
-
+			.AddEnvironmentVariables().Build().GetSection("AppSettings").Bind(appSettings);
 		return appSettings;
 	}
+}
+
+public class OrderSettings {
+	public double TaxPercent { get; set; }
+	public double AddOnPrice { get; set; }
 }
 
 public class SmsPanelSettings {

@@ -17,7 +17,7 @@ public class AddressController(IAddressRepository repository, IOutputCacheStore 
 	}
 
 	[HttpPost("Filter")]
-	[OutputCache(PolicyName = "address")]
+	[OutputCache(Tags = ["address"])]
 	public async Task<ActionResult<GenericResponse<IQueryable<AddressEntity>>>> Filter(AddressFilterDto dto) => Result(await repository.Filter(dto));
 
 	[HttpDelete("{id}")]
