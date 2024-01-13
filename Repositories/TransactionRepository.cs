@@ -16,7 +16,8 @@ public class TransactionRepository(DbContext dbContext) : ITransactionRepository
 			RefId = dto.RefId,
 			CardNumber = dto.CardNumber,
 			Tags = dto.Tags,
-			BuyerId = dto.UserId,
+			BuyerId = dto.BuyerId,
+			SellerId = dto.SellerId,
 			OrderId = dto.OrderId,
 			SubscriptionId = dto.SubscriptionId
 		};
@@ -97,7 +98,8 @@ public class TransactionRepository(DbContext dbContext) : ITransactionRepository
 				} : x.Order
 			});
 		if (dto.RefId.IsNotNullOrEmpty()) q = q.Where(x => x.RefId == dto.RefId);
-		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => x.BuyerId == dto.UserId);
+		if (dto.BuyerId.IsNotNullOrEmpty()) q = q.Where(x => x.BuyerId == dto.BuyerId);
+		if (dto.SellerId.IsNotNullOrEmpty()) q = q.Where(x => x.BuyerId == dto.SellerId);
 		if (dto.Amount is not null) q = q.Where(x => x.Amount == dto.Amount);
 		if (dto.OrderId is not null) q = q.Where(x => x.OrderId == dto.OrderId);
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));

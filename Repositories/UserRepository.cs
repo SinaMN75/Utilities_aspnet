@@ -452,7 +452,7 @@ public class UserRepository(
 	}
 
 	private static TransactionCreateDto MakeTransaction(string userId, long amount, string description) => new() {
-		UserId = userId,
+		BuyerId = userId,
 		Amount = amount,
 		Descriptions = description,
 		Tags = [TagTransaction.WalletToWallet]

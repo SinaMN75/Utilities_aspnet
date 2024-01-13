@@ -42,7 +42,8 @@ public class TransactionCreateDto {
 	public string? RefId { get; set; }
 	public string? CardNumber { get; set; }
 	public required List<TagTransaction> Tags { get; set; } = new();
-	public string? UserId { get; set; }
+	public string? BuyerId { get; set; }
+	public string? SellerId { get; set; }
 	public Guid? OrderId { get; set; }
 	public Guid? SubscriptionId { get; set; }
 }
@@ -54,8 +55,10 @@ public class TransactionUpdateDto {
 	public string? RefId { get; set; }
 	public string? CardNumber { get; set; }
 	public List<TagTransaction>? Tags { get; set; }
-	public string? UserId { get; set; }
+	public string? BuyerId { get; set; }
+	public string? SellerId { get; set; }
 	public Guid? OrderId { get; set; }
+	public Guid? Code { get; set; }
 	public Guid? SubscriptionId { get; set; }
 }
 
@@ -63,6 +66,8 @@ public class TransactionFilterDto {
 	public long? Amount { get; set; }
 	public string? RefId { get; set; }
 	public List<TagTransaction>? Tags { get; set; }
-	public string? UserId { get; set; }
+	public string? BuyerId { get; set; }
+	public string? SellerId { get; set; }
+	public string? Code { get; set; }
 	public Guid? OrderId { get; set; }
 }
