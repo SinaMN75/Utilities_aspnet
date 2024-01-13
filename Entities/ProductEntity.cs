@@ -5,6 +5,9 @@ public class ProductEntity : BaseEntity {
 	[MaxLength(100)]
 	public string? Title { get; set; }
 
+	[MaxLength(10)]
+	public string? Code { get; set; } = new Random().Next(10000, 99999).ToString();
+
 	[MaxLength(100)]
 	public string? Subtitle { get; set; }
 

@@ -4,6 +4,9 @@
 public class TransactionEntity : BaseEntity {
 	public long? Amount { get; set; }
 
+	[MaxLength(10)]
+	public string? Code { get; set; } = new Random().Next(10000, 99999).ToString();
+
 	[MaxLength(500)]
 	public string? Descriptions { get; set; }
 
