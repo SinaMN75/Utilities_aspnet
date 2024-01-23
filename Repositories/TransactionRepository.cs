@@ -11,7 +11,6 @@ public interface ITransactionRepository {
 }
 
 public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env) : ITransactionRepository {
-
 	public async Task<GenericResponse<TransactionEntity>> Create(TransactionCreateDto dto, CancellationToken ct) {
 		TransactionEntity e = new() {
 			Amount = dto.Amount,
@@ -41,7 +40,7 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 		return new GenericResponse<TransactionEntity>(e);
 	}
 
-	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) { 
+	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
 		await dbContext.Set<TransactionEntity>().Where(x => x.Id == id).ExecuteDeleteAsync(ct);
 		return new GenericResponse();
 	}
@@ -89,16 +88,18 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 					AppPhoneNumber = x.Buyer.AppPhoneNumber,
 					AppUserName = x.Buyer.AppUserName
 				},
-				Order = x.Order != null ? new OrderEntity {
-					Id = x.Order.Id,
-					CreatedAt = x.Order.CreatedAt,
-					UpdatedAt = x.Order.UpdatedAt,
-					JsonDetail = x.Order.JsonDetail,
-					UserId = x.Order.UserId,
-					TotalPrice = x.Order.TotalPrice,
-					ProductOwnerId = x.Order.ProductOwnerId,
-					OrderNumber = x.Order.OrderNumber
-				} : x.Order
+				Order = x.Order != null
+					? new OrderEntity {
+						Id = x.Order.Id,
+						CreatedAt = x.Order.CreatedAt,
+						UpdatedAt = x.Order.UpdatedAt,
+						JsonDetail = x.Order.JsonDetail,
+						UserId = x.Order.UserId,
+						TotalPrice = x.Order.TotalPrice,
+						ProductOwnerId = x.Order.ProductOwnerId,
+						OrderNumber = x.Order.OrderNumber
+					}
+					: x.Order
 			});
 		if (dto.RefId.IsNotNullOrEmpty()) q = q.Where(x => x.RefId == dto.RefId);
 		if (dto.BuyerId.IsNotNullOrEmpty()) q = q.Where(x => x.BuyerId == dto.BuyerId);
@@ -107,34 +108,101 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 		if (dto.OrderId is not null) q = q.Where(x => x.OrderId == dto.OrderId);
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
 
+
+		GenerateExcel(q.ToList());
+
 		return new GenericResponse<IQueryable<TransactionEntity>>(q.AsSingleQuery());
 	}
 
 	private void GenerateExcel(IEnumerable<TransactionEntity> list) {
-		string webRoot = env.WebRootPath;
-		string path = Path.Combine(webRoot, "Report", Guid.NewGuid().ToString());
-		string uploadDir = Path.Combine(webRoot, "Report");
+		DataTable datatableSell = new();
+		datatableSell.TableName = "فروش";
+		datatableSell.Columns.Add("کد", typeof(string));
+		datatableSell.Columns.Add("تاریخ", typeof(string));
+		datatableSell.Columns.Add("عنوان ", typeof(string));
+		datatableSell.Columns.Add("شماره سفارش", typeof(string));
+		datatableSell.Columns.Add("بستانکار", typeof(long));
+		datatableSell.Columns.Add("بدهکار", typeof(long));
+		datatableSell.Columns.Add("تخفیف بستانکار", typeof(long));
+		datatableSell.Columns.Add("تخفیف بدهکار", typeof(long));
+		datatableSell.Columns.Add("مبلغ نهایی بستانکار", typeof(int));
+		datatableSell.Columns.Add("مبلغ نهایی بدهکار", typeof(long));
+		datatableSell.Columns.Add("توضیحات", typeof(string));
 		
-		DataTable dt = new();
-		dt.TableName = "فروش";
-		dt.Columns.Add("نوع", typeof(string));
-		dt.Columns.Add("عنوان", typeof(string));
-		dt.Columns.Add("توضیحات", typeof(string));
-		dt.Columns.Add("تعداد", typeof(string));
-		dt.Columns.Add("مبلغ محاسبه شده (بدهکار) ", typeof(string));
-		dt.Columns.Add("مبلغ محاسبه شده (بستانکار)", typeof(string));
-		dt.Columns.Add("تخفیف محاسبه شده (بدهکار)", typeof(string));
-		dt.Columns.Add("تخفیف محاسبه شده (بستانکار)", typeof(string));
-		dt.Columns.Add("تخفیف درصدی", typeof(string));
-		dt.Columns.Add("مبلغ نهایی (بدهکار)", typeof(string));
-		dt.Columns.Add("مبلغ نهایی (بستانکار)", typeof(string));
+		DataTable datatableReturn = new();
+		datatableReturn.TableName = "فروش";
+		datatableReturn.Columns.Add("کد", typeof(string));
+		datatableReturn.Columns.Add("تاریخ", typeof(string));
+		datatableReturn.Columns.Add("عنوان ", typeof(string));
+		datatableReturn.Columns.Add("شماره سفارش", typeof(string));
+		datatableReturn.Columns.Add("بستانکار", typeof(long));
+		datatableReturn.Columns.Add("بدهکار", typeof(long));
+		datatableReturn.Columns.Add("تخفیف بستانکار", typeof(long));
+		datatableReturn.Columns.Add("تخفیف بدهکار", typeof(long));
+		datatableReturn.Columns.Add("مبلغ نهایی بستانکار", typeof(int));
+		datatableReturn.Columns.Add("مبلغ نهایی بدهکار", typeof(long));
+		datatableReturn.Columns.Add("توضیحات", typeof(string));
 		
 		foreach (TransactionEntity e in list) {
-			dt.Rows.Add("فروش", "فروش", "", "", "", "", "", "");
+			if (e.Tags.Contains(TagTransaction.Sell)) {
+				string code = e.Code ?? "";
+				string date = e.CreatedAt.ToString(CultureInfo.InvariantCulture);
+				string title = e.Order?.OrderDetails?.Select(x => x.Product.Title).ToString();
+				string orderCode = (e.Order?.OrderNumber ?? 0).ToString();
+				long bestankar = e.Amount ?? 0;
+				long bedehkar = 0;
+				long takhfifBestankar = 0;
+				long takhfifBedehkar = 0;
+				long finalPriceBestankar =  e.Amount ?? 0;
+				long finalPriceBedehkar = 0;
+				string description = "فروش به مبلغ " + (e.Amount ?? 0);
+			
+				datatableSell.Rows.Add(
+					code,
+					date,
+					title,
+					orderCode,
+					bestankar,
+					bedehkar,
+					takhfifBestankar,
+					takhfifBedehkar,
+					finalPriceBestankar,
+					finalPriceBedehkar,
+					description
+				);
+			}
+			else if (e.Tags.Contains(TagTransaction.Return)) {
+				string code = e.Code ?? "";
+				string date = e.CreatedAt.ToString(CultureInfo.InvariantCulture);
+				string title = e.Order?.OrderDetails?.Select(x => x.Product.Title).ToString();
+				string orderCode = (e.Order?.OrderNumber ?? 0).ToString();
+				long bestankar = 0;
+				long bedehkar = e.Amount ?? 0;
+				long takhfifBestankar = 0;
+				long takhfifBedehkar = 0;
+				long finalPriceBestankar =  e.Amount ?? 0;
+				long finalPriceBedehkar = e.Amount ?? 0;
+				string description = "برگشت از فروش به مبلغ " + (e.Amount ?? 0);
+			
+				datatableReturn.Rows.Add(
+					code,
+					date,
+					title,
+					orderCode,
+					bestankar,
+					bedehkar,
+					takhfifBestankar,
+					takhfifBedehkar,
+					finalPriceBestankar,
+					finalPriceBedehkar,
+					description
+				);
+			}
 		}
 		
 		XLWorkbook wb = new();
-		wb.AddWorksheet(dt, "فروش"); 
-		wb.SaveAs("hello.xlsx");
+		wb.AddWorksheet(datatableSell, "فروش");
+		wb.AddWorksheet(datatableReturn, "برگشت از فروش");
+		wb.SaveAs(Path.Combine(env.WebRootPath, "Report", Guid.NewGuid() + ".xlsx"));
 	}
 }
