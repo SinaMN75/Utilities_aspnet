@@ -1,3 +1,6 @@
+using System.Data;
+using ClosedXML.Excel;
+
 namespace Utilities_aspnet.Repositories;
 
 public interface ITransactionRepository {
@@ -7,7 +10,7 @@ public interface ITransactionRepository {
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 }
 
-public class TransactionRepository(DbContext dbContext) : ITransactionRepository {
+public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env) : ITransactionRepository {
 
 	public async Task<GenericResponse<TransactionEntity>> Create(TransactionCreateDto dto, CancellationToken ct) {
 		TransactionEntity e = new() {
@@ -105,5 +108,33 @@ public class TransactionRepository(DbContext dbContext) : ITransactionRepository
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
 
 		return new GenericResponse<IQueryable<TransactionEntity>>(q.AsSingleQuery());
+	}
+
+	private void GenerateExcel(IEnumerable<TransactionEntity> list) {
+		string webRoot = env.WebRootPath;
+		string path = Path.Combine(webRoot, "Report", Guid.NewGuid().ToString());
+		string uploadDir = Path.Combine(webRoot, "Report");
+		
+		DataTable dt = new();
+		dt.TableName = "فروش";
+		dt.Columns.Add("نوع", typeof(string));
+		dt.Columns.Add("عنوان", typeof(string));
+		dt.Columns.Add("توضیحات", typeof(string));
+		dt.Columns.Add("تعداد", typeof(string));
+		dt.Columns.Add("مبلغ محاسبه شده (بدهکار) ", typeof(string));
+		dt.Columns.Add("مبلغ محاسبه شده (بستانکار)", typeof(string));
+		dt.Columns.Add("تخفیف محاسبه شده (بدهکار)", typeof(string));
+		dt.Columns.Add("تخفیف محاسبه شده (بستانکار)", typeof(string));
+		dt.Columns.Add("تخفیف درصدی", typeof(string));
+		dt.Columns.Add("مبلغ نهایی (بدهکار)", typeof(string));
+		dt.Columns.Add("مبلغ نهایی (بستانکار)", typeof(string));
+		
+		foreach (TransactionEntity e in list) {
+			dt.Rows.Add("فروش", "فروش", "", "", "", "", "", "");
+		}
+		
+		XLWorkbook wb = new();
+		wb.AddWorksheet(dt, "فروش"); 
+		wb.SaveAs("hello.xlsx");
 	}
 }

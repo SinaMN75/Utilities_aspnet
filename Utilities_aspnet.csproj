@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <PackageReference Include="AWSSDK.S3" Version="3.7.303" />
+        <PackageReference Include="ClosedXML" Version="0.102.2" />
         <PackageReference Include="EPPlus" Version="7.0.2" />
         <PackageReference Include="Geolocation" Version="1.2.1" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />
