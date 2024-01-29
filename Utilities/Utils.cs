@@ -1,4 +1,6 @@
-﻿namespace Utilities_aspnet.Utilities;
+﻿using Microsoft.Extensions.Logging;
+
+namespace Utilities_aspnet.Utilities;
 
 public static class StartupExtension {
 	public static void SetupUtilities<T>(
@@ -26,6 +28,8 @@ public static class StartupExtension {
 		UtilitiesDatabaseType databaseType,
 		string? redisConnectionString
 	) where T : DbContext {
+		builder.Logging.AddRinLogger();
+		builder.Services.AddRin();
 		builder.Services.AddOptions();
 		builder.Services.AddUtilitiesOutputCache("appSetting", TimeSpan.FromHours(24), false);
 		builder.Services.AddUtilitiesOutputCache("content", TimeSpan.FromHours(24), false);
@@ -169,6 +173,7 @@ public static class StartupExtension {
 
 	public static void UseUtilitiesServices(this WebApplication app) {
 		app.UseCors(option => option.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+		app.UseRin();
 		app.UseRateLimiter();
 		app.UseOutputCache();
 		app.UseDeveloperExceptionPage();
@@ -181,6 +186,8 @@ public static class StartupExtension {
 		});
 		app.UseAuthentication();
 		app.UseAuthorization();
+		
+		app.UseRinDiagnosticsHandler();
 
 		//Encrypt/Decrypt
 		//app.UseMiddleware<EncryptionMiddleware>();
