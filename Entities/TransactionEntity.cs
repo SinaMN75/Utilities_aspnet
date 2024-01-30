@@ -70,4 +70,6 @@ public class TransactionFilterDto {
 	public string? SellerId { get; set; }
 	public string? Code { get; set; }
 	public Guid? OrderId { get; set; }
+	public DateTime? DateTimeStart { get; set; }
+	public DateTime? DateTimeEnd { get; set; }
 }

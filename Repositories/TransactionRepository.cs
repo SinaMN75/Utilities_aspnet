@@ -47,7 +47,7 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 
 
 	public GenericResponse<IQueryable<TransactionEntity>> Filter(TransactionFilterDto dto) {
-		IQueryable<TransactionEntity> q = dbContext.Set<TransactionEntity>().AsNoTracking().OrderBy(x => x.CreatedAt)
+		IQueryable<TransactionEntity> q = dbContext.Set<TransactionEntity>().AsNoTracking().OrderByDescending(x => x.CreatedAt)
 			.Select(x => new TransactionEntity {
 				Id = x.Id,
 				CreatedAt = x.CreatedAt,
@@ -101,6 +101,9 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 					}
 					: x.Order
 			});
+		if (dto.RefId.IsNotNullOrEmpty()) q = q.Where(x => x.RefId == dto.RefId);
+		if (dto.DateTimeStart.HasValue) q = q.Where(x => x.CreatedAt > dto.DateTimeStart);
+		if (dto.DateTimeEnd.HasValue) q = q.Where(x => x.CreatedAt < dto.DateTimeEnd);
 		if (dto.RefId.IsNotNullOrEmpty()) q = q.Where(x => x.RefId == dto.RefId);
 		if (dto.BuyerId.IsNotNullOrEmpty()) q = q.Where(x => x.BuyerId == dto.BuyerId);
 		if (dto.SellerId.IsNotNullOrEmpty()) q = q.Where(x => x.BuyerId == dto.SellerId);
