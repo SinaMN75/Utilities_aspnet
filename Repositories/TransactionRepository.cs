@@ -21,7 +21,7 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 			BuyerId = dto.BuyerId,
 			SellerId = dto.SellerId,
 			OrderId = dto.OrderId,
-			SubscriptionId = dto.SubscriptionId
+			SubscriptionId = dto.SubscriptionId,
 		};
 		await dbContext.Set<TransactionEntity>().AddAsync(e, ct);
 		await dbContext.SaveChangesAsync(ct);

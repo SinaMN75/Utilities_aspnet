@@ -13,11 +13,18 @@ public class PaymentRepository : IPaymentRepository {
 	private readonly AppSettings _appSettings = new();
 	private readonly DbContext _dbContext;
 	private readonly string? _userId;
+	private readonly ITransactionRepository _transactionRepository;
 
-	public PaymentRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IConfiguration config) {
+	public PaymentRepository(
+		DbContext dbContext,
+		IHttpContextAccessor httpContextAccessor,
+		IConfiguration config,
+		ITransactionRepository transactionRepository
+	) {
 		_dbContext = dbContext;
 		config.GetSection("AppSettings").Bind(_appSettings);
 		_userId = httpContextAccessor.HttpContext?.User.Identity?.Name;
+		_transactionRepository = transactionRepository;
 	}
 
 	public async Task<GenericResponse<string?>> PayOrder(Guid orderId) {
@@ -32,7 +39,7 @@ public class PaymentRepository : IPaymentRepository {
 				RestRequest request = new(Method.POST);
 				request.AddParameter("MerchantID", _appSettings.PaymentSettings.Id!);
 				request.AddParameter("Amount", order.TotalPrice!);
-				request.AddParameter("CallbackURL", callbackUrl); 
+				request.AddParameter("CallbackURL", callbackUrl);
 				await new RestClient("https://paymentpol.com/webservice/rest/PaymentRequest").ExecuteAsync(request);
 				break;
 			}
@@ -97,25 +104,16 @@ public class PaymentRepository : IPaymentRepository {
 
 				_dbContext.Update(o);
 
-				await _dbContext.Set<TransactionEntity>().AddAsync(new TransactionEntity {
-					Amount = o.TotalPrice,
-					Descriptions = $"خرید",
+				await _transactionRepository.Create(new TransactionCreateDto {
+					Amount = o.TotalPrice ?? 0,
+					Descriptions = "خرید",
 					RefId = refId,
 					CardNumber = cardNumber,
 					Tags = [TagTransaction.Buy],
 					BuyerId = _userId,
+					SellerId = productOwner.Id,
 					OrderId = o.Id
-				});
-
-				await _dbContext.Set<TransactionEntity>().AddAsync(new TransactionEntity {
-					Amount = o.TotalPrice,
-					Descriptions = $"فروش",
-					RefId = refId,
-					CardNumber = cardNumber,
-					Tags = [TagTransaction.Buy],
-					BuyerId = productOwner.Id,
-					OrderId = o.Id
-				});
+				}, CancellationToken.None);
 
 				await _dbContext.SaveChangesAsync();
 				return new GenericResponse();
@@ -167,7 +165,7 @@ public class PaymentRepository : IPaymentRepository {
 						_dbContext.Set<ProductEntity>().Update(p);
 					}
 				}
-				
+
 				if (o.JsonDetail.ReservationTimes.IsNotNullOrEmpty()) {
 					ProductEntity p = (await _dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == Guid.Parse(o.JsonDetail.ProductId!)))!;
 
@@ -179,25 +177,16 @@ public class PaymentRepository : IPaymentRepository {
 
 				_dbContext.Update(o);
 
-				await _dbContext.Set<TransactionEntity>().AddAsync(new TransactionEntity {
-					Amount = o.TotalPrice,
-					Descriptions = $"خرید",
+				await _transactionRepository.Create(new TransactionCreateDto {
+					Amount = o.TotalPrice ?? 0,
+					Descriptions = "خرید",
 					RefId = refId,
 					CardNumber = cardNumber,
 					Tags = [TagTransaction.Buy],
 					BuyerId = _userId,
+					SellerId = productOwner.Id,
 					OrderId = o.Id
-				});
-
-				await _dbContext.Set<TransactionEntity>().AddAsync(new TransactionEntity {
-					Amount = o.TotalPrice,
-					Descriptions = $"فروش",
-					RefId = refId,
-					CardNumber = cardNumber,
-					Tags = [TagTransaction.Buy],
-					BuyerId = productOwner.Id,
-					OrderId = o.Id
-				});
+				}, CancellationToken.None);
 
 				await _dbContext.SaveChangesAsync();
 				return new GenericResponse();
