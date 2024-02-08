@@ -5,23 +5,23 @@ namespace Utilities_aspnet.Repositories;
 
 public interface ITransactionRepository {
 	GenericResponse<IQueryable<TransactionEntity>> Filter(TransactionFilterDto dto);
-	Task<GenericResponse<List<string>>> GenerateReport(TransactionFilterDto dto);
+	Task<GenericResponse<List<MediaEntity>>> GenerateReport(TransactionFilterDto dto);
 	Task<GenericResponse<TransactionEntity>> Create(TransactionCreateDto dto, CancellationToken ct);
 	Task<GenericResponse<TransactionEntity>> Update(TransactionUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 }
 
 public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env) : ITransactionRepository {
-	public async Task<GenericResponse<List<string>>> GenerateReport(TransactionFilterDto dto) {
+	public async Task<GenericResponse<List<MediaEntity>>> GenerateReport(TransactionFilterDto dto) {
 		IQueryable<TransactionEntity> q = Filter(dto).Result!;
 
 		List<TransactionEntity> list = await q.ToListAsync();
 		List<List<TransactionEntity>> i = list.GroupBy(x => x.SellerId).Select(x => x.ToList()).ToList();
 
-		List<string> generatedFiles = [];
-		foreach (List<TransactionEntity> transactionEntities in i) generatedFiles.Add(GenerateExcel(transactionEntities));
+		List<MediaEntity> generatedFiles = [];
+		foreach (List<TransactionEntity> transactionEntities in i) generatedFiles.Add(new MediaEntity { FileName = GenerateExcel(transactionEntities) });
 
-		return new GenericResponse<List<string>>(generatedFiles);
+		return new GenericResponse<List<MediaEntity>>(generatedFiles);
 	}
 
 	public async Task<GenericResponse<TransactionEntity>> Create(TransactionCreateDto dto, CancellationToken ct) {
@@ -277,10 +277,11 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 		wb.AddWorksheet(datatableSuratHesab, "صورت حساب");
 		wb.SaveAs(
 			Path.Combine(env.WebRootPath,
+				"Media",
 				"Report",
 				$"{list.First().Seller?.FirstName} {list.First().Seller?.LastName} {DateTime.Now.Year}-{DateTime.Now.Month}-{DateTime.Now.Day}" + ".xlsx"
 			)
 		);
-		return $"{Server.ServerAddress}/Report/" + $"{list.First().Seller?.FirstName} {list.First().Seller?.LastName} {DateTime.Now.Year}-{DateTime.Now.Month}-{DateTime.Now.Day}" + ".xlsx";
+		return $"{list.First().Seller?.FirstName} {list.First().Seller?.LastName} {DateTime.Now.Year}-{DateTime.Now.Month}-{DateTime.Now.Day}" + ".xlsx";
 	}
 }
