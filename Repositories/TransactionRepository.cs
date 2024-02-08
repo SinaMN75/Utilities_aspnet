@@ -277,7 +277,7 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 		wb.AddWorksheet(datatableSuratHesab, "صورت حساب");
 		wb.SaveAs(
 			Path.Combine(env.WebRootPath,
-				"Media",
+				"Medias",
 				"Report",
 				$"{list.First().Seller?.FirstName} {list.First().Seller?.LastName} {DateTime.Now.Year}-{DateTime.Now.Month}-{DateTime.Now.Day}" + ".xlsx"
 			)
