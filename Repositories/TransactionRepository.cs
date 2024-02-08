@@ -282,6 +282,6 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 				$"{list.First().Seller?.FirstName} {list.First().Seller?.LastName} {DateTime.Now.Year}-{DateTime.Now.Month}-{DateTime.Now.Day}" + ".xlsx"
 			)
 		);
-		return $"{list.First().Seller?.FirstName} {list.First().Seller?.LastName} {DateTime.Now.Year}-{DateTime.Now.Month}-{DateTime.Now.Day}" + ".xlsx";
+		return $"Report/{list.First().Seller?.FirstName} {list.First().Seller?.LastName} {DateTime.Now.Year}-{DateTime.Now.Month}-{DateTime.Now.Day}" + ".xlsx";
 	}
 }
