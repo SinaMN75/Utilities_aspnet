@@ -5,24 +5,23 @@ namespace Utilities_aspnet.Repositories;
 
 public interface ITransactionRepository {
 	GenericResponse<IQueryable<TransactionEntity>> Filter(TransactionFilterDto dto);
-	Task<GenericResponse<IQueryable<TransactionEntity>>> GenerateReport(TransactionFilterDto dto);
+	Task<GenericResponse<List<string>>> GenerateReport(TransactionFilterDto dto);
 	Task<GenericResponse<TransactionEntity>> Create(TransactionCreateDto dto, CancellationToken ct);
 	Task<GenericResponse<TransactionEntity>> Update(TransactionUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 }
 
 public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env) : ITransactionRepository {
-	public async Task<GenericResponse<IQueryable<TransactionEntity>>> GenerateReport(TransactionFilterDto dto) {
+	public async Task<GenericResponse<List<string>>> GenerateReport(TransactionFilterDto dto) {
 		IQueryable<TransactionEntity> q = Filter(dto).Result!;
 
 		List<TransactionEntity> list = await q.ToListAsync();
 		List<List<TransactionEntity>> i = list.GroupBy(x => x.SellerId).Select(x => x.ToList()).ToList();
 
-		foreach (List<TransactionEntity> transactionEntities in i) {
-			GenerateExcel(transactionEntities);
-		}
+		List<string> generatedFiles = [];
+		foreach (List<TransactionEntity> transactionEntities in i) generatedFiles.Add(GenerateExcel(transactionEntities));
 
-		return new GenericResponse<IQueryable<TransactionEntity>>(q);
+		return new GenericResponse<List<string>>(generatedFiles);
 	}
 
 	public async Task<GenericResponse<TransactionEntity>> Create(TransactionCreateDto dto, CancellationToken ct) {
@@ -128,7 +127,7 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 		return new GenericResponse<IQueryable<TransactionEntity>>(q.AsSingleQuery());
 	}
 
-	private void GenerateExcel(List<TransactionEntity> list) {
+	private string GenerateExcel(List<TransactionEntity> list) {
 		DataTable datatableSell = new();
 		datatableSell.TableName = "فروش";
 		datatableSell.Columns.Add("کد", typeof(string));
@@ -278,9 +277,10 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 		wb.AddWorksheet(datatableSuratHesab, "صورت حساب");
 		wb.SaveAs(
 			Path.Combine(env.WebRootPath,
-				$"Report",
-				$"{list.FirstOrDefault()?.Seller?.FirstName} {list.FirstOrDefault()?.Seller?.LastName}" + ".xlsx"
+				"Report",
+				$"{list.First().Seller?.FirstName} {list.First().Seller?.LastName} {DateTime.Now.Year}-{DateTime.Now.Month}-{DateTime.Now.Day}" + ".xlsx"
 			)
 		);
+		return $"{Server.ServerAddress}/Report/" + $"{list.First().Seller?.FirstName} {list.First().Seller?.LastName} {DateTime.Now.Year}-{DateTime.Now.Month}-{DateTime.Now.Day}" + ".xlsx";
 	}
 }

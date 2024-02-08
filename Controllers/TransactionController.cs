@@ -12,7 +12,7 @@ public class TransactionController(ITransactionRepository repository) : BaseApiC
 	public ActionResult<GenericResponse<IQueryable<TransactionEntity>>> Filter(TransactionFilterDto dto) => Result(repository.Filter(dto));
 
 	[HttpPost("GenerateReport")]
-	public async Task<ActionResult<GenericResponse<IQueryable<TransactionEntity>>>> GenerateReport(TransactionFilterDto dto)
+	public async Task<ActionResult<GenericResponse<List<string>>>> GenerateReport(TransactionFilterDto dto)
 		=> Result(await repository.GenerateReport(dto));
 
 	[HttpPut]
