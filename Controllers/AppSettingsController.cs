@@ -11,7 +11,7 @@ public class AppSettingsController(IAppSettingsRepository repository) : BaseApiC
 	[OutputCache(Tags = ["appSetting"])]
 	public async Task<ActionResult<GenericResponse<DashboardReadDto>>> ReadDashboardData() => await repository.ReadDashboardData();
 	
-	[HttpGet("ReadEverything")]
+	[HttpPost("ReadEverything")]
 	[OutputCache(Tags = ["everything"])]
 	public ActionResult<GenericResponse<EverythingReadDto>> ReadEverything(EverythingFilterDto dto) => repository.ReadEverything(dto);
 }
