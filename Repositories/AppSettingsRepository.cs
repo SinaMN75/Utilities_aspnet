@@ -3,7 +3,7 @@ namespace Utilities_aspnet.Repositories;
 public interface IAppSettingsRepository {
 	GenericResponse<EnumDto> ReadAppSettings();
 	Task<GenericResponse<DashboardReadDto>> ReadDashboardData();
-	GenericResponse<EverythingReadDto> ReadEverything(EverythingFilterDto dto);
+	GenericResponse<EverythingReadDto> ReadEverything();
 }
 
 public class AppSettingsRepository(IConfiguration config, DbContext dbContext) : IAppSettingsRepository {
@@ -55,18 +55,14 @@ public class AppSettingsRepository(IConfiguration config, DbContext dbContext) :
 			NotAcceptedProducts = await dbContext.Set<ProductEntity>().AsNoTracking().Where(x => x.Tags!.Contains(TagProduct.NotAccepted)).CountAsync()
 		});
 
-	public GenericResponse<EverythingReadDto> ReadEverything(EverythingFilterDto dto) =>
+	public GenericResponse<EverythingReadDto> ReadEverything() =>
 		new(new EverythingReadDto() {
-				AppSettings = dto.ShowAppSettings ? ReadAppSettings().Result : null,
-				Categories = dto.ShowCategories
-					? dbContext.Set<CategoryEntity>().AsNoTracking()
-						.Include(x => x.Children)!.ThenInclude(x => x.Media)
-						.Include(x => x.Media)
-					: null,
-				Contents = dto.ShowContents
-					? dbContext.Set<ContentEntity>().AsNoTracking()
-						.Include(x => x.Media)
-					: null,
+				AppSettings = ReadAppSettings().Result,
+				Categories = dbContext.Set<CategoryEntity>().AsNoTracking()
+					.Include(x => x.Children)!.ThenInclude(x => x.Media)
+					.Include(x => x.Media),
+				Contents = dbContext.Set<ContentEntity>().AsNoTracking()
+					.Include(x => x.Media)
 			}
 		);
 }
