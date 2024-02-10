@@ -13,5 +13,5 @@ public class AppSettingsController(IAppSettingsRepository repository) : BaseApiC
 	
 	[HttpGet("ReadEverything")]
 	[OutputCache(Tags = ["everything"])]
-	public ActionResult<GenericResponse<EverythingReadDto>> ReadEverything(EverythingFilterDto dto) => repository.ReadEverything(dto);
+	public ActionResult<GenericResponse<EverythingReadDto>> ReadEverything(EverythingFilterDto dto) => repository.ReadEverything();
 }
