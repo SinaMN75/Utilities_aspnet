@@ -67,12 +67,6 @@ public class AppSettingsRepository(IConfiguration config, DbContext dbContext) :
 					? dbContext.Set<ContentEntity>().AsNoTracking()
 						.Include(x => x.Media)
 					: null,
-				Products = dto.ShowProducts
-					? dbContext.Set<ProductEntity>().AsNoTracking()
-						.Include(x => x.Media)
-						.Include(x => x.User).ThenInclude(x => x!.Media)
-						.Include(x => x.Categories)!.ThenInclude(x => x.Children)
-					: null
 			}
 		);
 }
