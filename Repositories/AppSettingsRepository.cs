@@ -3,6 +3,7 @@ namespace Utilities_aspnet.Repositories;
 public interface IAppSettingsRepository {
 	GenericResponse<EnumDto> ReadAppSettings();
 	Task<GenericResponse<DashboardReadDto>> ReadDashboardData();
+	GenericResponse<EverythingReadDto> ReadEverything(EverythingFilterDto dto);
 }
 
 public class AppSettingsRepository(IConfiguration config, DbContext dbContext) : IAppSettingsRepository {
@@ -39,8 +40,8 @@ public class AppSettingsRepository(IConfiguration config, DbContext dbContext) :
 		);
 	}
 
-	public async Task<GenericResponse<DashboardReadDto>> ReadDashboardData() {
-		DashboardReadDto dto = new() {
+	public async Task<GenericResponse<DashboardReadDto>> ReadDashboardData() =>
+		new(new DashboardReadDto() {
 			Categories = await dbContext.Set<CategoryEntity>().AsNoTracking().CountAsync(),
 			Users = await dbContext.Set<UserEntity>().AsNoTracking().CountAsync(),
 			Products = await dbContext.Set<ProductEntity>().AsNoTracking().CountAsync(),
@@ -52,7 +53,26 @@ public class AppSettingsRepository(IConfiguration config, DbContext dbContext) :
 			ReleasedProducts = await dbContext.Set<ProductEntity>().AsNoTracking().Where(x => x.Tags!.Contains(TagProduct.Released)).CountAsync(),
 			InQueueProducts = await dbContext.Set<ProductEntity>().AsNoTracking().Where(x => x.Tags!.Contains(TagProduct.InQueue)).CountAsync(),
 			NotAcceptedProducts = await dbContext.Set<ProductEntity>().AsNoTracking().Where(x => x.Tags!.Contains(TagProduct.NotAccepted)).CountAsync()
-		};
-		return new GenericResponse<DashboardReadDto>(dto);
-	}
+		});
+
+	public GenericResponse<EverythingReadDto> ReadEverything(EverythingFilterDto dto) =>
+		new(new EverythingReadDto() {
+				AppSettings = dto.ShowAppSettings ? ReadAppSettings().Result : null,
+				Categories = dto.ShowCategories
+					? dbContext.Set<CategoryEntity>().AsNoTracking()
+						.Include(x => x.Children)!.ThenInclude(x => x.Media)
+						.Include(x => x.Media)
+					: null,
+				Contents = dto.ShowContents
+					? dbContext.Set<ContentEntity>().AsNoTracking()
+						.Include(x => x.Media)
+					: null,
+				Products = dto.ShowProducts
+					? dbContext.Set<ProductEntity>().AsNoTracking()
+						.Include(x => x.Media)
+						.Include(x => x.User).ThenInclude(x => x!.Media)
+						.Include(x => x.Categories)!.ThenInclude(x => x.Children)
+					: null
+			}
+		);
 }

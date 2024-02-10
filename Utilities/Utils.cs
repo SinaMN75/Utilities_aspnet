@@ -31,6 +31,7 @@ public static class StartupExtension {
 		builder.Logging.AddRinLogger();
 		builder.Services.AddRin();
 		builder.Services.AddOptions();
+		builder.Services.AddUtilitiesOutputCache("everything", TimeSpan.FromHours(2), false);
 		builder.Services.AddUtilitiesOutputCache("appSetting", TimeSpan.FromHours(24), false);
 		builder.Services.AddUtilitiesOutputCache("content", TimeSpan.FromHours(24), false);
 		builder.Services.AddUtilitiesOutputCache("category", TimeSpan.FromHours(1), false);

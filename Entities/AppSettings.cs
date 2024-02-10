@@ -127,3 +127,17 @@ public class DashboardReadDto {
 	public int InQueueProducts { get; set; }
 	public int NotAcceptedProducts { get; set; }
 }
+
+public class EverythingReadDto {
+	public IEnumerable<ProductEntity>? Products { get; set; }
+	public IEnumerable<CategoryEntity>? Categories { get; set; }
+	public IEnumerable<ContentEntity>? Contents { get; set; }
+	public EnumDto? AppSettings { get; set; }
+}
+
+public class EverythingFilterDto {
+	public bool ShowProducts { get; set; }
+	public bool ShowCategories { get; set; }
+	public bool ShowContents { get; set; }
+	public bool ShowAppSettings { get; set; }
+}
