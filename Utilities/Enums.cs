@@ -386,6 +386,8 @@ public enum TagProduct {
 	Reserve = 176,
 	MicroBlog = 177,
 	DeliveryCost = 178,
+	Journal = 179,
+	Link = 180,
 	New = 201,
 	KindOfNew = 202,
 	Used = 203,
