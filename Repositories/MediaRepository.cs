@@ -51,7 +51,10 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 					Size = model.Size,
 					Time = model.Time,
 					Artist = model.Artist,
-					Album = model.Album
+					Album = model.Album,
+					Link1 = model.Link1,
+					Link2 = model.Link2,
+					Link3 = model.Link3,
 				}
 			};
 			await dbContext.Set<MediaEntity>().AddAsync(media);
@@ -82,7 +85,10 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 					         Size = model.Size,
 					         Time = model.Time,
 					         Artist = model.Artist,
-					         Album = model.Album
+					         Album = model.Album,
+					         Link1 = model.Link1,
+					         Link2 = model.Link2,
+					         Link3 = model.Link3,
 				         }
 			         })) {
 				await dbContext.Set<MediaEntity>().AddAsync(media);
@@ -144,6 +150,9 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 		media.JsonDetail.Time = model.Time ?? media.JsonDetail.Time;
 		media.JsonDetail.Artist = model.Artist ?? media.JsonDetail.Artist;
 		media.JsonDetail.Album = model.Album ?? media.JsonDetail.Album;
+		media.JsonDetail.Link1 = model.Link1 ?? media.JsonDetail.Link1;
+		media.JsonDetail.Link2 = model.Link2 ?? media.JsonDetail.Link2;
+		media.JsonDetail.Link3 = model.Link3 ?? media.JsonDetail.Link3;
 		media.UpdatedAt = DateTime.UtcNow;
 		media.Tags = model.Tags ?? media.Tags;
 		media.Order = model.Order ?? media.Order;

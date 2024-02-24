@@ -127,6 +127,9 @@ public class MediaJsonDetail {
 	public string? Time { get; set; }
 	public string? Artist { get; set; }
 	public string? Album { get; set; }
+	public string? Link1 { get; set; }
+	public string? Link2 { get; set; }
+	public string? Link3 { get; set; }
 	public PrivacyType? IsPrivate { get; set; }
 }
 
@@ -152,6 +155,9 @@ public class UploadDto {
 	public IEnumerable<string>? Links { get; set; }
 	public IFormFile? File { get; set; }
 	public List<TagMedia>? Tags { get; set; }
+	public string? Link1 { get; set; }
+	public string? Link2 { get; set; }
+	public string? Link3 { get; set; }
 }
 
 public class UpdateMediaDto {
@@ -162,6 +168,9 @@ public class UpdateMediaDto {
 	public string? Artist { get; set; }
 	public string? Album { get; set; }
 	public int? Order { get; set; }
+	public string? Link1 { get; set; }
+	public string? Link2 { get; set; }
+	public string? Link3 { get; set; }
 	public List<TagMedia>? Tags { get; set; }
 	public List<TagMedia>? RemoveTags { get; set; }
 	public List<TagMedia>? AddTags { get; set; }
