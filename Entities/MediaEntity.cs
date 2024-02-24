@@ -11,6 +11,12 @@ public class MediaEntity : BaseEntity {
 
 	[MaxLength(100)]
 	public List<TagMedia>? Tags { get; set; } = new();
+	
+	public Guid? ParentId { get; set; }
+	public MediaEntity? Parent { get; set; }
+
+	[InverseProperty("Parent")]
+	public IEnumerable<MediaEntity>? Children { get; set; }
 
 	[NotMapped]
 	public string Url => $"{Server.ServerAddress}/Medias/{FileName}";
@@ -116,6 +122,7 @@ public class MediaEntity : BaseEntity {
 
 public class MediaJsonDetail {
 	public string? Title { get; set; }
+	public string? Description { get; set; }
 	public string? Size { get; set; }
 	public string? Time { get; set; }
 	public string? Artist { get; set; }
@@ -127,6 +134,7 @@ public class UploadDto {
 	public int? Order { get; set; }
 	public string? UserId { get; set; }
 	public string? Title { get; set; }
+	public string? Description { get; set; }
 	public string? Size { get; set; }
 	public string? Time { get; set; }
 	public string? Artist { get; set; }
@@ -148,6 +156,7 @@ public class UploadDto {
 
 public class UpdateMediaDto {
 	public string? Title { get; set; }
+	public string? Description { get; set; }
 	public string? Size { get; set; }
 	public string? Time { get; set; }
 	public string? Artist { get; set; }

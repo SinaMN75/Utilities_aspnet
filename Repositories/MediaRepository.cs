@@ -46,6 +46,7 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 				Tags = model.Tags,
 				JsonDetail = {
 					Title = model.Title,
+					Description = model.Description,
 					IsPrivate = model.PrivacyType,
 					Size = model.Size,
 					Time = model.Time,
@@ -76,6 +77,7 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 				         Tags = model.Tags,
 				         JsonDetail = {
 					         Title = model.Title,
+					         Description = model.Description,
 					         IsPrivate = model.PrivacyType,
 					         Size = model.Size,
 					         Time = model.Time,
@@ -137,6 +139,7 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 			throw new Exception("media is not found");
 
 		media.JsonDetail.Title = model.Title ?? media.JsonDetail.Title;
+		media.JsonDetail.Description = model.Description ?? media.JsonDetail.Description;
 		media.JsonDetail.Size = model.Size ?? media.JsonDetail.Size;
 		media.JsonDetail.Time = model.Time ?? media.JsonDetail.Time;
 		media.JsonDetail.Artist = model.Artist ?? media.JsonDetail.Artist;
