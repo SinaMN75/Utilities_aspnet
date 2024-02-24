@@ -77,6 +77,7 @@ public class ContentRepository(DbContext dbContext, IMediaRepository mediaReposi
 		e.JsonDetail.SoundCloud = dto.SoundCloud ?? e.JsonDetail.SoundCloud;
 		e.JsonDetail.Email1 = dto.Email1 ?? e.JsonDetail.Email1;
 		e.JsonDetail.Email2 = dto.Email2 ?? e.JsonDetail.Email2;
+		e.JsonDetail.Website = dto.Website ?? e.JsonDetail.Website;
 
 		if (dto.RemoveTags.IsNotNullOrEmpty()) dto.RemoveTags!.ForEach(item => e.Tags.Remove(item));
 		if (dto.AddTags.IsNotNullOrEmpty()) e.Tags.AddRange(dto.AddTags!);
