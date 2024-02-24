@@ -131,6 +131,7 @@ public class DashboardReadDto {
 public class EverythingReadDto {
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
 	public IEnumerable<ContentEntity>? Contents { get; set; }
+	public IEnumerable<ProductEntity>? Products { get; set; }
 	public EnumDto? AppSettings { get; set; }
 }
 
@@ -138,4 +139,5 @@ public class EverythingFilterDto {
 	public bool ShowCategories { get; set; }
 	public bool ShowContents { get; set; }
 	public bool ShowAppSettings { get; set; }
+	public bool ShowProducts { get; set; }
 }

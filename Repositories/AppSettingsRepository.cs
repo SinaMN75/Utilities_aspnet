@@ -56,13 +56,17 @@ public class AppSettingsRepository(IConfiguration config, DbContext dbContext) :
 		});
 
 	public GenericResponse<EverythingReadDto> ReadEverything() =>
-		new(new EverythingReadDto() {
+		new(new EverythingReadDto {
 				AppSettings = ReadAppSettings().Result,
 				Categories = dbContext.Set<CategoryEntity>().AsNoTracking()
 					.Include(x => x.Children)!.ThenInclude(x => x.Media)
 					.Include(x => x.Media),
 				Contents = dbContext.Set<ContentEntity>().AsNoTracking()
-					.Include(x => x.Media)
+					.Include(x => x.Media),
+				Products = dbContext.Set<ProductEntity>()
+					.Include(x => x.Media)!.ThenInclude(x => x.Children)
+					.Include(x => x.Categories)!.ThenInclude(x => x.Children)
+					.Include(x => x.Comments)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
 			}
 		);
 }
