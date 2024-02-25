@@ -15,7 +15,7 @@ public class MediaController(IMediaRepository repository) : BaseApiController {
 	[Authorize]
 	public async Task<ActionResult<GenericResponse>> Delete(Guid id) => Result(await repository.Delete(id));
 
-	[HttpPut("{id:guid}")]
+	[HttpPut]
 	[Authorize]
 	public async Task<ActionResult<GenericResponse<MediaEntity>>> Update(UpdateMediaDto updateMediaDto) => Result(await repository.Update(updateMediaDto));
 }
