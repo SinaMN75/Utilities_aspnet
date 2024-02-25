@@ -3,7 +3,7 @@
 public interface IMediaRepository {
 	Task<GenericResponse<IEnumerable<MediaEntity>?>> Upload(UploadDto model);
 	Task<GenericResponse<IEnumerable<MediaEntity>?>> Filter(MediaFilterDto dto);
-	Task<GenericResponse<MediaEntity?>> Update(Guid id, UpdateMediaDto model);
+	Task<GenericResponse<MediaEntity?>> Update(UpdateMediaDto model);
 	Task<GenericResponse> Delete(Guid id);
 	Task DeleteMedia(IEnumerable<MediaEntity?>? media);
 }
@@ -139,8 +139,8 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 		}
 	}
 
-	public async Task<GenericResponse<MediaEntity?>> Update(Guid id, UpdateMediaDto model) {
-		MediaEntity? media = await dbContext.Set<MediaEntity>().FirstOrDefaultAsync(x => x.Id == id);
+	public async Task<GenericResponse<MediaEntity?>> Update(UpdateMediaDto model) {
+		MediaEntity? media = await dbContext.Set<MediaEntity>().FirstOrDefaultAsync(x => x.Id == model.Id);
 		if (media is null)
 			throw new Exception("media is not found");
 
