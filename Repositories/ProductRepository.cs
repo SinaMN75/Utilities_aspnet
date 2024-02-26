@@ -91,7 +91,7 @@ public class ProductRepository(
 		if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(x => x.Children);
 		if (dto.ShowComments.IsTrue()) q = q.Include(i => i.Comments!.Where(x => x.Parent == null));
 		if (dto.ShowCategoryMedia.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.Media);
-		if (dto.ShowMedia.IsTrue()) q = q.Include(i => i.Media)!.ThenInclude(i => i.Children);
+		if (dto.ShowMedia.IsTrue()) q = q.Include(i => i.Media!.Where(j => j.ProductId == null)).ThenInclude(i => i.Children);
 		if (dto.ShowVisitProducts.IsTrue()) q = q.Include(i => i.VisitProducts);
 		if (dto.OrderByVotes.IsTrue()) q = q.OrderBy(x => x.VoteCount);
 		if (dto.OrderByVotesDescending.IsTrue()) q = q.OrderByDescending(x => x.VoteCount);
@@ -160,7 +160,7 @@ public class ProductRepository(
 
 	public async Task<GenericResponse<ProductEntity?>> ReadById(Guid id, CancellationToken ct) {
 		ProductEntity? i = await dbContext.Set<ProductEntity>()
-			.Include(i => i.Media)!.ThenInclude(i => i.Children)
+			.Include(i => i.Media!.Where(j => j.ProductId == null)).ThenInclude(i => i.Children)
 			.Include(i => i.Children)!.ThenInclude(x => x.Media)
 			.Include(i => i.Categories)!.ThenInclude(x => x.Media)
 			.Include(i => i.User).ThenInclude(x => x!.Media)
