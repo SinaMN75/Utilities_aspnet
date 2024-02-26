@@ -12,26 +12,22 @@ public interface IProductRepository {
 	Task<GenericResponse<IQueryable<CustomersPaymentPerProduct>?>> GetMyCustomersPerProduct(Guid id);
 }
 
-public class ProductRepository(DbContext dbContext,
-		IHttpContextAccessor httpContextAccessor,
-		IMediaRepository mediaRepository,
-		IUserRepository userRepository,
-		IConfiguration config,
-		IPromotionRepository promotionRepository,
-		IFollowBookmarkRepository followBookMark,
-		ICommentRepository commentRepository
-	)
+public class ProductRepository(
+	DbContext dbContext,
+	IHttpContextAccessor httpContextAccessor,
+	IMediaRepository mediaRepository,
+	IUserRepository userRepository,
+	IConfiguration config,
+	IPromotionRepository promotionRepository,
+	IFollowBookmarkRepository followBookMark,
+	ICommentRepository commentRepository
+)
 	: IProductRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	public async Task<GenericResponse<ProductEntity?>> Create(ProductCreateUpdateDto dto, CancellationToken ct) {
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
-
-		//TagProduct tagProduct = getTagProduct(dto);
-		//Tuple<bool, UtilitiesStatusCodes> overUsedCheck =
-		//    Utils.IsUserOverused(dbContext, _userId, CallerType.CreateProduct, null, tagProduct.HasFlag(TagProduct.None) ? null : tagProduct, null, appSettings.UsageRulesBeforeUpgrade, appSettings.UsageRulesAfterUpgrade);
-		//if (overUsedCheck.Item1) return new GenericResponse<ProductEntity?>(null, overUsedCheck.Item2);
 
 		if (dto.ProductInsight is not null) dto.ProductInsight.UserId = _userId;
 
@@ -95,7 +91,7 @@ public class ProductRepository(DbContext dbContext,
 		if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(x => x.Children);
 		if (dto.ShowComments.IsTrue()) q = q.Include(i => i.Comments!.Where(x => x.Parent == null));
 		if (dto.ShowCategoryMedia.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.Media);
-		if (dto.ShowMedia.IsTrue()) q = q.Include(i => i.Media);
+		if (dto.ShowMedia.IsTrue()) q = q.Include(i => i.Media)!.ThenInclude(i => i.Children);
 		if (dto.ShowVisitProducts.IsTrue()) q = q.Include(i => i.VisitProducts);
 		if (dto.OrderByVotes.IsTrue()) q = q.OrderBy(x => x.VoteCount);
 		if (dto.OrderByVotesDescending.IsTrue()) q = q.OrderByDescending(x => x.VoteCount);
@@ -164,7 +160,7 @@ public class ProductRepository(DbContext dbContext,
 
 	public async Task<GenericResponse<ProductEntity?>> ReadById(Guid id, CancellationToken ct) {
 		ProductEntity? i = await dbContext.Set<ProductEntity>()
-			.Include(i => i.Media)
+			.Include(i => i.Media)!.ThenInclude(i => i.Children)
 			.Include(i => i.Children)!.ThenInclude(x => x.Media)
 			.Include(i => i.Categories)!.ThenInclude(x => x.Media)
 			.Include(i => i.User).ThenInclude(x => x!.Media)
@@ -179,14 +175,14 @@ public class ProductRepository(DbContext dbContext,
 			.FirstOrDefaultAsync(i => i.Id == id, ct);
 		if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound);
 
-			if (i.JsonDetail.VisitCounts is null) i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId ?? "", Count = 1 });
-			else
-				foreach (VisitCount j in i.JsonDetail.VisitCounts ?? new List<VisitCount>()) {
-					if (j.UserId == _userId) j.Count += 1;
-					else {
-						i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId, Count = 0 });
-					}
+		if (i.JsonDetail.VisitCounts is null) i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId ?? "", Count = 1 });
+		else
+			foreach (VisitCount j in i.JsonDetail.VisitCounts ?? new List<VisitCount>()) {
+				if (j.UserId == _userId) j.Count += 1;
+				else {
+					i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId, Count = 0 });
 				}
+			}
 
 		if (_userId.IsNotNullOrEmpty()) {
 			UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId, ct);
@@ -358,25 +354,6 @@ public class ProductRepository(DbContext dbContext,
 			.ToList();
 
 		return new GenericResponse<IQueryable<CustomersPaymentPerProduct>?>(result.AsQueryable());
-	}
-
-	private static TagProduct getTagProduct(ProductCreateUpdateDto dto) {
-		try {
-			List<TagProduct>? tags = dto.Tags;
-			dto?.RemoveTags?.ForEach(f => tags?.Remove(f));
-			if (dto?.AddTags?.Any() ?? false) tags?.AddRange(dto.AddTags);
-			TagProduct tagProduct = TagProduct.None;
-			if (tags!.Contains(TagProduct.Product)) tagProduct = TagProduct.Product;
-			else if (tags.Contains(TagProduct.MicroBlog)) tagProduct = TagProduct.MicroBlog;
-			else if (tags.Contains(TagProduct.AdEmployee)) tagProduct = TagProduct.AdEmployee;
-			else if (tags.Contains(TagProduct.AdHiring)) tagProduct = TagProduct.AdHiring;
-			else if (tags.Contains(TagProduct.AdProject)) tagProduct = TagProduct.AdProject;
-			else tagProduct = TagProduct.None;
-			return tagProduct;
-		}
-		catch (Exception) {
-			return TagProduct.None;
-		}
 	}
 }
 

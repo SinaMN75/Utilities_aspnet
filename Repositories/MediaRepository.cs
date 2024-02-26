@@ -43,6 +43,7 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 				NotificationId = model.NotificationId,
 				GroupChatId = model.GroupChatId,
 				GroupChatMessageId = model.GroupChatMessageId,
+				ParentId = model.ParentId,
 				Tags = model.Tags,
 				JsonDetail = {
 					Title = model.Title,
@@ -140,7 +141,9 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 	}
 
 	public async Task<GenericResponse<MediaEntity?>> Update(UpdateMediaDto model) {
-		MediaEntity media = (await dbContext.Set<MediaEntity>().FirstOrDefaultAsync(x => x.Id == model.Id))!;
+		MediaEntity? media = await dbContext.Set<MediaEntity>().FirstOrDefaultAsync(x => x.Id == model.Id);
+		if (media is null)
+			throw new Exception("media is not found");
 
 		media.JsonDetail.Title = model.Title ?? media.JsonDetail.Title;
 		media.JsonDetail.Description = model.Description ?? media.JsonDetail.Description;

@@ -11,7 +11,7 @@ public class MediaEntity : BaseEntity {
 
 	[MaxLength(100)]
 	public List<TagMedia>? Tags { get; set; } = new();
-	
+
 	public Guid? ParentId { get; set; }
 	public MediaEntity? Parent { get; set; }
 
@@ -152,6 +152,7 @@ public class UploadDto {
 	public Guid? GroupChatId { get; set; }
 	public Guid? GroupChatMessageId { get; set; }
 	public Guid? BookmarkId { get; set; }
+	public Guid? ParentId { get; set; }
 	public IEnumerable<string>? Links { get; set; }
 	public IFormFile? File { get; set; }
 	public List<TagMedia>? Tags { get; set; }
