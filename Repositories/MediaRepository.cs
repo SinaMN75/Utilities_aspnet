@@ -140,9 +140,7 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 	}
 
 	public async Task<GenericResponse<MediaEntity?>> Update(UpdateMediaDto model) {
-		MediaEntity? media = await dbContext.Set<MediaEntity>().FirstOrDefaultAsync(x => x.Id == model.Id);
-		if (media is null)
-			throw new Exception("media is not found");
+		MediaEntity media = (await dbContext.Set<MediaEntity>().FirstOrDefaultAsync(x => x.Id == model.Id))!;
 
 		media.JsonDetail.Title = model.Title ?? media.JsonDetail.Title;
 		media.JsonDetail.Description = model.Description ?? media.JsonDetail.Description;
