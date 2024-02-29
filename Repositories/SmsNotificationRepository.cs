@@ -84,7 +84,7 @@ public class SmsNotificationRepository(IConfiguration config) : ISmsNotification
 				break;
 			}
 			case "firebase": {
-				await FirebaseDataSource.SendFCMNotification(new FirebaseFcmNotificationCreateDto {
+				await FirebaseDataSource.SendFcmNotification(new FirebaseFcmNotificationCreateDto {
 					ServerKey = setting.Token!,
 					FcmToken = dto.FcmToken!,
 					Title = dto.Title,

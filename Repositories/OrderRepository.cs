@@ -12,7 +12,7 @@ public interface IOrderRepository {
 	Task<GenericResponse<OrderEntity?>> ApplyDiscountCode(ApplyDiscountCodeOnOrderDto dto);
 }
 
-public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor, IConfiguration config) : IOrderRepository {
+public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) : IOrderRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	public async Task<GenericResponse<OrderEntity?>> Update(OrderCreateUpdateDto dto) {

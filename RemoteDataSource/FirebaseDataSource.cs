@@ -11,7 +11,7 @@ public class FirebaseFcmNotificationCreateDto {
 }
 
 public static class FirebaseDataSource {
-	public static async Task<ZibalRequestReadDto?> SendFCMNotification(FirebaseFcmNotificationCreateDto dto) {
+	public static async Task SendFcmNotification(FirebaseFcmNotificationCreateDto dto) {
 		RestRequest request = new("https://fcm.googleapis.com/fcm/send", Method.POST);
 		var body = new {
 			to = dto.FcmToken,
@@ -32,6 +32,5 @@ public static class FirebaseDataSource {
 
 		IRestResponse responseRequest = await new RestClient().ExecuteAsync(request);
 		ZibalRequestReadDto? zibalRequestReadDto = ZibalRequestReadDto.FromJson(responseRequest.Content);
-		return zibalRequestReadDto;
 	}
 }

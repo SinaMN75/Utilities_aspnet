@@ -1,5 +1,3 @@
-using Microsoft.Extensions.Caching.Distributed;
-
 namespace Utilities_aspnet.Utilities;
 
 public static class Redis {

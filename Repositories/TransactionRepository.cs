@@ -1,6 +1,3 @@
-using System.Data;
-using ClosedXML.Excel;
-
 namespace Utilities_aspnet.Repositories;
 
 public interface ITransactionRepository {
@@ -174,7 +171,7 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 			if (e.Tags.Contains(TagTransaction.Sell)) {
 				string code = e.Code ?? "";
 				string date = e.CreatedAt.ToString(CultureInfo.InvariantCulture);
-				string title = e.Order?.OrderDetails?.Select(x => x.Product.Title).ToString();
+				string title = e.Order?.OrderDetails?.Select(x => x.Product!.Title).ToString()!;
 				string orderCode = (e.Order?.OrderNumber ?? 0).ToString();
 				long bestankar = e.Amount ?? 0;
 				long bedehkar = 0;
@@ -201,7 +198,7 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 			else if (e.Tags.Contains(TagTransaction.Return)) {
 				string code = e.Code ?? "";
 				string date = e.CreatedAt.ToString(CultureInfo.InvariantCulture);
-				string title = e.Order?.OrderDetails?.Select(x => x.Product.Title).ToString();
+				string title = e.Order!.OrderDetails!.Select(x => x.Product!.Title).ToString()!;
 				string orderCode = (e.Order?.OrderNumber ?? 0).ToString();
 				long bestankar = 0;
 				long bedehkar = e.Amount ?? 0;

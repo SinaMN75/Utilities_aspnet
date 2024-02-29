@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
-
-namespace Utilities_aspnet.Repositories;
+﻿namespace Utilities_aspnet.Repositories;
 
 public interface IUserRepository {
 	GenericResponse<IQueryable<UserEntity>> Filter(UserFilterDto dto);
