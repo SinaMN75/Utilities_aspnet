@@ -163,6 +163,7 @@ public enum TagTransaction {
 	Recharge = 105,
 	WalletToWallet = 106,
 	Return = 107,
+	Premium = 108,
 	Pending = 200,
 	Fail = 201,
 	Success = 202,

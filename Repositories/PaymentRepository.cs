@@ -140,6 +140,16 @@ public class PaymentRepository : IPaymentRepository {
 						p6 ? DateTime.Now.AddMonths(6) :
 						p12 ? DateTime.Now.AddMonths(12) : DateTime.Now
 				});
+				
+				await _transactionRepository.Create(new TransactionCreateDto {
+					Amount = o.TotalPrice ?? 0,
+					Descriptions = "خرید اشتراک",
+					RefId = refId,
+					CardNumber = cardNumber,
+					Tags = [TagTransaction.Premium],
+					BuyerId = _userId,
+					OrderId = o.Id
+				}, CancellationToken.None);
 				break;
 			}
 		}
