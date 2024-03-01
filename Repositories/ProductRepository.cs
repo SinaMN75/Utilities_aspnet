@@ -84,7 +84,6 @@ public class ProductRepository(
 		if (dto.ShowPostOfPrivateUser != null && !dto.ShowPostOfPrivateUser.Value) {
 			q = q.Include(i => i.User);
 			q = q.Where(w => w.User != null);
-			q = q.Where(w => w.User!.IsPrivate == false);
 		}
 
 		if (dto.ShowChildren.IsTrue()) q = q.Include(i => i.Children)!.ThenInclude(x => x.Media);

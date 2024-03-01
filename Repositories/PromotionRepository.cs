@@ -95,13 +95,7 @@ public class PromotionRepository(DbContext dbContext,
 			.Select(g => new KeyValue { Key = g.Key.Title ?? "", Value = g.Count().ToString() })
 			.ToList();
 
-		List<KeyValue> ageCategoryPerUsers = users
-			.GroupBy(u => u.AgeCategory)
-			.Select(g => new KeyValue { Key = g.Key.ToString()!, Value = g.Count().ToString() })
-			.ToList();
-
 		return new GenericResponse<PromotionDetail?>(new PromotionDetail {
-			AgeCategoryPerUsers = ageCategoryPerUsers,
 			SkillPerUsers = skillPerUsers,
 			StatePerUsers = statePerUsers,
 			TotalSeen = userPerHour

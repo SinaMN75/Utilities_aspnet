@@ -60,15 +60,11 @@ public class UserEntity {
 	public DateTime? Birthdate { get; set; }
 	public DateTime? CreatedAt { get; set; }
 	public DateTime? UpdatedAt { get; set; }
-	public bool? IsOnline { get; set; }
+	public DateTime PremiumExpireDate { get; set; }
 	public bool? Suspend { get; set; }
-	public bool IsPrivate { get; set; } = true;
-	public DateTime? ExpireUpgradeAccount { get; set; }
-	public AgeCategory? AgeCategory { get; set; }
-	public int CommentCount { get; set; }
 	public UserJsonDetail JsonDetail { get; set; } = new();
 
-	public List<TagUser> Tags { get; set; } = new();
+	public List<TagUser> Tags { get; set; } = [];
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }

@@ -55,12 +55,7 @@ public class UserRepository(
 				Birthdate = x.Birthdate,
 				CreatedAt = x.CreatedAt,
 				UpdatedAt = x.UpdatedAt,
-				IsOnline = x.IsOnline,
 				Suspend = x.Suspend,
-				IsPrivate = x.IsPrivate,
-				ExpireUpgradeAccount = x.ExpireUpgradeAccount,
-				AgeCategory = x.AgeCategory,
-				CommentCount = x.CommentCount,
 				JsonDetail = x.JsonDetail,
 				Tags = x.Tags,
 				Media = x.Media!.Select(y => new MediaEntity {
@@ -402,9 +397,6 @@ public class UserRepository(
 		entity.Badge = dto.Badge ?? entity.Badge;
 		entity.JobStatus = dto.JobStatus ?? entity.JobStatus;
 		entity.UpdatedAt = DateTime.UtcNow;
-		entity.IsOnline = dto.IsOnline ?? entity.IsOnline;
-		entity.ExpireUpgradeAccount = dto.ExpireUpgradeAccount ?? entity.ExpireUpgradeAccount;
-		entity.AgeCategory = dto.AgeCategory ?? entity.AgeCategory;
 		entity.Tags = dto.Tags ?? entity.Tags;
 		entity.Password = dto.Password ?? entity.Password;
 		entity.JsonDetail = new UserJsonDetail {

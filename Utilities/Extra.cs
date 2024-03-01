@@ -39,8 +39,6 @@ public static class GuidExtension {
 }
 
 public static partial class StringExtension {
-	public static bool IsEmail(this string email) => MyRegex().IsMatch(email);
-
 	public static bool IsNotNullOrEmpty(this string? s) => s is { Length: > 0 };
 
 	public static bool IsNullOrEmpty(this string? s) => string.IsNullOrEmpty(s);
@@ -58,9 +56,6 @@ public static partial class StringExtension {
 		return baseString + "," + userId;
 	}
 
-	[GeneratedRegex(@"^[^@\s]+@[^@\s]+\.(com|net|org|gov)$", RegexOptions.IgnoreCase, "en-US")]
-	private static partial Regex MyRegex();
-
 	private static readonly Random Rand = new();
 
 	public static IQueryable<ProductEntity> Shuffle(this IQueryable<ProductEntity> list) {
@@ -71,146 +66,5 @@ public static partial class StringExtension {
 		}
 
 		return values.AsQueryable();
-	}
-}
-
-public class Utils {
-	public static Tuple<bool, UtilitiesStatusCodes> IsBlockedUser(UserEntity? reciever, UserEntity? sender) {
-		bool isBlocked = false;
-		UtilitiesStatusCodes utilCode = UtilitiesStatusCodes.Success;
-		if (reciever is null || sender is null) return new Tuple<bool, UtilitiesStatusCodes>(isBlocked, utilCode);
-		if (reciever.BlockedUsers.IsNotNullOrEmpty()) {
-			isBlocked = reciever.BlockedUsers.Contains(sender.Id);
-			if (isBlocked) utilCode = UtilitiesStatusCodes.UserSenderBlocked;
-		}
-		else if (sender.BlockedUsers.IsNotNullOrEmpty() && !isBlocked) {
-			isBlocked = sender.BlockedUsers.Contains(reciever.Id);
-			if (isBlocked) utilCode = UtilitiesStatusCodes.UserRecieverBlocked;
-		}
-
-		return new Tuple<bool, UtilitiesStatusCodes>(isBlocked, utilCode);
-	}
-
-	public static Tuple<bool, UtilitiesStatusCodes> IsUserOverused(
-		DbContext context,
-		string? userId,
-		CallerType? type,
-		ChatType? chatType,
-		TagProduct? useCaseProduct,
-		int? countProduct,
-		UsageRulesBeforeUpgrade usageRulesBeforeUpgrade,
-		UsageRulesAfterUpgrade usageRulesAfterUpgrade) {
-		UserEntity? user = context.Set<UserEntity>().FirstOrDefault(f => f.Id == userId);
-		if (user == null) return new Tuple<bool, UtilitiesStatusCodes>(true, UtilitiesStatusCodes.UserNotFound);
-		try {
-			bool overUsed;
-			switch (type ?? CallerType.None) {
-				case CallerType.CreateGroupChat:
-					if (chatType == ChatType.Private) {
-						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.UtcNow)
-							overUsed = context.Set<GroupChatEntity>().Count(w => w.CreatorUserId == userId && w.CreatedAt > DateTime.UtcNow.AddHours(-1)) >
-							           usageRulesBeforeUpgrade.MaxChatPerHour;
-						else
-							overUsed = context.Set<GroupChatEntity>().Count(w => w.CreatorUserId == userId && w.CreatedAt > DateTime.UtcNow.AddHours(-1)) >
-							           usageRulesAfterUpgrade.MaxChatPerHour;
-					}
-					else {
-						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.UtcNow)
-							overUsed = context.Set<GroupChatEntity>().Count(w => w.CreatorUserId == userId) >
-							           usageRulesBeforeUpgrade.MaxGroupOrChannelPerProfile;
-						else
-							overUsed = false;
-					}
-
-					break;
-				case CallerType.CreateComment:
-					if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.UtcNow)
-						overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt > DateTime.UtcNow.AddHours(-1)) >
-						           usageRulesBeforeUpgrade.MaxCommentPerHour;
-					else
-						overUsed = context.Set<CommentEntity>().Count(w => w.UserId == userId && w.CreatedAt > DateTime.UtcNow.AddHours(-1)) >
-						           usageRulesAfterUpgrade.MaxCommentPerHour;
-					break;
-				case CallerType.CreateProduct:
-					if (useCaseProduct!.Value.HasFlag(TagProduct.Product)) {
-						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.UtcNow)
-							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.Tags!.Contains(TagProduct.Product) && w.CreatedAt.Date == DateTime.Today) >
-							           usageRulesBeforeUpgrade.MaxPostPerDay;
-						else
-							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.CreatedAt.Date == DateTime.Today) >
-							           usageRulesAfterUpgrade.MaxPostPerDay;
-					}
-					else if (useCaseProduct.Value.HasFlag(TagProduct.AdHiring) || useCaseProduct.Value.HasFlag(TagProduct.AdProject) ||
-					         useCaseProduct.Value.HasFlag(TagProduct.AdEmployee)) {
-						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.UtcNow)
-							overUsed = context.Set<ProductEntity>().Count(w =>
-								           w.UserId == userId &&
-								           (w.Tags!.Contains(TagProduct.AdEmployee) || w.Tags.Contains(TagProduct.AdHiring) || w.Tags.Contains(TagProduct.AdProject)) &&
-								           w.CreatedAt.Date == DateTime.Today) >
-							           usageRulesBeforeUpgrade.MaxAdvertismentPerDay;
-						else
-							overUsed = context.Set<ProductEntity>().Count(w =>
-								           w.UserId == userId &&
-								           (w.Tags!.Contains(TagProduct.AdEmployee) || w.Tags.Contains(TagProduct.AdHiring) || w.Tags.Contains(TagProduct.AdProject)) &&
-								           w.CreatedAt.Date == DateTime.Today) >
-							           usageRulesAfterUpgrade.MaxAdvertismentPerDay;
-					}
-					else if (useCaseProduct.Value.HasFlag(TagProduct.MicroBlog)) {
-						if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.UtcNow)
-							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.Tags!.Contains(TagProduct.MicroBlog) && w.CreatedAt.Date == DateTime.Today) >
-							           usageRulesBeforeUpgrade.MaxTweetPerDay;
-						else
-							overUsed = context.Set<ProductEntity>().Count(w => w.UserId == userId && w.Tags!.Contains(TagProduct.MicroBlog) && w.CreatedAt.Date == DateTime.Today) >
-							           usageRulesAfterUpgrade.MaxTweetPerDay;
-					}
-					else
-						overUsed = false;
-
-					break;
-				case CallerType.SendPost:
-					if (user.ExpireUpgradeAccount == null || user.ExpireUpgradeAccount < DateTime.UtcNow) {
-						IQueryable<GroupChatMessageEntity> groupChatMessages =
-							context.Set<GroupChatMessageEntity>().Where(w => w.UserId == userId && w.CreatedAt > DateTime.UtcNow.AddHours(-1));
-						IQueryable<ProductEntity> products = context.Set<ProductEntity>().Where(a => groupChatMessages.Any(w => w.Id == a.GroupChatMessageId));
-						overUsed = products.Count() + countProduct >
-						           usageRulesBeforeUpgrade.MaxSendPostPerHour;
-					}
-					else {
-						IQueryable<GroupChatMessageEntity> groupChatMessages =
-							context.Set<GroupChatMessageEntity>().Where(w => w.UserId == userId && w.CreatedAt > DateTime.UtcNow.AddHours(-1));
-						IQueryable<ProductEntity> products = context.Set<ProductEntity>().Where(a => groupChatMessages.Any(w => w.Id == a.GroupChatMessageId));
-						overUsed = products.Count() + countProduct >
-						           usageRulesAfterUpgrade.MaxSendPostPerHour;
-					}
-
-					break;
-				default:
-					overUsed = false;
-					break;
-			}
-
-			return overUsed
-				? new Tuple<bool, UtilitiesStatusCodes>(overUsed, UtilitiesStatusCodes.Overused)
-				: new Tuple<bool, UtilitiesStatusCodes>(false, UtilitiesStatusCodes.Success);
-		}
-		catch (Exception) {
-			return new Tuple<bool, UtilitiesStatusCodes>(true, UtilitiesStatusCodes.BadRequest);
-		}
-	}
-
-	public static long CalculatePriceWithDiscount(long? price, int? discountPercent, long? discountPrice) {
-		if (!price.HasValue) return 0;
-
-		if (discountPrice.HasValue && discountPercent.HasValue) return price.Value;
-
-		if (discountPercent.HasValue) {
-			long result = price.Value * discountPercent.Value / 100;
-			return price.Value - result;
-		}
-
-		if (discountPrice.HasValue)
-			return price.Value - discountPrice.Value;
-
-		return -99999;
 	}
 }
