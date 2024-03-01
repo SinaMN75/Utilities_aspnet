@@ -12,7 +12,7 @@ public class NotificationEntity : BaseEntity {
 	public string? Link { get; set; }
 
 	[MaxLength(100)]
-	public List<TagNotification>? Tags { get; set; } = new();
+	public List<TagNotification> Tags { get; set; } = [];
 
 	public SeenStatus? SeenStatus { get; set; }
 	public bool? Visited { get; set; }

@@ -9,7 +9,6 @@ public interface IOrderRepository {
 	Task<GenericResponse<OrderEntity?>> CreateUpdateOrderDetail(OrderDetailCreateUpdateDto dto);
 	Task<GenericResponse<OrderEntity?>> CreateReservationOrder(ReserveCreateUpdateDto dto);
 	Task<GenericResponse<OrderEntity?>> CreateChairReservationOrder(ReserveChairCreateUpdateDto dto);
-	Task<GenericResponse<OrderEntity?>> ApplyDiscountCode(ApplyDiscountCodeOnOrderDto dto);
 }
 
 public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) : IOrderRepository {
@@ -98,7 +97,9 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 		if (o is null) {
 			EntityEntry<OrderEntity> orderEntity = await dbContext.Set<OrderEntity>().AddAsync(new OrderEntity {
 				OrderNumber = new Random().Next(10000, 99999),
-				Tags = [TagOrder.Pending],
+				Tags = p.Tags.Contains(new[] { TagProduct.Premium1Month, TagProduct.Premium3Month, TagProduct.Premium6Month, TagProduct.Premium12Month })
+					? [TagOrder.Pending, TagOrder.Premium]
+					: [TagOrder.Pending],
 				UserId = _userId,
 				SendPrice = p.User!.JsonDetail.DeliveryPrice1,
 				CreatedAt = DateTime.UtcNow,
@@ -243,25 +244,6 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 		await dbContext.SaveChangesAsync();
 
 		return new GenericResponse<OrderEntity?>(orderEntity.Entity);
-	}
-
-	public async Task<GenericResponse<OrderEntity?>> ApplyDiscountCode(ApplyDiscountCodeOnOrderDto dto) {
-		OrderEntity o = (await dbContext.Set<OrderEntity>()
-			.Include(x => x.ProductOwner).FirstOrDefaultAsync(x => x.Id == dto.OrderId))!;
-		DiscountEntity? d = await dbContext.Set<DiscountEntity>()
-			.FirstOrDefaultAsync(x => x.Code == dto.Code && x.UserId == o.UserId);
-		if (d is null) return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.InvalidDiscountCode);
-		if (d.StartDate >= DateTime.UtcNow || d.EndDate <= DateTime.UtcNow || d.NumberUses <= 0)
-			return new GenericResponse<OrderEntity?>(null, UtilitiesStatusCodes.InvalidDiscountCode);
-
-		o.DiscountCode = d.Code;
-		o.DiscountPrice = d.DiscountPrice;
-		o.TotalPrice -= d.DiscountPrice;
-		d.NumberUses -= 1;
-		dbContext.Update(o);
-		dbContext.Update(d);
-		await dbContext.SaveChangesAsync();
-		return new GenericResponse<OrderEntity?>(o);
 	}
 
 	public async Task<GenericResponse> Vote(OrderVoteDto dto) {

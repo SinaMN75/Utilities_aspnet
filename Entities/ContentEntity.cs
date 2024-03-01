@@ -14,7 +14,7 @@ public class ContentEntity : BaseEntity {
 	public DateTime? DeletedAt { get; set; }
 
 	[MaxLength(100)]
-	public required List<TagContent> Tags { get; set; } = new();
+	public required List<TagContent> Tags { get; set; } = [];
 
 	public required ContentJsonDetail JsonDetail { get; set; } = new();
 

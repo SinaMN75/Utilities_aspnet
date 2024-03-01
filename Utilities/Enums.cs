@@ -408,6 +408,7 @@ public enum TagOrder {
 	Digital = 101,
 	Donate = 102,
 	Reserve = 103,
+	Premium = 104,
 	PishtazDelivery = 201,
 	SendTipaxDelivery = 202,
 	CustomDelivery = 203,
@@ -466,7 +467,8 @@ public enum TagUser {
 
 public enum TagPayment {
 	PayOrder = 101,
-	PayWallet = 102
+	PayWallet = 102,
+	Premium = 103
 }
 
 public enum TagReservationChair {

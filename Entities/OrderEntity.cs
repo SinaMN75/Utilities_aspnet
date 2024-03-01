@@ -34,7 +34,7 @@ public class OrderEntity : BaseEntity {
 	public string? ProductOwnerId { get; set; }
 
 	public IEnumerable<TransactionEntity>? Transactions { get; set; }
-	public List<TagOrder> Tags { get; set; } = new();
+	public List<TagOrder> Tags { get; set; } = [];
 
 	public IEnumerable<OrderDetailEntity>? OrderDetails { get; set; }
 

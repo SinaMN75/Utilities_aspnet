@@ -156,17 +156,6 @@ public class VerifyMobileForLoginDto {
 	public string? FcmToken { get; set; }
 }
 
-public class RegisterDto {
-	public string? UserName { get; set; }
-	public string? FirstName { get; set; }
-	public string? LastName { get; set; }
-	public string? Email { get; set; }
-	public string? PhoneNumber { get; set; }
-	public string? Password { get; set; }
-	public bool SendSms { get; set; } = false;
-	public UserJsonDetail? JsonDetail { get; set; } = new();
-}
-
 public class LoginWithPasswordDto {
 	public string? Email { get; set; }
 	public string? Password { get; set; }
@@ -216,10 +205,8 @@ public class UserCreateUpdateDto {
 	public LegalAuthenticationType? LegalAuthenticationType { get; set; }
 	public NationalityType? NationalityType { get; set; }
 	public PrivacyType? PrivacyType { get; set; }
-	public bool? IsOnline { get; set; }
-	public AgeCategory? AgeCategory { get; set; }
 	public DateTime? BirthDate { get; set; }
-	public DateTime? ExpireUpgradeAccount { get; set; }
+	public DateTime PremiumExpireDate { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 	public string? Code { get; set; }
 	public string? ShebaNumber { get; set; }

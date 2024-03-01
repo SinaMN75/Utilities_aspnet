@@ -10,7 +10,7 @@ public class MediaEntity : BaseEntity {
 	public MediaJsonDetail JsonDetail { get; set; } = new();
 
 	[MaxLength(100)]
-	public List<TagMedia>? Tags { get; set; } = new();
+	public List<TagMedia> Tags { get; set; } = [];
 
 	public Guid? ParentId { get; set; }
 	public MediaEntity? Parent { get; set; }

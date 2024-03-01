@@ -23,7 +23,7 @@ public class CommentEntity : BaseEntity {
 	public Guid? ProductId { get; set; }
 
 	[MaxLength(100)]
-	public List<TagComment>? Tags { get; set; } = new();
+	public List<TagComment> Tags { get; set; } = [];
 
 	[InverseProperty("Parent")]
 	public IEnumerable<CommentEntity>? Children { get; set; }

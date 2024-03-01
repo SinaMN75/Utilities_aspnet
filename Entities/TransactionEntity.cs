@@ -17,7 +17,7 @@ public class TransactionEntity : BaseEntity {
 	public string? CardNumber { get; set; }
 
 	[MaxLength(100)]
-	public List<TagTransaction> Tags { get; set; } = new();
+	public List<TagTransaction> Tags { get; set; } = [];
 	
 	public UserEntity? Buyer { get; set; }
 
@@ -38,7 +38,7 @@ public class TransactionCreateDto {
 	public required string Descriptions { get; set; } = "";
 	public string? RefId { get; set; }
 	public string? CardNumber { get; set; }
-	public required List<TagTransaction> Tags { get; set; } = new();
+	public required List<TagTransaction> Tags { get; set; } = [];
 	public string? BuyerId { get; set; }
 	public string? SellerId { get; set; }
 	public Guid? OrderId { get; set; }

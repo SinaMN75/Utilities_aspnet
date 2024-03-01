@@ -53,7 +53,7 @@ public class ProductEntity : BaseEntity {
 	public ProductJsonDetail JsonDetail { get; set; } = new();
 
 	[MaxLength(100)]
-	public List<TagProduct>? Tags { get; set; } = new();
+	public List<TagProduct> Tags { get; set; } = [];
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
