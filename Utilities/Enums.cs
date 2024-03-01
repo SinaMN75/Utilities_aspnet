@@ -97,12 +97,6 @@ public enum Priority {
 	Low = 103
 }
 
-public enum SubscriptionType {
-	None = 100,
-	Promotion = 101,
-	UpgradeAccount = 102
-}
-
 public enum Reaction {
 	None = 100,
 	Like = 101,
@@ -468,8 +462,7 @@ public enum TagUser {
 
 public enum TagPayment {
 	PayOrder = 101,
-	PayWallet = 102,
-	PaySubscription = 103
+	PayWallet = 102
 }
 
 public enum TagReservationChair {

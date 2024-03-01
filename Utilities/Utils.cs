@@ -118,7 +118,6 @@ public static class StartupExtension {
 		builder.Services.AddScoped<ISmsNotificationRepository, SmsNotificationRepository>();
 		builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 		builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
-		builder.Services.AddScoped<ISubscriptionPaymentRepository, SubscriptionPaymentRepository>();
 		builder.Services.AddScoped<IAppSettingsRepository, AppSettingsRepository>();
 		builder.Services.AddScoped<IAmazonS3Repository, AmazonS3Repository>();
 	}

@@ -31,7 +31,6 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 			BuyerId = dto.BuyerId,
 			SellerId = dto.SellerId,
 			OrderId = dto.OrderId,
-			SubscriptionId = dto.SubscriptionId,
 		};
 		await dbContext.Set<TransactionEntity>().AddAsync(e, ct);
 		await dbContext.SaveChangesAsync(ct);
@@ -70,7 +69,6 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 				BuyerId = x.BuyerId,
 				SellerId = x.SellerId,
 				OrderId = x.OrderId,
-				SubscriptionId = x.SubscriptionId,
 				Code = x.Code,
 				Buyer = new UserEntity {
 					Id = x.Buyer!.Id,

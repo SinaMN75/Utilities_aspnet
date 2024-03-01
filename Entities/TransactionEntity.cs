@@ -31,9 +31,6 @@ public class TransactionEntity : BaseEntity {
 	
 	public OrderEntity? Order { get; set; }
 	public Guid? OrderId { get; set; }
-
-	public SubscriptionPaymentEntity? SubscriptionPayment { get; set; }
-	public Guid? SubscriptionId { get; set; }
 }
 
 public class TransactionCreateDto {

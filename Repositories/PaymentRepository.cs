@@ -3,10 +3,8 @@
 public interface IPaymentRepository {
 	Task<GenericResponse<string>> IncreaseWalletBalance(long amount);
 	Task<GenericResponse<string?>> PayOrder(Guid orderId);
-	Task<GenericResponse<string?>> PaySubscription(Guid subscriptionId);
 	Task<GenericResponse> CallBack(int tagPayment, string id, long trackId);
 	Task<GenericResponse> CallBackFake(int tagPayment, string id, long trackId);
-	Task<GenericResponse> CallBackSubscription(Guid subscriptionId, string authority, string status);
 }
 
 public class PaymentRepository : IPaymentRepository {
@@ -232,24 +230,5 @@ public class PaymentRepository : IPaymentRepository {
 		}
 
 		return new GenericResponse<string>("");
-	}
-
-	public async Task<GenericResponse<string?>> PaySubscription(Guid subscriptionId) {
-		SubscriptionPaymentEntity spe = (await _dbContext.Set<SubscriptionPaymentEntity>().FirstOrDefaultAsync(x => x.Id == subscriptionId))!;
-		UserEntity? user = await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId);
-		string callbackUrl = $"{Server.ServerAddress}/CallBackSubscription/{spe.Id}";
-		return new GenericResponse<string?>("", UtilitiesStatusCodes.BadRequest);
-	}
-
-	public async Task<GenericResponse> CallBackSubscription(Guid subscriptionId, string authority, string status) {
-		SubscriptionPaymentEntity spe = (await _dbContext.Set<SubscriptionPaymentEntity>().Include(i => i.Promotion)
-			.FirstOrDefaultAsync(x => x.Id == subscriptionId))!;
-		if (!status.Equals("OK")) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
-
-		spe.Tag = TagOrder.Complete;
-
-		_dbContext.Update(spe);
-		await _dbContext.SaveChangesAsync();
-		return new GenericResponse();
 	}
 }
