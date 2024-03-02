@@ -13,14 +13,15 @@ public class PaymentRepository : IPaymentRepository {
 	private readonly string? _userId;
 	private readonly ITransactionRepository _transactionRepository;
 	private readonly IUserRepository _userRepository;
-	private readonly OrderRepository _orderRepository;
+	private readonly IOrderRepository _orderRepository;
 
 	public PaymentRepository(
 		DbContext dbContext,
 		IHttpContextAccessor httpContextAccessor,
 		IConfiguration config,
 		ITransactionRepository transactionRepository,
-		UserRepository userRepository, OrderRepository orderRepository) {
+		IUserRepository userRepository,
+		IOrderRepository orderRepository) {
 		_dbContext = dbContext;
 		config.GetSection("AppSettings").Bind(_appSettings);
 		_userId = httpContextAccessor.HttpContext?.User.Identity?.Name;
