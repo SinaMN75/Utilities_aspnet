@@ -57,7 +57,7 @@ public class UserEntity {
 	public DateTime? Birthdate { get; set; }
 	public DateTime? CreatedAt { get; set; }
 	public DateTime? UpdatedAt { get; set; }
-	public DateTime PremiumExpireDate { get; set; }
+	public DateTime? PremiumExpireDate { get; set; }
 	public bool? Suspend { get; set; }
 	public UserJsonDetail JsonDetail { get; set; } = new();
 
@@ -234,6 +234,7 @@ public class UserFilterDto : BaseFilterDto {
 	public string? State { get; set; }
 	public string? Badge { get; set; }
 	public bool? ShowMedia { get; set; }
+	public bool? ShowPremiums { get; set; }
 	public bool? ShowCategories { get; set; }
 	public bool? ShowSuspend { get; set; }
 	public bool? ShowMyCustomers { get; set; }
