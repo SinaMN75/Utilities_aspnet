@@ -4,6 +4,7 @@ public interface IPaymentRepository {
 	Task<GenericResponse<string>> IncreaseWalletBalance(long amount);
 	Task<GenericResponse<string?>> PayOrder(Guid orderId);
 	Task<GenericResponse> CallBack(int tagPayment, string id, long trackId);
+	Task<GenericResponse> CallBackPremiumFake(int tagPayment, string id, long trackId);
 }
 
 public class PaymentRepository : IPaymentRepository {
@@ -11,20 +12,21 @@ public class PaymentRepository : IPaymentRepository {
 	private readonly DbContext _dbContext;
 	private readonly string? _userId;
 	private readonly ITransactionRepository _transactionRepository;
-	private readonly UserRepository _userRepository;
+	private readonly IUserRepository _userRepository;
+	private readonly OrderRepository _orderRepository;
 
 	public PaymentRepository(
 		DbContext dbContext,
 		IHttpContextAccessor httpContextAccessor,
 		IConfiguration config,
 		ITransactionRepository transactionRepository,
-		UserRepository userRepository
-	) {
+		UserRepository userRepository, OrderRepository orderRepository) {
 		_dbContext = dbContext;
 		config.GetSection("AppSettings").Bind(_appSettings);
 		_userId = httpContextAccessor.HttpContext?.User.Identity?.Name;
 		_transactionRepository = transactionRepository;
 		_userRepository = userRepository;
+		_orderRepository = orderRepository;
 	}
 
 	public async Task<GenericResponse<string?>> PayOrder(Guid orderId) {
@@ -154,6 +156,41 @@ public class PaymentRepository : IPaymentRepository {
 			}
 		}
 
+		return new GenericResponse();
+	}
+
+	public async Task<GenericResponse> CallBackPremiumFake(int tagPayment, string id, long trackId) {
+		OrderEntity o = (await _dbContext.Set<OrderEntity>()
+			.Include(i => i.OrderDetails)!.ThenInclude(x => x.Product)
+			.FirstOrDefaultAsync(x => x.Id == Guid.Parse(id)))!;
+		bool p1 = o.OrderDetails!.Any(x => x.Product!.Tags.Contains(TagProduct.Premium1Month));
+		bool p3 = o.OrderDetails!.Any(x => x.Product!.Tags.Contains(TagProduct.Premium3Month));
+		bool p6 = o.OrderDetails!.Any(x => x.Product!.Tags.Contains(TagProduct.Premium6Month));
+		bool p12 = o.OrderDetails!.Any(x => x.Product!.Tags.Contains(TagProduct.Premium12Month));
+
+		await _orderRepository.Update(new OrderCreateUpdateDto {
+			Id = o.Id,
+			Tags = [TagOrder.Complete, TagOrder.Premium]
+		});
+
+		await _userRepository.Update(new UserCreateUpdateDto {
+			Id = _userId,
+			PremiumExpireDate =
+				p1 ? DateTime.Now.AddMonths(1) :
+				p3 ? DateTime.Now.AddMonths(3) :
+				p6 ? DateTime.Now.AddMonths(6) :
+				p12 ? DateTime.Now.AddMonths(12) : DateTime.Now
+		});
+				
+		await _transactionRepository.Create(new TransactionCreateDto {
+			Amount = o.TotalPrice ?? 0,
+			Descriptions = "خرید اشتراک",
+			RefId = "refId",
+			CardNumber = "cardNumber",
+			Tags = [TagTransaction.Premium],
+			BuyerId = _userId,
+			OrderId = o.Id
+		}, CancellationToken.None);
 		return new GenericResponse();
 	}
 
