@@ -94,11 +94,11 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 			Visited = false
 		};
 		if (model.RemoveTags.IsNotNullOrEmpty()) {
-			model.RemoveTags?.ForEach(item => notification.Tags?.Remove(item));
+			model.RemoveTags.ForEach(item => notification.Tags.Remove(item));
 		}
 
 		if (model.AddTags.IsNotNullOrEmpty()) {
-			notification.Tags?.AddRange(model.AddTags!);
+			notification.Tags.AddRange(model.AddTags);
 		}
 
 		await dbContext.Set<NotificationEntity>().AddAsync(notification);

@@ -22,9 +22,7 @@ public class UserRepository(
 	IHttpContextAccessor httpContextAccessor,
 	ITransactionRepository transactionRepository,
 	IDistributedCache cache
-)
-	: IUserRepository {
-	private readonly IHttpContextAccessor? _http = httpContextAccessor;
+) : IUserRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	public async Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null) {
@@ -47,7 +45,6 @@ public class UserRepository(
 				State = x.State,
 				Badge = x.Badge,
 				JobStatus = x.JobStatus,
-				UserAgent = x.UserAgent,
 				MutedChats = x.MutedChats,
 				Gender = x.Gender,
 				Wallet = x.Wallet,
@@ -154,7 +151,7 @@ public class UserRepository(
 
 		if (dto.UserIds.IsNotNullOrEmpty()) q = q.Where(x => dto.UserIds!.Contains(x.Id));
 		if (dto.PhoneNumbers.IsNotNullOrEmpty()) q = q.Where(x => dto.PhoneNumbers!.Contains(x.PhoneNumber));
-		if (dto.UserName.IsNotNullOrEmpty()) q = q.Where(x => (x.AppUserName ?? "").ToLower().Contains(dto.UserName!.ToLower()));
+		if (dto.UserName.IsNotNullOrEmpty()) q = q.Where(x => (x.AppUserName ?? "").Contains(dto.UserName!, StringComparison.CurrentCultureIgnoreCase));
 		if (dto.ShowSuspend.IsTrue()) q = q.Where(x => x.Suspend == true);
 
 		if (dto.OrderByUserName.IsTrue()) q = q.OrderBy(x => x.UserName);
@@ -240,7 +237,6 @@ public class UserRepository(
 	}
 
 	public async Task<GenericResponse<UserEntity?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto) {
-		string userAgent = _http!.HttpContext!.Request.Headers.FirstOrDefault(s => s.Key.ToLower() == "user-agent").Value!;
 		string mobile = dto.Mobile.DeleteAdditionsInsteadNumber();
 		mobile = mobile.GetLast(10);
 		mobile = mobile.Insert(0, "0");
@@ -253,7 +249,6 @@ public class UserRepository(
 
 		if (existingUser != null) {
 			if (!await SendOtp(existingUser.Id)) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.MaximumLimitReached);
-			existingUser.UserAgent = userAgent;
 			dbContext.Update(existingUser);
 			await dbContext.SaveChangesAsync();
 			return new GenericResponse<UserEntity?>(existingUser);
@@ -262,8 +257,7 @@ public class UserRepository(
 		UserEntity user = new() {
 			PhoneNumber = mobile,
 			UserName = mobile,
-			CreatedAt = DateTime.UtcNow,
-			UserAgent = userAgent
+			CreatedAt = DateTime.UtcNow
 		};
 
 		await dbContext.AddAsync(user);
@@ -453,9 +447,7 @@ public class UserRepository(
 
 		string newOtp = Random.Shared.Next(1000, 9999).ToString();
 		string? cachedData = await cache.GetStringAsync(userId);
-		if (cachedData.IsNullOrEmpty()) {
-			await cache.SetStringData(userId, newOtp, TimeSpan.FromSeconds(120));
-		}
+		if (cachedData.IsNullOrEmpty()) cache.SetStringData(userId, newOtp, TimeSpan.FromSeconds(120));
 
 		UserEntity? user = await ReadByIdMinimal(userId);
 		await sms.SendSms(user?.PhoneNumber!, AppSettings.GetCurrentSettings().SmsPanelSettings.PatternCode!, newOtp);

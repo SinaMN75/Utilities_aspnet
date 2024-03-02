@@ -38,13 +38,12 @@ public class ProductRepository(
 		EntityEntry<ProductEntity> i = await dbContext.Set<ProductEntity>().AddAsync(e, ct);
 		await dbContext.SaveChangesAsync(ct);
 
-		if (dto.Children is not null) {
-			foreach (ProductCreateUpdateDto childDto in dto.Children) {
-				if (childDto.Id is not null) await Update(childDto, ct);
-				else {
-					childDto.ParentId = i.Entity.Id;
-					await Create(childDto, ct);
-				}
+		if (dto.Children is null) return new GenericResponse<ProductEntity?>(i.Entity);
+		foreach (ProductCreateUpdateDto childDto in dto.Children) {
+			if (childDto.Id is not null) await Update(childDto, ct);
+			else {
+				childDto.ParentId = i.Entity.Id;
+				await Create(childDto, ct);
 			}
 		}
 
@@ -56,7 +55,7 @@ public class ProductRepository(
 		if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.UtcNow);
 		q = !dto.ShowWithChildren ? q.Where(x => x.ParentId == null) : q.Include(x => x.Parent);
 
-		List<ProductEntity> postsThatMyFollowersSeen = new();
+		List<ProductEntity> postsThatMyFollowersSeen = [];
 		if (dto.PostsThatMyFollowersSeen.IsTrue()) {
 			GenericResponse<IQueryable<UserEntity>> myFollower = await followBookMark.GetFollowers(_userId!);
 			if (myFollower.Result != null && myFollower.Result.Any()) {
@@ -140,7 +139,13 @@ public class ProductRepository(
 		int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
-		if (dto.ShowCountOfComment.IsTrue()) {
+		if (!dto.ShowCountOfComment.IsTrue())
+			return new GenericResponse<IQueryable<ProductEntity>>(q) {
+				TotalCount = totalCount,
+				PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
+				PageSize = dto.PageSize
+			};
+		{
 			List<ProductEntity> tempQ = q.ToList();
 			foreach (ProductEntity item in tempQ) {
 				GenericResponse<IQueryable<CommentEntity>?> comments = commentRepository.ReadByProductId(item.Id);
@@ -203,7 +208,7 @@ public class ProductRepository(
 		if (i.ProductInsights?.Any() != null) {
 			List<IGrouping<ReactionEntity?, ProductInsight>> psGrouping = i.ProductInsights.GroupBy(g => g.Reaction).ToList();
 			i.ProductInsights = null;
-			List<ProductInsight> productInsights = new();
+			List<ProductInsight> productInsights = [];
 			foreach (IGrouping<ReactionEntity?, ProductInsight> item in psGrouping) {
 				item.FirstOrDefault()!.Count = item.Count();
 				productInsights.Add(item.FirstOrDefault()!);
@@ -420,7 +425,7 @@ public static class ProductEntityExtension {
 		}
 
 		if (dto.Categories.IsNotNull()) {
-			List<CategoryEntity> listCategory = new();
+			List<CategoryEntity> listCategory = [];
 			foreach (Guid item in dto.Categories!) {
 				CategoryEntity? e = await context.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item);
 				if (e != null) listCategory.Add(e);
@@ -435,15 +440,15 @@ public static class ProductEntityExtension {
 		}
 
 		if (dto.RemoveTags.IsNotNullOrEmpty()) {
-			dto.RemoveTags?.ForEach(item => entity.Tags?.Remove(item));
+			dto.RemoveTags?.ForEach(item => entity.Tags.Remove(item));
 		}
 
 		if (dto.AddTags.IsNotNullOrEmpty()) {
-			entity.Tags?.AddRange(dto.AddTags!);
+			entity.Tags.AddRange(dto.AddTags!);
 		}
 
 		if (dto.ProductInsight is not null) {
-			List<ProductInsight> productInsights = new();
+			List<ProductInsight> productInsights = [];
 			ProductInsightDto? pInsight = dto.ProductInsight;
 			UserEntity? e = await context.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == pInsight.UserId);
 			if (e != null) {

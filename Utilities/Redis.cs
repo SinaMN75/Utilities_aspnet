@@ -1,7 +1,7 @@
 namespace Utilities_aspnet.Utilities;
 
 public static class Redis {
-	public static async Task SetStringData(this IDistributedCache cache,
+	public static void SetStringData(this IDistributedCache cache,
 		string key,
 		string value,
 		TimeSpan? absoluteExpireTime = null,
@@ -10,11 +10,9 @@ public static class Redis {
 			AbsoluteExpirationRelativeToNow = absoluteExpireTime ?? TimeSpan.FromSeconds(60),
 			SlidingExpiration = slidingExpireTime
 		};
+		
+		cache.SetStringAsync(key, value, options);
+	}
 
-		await cache.SetStringAsync(key, value, options);
-	}
-	
-	public static async Task<string?> GetStringData(this IDistributedCache cache, string recordId) {
-		return await cache.GetStringAsync(recordId);
-	}
+	public static Task<string?> GetStringData(this IDistributedCache cache, string recordId) => cache.GetStringAsync(recordId);
 }

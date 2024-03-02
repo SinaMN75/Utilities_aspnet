@@ -51,7 +51,7 @@ public class CommentRepository(DbContext dbContext,
 		if (dto.Status is not null) q = q.Where(x => x.Status == dto.Status);
 		if (dto.UserId is not null) q = q.Where(x => x.UserId == dto.UserId);
 		if (dto.ProductOwnerId is not null) q = q.Where(x => x.Product!.UserId == dto.ProductOwnerId);
-		if (dto.Tags is not null) q = q.Where(x => dto.Tags!.All(y => x.Tags!.Contains(y)));
+		if (dto.Tags is not null) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
 		if (dto.TargetUserId is not null) q = q.Where(x => x.TargetUserId == dto.TargetUserId);
 
 		q = q.Include(x => x.User).ThenInclude(x => x!.Media)
@@ -89,9 +89,7 @@ public class CommentRepository(DbContext dbContext,
 	public async Task<GenericResponse<CommentEntity?>> Create(CommentCreateUpdateDto dto, CancellationToken ct) {
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
-
-		ProductEntity? prdct = await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == dto.ProductId, ct);
-
+		
 		UserEntity? trgtUser = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == dto.UserId, ct);
 
 		CommentEntity comment = new() {
@@ -145,11 +143,11 @@ public class CommentRepository(DbContext dbContext,
 		if (dto.Status.HasValue) comment.Status = dto.Status;
 		if (dto.Tags.IsNotNullOrEmpty()) comment.Tags = dto.Tags;
 		if (dto.RemoveTags.IsNotNullOrEmpty()) {
-			dto.RemoveTags?.ForEach(item => comment.Tags?.Remove(item));
+			dto.RemoveTags.ForEach(item => comment.Tags.Remove(item));
 		}
 
 		if (dto.AddTags.IsNotNullOrEmpty()) {
-			comment.Tags?.AddRange(dto.AddTags!);
+			comment.Tags.AddRange(dto.AddTags);
 		}
 
 		comment.UpdatedAt = DateTime.UtcNow;

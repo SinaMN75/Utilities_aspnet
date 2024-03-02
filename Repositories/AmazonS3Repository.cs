@@ -48,7 +48,7 @@ public class AmazonS3Repository(IConfiguration config) : IAmazonS3Repository {
 			// Create the request
 			DeleteObjectsRequest request = new() {
 				BucketName = bucketName,
-				Objects = [new() { Key = objectName, VersionId = null }]
+				Objects = [new KeyVersion { Key = objectName, VersionId = null }]
 			};
 
 			// Submit the request

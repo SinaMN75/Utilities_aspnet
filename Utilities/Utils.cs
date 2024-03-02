@@ -1,4 +1,7 @@
-﻿namespace Utilities_aspnet.Utilities;
+﻿using Microsoft.Extensions.Hosting;
+using static System.TimeSpan;
+
+namespace Utilities_aspnet.Utilities;
 
 public static class StartupExtension {
 	public static void SetupUtilities<T>(
@@ -29,13 +32,13 @@ public static class StartupExtension {
 		builder.Logging.AddRinLogger();
 		builder.Services.AddRin();
 		builder.Services.AddOptions();
-		builder.Services.AddUtilitiesOutputCache("everything", TimeSpan.FromHours(2), false);
-		builder.Services.AddUtilitiesOutputCache("appSetting", TimeSpan.FromHours(24), false);
-		builder.Services.AddUtilitiesOutputCache("content", TimeSpan.FromHours(24), false);
-		builder.Services.AddUtilitiesOutputCache("category", TimeSpan.FromHours(1), false);
-		builder.Services.AddUtilitiesOutputCache("address", TimeSpan.FromHours(1));
-		builder.Services.AddUtilitiesOutputCache("comment", TimeSpan.FromHours(1));
-		builder.Services.AddUtilitiesOutputCache("transaction", TimeSpan.FromMinutes(1));
+		builder.Services.AddUtilitiesOutputCache("everything", FromHours(2), false);
+		builder.Services.AddUtilitiesOutputCache("appSetting", FromHours(24), false);
+		builder.Services.AddUtilitiesOutputCache("content", FromHours(24), false);
+		builder.Services.AddUtilitiesOutputCache("category", FromHours(1), false);
+		builder.Services.AddUtilitiesOutputCache("address", FromHours(1));
+		builder.Services.AddUtilitiesOutputCache("comment", FromHours(1));
+		builder.Services.AddUtilitiesOutputCache("transaction", FromMinutes(1));
 
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
@@ -43,13 +46,13 @@ public static class StartupExtension {
 			x.RejectionStatusCode = 429;
 			x.AddFixedWindowLimiter("fixed", y => {
 				y.PermitLimit = 5;
-				y.Window = TimeSpan.FromSeconds(2);
+				y.Window = FromSeconds(2);
 				y.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
 				y.QueueLimit = 10;
 			});
 			x.AddFixedWindowLimiter("follow", y => {
 				y.PermitLimit = 30;
-				y.Window = TimeSpan.FromHours(24);
+				y.Window = FromHours(24);
 			});
 		});
 
@@ -67,7 +70,7 @@ public static class StartupExtension {
 			switch (databaseType) {
 				case UtilitiesDatabaseType.SqlServer:
 					options.UseSqlServer(connectionStrings, o => {
-						o.EnableRetryOnFailure(maxRetryCount: 2, maxRetryDelay: TimeSpan.FromSeconds(1), errorNumbersToAdd: new int[] { });
+						o.EnableRetryOnFailure(maxRetryCount: 2, maxRetryDelay: FromSeconds(1), errorNumbersToAdd: new int[] { });
 						o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
 					});
 					break;
@@ -122,7 +125,7 @@ public static class StartupExtension {
 		builder.Services.AddScoped<IAmazonS3Repository, AmazonS3Repository>();
 	}
 
-	private static void AddUtilitiesSwagger(this WebApplicationBuilder builder, IServiceProvider? serviceProvider) {
+	private static void AddUtilitiesSwagger(this IHostApplicationBuilder builder, IServiceProvider? serviceProvider) {
 		Server.Configure(serviceProvider?.GetService<IHttpContextAccessor>());
 		builder.Services.AddEndpointsApiExplorer();
 		builder.Services.AddSwaggerGen(c => {
@@ -145,7 +148,7 @@ public static class StartupExtension {
 		});
 	}
 
-	public static void AddUtilitiesIdentity(this WebApplicationBuilder builder) {
+	private static void AddUtilitiesIdentity(this WebApplicationBuilder builder) {
 		builder.Services.AddAuthentication(options => {
 			options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
 			options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -159,7 +162,7 @@ public static class StartupExtension {
 				ValidateIssuer = true,
 				ValidateAudience = true,
 				RequireExpirationTime = true,
-				ClockSkew = TimeSpan.Zero,
+				ClockSkew = Zero,
 				ValidAudience = "https://SinaMN75.com,BetterSoft1234",
 				ValidIssuer = "https://SinaMN75.com,BetterSoft1234",
 				IssuerSigningKey = new SymmetricSecurityKey("https://SinaMN75.com,BetterSoft1234"u8.ToArray())

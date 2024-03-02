@@ -21,7 +21,7 @@ public class ContentController(IContentRepository repository, IOutputCacheStore 
 		return Result(await repository.Update(dto, ct));
 	}
 
-	[HttpDelete("{id}")]
+	[HttpDelete("{id:guid}")]
 	[Authorize]
 	public async Task<IActionResult> Delete(Guid id, CancellationToken ct) {
 		await outputCache.EvictByTagAsync("content", ct);

@@ -107,9 +107,6 @@ public class ChatRepository(
 
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
-		GroupChatEntity groupChat = (await dbContext.Set<GroupChatEntity>()
-			.Include(x => x.Users)
-			.FirstOrDefaultAsync(f => f.Id == dto.GroupChatId))!;
 
 		GroupChatMessageEntity entity = new() {
 			Message = dto.Message,
@@ -274,21 +271,20 @@ public class ChatRepository(
 			.Include(x => x.GroupChatMessage)
 			.Include(x => x.Media).FirstOrDefaultAsync(x => x.Id == id);
 
-		if (e != null) {
-			int countOfMessage;
-			SeenUsers? seenUsers = dbContext.Set<SeenUsers>().FirstOrDefault(w => w.FkGroupChat == e.Id && w.FkUserId == _userId);
-			IQueryable<GroupChatMessageEntity> groupChatMessages = dbContext.Set<GroupChatMessageEntity>().Where(w => w.GroupChatId == e.Id);
-			if (seenUsers is null) {
-				countOfMessage = groupChatMessages.Count();
-			}
-			else {
-				GroupChatMessageEntity lastSeenMessage = groupChatMessages.FirstOrDefault(w => w.Id == seenUsers.FkGroupChatMessage)!;
-				countOfMessage = groupChatMessages.Count(w => w.CreatedAt > lastSeenMessage.CreatedAt);
-			}
-
-			e.CountOfUnreadMessages = countOfMessage;
-			await promotionRepository.UserSeened(e.Id);
+		if (e == null) return new GenericResponse<GroupChatEntity>(e!);
+		int countOfMessage;
+		SeenUsers? seenUsers = dbContext.Set<SeenUsers>().FirstOrDefault(w => w.FkGroupChat == e.Id && w.FkUserId == _userId);
+		IQueryable<GroupChatMessageEntity> groupChatMessages = dbContext.Set<GroupChatMessageEntity>().Where(w => w.GroupChatId == e.Id);
+		if (seenUsers is null) {
+			countOfMessage = groupChatMessages.Count();
 		}
+		else {
+			GroupChatMessageEntity lastSeenMessage = groupChatMessages.FirstOrDefault(w => w.Id == seenUsers.FkGroupChatMessage)!;
+			countOfMessage = groupChatMessages.Count(w => w.CreatedAt > lastSeenMessage.CreatedAt);
+		}
+
+		e.CountOfUnreadMessages = countOfMessage;
+		await promotionRepository.UserSeened(e.Id);
 
 		return new GenericResponse<GroupChatEntity>(e!);
 	}
@@ -372,15 +368,12 @@ public class ChatRepository(
 		List<UserEntity> tempUsers = groupChat.Users!.ToList();
 		bool result = tempUsers.Remove(user!);
 
-		if (result) {
-			groupChat.Users = tempUsers;
+		if (!result) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
+		groupChat.Users = tempUsers;
 
-			dbContext.Update(groupChat);
-			await dbContext.SaveChangesAsync();
-			return new GenericResponse();
-		}
-
-		return new GenericResponse(UtilitiesStatusCodes.BadRequest);
+		dbContext.Update(groupChat);
+		await dbContext.SaveChangesAsync();
+		return new GenericResponse();
 	}
 
 	public async Task<GenericResponse> Mute(Guid id) {
@@ -440,7 +433,7 @@ public class ChatRepository(
 		await dbContext.SaveChangesAsync();
 		return new GenericResponse<GroupChatEntity?>(e.Entity);
 	}
-	
+
 	private async Task DeleteEmptyGroups() {
 		IQueryable<GroupChatEntity> list = dbContext.Set<GroupChatEntity>()
 			.Where(x => x.Type != ChatType.Private)

@@ -9,20 +9,20 @@ public static class Seeder {
 		builder.Entity<ContentEntity>().OwnsOne(e => e.JsonDetail, b => b.ToJson());
 		builder.Entity<ProductEntity>().OwnsOne(e => e.JsonDetail, b => {
 			b.ToJson();
-			b.OwnsMany(_ => _.KeyValues);
-			b.OwnsMany(_ => _.ReservationTimes);
-			b.OwnsMany(_ => _.VisitCounts);
-			b.OwnsMany(_ => _.Seats);
+			b.OwnsMany(i => i.KeyValues);
+			b.OwnsMany(i => i.ReservationTimes);
+			b.OwnsMany(i => i.VisitCounts);
+			b.OwnsMany(i => i.Seats);
 		});
 		builder.Entity<CommentEntity>().OwnsOne(e => e.JsonDetail, b => {
 			b.ToJson();
-			b.OwnsMany(_ => _.Reacts);
+			b.OwnsMany(i => i.Reacts);
 		});
 		builder.Entity<OrderEntity>().OwnsOne(e => e.JsonDetail, b => {
 			b.ToJson();
-			b.OwnsMany(_ => _.ReservationTimes);
-			b.OwnsMany(_ => _.Seats);
-			b.OwnsMany(_ => _.OrderDetailHistories);
+			b.OwnsMany(i => i.ReservationTimes);
+			b.OwnsMany(i => i.Seats);
+			b.OwnsMany(i => i.OrderDetailHistories);
 		});
 	}
 }

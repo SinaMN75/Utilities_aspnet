@@ -19,6 +19,6 @@ public class TransactionController(ITransactionRepository repository) : BaseApiC
 	public async Task<ActionResult<GenericResponse<IQueryable<TransactionEntity>>>> Update(TransactionUpdateDto dto, CancellationToken ct)
 		=> Result(await repository.Update(dto, ct));
 
-	[HttpDelete("{id}")]
+	[HttpDelete("{id:guid}")]
 	public async Task<ActionResult<GenericResponse>> Delete(Guid id, CancellationToken ct) => Result(await repository.Delete(id, ct));
 }

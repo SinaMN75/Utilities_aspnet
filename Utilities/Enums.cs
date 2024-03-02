@@ -169,7 +169,7 @@ public enum TagTransaction {
 	Success = 202,
 	WithdrawAccepted = 301,
 	WithdrawRejected = 302,
-	WithdrawRequested = 303,
+	WithdrawRequested = 303
 }
 
 public enum TagCategory {

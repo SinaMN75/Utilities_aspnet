@@ -49,7 +49,7 @@ public class SmsNotificationRepository(IConfiguration config) : ISmsNotification
 				request.AddParameter("token", param1);
 				if (param2 != null) request.AddParameter("token2", param2);
 				if (param3 != null) request.AddParameter("token3", param3);
-				request.AddParameter("template", template ?? smsSetting.PatternCode!);
+				request.AddParameter("template", template);
 				await new RestClient($"https://api.kavenegar.com/v1/{smsSetting.SmsApiKey}/verify/lookup.json").ExecuteAsync(request);
 				break;
 			}
@@ -84,13 +84,6 @@ public class SmsNotificationRepository(IConfiguration config) : ISmsNotification
 				break;
 			}
 			case "firebase": {
-				await FirebaseDataSource.SendFcmNotification(new FirebaseFcmNotificationCreateDto {
-					ServerKey = setting.Token!,
-					FcmToken = dto.FcmToken!,
-					Title = dto.Title,
-					Body = dto.Content,
-					TargetUserIds = dto.UserIds
-				});
 				break;
 			}
 		}

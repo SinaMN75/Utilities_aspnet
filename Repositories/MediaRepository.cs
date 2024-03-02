@@ -55,7 +55,7 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 					Album = model.Album,
 					Link1 = model.Link1,
 					Link2 = model.Link2,
-					Link3 = model.Link3,
+					Link3 = model.Link3
 				}
 			};
 			await dbContext.Set<MediaEntity>().AddAsync(media);
@@ -67,7 +67,8 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 				await amazonS3Repository.UploadObjectFromFileAsync(amazonS3Settings.DefaultBucket!, name, path);
 		}
 
-		if (model.Links != null)
+		if (model.Links == null) return new GenericResponse<IEnumerable<MediaEntity>?>(medias, message: Path.Combine(env.WebRootPath, "Medias"));
+		{
 			foreach (MediaEntity media in model.Links.Select(_ => new MediaEntity {
 				         UserId = model.UserId,
 				         ProductId = model.ProductId,
@@ -89,13 +90,14 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 					         Album = model.Album,
 					         Link1 = model.Link1,
 					         Link2 = model.Link2,
-					         Link3 = model.Link3,
+					         Link3 = model.Link3
 				         }
 			         })) {
 				await dbContext.Set<MediaEntity>().AddAsync(media);
 				await dbContext.SaveChangesAsync();
 				medias.Add(media);
 			}
+		}
 
 		return new GenericResponse<IEnumerable<MediaEntity>?>(medias, message: Path.Combine(env.WebRootPath, "Medias"));
 	}
@@ -155,15 +157,15 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 		media.JsonDetail.Link2 = model.Link2 ?? media.JsonDetail.Link2;
 		media.JsonDetail.Link3 = model.Link3 ?? media.JsonDetail.Link3;
 		media.UpdatedAt = DateTime.UtcNow;
-		media.Tags = model.Tags ?? media.Tags;
+		media.Tags = model.Tags;
 		media.Order = model.Order ?? media.Order;
 
 		if (model.RemoveTags.IsNotNullOrEmpty()) {
-			model.RemoveTags?.ForEach(item => media.Tags?.Remove(item));
+			model.RemoveTags.ForEach(item => media.Tags.Remove(item));
 		}
 
 		if (model.AddTags.IsNotNullOrEmpty()) {
-			media.Tags?.AddRange(model.AddTags!);
+			media.Tags.AddRange(model.AddTags!);
 		}
 
 		dbContext.Set<MediaEntity>().Update(media);

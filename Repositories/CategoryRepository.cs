@@ -28,7 +28,7 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 	}
 
 	public async Task<GenericResponse<IEnumerable<CategoryEntity>>> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto, CancellationToken ct) {
-		List<CategoryEntity> list = new();
+		List<CategoryEntity> list = [];
 		foreach (CategoryCreateUpdateDto i in dto) {
 			GenericResponse<CategoryEntity> j = await Create(i, ct);
 			list.Add(j.Result!);
@@ -38,7 +38,7 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 	}
 
 	public async Task<GenericResponse> ImportFromExcel(IFormFile file, CancellationToken ct) {
-		List<CategoryCreateUpdateDto> list = new();
+		List<CategoryCreateUpdateDto> list = [];
 		using MemoryStream stream = new();
 		await file.CopyToAsync(stream, ct);
 		using ExcelPackage package = new(stream);
@@ -51,7 +51,7 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 				TitleTr1 = worksheet.Cells[i, 3].Value.ToString(),
 				ParentId = Guid.TryParse(worksheet.Cells[i, 4].Value.ToString(), out _) ? Guid.Parse(worksheet.Cells[i, 4].Value.ToString()!) : null,
 				Tags = new List<TagCategory> { TagCategory.Category },
-				IsUnique = false,
+				IsUnique = false
 			});
 		}
 

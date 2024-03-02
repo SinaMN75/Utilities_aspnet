@@ -30,7 +30,7 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 			Tags = dto.Tags,
 			BuyerId = dto.BuyerId,
 			SellerId = dto.SellerId,
-			OrderId = dto.OrderId,
+			OrderId = dto.OrderId
 		};
 		await dbContext.Set<TransactionEntity>().AddAsync(e, ct);
 		await dbContext.SaveChangesAsync(ct);
@@ -172,11 +172,11 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 				string title = e.Order?.OrderDetails?.Select(x => x.Product!.Title).ToString()!;
 				string orderCode = (e.Order?.OrderNumber ?? 0).ToString();
 				long bestankar = e.Amount ?? 0;
-				long bedehkar = 0;
-				long takhfifBestankar = 0;
-				long takhfifBedehkar = 0;
+				const long bedehkar = 0;
+				const long takhfifBestankar = 0;
+				const long takhfifBedehkar = 0;
 				long finalPriceBestankar = e.Amount ?? 0;
-				long finalPriceBedehkar = 0;
+				const long finalPriceBedehkar = 0;
 				string description = "فروش به مبلغ " + (e.Amount ?? 0);
 
 				datatableSell.Rows.Add(
@@ -222,22 +222,22 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 			}
 		}
 
-		string type1 = "فروش";
-		string type2 = "فروش";
-		string title1 = "فروش";
-		string title2 = "برگشت از فروش";
+		const string type1 = "فروش";
+		const string type2 = "فروش";
+		const string title1 = "فروش";
+		const string title2 = "برگشت از فروش";
 		int count1 = list.Count(x => x.Tags.Contains(TagTransaction.Sell));
 		int count2 = list.Count(x => x.Tags.Contains(TagTransaction.Return));
 		long priceBedehkar1 = list.Where(x => x.Tags.Contains(TagTransaction.Sell)).Sum(x => x.Amount ?? 0);
-		long priceBedehkar2 = 0;
-		long priceBestankar1 = 0;
+		const long priceBedehkar2 = 0;
+		const long priceBestankar1 = 0;
 		long priceBestankar2 = list.Where(x => x.Tags.Contains(TagTransaction.Return)).Sum(x => x.Amount ?? 0);
-		long discountBedehkar1 = 0;
-		long discountBedehkar2 = 0;
-		long discountBestankar1 = 0;
-		long discountBestankar2 = 0;
-		long discountPrecent1 = 0;
-		long discountPrecent2 = 0;
+		const long discountBedehkar1 = 0;
+		const long discountBedehkar2 = 0;
+		const long discountBestankar1 = 0;
+		const long discountBestankar2 = 0;
+		const long discountPrecent1 = 0;
+		const long discountPrecent2 = 0;
 
 		datatableSuratHesab.Rows.Add(
 			type1,

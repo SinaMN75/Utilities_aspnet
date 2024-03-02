@@ -29,7 +29,7 @@ public class CategoryController(ICategoryRepository repository) : BaseApiControl
 	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Update(CategoryCreateUpdateDto dto, CancellationToken ct) =>
 		Result(await repository.Update(dto, ct));
 
-	[HttpDelete("{id}")]
+	[HttpDelete("{id:guid}")]
 	[Authorize]
 	public async Task<IActionResult> Delete(Guid id, CancellationToken ct) => Result(await repository.Delete(id, ct));
 }

@@ -75,7 +75,7 @@ public class PromotionRepository(DbContext dbContext,
 
 		string[]? usersId = promotion.Users.IsNotNullOrEmpty() ? promotion.Users!.Split(",") : null;
 		if (usersId is null) return new GenericResponse<PromotionDetail?>(null, UtilitiesStatusCodes.BadRequest);
-		List<UserEntity> users = new();
+		List<UserEntity> users = [];
 		foreach (string? item in usersId) {
 			UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == item);
 			if (user is null) continue;

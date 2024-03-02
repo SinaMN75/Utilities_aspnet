@@ -7,7 +7,7 @@ public class ReportController(IReportRepository repository) : BaseApiController 
 	[HttpPost("Filter")]
 	public ActionResult<GenericResponse<IEnumerable<ReportEntity>>> Filter() => Result(repository.Filter());
 
-	[HttpGet("{id}")]
+	[HttpGet("{id:guid}")]
 	public async Task<ActionResult<GenericResponse<ReportEntity>>> ReadById(Guid id) => Result(await repository.ReadById(id));
 
 	[HttpPost]

@@ -20,7 +20,7 @@ public class AddressController(IAddressRepository repository, IOutputCacheStore 
 	[OutputCache(Tags = ["address"])]
 	public async Task<ActionResult<GenericResponse<IQueryable<AddressEntity>>>> Filter(AddressFilterDto dto) => Result(await repository.Filter(dto));
 
-	[HttpDelete("{id}")]
+	[HttpDelete("{id:guid}")]
 	public async Task<ActionResult<GenericResponse>> Delete(Guid id, CancellationToken ct) {
 		await outputCache.EvictByTagAsync("address", ct);
 		return Result(await repository.Delete(id, ct));
