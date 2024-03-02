@@ -165,7 +165,7 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 		}
 
 		if (model.AddTags.IsNotNullOrEmpty()) {
-			media.Tags.AddRange(model.AddTags!);
+			media.Tags.AddRange(model.AddTags);
 		}
 
 		dbContext.Set<MediaEntity>().Update(media);

@@ -198,12 +198,12 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 				string date = e.CreatedAt.ToString(CultureInfo.InvariantCulture);
 				string title = e.Order!.OrderDetails!.Select(x => x.Product!.Title).ToString()!;
 				string orderCode = (e.Order?.OrderNumber ?? 0).ToString();
-				long bestankar = 0;
+				const long bestankar = 0;
 				long bedehkar = e.Amount ?? 0;
-				long takhfifBestankar = 0;
-				long takhfifBedehkar = 0;
+				const long takhfifBestankar = 0;
+				const long takhfifBedehkar = 0;
 				long finalPriceBestankar = e.Amount ?? 0;
-				long finalPriceBedehkar = 0;
+				const long finalPriceBedehkar = 0;
 				string description = "برگشت از فروش به مبلغ " + (e.Amount ?? 0);
 
 				datatableReturn.Rows.Add(

@@ -70,7 +70,7 @@ public static class StartupExtension {
 			switch (databaseType) {
 				case UtilitiesDatabaseType.SqlServer:
 					options.UseSqlServer(connectionStrings, o => {
-						o.EnableRetryOnFailure(maxRetryCount: 2, maxRetryDelay: FromSeconds(1), errorNumbersToAdd: new int[] { });
+						o.EnableRetryOnFailure(maxRetryCount: 2, maxRetryDelay: FromSeconds(1), errorNumbersToAdd: Array.Empty<int>());
 						o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
 					});
 					break;
@@ -148,7 +148,7 @@ public static class StartupExtension {
 		});
 	}
 
-	private static void AddUtilitiesIdentity(this WebApplicationBuilder builder) {
+	private static void AddUtilitiesIdentity(this IHostApplicationBuilder builder) {
 		builder.Services.AddAuthentication(options => {
 			options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
 			options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;

@@ -41,7 +41,7 @@ public class AppSettingsRepository(IConfiguration config, DbContext dbContext) :
 	}
 
 	public async Task<GenericResponse<DashboardReadDto>> ReadDashboardData() =>
-		new(new DashboardReadDto() {
+		new(new DashboardReadDto {
 			Categories = await dbContext.Set<CategoryEntity>().AsNoTracking().CountAsync(),
 			Users = await dbContext.Set<UserEntity>().AsNoTracking().CountAsync(),
 			Products = await dbContext.Set<ProductEntity>().AsNoTracking().CountAsync(),

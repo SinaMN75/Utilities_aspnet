@@ -181,7 +181,7 @@ public class ProductRepository(
 
 		if (i.JsonDetail.VisitCounts is null) i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId ?? "", Count = 1 });
 		else
-			foreach (VisitCount j in i.JsonDetail.VisitCounts ?? new List<VisitCount>()) {
+			foreach (VisitCount j in i.JsonDetail.VisitCounts ?? []) {
 				if (j.UserId == _userId) j.Count += 1;
 				else {
 					i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId, Count = 0 });
@@ -473,10 +473,10 @@ public static class ProductEntityExtension {
 			entity.ProductInsights = productInsights;
 		}
 
-		if (dto.ParentId is not null) {
-			entity.ParentId = dto.ParentId ?? entity.ParentId;
-			entity.Parent = context.Set<ProductEntity>().FirstOrDefault(f => f.Id == dto.ParentId);
-		}
+		if (dto.ParentId is null) return entity;
+
+		entity.ParentId = dto.ParentId ?? entity.ParentId;
+		entity.Parent = context.Set<ProductEntity>().FirstOrDefault(f => f.Id == dto.ParentId);
 
 		return entity;
 	}

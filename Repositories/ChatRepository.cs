@@ -286,7 +286,7 @@ public class ChatRepository(
 		e.CountOfUnreadMessages = countOfMessage;
 		await promotionRepository.UserSeened(e.Id);
 
-		return new GenericResponse<GroupChatEntity>(e!);
+		return new GenericResponse<GroupChatEntity>(e);
 	}
 
 	public GenericResponse<IQueryable<GroupChatMessageEntity>?> ReadGroupChatMessages(Guid id, int pageSize, int pageNumber) {
