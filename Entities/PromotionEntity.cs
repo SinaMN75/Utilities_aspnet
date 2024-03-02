@@ -33,7 +33,6 @@ public class PromotionEntity : BaseEntity {
 }
 
 public class CreateUpdatePromotionDto {
-	public Guid? Id { get; set; }
 	public DisplayType DisplayType { get; set; }
 	public List<string>? Skills { get; set; }
 	public List<string>? Gender { get; set; }
@@ -49,5 +48,4 @@ public class PromotionDetail {
 	public int TotalSeen { get; set; }
 	public List<KeyValue> StatePerUsers { get; set; } = null!;
 	public List<KeyValue> SkillPerUsers { get; set; } = null!;
-	public List<KeyValue> AgeCategoryPerUsers { get; set; } = null!;
 }

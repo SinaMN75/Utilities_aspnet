@@ -13,7 +13,7 @@ public class ContentRepository(DbContext dbContext, IMediaRepository mediaReposi
 			Description = dto.Description,
 			Title = dto.Title,
 			SubTitle = dto.SubTitle,
-			Tags = dto.Tags,
+			Tags = dto.Tags ?? [],
 			JsonDetail = new ContentJsonDetail {
 				Instagram = dto.Instagram,
 				Telegram = dto.Telegram,

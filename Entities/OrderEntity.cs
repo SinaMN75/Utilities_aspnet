@@ -89,9 +89,9 @@ public class ReserveChairCreateUpdateDto {
 public class OrderJsonDetail {
 	public string? ProductId { get; set; }
 	public string? RefCode { get; set; }
-	public List<OrderDetailHistory> OrderDetailHistories { get; set; } = new();
-	public List<ReserveDto> ReservationTimes { get; set; } = new();
-	public List<Seat> Seats { get; set; } = new();
+	public List<OrderDetailHistory> OrderDetailHistories { get; set; } = [];
+	public List<ReserveDto> ReservationTimes { get; set; } = [];
+	public List<Seat> Seats { get; set; } = [];
 }
 
 public class OrderDetailHistory {

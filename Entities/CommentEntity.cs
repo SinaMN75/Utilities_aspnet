@@ -32,7 +32,7 @@ public class CommentEntity : BaseEntity {
 }
 
 public class CommentJsonDetail {
-	public List<CommentReacts> Reacts { get; set; } = new();
+	public List<CommentReacts> Reacts { get; set; } = [];
 }
 
 public class CommentReacts {
@@ -47,9 +47,9 @@ public class CommentCreateUpdateDto {
 	public Guid? ProductId { get; set; }
 	public string? UserId { get; set; }
 	public ChatStatus? Status { get; set; }
-	public List<TagComment> Tags { get; set; } = [];
-	public List<TagComment> RemoveTags { get; set; } = [];
-	public List<TagComment> AddTags { get; set; } = [];
+	public List<TagComment>? Tags { get; set; }
+	public List<TagComment>? RemoveTags { get; set; }
+	public List<TagComment>? AddTags { get; set; }
 }
 
 public class CommentFilterDto : BaseFilterDto {

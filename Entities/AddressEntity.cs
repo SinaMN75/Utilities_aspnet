@@ -32,7 +32,6 @@ public class AddressCreateDto {
 	public required string Pelak { get; set; }
 	public required string Unit { get; set; }
 	public required string PostalCode { get; set; }
-	public required bool IsDefault { get; set; } = false;
 }
 
 public class AddressUpdateDto {

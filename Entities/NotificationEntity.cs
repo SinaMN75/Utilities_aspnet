@@ -40,9 +40,9 @@ public class NotificationCreateUpdateDto {
 	public string? Message { get; set; }
 	public string? Link { get; set; }
 	public Guid? ProductId { get; set; }
-	public List<TagNotification> Tags { get; set; } = [];
-	public List<TagNotification> RemoveTags { get; set; } = [];
-	public List<TagNotification> AddTags { get; set; } = [];
+	public List<TagNotification>? Tags { get; set; }
+	public List<TagNotification>? RemoveTags { get; set; }
+	public List<TagNotification>? AddTags { get; set; }
 }
 
 public class NotificationFilterDto : BaseFilterDto {
@@ -50,5 +50,4 @@ public class NotificationFilterDto : BaseFilterDto {
 	public string? UserId { get; set; }
 	public string? CreatorUserId { get; set; }
 	public string? Message { get; set; }
-	public List<TagNotification>? Tags { get; set; }
 }

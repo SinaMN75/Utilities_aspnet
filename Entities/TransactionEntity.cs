@@ -38,11 +38,10 @@ public class TransactionCreateDto {
 	public required string Descriptions { get; set; } = "";
 	public string? RefId { get; set; }
 	public string? CardNumber { get; set; }
-	public required List<TagTransaction> Tags { get; set; } = [];
+	public required List<TagTransaction>? Tags { get; set; }
 	public string? BuyerId { get; set; }
 	public string? SellerId { get; set; }
 	public Guid? OrderId { get; set; }
-	public Guid? SubscriptionId { get; set; }
 }
 
 public class TransactionUpdateDto {
@@ -52,11 +51,6 @@ public class TransactionUpdateDto {
 	public string? RefId { get; set; }
 	public string? CardNumber { get; set; }
 	public List<TagTransaction>? Tags { get; set; }
-	public string? BuyerId { get; set; }
-	public string? SellerId { get; set; }
-	public Guid? OrderId { get; set; }
-	public Guid? Code { get; set; }
-	public Guid? SubscriptionId { get; set; }
 }
 
 public class TransactionFilterDto {
@@ -65,7 +59,6 @@ public class TransactionFilterDto {
 	public List<TagTransaction>? Tags { get; set; }
 	public string? BuyerId { get; set; }
 	public string? SellerId { get; set; }
-	public string? Code { get; set; }
 	public Guid? OrderId { get; set; }
 	public DateTime? DateTimeStart { get; set; }
 	public DateTime? DateTimeEnd { get; set; }

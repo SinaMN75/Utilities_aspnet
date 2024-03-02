@@ -27,7 +27,7 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 			Descriptions = dto.Descriptions,
 			RefId = dto.RefId,
 			CardNumber = dto.CardNumber,
-			Tags = dto.Tags,
+			Tags = dto.Tags ?? [],
 			BuyerId = dto.BuyerId,
 			SellerId = dto.SellerId,
 			OrderId = dto.OrderId

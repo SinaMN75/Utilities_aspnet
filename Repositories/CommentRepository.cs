@@ -141,13 +141,13 @@ public class CommentRepository(DbContext dbContext,
 		if (dto.ProductId.HasValue) comment.ProductId = dto.ProductId;
 		if (dto.UserId.IsNotNullOrEmpty()) comment.TargetUserId = dto.UserId;
 		if (dto.Status.HasValue) comment.Status = dto.Status;
-		if (dto.Tags.IsNotNullOrEmpty()) comment.Tags = dto.Tags;
+		if (dto.Tags.IsNotNullOrEmpty()) comment.Tags = dto.Tags!;
 		if (dto.RemoveTags.IsNotNullOrEmpty()) {
-			dto.RemoveTags.ForEach(item => comment.Tags.Remove(item));
+			dto.RemoveTags!.ForEach(item => comment.Tags!.Remove(item));
 		}
 
 		if (dto.AddTags.IsNotNullOrEmpty()) {
-			comment.Tags.AddRange(dto.AddTags);
+			comment.Tags!.AddRange(dto.AddTags!);
 		}
 
 		comment.UpdatedAt = DateTime.UtcNow;

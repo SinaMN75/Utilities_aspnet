@@ -157,15 +157,15 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 		media.JsonDetail.Link2 = model.Link2 ?? media.JsonDetail.Link2;
 		media.JsonDetail.Link3 = model.Link3 ?? media.JsonDetail.Link3;
 		media.UpdatedAt = DateTime.UtcNow;
-		media.Tags = model.Tags;
+		media.Tags = model.Tags ?? [];
 		media.Order = model.Order ?? media.Order;
 
 		if (model.RemoveTags.IsNotNullOrEmpty()) {
-			model.RemoveTags.ForEach(item => media.Tags.Remove(item));
+			model.RemoveTags!.ForEach(item => media.Tags!.Remove(item));
 		}
 
 		if (model.AddTags.IsNotNullOrEmpty()) {
-			media.Tags.AddRange(model.AddTags);
+			media.Tags!.AddRange(model.AddTags!);
 		}
 
 		dbContext.Set<MediaEntity>().Update(media);

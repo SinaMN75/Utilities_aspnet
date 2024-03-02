@@ -75,24 +75,6 @@ public class SeenUsers : BaseEntity {
 	public Guid? FkGroupChatMessage { get; set; }
 }
 
-public class ChatReadDto {
-	public Guid? Id { get; set; }
-	public string? UserId { get; set; }
-	public string? MessageText { get; set; }
-	public DateTime? DateTime { get; set; }
-	public bool? Send { get; set; }
-	public int? UnReadMessages { get; set; } = 0;
-	public Guid? ParentId { get; set; }
-	public IEnumerable<MediaEntity>? Media { get; set; }
-	public UserEntity? User { get; set; }
-	public IEnumerable<ProductEntity?>? Products { get; set; }
-	public ChatReadDto? Parent { get; set; }
-}
-
-public class ChatFilterDto : BaseFilterDto {
-	public string UserId { get; set; } = null!;
-}
-
 public class GroupChatFilterDto : BaseFilterDto {
 	public IEnumerable<string>? UsersIds { get; set; }
 	public IEnumerable<Guid>? ProductsIds { get; set; }

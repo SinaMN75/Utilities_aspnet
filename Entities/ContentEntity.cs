@@ -58,7 +58,7 @@ public class ContentCreateDto {
 	public string Address1 { get; set; } = "";
 	public string Address2 { get; set; } = "";
 	public string Address3 { get; set; } = "";
-	public List<TagContent> Tags { get; set; } = new();
+	public List<TagContent>? Tags { get; set; }
 }
 
 public class ContentUpdateDto {

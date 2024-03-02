@@ -3,10 +3,7 @@
 public class AppSettings {
 	public SmsPanelSettings SmsPanelSettings { get; set; } = null!;
 	public PaymentSettings PaymentSettings { get; set; } = null!;
-	public OrderSettings OrderSettings { get; set; } = null!;
 	public PushNotificationSetting PushNotificationSetting { get; set; } = null!;
-	public UsageRulesBeforeUpgrade UsageRulesBeforeUpgrade { get; set; } = null!;
-	public UsageRulesAfterUpgrade UsageRulesAfterUpgrade { get; set; } = null!;
 	public AmazonS3Settings AmazonS3Settings { get; set; } = null!;
 	public int? WithdrawalLimit { get; set; }
 	public int? WithdrawalTimeLimit { get; set; }
@@ -29,11 +26,6 @@ public class AppSettings {
 	}
 }
 
-public class OrderSettings {
-	public double TaxPercent { get; set; }
-	public double AddOnPrice { get; set; }
-}
-
 public class SmsPanelSettings {
 	public string? Provider { get; set; }
 	public string? UserName { get; set; }
@@ -48,26 +40,6 @@ public class AmazonS3Settings {
 	public string? SecretKey { get; set; }
 	public string? Url { get; set; }
 	public string? DefaultBucket { get; set; }
-}
-
-public class UsageRulesBeforeUpgrade {
-	public int MaxPostPerDay { get; set; }
-	public int MaxTweetPerDay { get; set; }
-	public int MaxAdvertismentPerDay { get; set; }
-	public int MaxGroupOrChannelPerProfile { get; set; }
-	public int MaxSendPostPerHour { get; set; }
-	public int MaxCommentPerHour { get; set; }
-	public int MaxChatPerHour { get; set; }
-}
-
-public class UsageRulesAfterUpgrade {
-	public int MaxPostPerDay { get; set; }
-	public int MaxTweetPerDay { get; set; }
-	public int MaxAdvertismentPerDay { get; set; }
-	public int MaxGroupOrChannelPerProfile { get; set; }
-	public int MaxSendPostPerHour { get; set; }
-	public int MaxCommentPerHour { get; set; }
-	public int MaxChatPerHour { get; set; }
 }
 
 public class PaymentSettings {

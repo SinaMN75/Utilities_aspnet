@@ -16,7 +16,7 @@ public class CategoryEntity : BaseEntity {
 	public CategoryJsonDetail JsonDetail { get; set; } = new();
 
 	[MaxLength(100)]
-	public List<TagCategory> Tags { get; set; } = new();
+	public List<TagCategory> Tags { get; set; } = [];
 
 	public Guid? ParentId { get; set; }
 	public CategoryEntity? Parent { get; set; }
@@ -90,6 +90,5 @@ public class CategoryFilterDto : BaseFilterDto {
 	public bool? ShowMedia { get; set; }
 	public bool? OrderByOrder { get; set; }
 	public bool? OrderByOrderDescending { get; set; }
-	public bool? OrderByCreatedAt { get; set; }
 	public bool? OrderByCreatedAtDescending { get; set; }
 }

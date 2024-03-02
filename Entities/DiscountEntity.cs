@@ -20,7 +20,6 @@ public class DiscountEntity : BaseEntity {
 public class DiscountFilterDto : BaseFilterDto {
 	public string? Title { get; set; }
 	public string? Code { get; set; }
-	public int? DiscountPercent { get; set; }
 	public int? NumberUses { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }

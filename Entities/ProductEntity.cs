@@ -97,10 +97,10 @@ public class ProductJsonDetail {
 	public int? ShippingTime { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
-	public List<KeyValue>? KeyValues { get; set; } = new();
-	public List<ReservationTime>? ReservationTimes { get; set; } = new();
-	public List<VisitCount>? VisitCounts { get; set; } = new();
-	public List<Seat>? Seats { get; set; } = new();
+	public List<KeyValue>? KeyValues { get; set; } = [];
+	public List<ReservationTime>? ReservationTimes { get; set; } = [];
+	public List<VisitCount>? VisitCounts { get; set; } = [];
+	public List<Seat>? Seats { get; set; } = [];
 }
 
 public class Seat {
@@ -248,7 +248,6 @@ public class ProductFilterDto : BaseFilterDto {
 	public bool? OrderByPriceDescending { get; set; } = false;
 	public bool? OrderByCreatedDate { get; set; } = true;
 	public bool? OrderByCreatedDateDescending { get; set; } = false;
-	public bool? OrderByMostUsedHashtag { get; set; }
 	public bool? OrderByAgeCategory { get; set; }
 	public bool? OrderByCategory { get; set; }
 	public bool? ShowCountOfComment { get; set; }

@@ -173,9 +173,9 @@ public class UpdateMediaDto {
 	public string? Link1 { get; set; }
 	public string? Link2 { get; set; }
 	public string? Link3 { get; set; }
-	public List<TagMedia> Tags { get; set; } = [];
-	public List<TagMedia> RemoveTags { get; set; } = [];
-	public List<TagMedia> AddTags { get; set; } = [];
+	public List<TagMedia>? Tags { get; set; }
+	public List<TagMedia>? RemoveTags { get; set; }
+	public List<TagMedia>? AddTags { get; set; }
 }
 
 public class MediaFilterDto : BaseFilterDto;
