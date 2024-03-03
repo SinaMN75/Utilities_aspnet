@@ -175,7 +175,7 @@ public enum TagTransaction {
 public enum TagCategory {
 	Category = 100,
 	YooNote = 101,
-	Specialty = 102,
+	Speciality = 102,
 	SpecializedArt = 103,
 	Colors = 104,
 	Brand = 105,
@@ -252,7 +252,6 @@ public enum TagCategory {
 	Country = 176,
 	City = 177,
 	Province = 178,
-	Speciality = 179,
 	Free = 180,
 	Payment = 181,
 	Favorites = 182,
@@ -272,7 +271,8 @@ public enum TagContent {
 	ContactInfo = 109,
 	SmallDetail1 = 110,
 	SmallDetail2 = 111,
-	News = 112
+	News = 112,
+	Premium = 113
 }
 
 public enum TagComment {
@@ -391,6 +391,7 @@ public enum TagProduct {
 	Premium3Month = 185,
 	Premium6Month = 186,
 	Premium12Month = 187,
+	Post = 189,
 	New = 201,
 	KindOfNew = 202,
 	Used = 203,
