@@ -479,4 +479,6 @@ public enum TagReservationChair {
 	Reserved = 104
 }
 
-public enum TagNotification;
+public enum TagNotification {
+	ReceivedComment = 100
+};

@@ -115,6 +115,7 @@ public class CommentRepository(DbContext dbContext,
 				Title = "Comment",
 				CreatorUserId = comment.UserId,
 				Link = product.Id.ToString(),
+				Tags = [TagNotification.ReceivedComment],
 				ProductId = product.Id
 			});
 		if (dto.UserId != null) {
@@ -123,6 +124,7 @@ public class CommentRepository(DbContext dbContext,
 					UserId = trgtUser.Id,
 					Message = dto.Comment ?? "",
 					Title = "Comment",
+					Tags = [TagNotification.ReceivedComment],
 					CreatorUserId = comment.UserId,
 					Link = product.Id.ToString()
 				});
