@@ -64,7 +64,7 @@ public class AppSettingsRepository(IConfiguration config, DbContext dbContext) :
 				Contents = dbContext.Set<ContentEntity>().AsNoTracking()
 					.Include(x => x.Media),
 				Products = dbContext.Set<ProductEntity>().AsNoTracking()
-					.Include(x => x.Media!.Where(y => y.ParentId != null)).ThenInclude(x => x.Children)
+					.Include(x => x.Media!.Where(y => y.ParentId == null)).ThenInclude(x => x.Children)
 					.Include(x => x.Categories)!.ThenInclude(x => x.Children)
 					.Include(x => x.Comments)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
 			}
