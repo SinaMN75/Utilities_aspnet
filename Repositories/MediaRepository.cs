@@ -30,6 +30,7 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 			else if (model.GroupChatMessageId is not null) folderName = "groupChatsMessages/";
 			string name = $"{folderName}{Guid.NewGuid() + Path.GetExtension(model.File.FileName)}";
 			MediaEntity media = new() {
+				Id = model.Id ?? Guid.NewGuid(),
 				FileName = name,
 				UserId = model.UserId,
 				ProductId = model.ProductId,
