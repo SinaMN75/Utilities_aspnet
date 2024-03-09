@@ -32,13 +32,6 @@ public static class StartupExtension {
 		builder.Logging.AddRinLogger();
 		builder.Services.AddRin();
 		builder.Services.AddOptions();
-		builder.Services.AddUtilitiesOutputCache("everything", FromHours(2), false);
-		builder.Services.AddUtilitiesOutputCache("appSetting", FromHours(24), false);
-		builder.Services.AddUtilitiesOutputCache("content", FromHours(24), false);
-		builder.Services.AddUtilitiesOutputCache("category", FromHours(1), false);
-		builder.Services.AddUtilitiesOutputCache("address", FromHours(1));
-		builder.Services.AddUtilitiesOutputCache("comment", FromHours(1));
-		builder.Services.AddUtilitiesOutputCache("transaction", FromMinutes(1));
 
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
@@ -99,9 +92,8 @@ public static class StartupExtension {
 			options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
 			options.UseCamelCasing(true);
 		});
-		//Encrypt/Decrypt
-		//builder.Services.AddTransient<EncryptionMiddleware>();
-		//Encrypt/Decrypt
+
+		builder.Services.AddOutputCache();
 		builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 		builder.Services.AddScoped<AppSettings>();
 		builder.Services.AddScoped<IReportRepository, ReportRepository>();
@@ -202,30 +194,4 @@ public static class StartupExtension {
 			c.DefaultModelsExpandDepth(2);
 		});
 	}
-
-	private static void AddUtilitiesOutputCache(this IServiceCollection service, string tag, TimeSpan expire, bool varyByHeaders = true) =>
-		service.AddOutputCache(x => {
-			x.AddPolicy(tag, cachePolicyBuilder => {
-				cachePolicyBuilder.SetVaryByRouteValue("*");
-				if (varyByHeaders)
-					cachePolicyBuilder.SetVaryByHeader("*");
-				cachePolicyBuilder.SetVaryByHost(true);
-				cachePolicyBuilder.SetVaryByQuery("*");
-				cachePolicyBuilder.Expire(expire);
-				cachePolicyBuilder.AddPolicy<OutputCachePolicy>().VaryByValue(context => {
-					context.Request.EnableBuffering();
-					using StreamReader reader = new(context.Request.Body, leaveOpen: true);
-					Task<string> body = reader.ReadToEndAsync();
-					context.Request.Body.Position = 0;
-					KeyValuePair<string, string> keyVal = new("requestBody", body.Result);
-					return keyVal;
-				});
-			});
-		});
-}
-
-internal class OutputCachePolicy : IOutputCachePolicy {
-	public ValueTask ServeFromCacheAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
-	public ValueTask ServeResponseAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
-	public ValueTask CacheRequestAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
 }
