@@ -260,6 +260,8 @@ public class ProductRepository(
 			.Include(x => x.VisitProducts)
 			.Include(x => x.OrderDetail)
 			.Include(x => x.Comments)
+			.Include(x => x.Bookmarks)!.ThenInclude(y => y.Media)
+			.Include(x => x.Bookmarks)!.ThenInclude(y => y.Children)!.ThenInclude(z => z.Media)
 			.Include(x => x.Children)!.ThenInclude(x => x.Media)
 			.Include(x => x.Children)!.ThenInclude(x => x.VisitProducts)
 			.Include(x => x.Children)!.ThenInclude(x => x.OrderDetail)
@@ -268,6 +270,14 @@ public class ProductRepository(
 		foreach (CommentEntity comment in i.Comments ?? new List<CommentEntity>()) await commentRepository.Delete(comment.Id, ct);
 		foreach (VisitProducts visitProduct in i.VisitProducts ?? new List<VisitProducts>()) dbContext.Remove(visitProduct);
 		foreach (OrderDetailEntity orderDetail in i.OrderDetail ?? new List<OrderDetailEntity>()) dbContext.Remove(orderDetail);
+		foreach (BookmarkEntity bookmark in i.Bookmarks ?? new List<BookmarkEntity>()) {
+			foreach (BookmarkEntity bookmarkChild in bookmark.Children ?? new List<BookmarkEntity>()) {
+				await mediaRepository.DeleteMedia(bookmarkChild.Media);
+				dbContext.Remove(bookmarkChild);
+			}
+			await mediaRepository.DeleteMedia(bookmark.Media);
+			dbContext.Remove(bookmark);
+		}
 		await mediaRepository.DeleteMedia(i.Media);
 		foreach (ProductEntity product in i.Children ?? new List<ProductEntity>()) {
 			await mediaRepository.DeleteMedia(product.Media);
