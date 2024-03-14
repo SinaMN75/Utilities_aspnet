@@ -117,8 +117,12 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 	}
 
 	public async Task<GenericResponse> Delete(Guid id) {
-		MediaEntity? media = await dbContext.Set<MediaEntity>().FirstOrDefaultAsync(x => x.Id == id);
-		if (media == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
+		MediaEntity media = (await dbContext.Set<MediaEntity>()
+			.Include(x => x.Children)
+			.FirstOrDefaultAsync(x => x.Id == id))!;
+		
+		foreach (MediaEntity i in media.Children ?? new List<MediaEntity>()) await Delete(i.Id);
+		
 		try {
 			File.Delete(Path.Combine(env.WebRootPath, "Medias", media.FileName!));
 		}
