@@ -10,6 +10,6 @@ public class AppSettingsController(IAppSettingsRepository repository) : BaseApiC
 	public async Task<ActionResult<GenericResponse<DashboardReadDto>>> ReadDashboardData() => await repository.ReadDashboardData();
 	
 	[HttpGet("ReadEverything")]
-	[OutputCache(Duration = 60)]
+	[OutputCache(Duration = 1)]
 	public ActionResult<GenericResponse<EverythingReadDto>> ReadEverything() => repository.ReadEverything();
 }
