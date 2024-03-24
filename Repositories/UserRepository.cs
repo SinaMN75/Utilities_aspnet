@@ -21,7 +21,8 @@ public class UserRepository(
 	ISmsNotificationRepository sms,
 	IHttpContextAccessor httpContextAccessor,
 	ITransactionRepository transactionRepository,
-	IDistributedCache cache
+	IDistributedCache cache,
+	IConfiguration config
 ) : IUserRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
@@ -451,7 +452,11 @@ public class UserRepository(
 		if (cachedData.IsNullOrEmpty()) cache.SetStringData(userId, newOtp, TimeSpan.FromSeconds(120));
 
 		UserEntity? user = await ReadByIdMinimal(userId);
-		await sms.SendSms(user?.PhoneNumber!, AppSettings.GetCurrentSettings().SmsPanelSettings.PatternCode!, newOtp);
+		
+		AppSettings appSettings = new();
+		config.GetSection("AppSettings").Bind(appSettings);
+		
+		await sms.SendSms(user?.PhoneNumber!, appSettings.SmsPanelSettings.PatternCode!, newOtp);
 		await dbContext.SaveChangesAsync();
 		return true;
 	}

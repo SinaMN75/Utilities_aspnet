@@ -8,7 +8,12 @@ public interface IMediaRepository {
 	Task DeleteMedia(IEnumerable<MediaEntity?>? media);
 }
 
-public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmazonS3Repository amazonS3Repository) : IMediaRepository {
+public class MediaRepository(
+	IWebHostEnvironment env,
+	DbContext dbContext,
+	IAmazonS3Repository amazonS3Repository,
+	IConfiguration config
+) : IMediaRepository {
 	public async Task<GenericResponse<IEnumerable<MediaEntity>?>> Upload(UploadDto model) {
 		List<MediaEntity> medias = [];
 
@@ -63,7 +68,9 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 			await dbContext.SaveChangesAsync();
 			medias.Add(media);
 			string path = SaveMedia(model.File, name);
-			AmazonS3Settings amazonS3Settings = AppSettings.GetCurrentSettings().AmazonS3Settings;
+			AppSettings appSettings = new();
+			config.GetSection("AppSettings").Bind(appSettings);
+			AmazonS3Settings amazonS3Settings = appSettings.AmazonS3Settings;
 			if (amazonS3Settings.UseS3 ?? false)
 				await amazonS3Repository.UploadObjectFromFileAsync(amazonS3Settings.DefaultBucket!, name, path);
 		}
@@ -120,15 +127,17 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 		MediaEntity media = (await dbContext.Set<MediaEntity>()
 			.Include(x => x.Children)
 			.FirstOrDefaultAsync(x => x.Id == id))!;
-		
+
 		foreach (MediaEntity i in media.Children ?? new List<MediaEntity>()) await Delete(i.Id);
-		
+
 		try {
 			File.Delete(Path.Combine(env.WebRootPath, "Medias", media.FileName!));
 		}
 		catch (Exception) { }
 
-		AmazonS3Settings amazonS3Settings = AppSettings.GetCurrentSettings().AmazonS3Settings;
+		AppSettings appSettings = new();
+		config.GetSection("AppSettings").Bind(appSettings);
+		AmazonS3Settings amazonS3Settings = appSettings.AmazonS3Settings;
 		if (amazonS3Settings.UseS3 ?? false)
 			await amazonS3Repository.DeleteObject(amazonS3Settings.DefaultBucket!, media.FileName!);
 
@@ -166,11 +175,11 @@ public class MediaRepository(IWebHostEnvironment env, DbContext dbContext, IAmaz
 		media.Order = model.Order ?? media.Order;
 
 		if (model.RemoveTags.IsNotNullOrEmpty()) {
-			model.RemoveTags!.ForEach(item => media.Tags!.Remove(item));
+			model.RemoveTags!.ForEach(item => media.Tags.Remove(item));
 		}
 
 		if (model.AddTags.IsNotNullOrEmpty()) {
-			media.Tags!.AddRange(model.AddTags!);
+			media.Tags.AddRange(model.AddTags!);
 		}
 
 		dbContext.Set<MediaEntity>().Update(media);
