@@ -258,6 +258,7 @@ public class ProductFilterDto : BaseFilterDto {
 	public IEnumerable<Guid>? Categories { get; set; }
 	public List<TagProduct>? Tags { get; set; }
 	public IEnumerable<string>? UserIds { get; set; }
+	public IEnumerable<Guid>? Ids { get; set; }
 	public string? Query { get; set; }
 	public bool ShowExpired { get; set; } = false;
 	public bool Boosted { get; set; }
