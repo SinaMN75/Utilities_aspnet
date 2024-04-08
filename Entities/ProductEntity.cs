@@ -98,10 +98,11 @@ public class ProductJsonDetail {
 	public int? ShippingTime { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
-	public List<KeyValue>? KeyValues { get; set; } = [];
-	public List<ReservationTime>? ReservationTimes { get; set; } = [];
-	public List<VisitCount>? VisitCounts { get; set; } = [];
-	public List<Seat>? Seats { get; set; } = [];
+	public List<KeyValue> KeyValues { get; set; } = [];
+	public List<ReservationTime> ReservationTimes { get; set; } = [];
+	public List<VisitCount> VisitCounts { get; set; } = [];
+	public List<Seat> Seats { get; set; } = [];
+	public List<Guid> RelatedProducts { get; set; } = [];
 }
 
 public class Seat {
@@ -210,6 +211,7 @@ public class ProductCreateUpdateDto {
 	public List<TagProduct>? Tags { get; set; }
 	public List<TagProduct>? RemoveTags { get; set; }
 	public List<TagProduct>? AddTags { get; set; }
+	public List<Guid>? RelatedProducts { get; set; }
 
 	[JsonIgnore]
 	[System.Text.Json.Serialization.JsonIgnore]

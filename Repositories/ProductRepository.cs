@@ -421,7 +421,8 @@ public static class ProductEntityExtension {
 			Type2 = dto.Type2 ?? entity.JsonDetail.Type2,
 			KeyValues = dto.KeyValues ?? entity.JsonDetail.KeyValues,
 			Seats = dto.Seats ?? entity.JsonDetail.Seats,
-			ReservationTimes = dto.ReservationTimes ?? entity.JsonDetail.ReservationTimes
+			ReservationTimes = dto.ReservationTimes ?? entity.JsonDetail.ReservationTimes,
+			RelatedProducts = dto.RelatedProducts ?? []
 		};
 
 		if (dto.ScorePlus.HasValue) {
