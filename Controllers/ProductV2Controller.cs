@@ -35,15 +35,7 @@ public class ProductV2Controller(IProductRepository repository) : BaseApiControl
 	[HttpPost("CreateReaction")]
 	[Authorize]
 	public async Task<ActionResult<GenericResponse>> CreateReaction(ReactionCreateUpdateDto dto) => Result(await repository.CreateReaction(dto));
-
-	[HttpGet("ReadReactions/{id:guid}")]
-	[Authorize]
-	public ActionResult<GenericResponse<IQueryable<ReactionEntity>>> ReadReactionsById(Guid id) => Result(repository.ReadReactionsById(id));
-
-	[HttpPost("FilterReaction")]
-	[Authorize]
-	public ActionResult<GenericResponse<IQueryable<ReactionEntity>>> FilterReaction(ReactionFilterDto dto) => Result(repository.FilterReaction(dto));
-
+	
 	[HttpGet("GetMyCustomersPerProduct/{id:guid}")]
 	[Authorize]
 	public async Task<ActionResult<GenericResponse<IQueryable<CustomersPaymentPerProduct>?>>> GetMyCustomersPerProduct(Guid id) =>
