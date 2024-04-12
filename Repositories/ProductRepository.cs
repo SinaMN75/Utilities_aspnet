@@ -7,8 +7,6 @@ public interface IProductRepository {
 	Task<GenericResponse<ProductEntity>> Update(ProductCreateUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 	Task<GenericResponse> CreateReaction(ReactionCreateUpdateDto dto);
-	GenericResponse<IQueryable<ReactionEntity>> ReadReactionsById(Guid id);
-	GenericResponse<IQueryable<ReactionEntity>> FilterReaction(ReactionFilterDto dto);
 	Task<GenericResponse<IQueryable<CustomersPaymentPerProduct>?>> GetMyCustomersPerProduct(Guid id);
 }
 
@@ -19,7 +17,6 @@ public class ProductRepository(
 	IUserRepository userRepository,
 	IConfiguration config,
 	IPromotionRepository promotionRepository,
-	IFollowBookmarkRepository followBookMark,
 	ICommentRepository commentRepository
 )
 	: IProductRepository {
@@ -28,8 +25,6 @@ public class ProductRepository(
 	public async Task<GenericResponse<ProductEntity?>> Create(ProductCreateUpdateDto dto, CancellationToken ct) {
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
-
-		if (dto.ProductInsight is not null) dto.ProductInsight.UserId = _userId;
 
 		ProductEntity e = await new ProductEntity().FillData(dto, dbContext);
 		e.UserId = _userId;
@@ -54,15 +49,6 @@ public class ProductRepository(
 		IQueryable<ProductEntity> q = dbContext.Set<ProductEntity>().AsNoTracking();
 		if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.UtcNow);
 		q = !dto.ShowWithChildren ? q.Where(x => x.ParentId == null) : q.Include(x => x.Parent);
-
-		List<ProductEntity> postsThatMyFollowersSeen = [];
-		if (dto.PostsThatMyFollowersSeen.IsTrue()) {
-			GenericResponse<IQueryable<UserEntity>> myFollower = await followBookMark.GetFollowers(_userId!);
-			if (myFollower.Result != null && myFollower.Result.Any()) {
-				IQueryable<VisitProducts> productsThatMyFollowerSeen = dbContext.Set<VisitProducts>().Where(w => myFollower.Result.Any(a => a.Id == w.UserId));
-				postsThatMyFollowersSeen = q.Where(x => productsThatMyFollowerSeen.Select(s => s.ProductId).Contains(x.Id)).ToList();
-			}
-		}
 
 		if (dto.Ids.IsNotNullOrEmpty()) q = q.Where(x => dto.Ids!.Contains(x.Id));
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
@@ -91,7 +77,6 @@ public class ProductRepository(
 		if (dto.ShowComments.IsTrue()) q = q.Include(i => i.Comments!.Where(x => x.Parent == null));
 		if (dto.ShowCategoryMedia.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.Media);
 		if (dto.ShowMedia.IsTrue()) q = q.Include(i => i.Media!.Where(j => j.ParentId == null)).ThenInclude(i => i.Children);
-		if (dto.ShowVisitProducts.IsTrue()) q = q.Include(i => i.VisitProducts);
 		if (dto.OrderByVotes.IsTrue()) q = q.OrderBy(x => x.VoteCount);
 		if (dto.OrderByVotesDescending.IsTrue()) q = q.OrderByDescending(x => x.VoteCount);
 		if (dto.OrderByAtoZ.IsTrue()) q = q.OrderBy(x => x.Title);
@@ -124,12 +109,6 @@ public class ProductRepository(
 		if (dto.OrderByPriceDescending.IsTrue()) q = q.Where(x => x.Price.HasValue).OrderByDescending(x => x.Price);
 		if (dto.OrderByCreatedDate.IsTrue()) q = q.OrderBy(x => x.CreatedAt);
 		if (dto.OrderByCreatedDateDescending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
-
-		//Its Important to double check this condition , dont delete it <MohamadHosein>
-		if (dto.PostsThatMyFollowersSeen.IsTrue()) {
-			postsThatMyFollowersSeen.AddRange(q.ToList());
-			q = postsThatMyFollowersSeen.AsQueryable();
-		}
 
 		if (dto.Shuffle1.IsTrue()) q = q.Shuffle();
 		if (dto.Shuffle2.IsTrue()) {
@@ -170,8 +149,6 @@ public class ProductRepository(
 			.Include(i => i.Categories)!.ThenInclude(x => x.Media)
 			.Include(i => i.User).ThenInclude(x => x!.Media)
 			.Include(i => i.User).ThenInclude(x => x!.Categories)
-			.Include(i => i.VisitProducts)!.ThenInclude(i => i.User)
-			.Include(i => i.ProductInsights)
 			.Include(i => i.Parent).ThenInclude(i => i!.Categories)
 			.Include(i => i.Parent).ThenInclude(i => i!.Media)
 			.Include(i => i.Parent).ThenInclude(i => i!.Children)
@@ -194,28 +171,8 @@ public class ProductRepository(
 			if (!user!.VisitedProducts.Contains(i.Id.ToString()))
 				await userRepository.Update(new UserCreateUpdateDto { Id = _userId, VisitedProducts = user.VisitedProducts + "," + i.Id });
 
-			VisitProducts? vp = await dbContext.Set<VisitProducts>().FirstOrDefaultAsync(a => a.UserId == user.Id && a.ProductId == i.Id, ct);
-			if (vp is null) {
-				VisitProducts visitProduct = new() { CreatedAt = DateTime.UtcNow, ProductId = i.Id, UserId = user.Id };
-				await dbContext.Set<VisitProducts>().AddAsync(visitProduct, ct);
-				if (string.IsNullOrEmpty(i.SeenUsers)) i.SeenUsers = user.Id;
-				else i.SeenUsers = i.SeenUsers + "," + user.Id;
-			}
-
 			dbContext.Update(i);
 			await dbContext.SaveChangesAsync(ct);
-		}
-
-		if (i.ProductInsights?.Any() != null) {
-			List<IGrouping<ReactionEntity?, ProductInsight>> psGrouping = i.ProductInsights.GroupBy(g => g.Reaction).ToList();
-			i.ProductInsights = null;
-			List<ProductInsight> productInsights = [];
-			foreach (IGrouping<ReactionEntity?, ProductInsight> item in psGrouping) {
-				item.FirstOrDefault()!.Count = item.Count();
-				productInsights.Add(item.FirstOrDefault()!);
-			}
-
-			i.ProductInsights = productInsights;
 		}
 
 		IQueryable<OrderEntity> completeOrder = dbContext.Set<OrderEntity>()
@@ -245,8 +202,6 @@ public class ProductRepository(
 				}
 			}
 
-		if (dto.ProductInsight is not null) dto.ProductInsight.UserId = _userId;
-
 		ProductEntity e = await entity.FillData(dto, dbContext);
 		dbContext.Update(e);
 
@@ -258,90 +213,54 @@ public class ProductRepository(
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
 		ProductEntity i = (await dbContext.Set<ProductEntity>()
 			.Include(x => x.Media)
-			.Include(x => x.VisitProducts)
 			.Include(x => x.OrderDetail)
 			.Include(x => x.Comments)
 			.Include(x => x.Bookmarks)!.ThenInclude(y => y.Media)
 			.Include(x => x.Bookmarks)!.ThenInclude(y => y.Children)!.ThenInclude(z => z.Media)
 			.Include(x => x.Children)!.ThenInclude(x => x.Media)
-			.Include(x => x.Children)!.ThenInclude(x => x.VisitProducts)
 			.Include(x => x.Children)!.ThenInclude(x => x.OrderDetail)
 			.Include(x => x.Children)!.ThenInclude(x => x.Comments)
 			.FirstOrDefaultAsync(x => x.Id == id, ct))!;
 		foreach (CommentEntity comment in i.Comments ?? new List<CommentEntity>()) await commentRepository.Delete(comment.Id, ct);
-		foreach (VisitProducts visitProduct in i.VisitProducts ?? new List<VisitProducts>()) dbContext.Remove(visitProduct);
 		foreach (OrderDetailEntity orderDetail in i.OrderDetail ?? new List<OrderDetailEntity>()) dbContext.Remove(orderDetail);
 		foreach (BookmarkEntity bookmark in i.Bookmarks ?? new List<BookmarkEntity>()) {
 			foreach (BookmarkEntity bookmarkChild in bookmark.Children ?? new List<BookmarkEntity>()) {
 				await mediaRepository.DeleteMedia(bookmarkChild.Media);
 				dbContext.Remove(bookmarkChild);
 			}
+
 			await mediaRepository.DeleteMedia(bookmark.Media);
 			dbContext.Remove(bookmark);
 		}
+
 		await mediaRepository.DeleteMedia(i.Media);
 		foreach (ProductEntity product in i.Children ?? new List<ProductEntity>()) {
 			await mediaRepository.DeleteMedia(product.Media);
 			foreach (CommentEntity comment in product.Comments ?? new List<CommentEntity>()) await commentRepository.Delete(comment.Id, ct);
-			foreach (VisitProducts visitProduct in product.VisitProducts ?? new List<VisitProducts>()) dbContext.Remove(visitProduct);
 			foreach (OrderDetailEntity orderDetail in product.OrderDetail ?? new List<OrderDetailEntity>()) dbContext.Remove(orderDetail);
 			dbContext.Remove(product);
 		}
 
-		IQueryable<ReactionEntity> reactions = dbContext.Set<ReactionEntity>().Where(x => x.ProductId == i.Id);
-		if (reactions.Any()) dbContext.Set<ReactionEntity>().RemoveRange(reactions);
 		dbContext.Remove(i);
 		await dbContext.SaveChangesAsync(ct);
 		return new GenericResponse();
 	}
 
 	public async Task<GenericResponse> CreateReaction(ReactionCreateUpdateDto dto) {
-		ReactionEntity? reaction = await dbContext.Set<ReactionEntity>().FirstOrDefaultAsync(f => f.UserId == _userId && f.ProductId == dto.ProductId);
-		if (reaction?.Reaction == null) {
-			reaction = new ReactionEntity {
-				CreatedAt = DateTime.UtcNow,
-				ProductId = dto.ProductId,
-				Reaction = dto.Reaction,
-				UserId = _userId
-			};
-			dbContext.Set<ReactionEntity>().Add(reaction);
+		ProductEntity p = (await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
+		if ((p.JsonDetail.UsersReactions ?? []).Where(x => x.UserId == _userId).IsNullOrEmpty()) {
+			p.JsonDetail.UsersReactions!.First(x => x.UserId == _userId).Reaction = dto.Reaction;
 		}
-		//else if (reaction.Reaction.Value.HasFlag(dto.Reaction.Value))
-		//{
-
-		//}
 		else {
-			reaction.Reaction = dto.Reaction;
-			reaction.UpdatedAt = DateTime.UtcNow;
-			dbContext.Update(reaction);
+			p.JsonDetail.UsersReactions?.Add(new UserReaction {
+				Reaction = dto.Reaction,
+				UserId = _userId!
+			});
 		}
 
 		await dbContext.SaveChangesAsync();
+
 		return new GenericResponse();
-	}
-
-	public GenericResponse<IQueryable<ReactionEntity>> ReadReactionsById(Guid id) {
-		IQueryable<ReactionEntity> reactions = dbContext.Set<ReactionEntity>()
-			.Include(i => i.User)
-			.Where(w => w.ProductId == id)
-			.OrderBy(o => o.Reaction);
-		return new GenericResponse<IQueryable<ReactionEntity>>(reactions);
-	}
-
-	public GenericResponse<IQueryable<ReactionEntity>> FilterReaction(ReactionFilterDto dto) {
-		IQueryable<ReactionEntity> q = dbContext.Set<ReactionEntity>()
-			.Include(i => i.User)
-			.Where(w => w.ProductId == dto.ProductId);
-
-		if (dto.Reaction.HasValue) q = q.Where(w => (int)w.Reaction!.Value == (int)dto.Reaction.Value);
-
-		int totalCount = q.Count();
-		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
-		return new GenericResponse<IQueryable<ReactionEntity>>(q.AsSingleQuery()) {
-			TotalCount = totalCount,
-			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
-			PageSize = dto.PageSize
-		};
 	}
 
 	public async Task<GenericResponse<IQueryable<CustomersPaymentPerProduct>?>> GetMyCustomersPerProduct(Guid id) {
@@ -457,32 +376,6 @@ public static class ProductEntityExtension {
 
 		if (dto.AddTags.IsNotNullOrEmpty()) {
 			entity.Tags.AddRange(dto.AddTags!);
-		}
-
-		if (dto.ProductInsight is not null) {
-			List<ProductInsight> productInsights = [];
-			ProductInsightDto? pInsight = dto.ProductInsight;
-			UserEntity? e = await context.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == pInsight.UserId);
-			if (e != null) {
-				ProductInsight pI;
-				ProductInsight? oldProductInsight = await context.Set<ProductInsight>().FirstOrDefaultAsync(f => f.UserId == e.Id && f.ProductId == entity.Id);
-				if (oldProductInsight is not null && oldProductInsight.Reaction != pInsight.Reaction)
-					pI = new ProductInsight {
-						UserId = e.Id,
-						Reaction = pInsight.Reaction,
-						UpdatedAt = DateTime.UtcNow
-					};
-				else
-					pI = new ProductInsight {
-						UserId = e.Id,
-						Reaction = pInsight.Reaction,
-						CreatedAt = DateTime.UtcNow
-					};
-				await context.Set<ProductInsight>().AddAsync(pI);
-				productInsights.Add(pI);
-			}
-
-			entity.ProductInsights = productInsights;
 		}
 
 		if (dto.ParentId is null) return entity;

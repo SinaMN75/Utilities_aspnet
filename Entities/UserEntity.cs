@@ -70,10 +70,6 @@ public class UserEntity {
 	[JsonIgnore]
 	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public IEnumerable<ReactionEntity>? Reactions { get; set; }
-
 	[MaxLength(50)]
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]

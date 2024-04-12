@@ -58,8 +58,6 @@ public class ProductEntity : BaseEntity {
 	public IEnumerable<BookmarkEntity>? Bookmarks { get; set; }
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
-	public IEnumerable<ProductInsight>? ProductInsights { get; set; }
-	public IEnumerable<VisitProducts>? VisitProducts { get; set; }
 	public IEnumerable<OrderDetailEntity>? OrderDetail { get; set; }
 	public IEnumerable<CommentEntity>? Comments { get; set; }
 
@@ -103,6 +101,12 @@ public class ProductJsonDetail {
 	public List<VisitCount>? VisitCounts { get; set; } = [];
 	public List<Seat>? Seats { get; set; } = [];
 	public List<Guid>? RelatedProducts { get; set; } = [];
+	public List<UserReaction>? UsersReactions { get; set; } = [];
+}
+
+public class UserReaction {
+	public required string UserId { get; set; }
+	public required Reaction Reaction { get; set; }
 }
 
 public class Seat {
@@ -131,26 +135,6 @@ public class ReservationTime {
 	public int? MaxExtraMemberAllowed { get; set; }
 	public string? ReservedByUserId { get; set; }
 	public string? ReservedByUserName { get; set; }
-}
-
-[Table("ProductsInsight")]
-public class ProductInsight : BaseEntity {
-	public ReactionEntity? Reaction { get; set; }
-	public UserEntity? User { get; set; }
-	public string? UserId { get; set; }
-	public ProductEntity? Product { get; set; }
-	public Guid? ProductId { get; set; }
-
-	[NotMapped]
-	public int? Count { get; set; } = 0;
-}
-
-[Table("VisitProducts")]
-public class VisitProducts : BaseEntity {
-	public UserEntity? User { get; set; }
-	public string? UserId { get; set; }
-	public ProductEntity? Product { get; set; }
-	public Guid? ProductId { get; set; }
 }
 
 public class VisitCount {
@@ -213,10 +197,6 @@ public class ProductCreateUpdateDto {
 	public List<TagProduct>? AddTags { get; set; }
 	public List<Guid>? RelatedProducts { get; set; }
 
-	[JsonIgnore]
-	[System.Text.Json.Serialization.JsonIgnore]
-	public ProductInsightDto? ProductInsight { get; set; }
-
 	public IEnumerable<Guid>? Categories { get; set; }
 	public IEnumerable<string>? Teams { get; set; }
 	public IEnumerable<ProductCreateUpdateDto>? Children { get; set; }
@@ -265,12 +245,11 @@ public class ProductFilterDto : BaseFilterDto {
 	public bool ShowWithChildren { get; set; } = false;
 	public bool? Shuffle1 { get; set; } = false;
 	public bool? Shuffle2 { get; set; } = false;
-	public bool? PostsThatMyFollowersSeen { get; set; } = false;
 }
 
-public class ProductInsightDto {
-	public ReactionEntity? Reaction { get; set; }
-	public string? UserId { get; set; }
+public class ReactionCreateUpdateDto {
+	public required Reaction Reaction { get; set; }
+	public required Guid ProductId { get; set; }
 }
 
 public class CustomersPaymentPerProduct {

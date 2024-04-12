@@ -100,7 +100,7 @@ public enum Priority {
 public enum Reaction {
 	None = 100,
 	Like = 101,
-	DissLike = 102,
+	DisLike = 102,
 	Funny = 103,
 	Awful = 104
 }
