@@ -5,6 +5,7 @@
 public class MediaController(IMediaRepository repository) : BaseApiController {
 	[HttpPost]
 	[Authorize]
+	[RequestSizeLimit(512 * 1024 * 1024)]
 	public async Task<ActionResult<GenericResponse<MediaEntity>>> Upload([FromForm] UploadDto dto) => Result(await repository.Upload(dto));
 
 	[HttpPost("Filter")]
