@@ -248,18 +248,18 @@ public class ProductRepository(
 
 	public async Task<GenericResponse> CreateReaction(ReactionCreateUpdateDto dto) {
 		ProductEntity p = (await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
-		if ((p.JsonDetail.UsersReactions ?? []).Where(x => x.UserId == _userId).IsNullOrEmpty()) {
+
+		if (p.JsonDetail.UsersReactions.IsNullOrEmpty())
+			p.JsonDetail.UsersReactions = new List<UserReaction> { new() { Reaction = dto.Reaction, UserId = _userId! } };
+		else if ((p.JsonDetail.UsersReactions ?? []).Where(x => x.UserId == _userId).IsNullOrEmpty())
 			p.JsonDetail.UsersReactions!.First(x => x.UserId == _userId).Reaction = dto.Reaction;
-		}
-		else {
+		else
 			p.JsonDetail.UsersReactions?.Add(new UserReaction {
 				Reaction = dto.Reaction,
 				UserId = _userId!
 			});
-		}
 
 		await dbContext.SaveChangesAsync();
-
 		return new GenericResponse();
 	}
 
