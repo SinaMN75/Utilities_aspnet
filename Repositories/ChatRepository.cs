@@ -190,6 +190,7 @@ public class ChatRepository(
 		await DeleteEmptyGroups();
 		IQueryable<GroupChatEntity> q = dbContext.Set<GroupChatEntity>().AsNoTracking();
 
+		if (dto.Ids.IsNotNullOrEmpty()) q = q.Where(x => dto.Ids!.Contains(x.Id));
 		if (dto.UsersIds.IsNotNullOrEmpty()) q = q.Where(x => x.Users!.Any(y => dto.UsersIds!.Contains(y.Id)));
 		if (dto.ProductsIds.IsNotNullOrEmpty()) q = q.Where(x => x.Products!.Any(y => dto.ProductsIds!.Contains(y.Id)));
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => x.Title == dto.Title);
@@ -228,6 +229,7 @@ public class ChatRepository(
 	public async Task<GenericResponse<IQueryable<GroupChatEntity>>> FilterAllGroupChats(GroupChatFilterDto dto) {
 		await DeleteEmptyGroups();
 		IQueryable<GroupChatEntity> q = dbContext.Set<GroupChatEntity>();
+		if (dto.Ids.IsNotNullOrEmpty()) q = q.Where(x => dto.Ids!.Contains(x.Id));
 		if (dto.UsersIds.IsNotNullOrEmpty()) q = q.Where(x => x.Users!.Any(y => y.Id == dto.UsersIds!.FirstOrDefault()));
 		if (dto.ProductsIds.IsNotNullOrEmpty()) q = q.Where(x => x.Products!.Any(y => y.Id == dto.ProductsIds!.FirstOrDefault()));
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => x.Title == dto.Title);

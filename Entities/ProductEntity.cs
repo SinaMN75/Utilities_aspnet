@@ -101,6 +101,7 @@ public class ProductJsonDetail {
 	public List<VisitCount>? VisitCounts { get; set; } = [];
 	public List<Seat>? Seats { get; set; } = [];
 	public List<Guid>? RelatedProducts { get; set; } = [];
+	public List<Guid>? RelatedGroupChats { get; set; } = [];
 	public List<UserReaction>? UsersReactions { get; set; } = [];
 }
 
@@ -196,6 +197,7 @@ public class ProductCreateUpdateDto {
 	public List<TagProduct>? RemoveTags { get; set; }
 	public List<TagProduct>? AddTags { get; set; }
 	public List<Guid>? RelatedProducts { get; set; }
+	public List<Guid>? RelatedGroupChats { get; set; }
 
 	public IEnumerable<Guid>? Categories { get; set; }
 	public IEnumerable<string>? Teams { get; set; }

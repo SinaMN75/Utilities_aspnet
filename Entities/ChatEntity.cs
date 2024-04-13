@@ -76,6 +76,7 @@ public class SeenUsers : BaseEntity {
 }
 
 public class GroupChatFilterDto : BaseFilterDto {
+	public IEnumerable<Guid>? Ids { get; set; }
 	public IEnumerable<string>? UsersIds { get; set; }
 	public IEnumerable<Guid>? ProductsIds { get; set; }
 	public string? Title { get; set; }
