@@ -60,6 +60,7 @@ public class ProductEntity : BaseEntity {
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
 	public IEnumerable<OrderDetailEntity>? OrderDetail { get; set; }
 	public IEnumerable<CommentEntity>? Comments { get; set; }
+	public IEnumerable<ReportEntity>? Reports { get; set; }
 
 	[NotMapped]
 	public IEnumerable<OrderEntity>? Orders { get; set; }
