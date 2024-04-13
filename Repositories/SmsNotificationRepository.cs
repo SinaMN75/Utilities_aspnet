@@ -84,8 +84,19 @@ public class SmsNotificationRepository(IConfiguration config) : ISmsNotification
 				break;
 			}
 			case "firebase": {
-				break;
-			}
+				RestRequest request = new(Method.POST);
+				request.AddHeader("Content-Type", "application/json");
+				request.AddHeader("Authorization", "Bearer " + setting.Token);
+				var body = new {
+					appId = setting.AppId,
+					title = dto.Title,
+					body = dto.Body,
+					content = dto.Content,
+					token = dto.FcmToken
+				};
+				request.AddJsonBody(body);
+				await new RestClient("https://fcm.sinamn75.com/send").ExecuteAsync(request);
+				break;			}
 		}
 
 		return new GenericResponse();
@@ -95,6 +106,7 @@ public class SmsNotificationRepository(IConfiguration config) : ISmsNotification
 public class NotificationCreateDto {
 	public IEnumerable<string> UserIds { get; set; } = new List<string>();
 	public string Title { get; set; } = "";
+	public string Body { get; set; } = "";
 	public string Content { get; set; } = "";
 	public string BigContent { get; set; } = "";
 	public string Url { get; set; } = "";

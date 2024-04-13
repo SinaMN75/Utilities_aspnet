@@ -51,6 +51,7 @@ public class PushNotificationSetting {
 	public string? Provider { get; set; }
 	public string? Token { get; set; }
 	public string? AppId { get; set; }
+	public string? FcmToken { get; set; }
 }
 
 public class IdTitleDto {
@@ -105,11 +106,4 @@ public class EverythingReadDto {
 	public IEnumerable<ContentEntity>? Contents { get; set; }
 	public IEnumerable<ProductEntity>? Products { get; set; }
 	public EnumDto? AppSettings { get; set; }
-}
-
-public class EverythingFilterDto {
-	public bool ShowCategories { get; set; }
-	public bool ShowContents { get; set; }
-	public bool ShowAppSettings { get; set; }
-	public bool ShowProducts { get; set; }
 }

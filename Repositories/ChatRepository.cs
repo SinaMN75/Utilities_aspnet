@@ -22,6 +22,7 @@ public class ChatRepository(
 	IHttpContextAccessor httpContextAccessor,
 	IConfiguration config,
 	IPromotionRepository promotionRepository,
+	ISmsNotificationRepository smsNotificationRepository,
 	IMediaRepository mediaRepository
 ) : IChatRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
@@ -121,6 +122,22 @@ public class ChatRepository(
 
 		EntityEntry<GroupChatMessageEntity> e = await dbContext.Set<GroupChatMessageEntity>().AddAsync(entity);
 		await dbContext.SaveChangesAsync();
+
+		try {
+			GroupChatEntity gce = (await dbContext.Set<GroupChatEntity>().AsNoTracking()
+				.Include(x => x.Users)
+				.FirstOrDefaultAsync(x => x.Id == dto.GroupChatId))!;
+		
+			foreach (UserEntity i in gce.Users ?? new List<UserEntity>()) {
+				await smsNotificationRepository.SendNotification(new NotificationCreateDto {
+					FcmToken = i.JsonDetail.FcmToken,
+					Title = "پیام جدید",
+					Body = dto.Message ?? "",
+				});
+			}
+		}
+		catch (Exception) { }
+		
 		return new GenericResponse<GroupChatMessageEntity?>(e.Entity);
 	}
 
