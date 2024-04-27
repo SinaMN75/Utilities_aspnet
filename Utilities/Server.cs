@@ -19,6 +19,8 @@ public class Server {
 	public static void Configure(IHttpContextAccessor? httpContextAccessor) => _httpContextAccessor = httpContextAccessor;
 	
 	public static async Task RunCommand(string command, string args) {
+		Console.WriteLine("COMMAND Started");
+		Console.WriteLine(command);
 		try {
 			Process process = new() {
 				StartInfo = new ProcessStartInfo {
@@ -26,17 +28,21 @@ public class Server {
 					Arguments = args,
 					RedirectStandardOutput = true,
 					RedirectStandardError = true,
-					UseShellExecute = false,
+					UseShellExecute = true,
 					CreateNoWindow = true,
 				}
 			};
 			process.Start();
 			string output = await process.StandardOutput.ReadToEndAsync();
 			string error = await process.StandardError.ReadToEndAsync();
+			Console.WriteLine("COMMAND LOG");
 			Console.WriteLine(output);
 			Console.WriteLine(error);
 			await process.WaitForExitAsync();
 		}
-		catch (Exception) { }
+		catch (Exception e) {
+			Console.WriteLine("COMMAND Exception");
+			Console.WriteLine(e.Message);
+		}
 	}
 }
