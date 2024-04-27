@@ -34,10 +34,8 @@ public class Server {
 			};
 			process.Start();
 			string output = await process.StandardOutput.ReadToEndAsync();
-			string error = await process.StandardError.ReadToEndAsync();
 			Console.WriteLine("COMMAND LOG");
 			Console.WriteLine(output);
-			Console.WriteLine(error);
 			await process.WaitForExitAsync();
 		}
 		catch (Exception e) {

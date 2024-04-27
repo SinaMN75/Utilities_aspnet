@@ -202,9 +202,7 @@ public class MediaRepository(
 
 		await using FileStream stream = new(path, FileMode.Create);
 		await image.CopyToAsync(stream);
-
-		await Server.RunCommand("HandBrakeCLI -i hhh.mp4 -o hhh.mp4", "");
-
+		
 		return path;
 	}
 }
