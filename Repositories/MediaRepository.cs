@@ -67,7 +67,7 @@ public class MediaRepository(
 			await dbContext.Set<MediaEntity>().AddAsync(media);
 			await dbContext.SaveChangesAsync();
 			medias.Add(media);
-			string path = SaveMedia(model.File, name);
+			string path = await SaveMedia(model.File, name);
 			AppSettings appSettings = new();
 			config.GetSection("AppSettings").Bind(appSettings);
 			AmazonS3Settings amazonS3Settings = appSettings.AmazonS3Settings;
@@ -188,7 +188,7 @@ public class MediaRepository(
 		return new GenericResponse<MediaEntity?>(media);
 	}
 
-	private string SaveMedia(IFormFile image, string name) {
+	private async Task<string> SaveMedia(IFormFile image, string name) {
 		string webRoot = env.WebRootPath;
 		string path = Path.Combine(webRoot, "Medias", name);
 		string uploadDir = Path.Combine(webRoot, "Medias");
@@ -200,8 +200,10 @@ public class MediaRepository(
 			throw new ArgumentException("Exception in SaveMedia- Delete! " + ex.Message);
 		}
 
-		using FileStream stream = new(path, FileMode.Create);
-		image.CopyTo(stream);
+		await using FileStream stream = new(path, FileMode.Create);
+		await image.CopyToAsync(stream);
+
+		await Server.RunCommand("HandBrakeCLI -i hhh.mp4 -o hhh.mp4", "");
 
 		return path;
 	}
