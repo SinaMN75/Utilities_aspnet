@@ -12,21 +12,20 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	public GenericResponse<IQueryable<NotificationEntity>> Read() {
-		IQueryable<NotificationEntity> i = dbContext.Set<NotificationEntity>()
+		IQueryable<NotificationEntity> i = dbContext.Set<NotificationEntity>().AsNoTracking()
 			.Include(x => x.Media)
 			.Include(x => x.CreatorUser).ThenInclude(x => x!.Media)
 			.Include(x => x.CreatorUser).ThenInclude(x => x!.Categories)
 			.Include(x => x.User)
 			.Where(x => x.UserId == null || x.UserId == _userId)
 			.OrderByDescending(x => x.CreatedAt)
-			.AsNoTracking()
 			.Take(100);
 
 		return new GenericResponse<IQueryable<NotificationEntity>>(i);
 	}
 
 	public GenericResponse<IQueryable<NotificationEntity>> Filter(NotificationFilterDto dto) {
-		IQueryable<NotificationEntity> q = dbContext.Set<NotificationEntity>()
+		IQueryable<NotificationEntity> q = dbContext.Set<NotificationEntity>().AsNoTracking()
 			.Include(x => x.Media)
 			.Include(x => x.CreatorUser).ThenInclude(x => x!.Media)
 			.Include(x => x.CreatorUser).ThenInclude(x => x!.Categories)
@@ -37,15 +36,10 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => (x.UserId ?? "").Contains(dto.UserId!));
 		if (dto.CreatorUserId.IsNotNullOrEmpty()) q = q.Where(x => (x.CreatorUserId ?? "").Contains(dto.CreatorUserId!));
 		if (dto.Message.IsNotNullOrEmpty()) q = q.Where(x => (x.Message ?? "").Contains(dto.Message!));
-		// این شرط قبلا یجور دیگه بود اینکلود نمیکرد ، من این کلود اش رو نوشتم بعد تاریخ 27 شهریور کامنتش کردم چون فرزاد مشکل داشت باهاش ، میزیتو چک شود
-		//if (dto.Tags.IsNotNullOrEmpty())
-		//{
-		//    q.Include(x => x.Tags);
-		//    q = q.Where(x => dto.Tags!.All(y => x.Tags!.Contains(y)));
-		//}
+		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
 
 		int totalCount = q.Count();
-		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize).AsNoTracking();
+		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
 		return new GenericResponse<IQueryable<NotificationEntity>>(q) {
 			TotalCount = totalCount,
@@ -90,16 +84,10 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 			CreatorUserId = model.CreatorUserId,
 			CreatedAt = DateTime.UtcNow,
 			UpdatedAt = DateTime.UtcNow,
-			Tags = model.Tags,
-			Visited = false
+			Tags = model.Tags ?? []
 		};
-		if (model.RemoveTags.IsNotNullOrEmpty()) {
-			model.RemoveTags!.ForEach(item => notification.Tags.Remove(item));
-		}
-
-		if (model.AddTags.IsNotNullOrEmpty()) {
-			notification.Tags!.AddRange(model.AddTags ?? []);
-		}
+		if (model.RemoveTags.IsNotNullOrEmpty()) model.RemoveTags!.ForEach(item => notification.Tags.Remove(item));
+		if (model.AddTags.IsNotNullOrEmpty()) notification.Tags.AddRange(model.AddTags ?? []);
 
 		await dbContext.Set<NotificationEntity>().AddAsync(notification);
 		await dbContext.SaveChangesAsync();

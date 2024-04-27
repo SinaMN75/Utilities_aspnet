@@ -23,7 +23,8 @@ public class ChatRepository(
 	IConfiguration config,
 	IPromotionRepository promotionRepository,
 	ISmsNotificationRepository smsNotificationRepository,
-	IMediaRepository mediaRepository
+	IMediaRepository mediaRepository,
+	INotificationRepository notificationRepository
 ) : IChatRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
@@ -121,13 +122,12 @@ public class ChatRepository(
 		};
 
 		EntityEntry<GroupChatMessageEntity> e = await dbContext.Set<GroupChatMessageEntity>().AddAsync(entity);
-		await dbContext.SaveChangesAsync();
 
 		try {
 			GroupChatEntity gce = (await dbContext.Set<GroupChatEntity>().AsNoTracking()
 				.Include(x => x.Users)
 				.FirstOrDefaultAsync(x => x.Id == dto.GroupChatId))!;
-		
+
 			foreach (UserEntity i in gce.Users ?? new List<UserEntity>()) {
 				await smsNotificationRepository.SendNotification(new NotificationCreateDto {
 					FcmToken = i.JsonDetail.FcmToken,
@@ -135,9 +135,21 @@ public class ChatRepository(
 					Body = dto.Message ?? "",
 				});
 			}
+			
+			foreach (UserEntity i in gce.Users ?? []) {
+				await notificationRepository.Create(new NotificationCreateUpdateDto {
+					Title = "پیام جدید",
+					UserId = i.Id,
+					CreatorUserId = _userId,
+					Message = dto.Message,
+					GroupChatId = dto.GroupChatId,
+					Tags = [TagNotification.ReceivedChat],
+				});
+			}
 		}
 		catch (Exception) { }
-		
+
+		await dbContext.SaveChangesAsync();
 		return new GenericResponse<GroupChatMessageEntity?>(e.Entity);
 	}
 

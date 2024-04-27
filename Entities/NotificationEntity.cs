@@ -15,7 +15,6 @@ public class NotificationEntity : BaseEntity {
 	public List<TagNotification> Tags { get; set; } = [];
 
 	public SeenStatus? SeenStatus { get; set; }
-	public bool? Visited { get; set; }
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 
@@ -31,6 +30,9 @@ public class NotificationEntity : BaseEntity {
 
 	public ProductEntity? Product { get; set; }
 	public Guid? ProductId { get; set; }
+
+	public GroupChatEntity? GroupChat;
+	public Guid? GroupChatId;
 }
 
 public class NotificationCreateUpdateDto {
@@ -40,6 +42,7 @@ public class NotificationCreateUpdateDto {
 	public string? Message { get; set; }
 	public string? Link { get; set; }
 	public Guid? ProductId { get; set; }
+	public Guid? GroupChatId { get; set; }
 	public List<TagNotification>? Tags { get; set; }
 	public List<TagNotification>? RemoveTags { get; set; }
 	public List<TagNotification>? AddTags { get; set; }
@@ -50,4 +53,5 @@ public class NotificationFilterDto : BaseFilterDto {
 	public string? UserId { get; set; }
 	public string? CreatorUserId { get; set; }
 	public string? Message { get; set; }
+	public List<TagNotification>? Tags { get; set; }
 }

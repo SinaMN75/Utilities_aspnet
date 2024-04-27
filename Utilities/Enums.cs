@@ -481,5 +481,6 @@ public enum TagReservationChair {
 }
 
 public enum TagNotification {
-	ReceivedComment = 100
+	ReceivedComment = 101,
+	ReceivedChat = 102
 };
