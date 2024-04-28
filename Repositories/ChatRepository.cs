@@ -135,7 +135,7 @@ public class ChatRepository(
 					Body = dto.Message ?? "",
 				});
 			}
-			
+
 			foreach (UserEntity i in gce.Users ?? []) {
 				await notificationRepository.Create(new NotificationCreateUpdateDto {
 					Title = "پیام جدید",
@@ -424,6 +424,9 @@ public class ChatRepository(
 		if (dto.UserIds!.Count() > 2 && dto.Type == ChatType.Private)
 			return new GenericResponse<GroupChatEntity?>(null, UtilitiesStatusCodes.MoreThan2UserIsInPrivateChat);
 		List<UserEntity> users = [];
+
+		foreach (string i in dto.UserIds ?? []) 
+			users.Add((await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == i))!);
 
 		List<ProductEntity> products = [];
 		if (dto.Products.IsNotNullOrEmpty())
