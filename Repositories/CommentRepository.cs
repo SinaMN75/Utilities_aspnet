@@ -15,8 +15,7 @@ public class CommentRepository(DbContext dbContext,
 		IHttpContextAccessor httpContextAccessor,
 		INotificationRepository notificationRepository,
 		IConfiguration config,
-		IMediaRepository mediaRepository
-		)
+		IMediaRepository mediaRepository)
 	: ICommentRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 

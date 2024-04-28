@@ -89,21 +89,6 @@ public class FollowBookmarkRepository(DbContext dbContext,
 		UserEntity myUser = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId))!;
 		UserEntity targetUser = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == parameters.UserId))!;
 
-		try {
-			GenericResponse<IQueryable<NotificationEntity>> notification = notificationRepository.Filter(new NotificationFilterDto {
-				UserId = parameters.UserId,
-				CreatorUserId = _userId
-			});
-			if (notification.Result.IsNullOrEmpty())
-				await notificationRepository.Create(new NotificationCreateUpdateDto {
-					UserId = parameters.UserId,
-					Message = "You are being followed by " + myUser.UserName,
-					Title = "Follow",
-					CreatorUserId = _userId
-				});
-		}
-		catch { }
-
 		if (myUser.FollowingUsers.Contains(parameters.UserId)) {
 			await userRepository.Update(new UserCreateUpdateDto {
 				Id = _userId,
@@ -124,6 +109,14 @@ public class FollowBookmarkRepository(DbContext dbContext,
 			await userRepository.Update(new UserCreateUpdateDto {
 				Id = parameters.UserId,
 				FollowedUsers = targetUser.FollowedUsers + "," + myUser.Id
+			});
+			
+			await notificationRepository.Create(new NotificationCreateUpdateDto {
+				UserId = parameters.UserId,
+				Message = "You are being followed by " + myUser.UserName,
+				Title = "Follow",
+				Tags = [TagNotification.Followed],
+				CreatorUserId = _userId
 			});
 		}
 
