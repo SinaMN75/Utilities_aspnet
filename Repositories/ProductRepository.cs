@@ -254,7 +254,7 @@ public class ProductRepository(
 
 		if (p.JsonDetail.UsersReactions.IsNullOrEmpty())
 			p.JsonDetail.UsersReactions = new List<UserReaction> { new() { Reaction = dto.Reaction, UserId = _userId! } };
-		else if ((p.JsonDetail.UsersReactions ?? []).Where(x => x.UserId == _userId).IsNullOrEmpty())
+		else if (p.JsonDetail.UsersReactions!.Any(x => x.UserId == _userId))
 			p.JsonDetail.UsersReactions!.First(x => x.UserId == _userId).Reaction = dto.Reaction;
 		else
 			p.JsonDetail.UsersReactions?.Add(new UserReaction {
