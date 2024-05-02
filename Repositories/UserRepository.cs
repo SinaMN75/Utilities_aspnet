@@ -395,6 +395,7 @@ public class UserRepository(
 		entity.UpdatedAt = DateTime.UtcNow;
 		entity.Tags = dto.Tags ?? entity.Tags;
 		entity.Password = dto.Password ?? entity.Password;
+		entity.PremiumExpireDate = dto.PremiumExpireDate ?? entity.PremiumExpireDate;
 		entity.JsonDetail = new UserJsonDetail {
 			Instagram = dto.Instagram ?? entity.JsonDetail.Instagram,
 			Telegram = dto.Telegram ?? entity.JsonDetail.Telegram,

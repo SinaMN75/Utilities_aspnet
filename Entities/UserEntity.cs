@@ -199,7 +199,7 @@ public class UserCreateUpdateDto {
 	public NationalityType? NationalityType { get; set; }
 	public PrivacyType? PrivacyType { get; set; }
 	public DateTime? BirthDate { get; set; }
-	public DateTime PremiumExpireDate { get; set; }
+	public DateTime? PremiumExpireDate { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 	public string? Code { get; set; }
 	public string? ShebaNumber { get; set; }
