@@ -56,6 +56,7 @@ public class UserRepository(
 				Suspend = x.Suspend,
 				JsonDetail = x.JsonDetail,
 				Tags = x.Tags,
+				PremiumExpireDate = x.PremiumExpireDate,
 				Media = x.Media!.Select(y => new MediaEntity {
 					Id = y.Id,
 					FileName = y.FileName,
@@ -80,7 +81,7 @@ public class UserRepository(
 						JsonDetail = z.JsonDetail,
 						Tags = z.Tags
 					})
-				})
+				}),
 			})
 			.FirstOrDefaultAsync(u => isUserId ? u.Id == idOrUserName : u.UserName == idOrUserName);
 
