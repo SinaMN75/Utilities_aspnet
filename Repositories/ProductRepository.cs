@@ -17,6 +17,7 @@ public class ProductRepository(
 	IUserRepository userRepository,
 	IConfiguration config,
 	IPromotionRepository promotionRepository,
+	INotificationRepository notificationRepository,
 	IReportRepository reportRepository,
 	ICommentRepository commentRepository
 )
@@ -261,6 +262,13 @@ public class ProductRepository(
 				Reaction = dto.Reaction,
 				UserId = _userId!
 			});
+
+		await notificationRepository.Create(new NotificationCreateUpdateDto {
+			UserId = p.UserId,
+			Tags = [TagNotification.ReceivedReactionOnProduct],
+			ProductId = p.Id,
+			CreatorUserId = _userId,
+		});
 
 		await dbContext.SaveChangesAsync();
 		return new GenericResponse();
