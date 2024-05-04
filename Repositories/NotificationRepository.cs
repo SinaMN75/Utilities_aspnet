@@ -25,13 +25,19 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 	}
 
 	public GenericResponse<IQueryable<NotificationEntity>> Filter(NotificationFilterDto dto) {
-		IQueryable<NotificationEntity> q = dbContext.Set<NotificationEntity>().AsNoTracking()
-			.Include(x => x.Media)
-			.Include(x => x.CreatorUser).ThenInclude(x => x!.Media)
-			.Include(x => x.CreatorUser).ThenInclude(x => x!.Categories)
-			.Include(x => x.Product).ThenInclude(x => x!.Media)
-			.OrderByDescending(x => x.CreatedAt);
+		IQueryable<NotificationEntity> q = dbContext.Set<NotificationEntity>().AsNoTracking().OrderByDescending(x => x.CreatedAt);
 
+		if (dto.ShowMedia.IsTrue()) q = q.Include(x => x.Media);
+		if (dto.ShowCreator.IsTrue()) q = q.Include(x => x.CreatorUser).ThenInclude(x => x!.Media);
+		if (dto.ShowUser.IsTrue()) q = q.Include(x => x.User).ThenInclude(x => x!.Media);
+		if (dto.ShowProduct.IsTrue()) q = q.Include(x => x.Product).ThenInclude(x => x!.Media);
+		if (dto.ShowGroupChat.IsTrue()) q = q.Include(x => x.GroupChat);
+		if (dto.ShowComment.IsTrue()) {
+			q = q.Include(x => x.Comment)
+				.ThenInclude(x => x!.Product).ThenInclude(x => x.Media);
+			q = q.Include(x => x.Comment)
+				.ThenInclude(x => x!.User).ThenInclude(x => x!.Media);
+		}
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
 		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => (x.UserId ?? "").Contains(dto.UserId!));
 		if (dto.CreatorUserId.IsNotNullOrEmpty()) q = q.Where(x => (x.CreatorUserId ?? "").Contains(dto.CreatorUserId!));

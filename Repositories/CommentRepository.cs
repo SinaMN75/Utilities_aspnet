@@ -15,7 +15,8 @@ public class CommentRepository(DbContext dbContext,
 		IHttpContextAccessor httpContextAccessor,
 		INotificationRepository notificationRepository,
 		IConfiguration config,
-		IMediaRepository mediaRepository)
+		IMediaRepository mediaRepository
+		)
 	: ICommentRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
@@ -92,6 +93,7 @@ public class CommentRepository(DbContext dbContext,
 		UserEntity? trgtUser = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == dto.UserId, ct);
 
 		CommentEntity comment = new() {
+			Id = Guid.NewGuid(),
 			CreatedAt = DateTime.UtcNow,
 			UpdatedAt = DateTime.UtcNow,
 			Comment = dto.Comment,
@@ -114,6 +116,7 @@ public class CommentRepository(DbContext dbContext,
 				Title = "Comment",
 				CreatorUserId = comment.UserId,
 				Link = product.Id.ToString(),
+				CommentId = comment.Id,
 				Tags = [TagNotification.ReceivedComment],
 				ProductId = product.Id
 			});
@@ -123,6 +126,7 @@ public class CommentRepository(DbContext dbContext,
 					UserId = trgtUser.Id,
 					Message = dto.Comment ?? "",
 					Title = "Comment",
+					CommentId = comment.Id,
 					Tags = [TagNotification.ReceivedComment],
 					CreatorUserId = comment.UserId,
 					Link = product.Id.ToString()
