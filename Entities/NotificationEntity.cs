@@ -31,11 +31,10 @@ public class NotificationEntity : BaseEntity {
 	public ProductEntity? Product { get; set; }
 	public Guid? ProductId { get; set; }
 
-	public GroupChatEntity? GroupChat;
-	public Guid? GroupChatId;
-	
-	public CommentEntity? Comment;
-	public Guid? CommentId;
+	public GroupChatEntity? GroupChat { get; set; }
+	public Guid? GroupChatId { get; set; }
+	public CommentEntity? Comment { get; set; }
+	public Guid? CommentId { get; set; }
 }
 
 public class NotificationCreateUpdateDto {
