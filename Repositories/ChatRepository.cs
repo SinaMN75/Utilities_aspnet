@@ -93,10 +93,11 @@ public class ChatRepository(
 
 	public async Task<GenericResponse> DeleteGroupChat(Guid id) {
 		GroupChatEntity e = (await dbContext.Set<GroupChatEntity>()
-			.Include(w => w.GroupChatMessage)
+			.Include(x => x.GroupChatMessage)!.ThenInclude(x => x.Media)
 			.Include(x => x.Media)
 			.FirstOrDefaultAsync(x => x.Id == id))!;
 		await mediaRepository.DeleteMedia(e.Media);
+		foreach (GroupChatMessageEntity i in e.GroupChatMessage ?? []) await mediaRepository.DeleteMedia(i.Media);
 		dbContext.Set<GroupChatMessageEntity>().RemoveRange(e.GroupChatMessage!);
 		dbContext.Set<GroupChatEntity>().Remove(e);
 		await dbContext.SaveChangesAsync();
