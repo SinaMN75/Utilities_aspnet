@@ -10,10 +10,11 @@ public interface IFollowBookmarkRepository {
 	Task<GenericResponse<BookmarkEntity?>> UpdateBookmark(Guid bookmarkId, BookmarkCreateDto dto);
 }
 
-public class FollowBookmarkRepository(DbContext dbContext,
-		IHttpContextAccessor httpContextAccessor,
-		INotificationRepository notificationRepository,
-		IUserRepository userRepository)
+public class FollowBookmarkRepository(
+	DbContext dbContext,
+	IHttpContextAccessor httpContextAccessor,
+	INotificationRepository notificationRepository,
+	IUserRepository userRepository)
 	: IFollowBookmarkRepository {
 	private readonly string _userId = httpContextAccessor.HttpContext!.User.Identity!.Name!;
 
@@ -99,6 +100,20 @@ public class FollowBookmarkRepository(DbContext dbContext,
 				Id = parameters.UserId,
 				FollowedUsers = targetUser.FollowedUsers.Replace($",{parameters.UserId}", "")
 			});
+
+			try {
+				List<NotificationEntity> exFollowedNotifications =
+					await notificationRepository.Filter(new NotificationFilterDto {
+						UserId = parameters.UserId,
+						CreatorUserId = _userId,
+						Tags = [TagNotification.Followed],
+					}).Result!.ToListAsync();
+
+				foreach (NotificationEntity exFollowedNotification in exFollowedNotifications) {
+					await notificationRepository.Delete(exFollowedNotification.Id);
+				}
+			}
+			catch (Exception e) { }
 		}
 		else {
 			await userRepository.Update(new UserCreateUpdateDto {
@@ -110,7 +125,7 @@ public class FollowBookmarkRepository(DbContext dbContext,
 				Id = parameters.UserId,
 				FollowedUsers = targetUser.FollowedUsers + "," + myUser.Id
 			});
-			
+
 			await notificationRepository.Create(new NotificationCreateUpdateDto {
 				UserId = parameters.UserId,
 				Message = "You are being followed by " + myUser.UserName,

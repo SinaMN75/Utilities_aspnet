@@ -3,6 +3,7 @@
 public interface INotificationRepository {
 	Task<GenericResponse> Create(NotificationCreateUpdateDto model);
 	GenericResponse<IQueryable<NotificationEntity>> Read();
+	Task<GenericResponse> Delete(Guid id);
 	GenericResponse<IQueryable<NotificationEntity>> Filter(NotificationFilterDto dto);
 	Task<GenericResponse<NotificationEntity?>> ReadById(Guid id);
 	Task<GenericResponse> UpdateSeenStatus(IEnumerable<Guid> ids, SeenStatus seenStatus);
@@ -24,6 +25,11 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 		return new GenericResponse<IQueryable<NotificationEntity>>(i);
 	}
 
+	public async Task<GenericResponse> Delete(Guid id) {
+		await dbContext.Set<NotificationEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
+		return new GenericResponse();
+	}
+
 	public GenericResponse<IQueryable<NotificationEntity>> Filter(NotificationFilterDto dto) {
 		IQueryable<NotificationEntity> q = dbContext.Set<NotificationEntity>().AsNoTracking().OrderByDescending(x => x.CreatedAt);
 
@@ -38,6 +44,7 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 			q = q.Include(x => x.Comment)
 				.ThenInclude(x => x!.User).ThenInclude(x => x!.Media);
 		}
+
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
 		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => (x.UserId ?? "").Contains(dto.UserId!));
 		if (dto.CreatorUserId.IsNotNullOrEmpty()) q = q.Where(x => (x.CreatorUserId ?? "").Contains(dto.CreatorUserId!));
@@ -90,11 +97,11 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 			CreatorUserId = model.CreatorUserId,
 			CreatedAt = DateTime.UtcNow,
 			UpdatedAt = DateTime.UtcNow,
-			Tags = model.Tags ?? []
+			ProductId = model.ProductId,
+			Tags = model.Tags ?? [],
+			CommentId = model.CommentId,
+			GroupChatId = model.GroupChatId
 		};
-		if (model.RemoveTags.IsNotNullOrEmpty()) model.RemoveTags!.ForEach(item => notification.Tags.Remove(item));
-		if (model.AddTags.IsNotNullOrEmpty()) notification.Tags.AddRange(model.AddTags ?? []);
-
 		await dbContext.Set<NotificationEntity>().AddAsync(notification);
 		await dbContext.SaveChangesAsync();
 

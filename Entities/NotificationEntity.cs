@@ -47,8 +47,6 @@ public class NotificationCreateUpdateDto {
 	public Guid? GroupChatId { get; set; }
 	public Guid? CommentId { get; set; }
 	public List<TagNotification>? Tags { get; set; }
-	public List<TagNotification>? RemoveTags { get; set; }
-	public List<TagNotification>? AddTags { get; set; }
 }
 
 public class NotificationFilterDto : BaseFilterDto {

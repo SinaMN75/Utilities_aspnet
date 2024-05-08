@@ -17,6 +17,10 @@ public class NotificationController(INotificationRepository repository) : BaseAp
 	public async Task<ActionResult<GenericResponse>> Create(NotificationCreateUpdateDto model) => Result(await repository.Create(model));
 
 	[Authorize]
+	[HttpDelete("{id:guid}")]
+	public async Task<ActionResult<GenericResponse>> Delete(Guid id) => Result(await repository.Delete(id));
+
+	[Authorize]
 	[HttpPost("Filter")]
 	public ActionResult<GenericResponse> Filter(NotificationFilterDto dto) => Result(repository.Filter(dto));
 
