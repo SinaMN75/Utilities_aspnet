@@ -136,7 +136,8 @@ public class ChatRepository(
 					Body = dto.Message ?? "",
 				});
 			}
-
+			
+			
 			foreach (UserEntity i in gce.Users ?? []) {
 				await notificationRepository.Create(new NotificationCreateUpdateDto {
 					Title = "پیام جدید",

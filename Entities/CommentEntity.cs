@@ -29,6 +29,8 @@ public class CommentEntity : BaseEntity {
 	public IEnumerable<CommentEntity>? Children { get; set; }
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
+	
+	public IEnumerable<NotificationEntity>? Notifications { get; set; }
 }
 
 public class CommentJsonDetail {

@@ -162,10 +162,16 @@ public class CommentRepository(DbContext dbContext,
 	}
 
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
-		CommentEntity? comment = await dbContext.Set<CommentEntity>().Include(i => i.Media).Include(i => i.Children).FirstOrDefaultAsync(x => x.Id == id, ct);
+		CommentEntity? comment = await dbContext.Set<CommentEntity>()
+			.Include(i => i.Media)
+			.Include(i => i.Children)!.ThenInclude(i => i.Notifications)
+			.Include(i => i.Children)!.ThenInclude(i => i.Media)
+			.Include(i => i.Notifications)
+			.FirstOrDefaultAsync(x => x.Id == id, ct);
 		if (comment == null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
 		foreach (MediaEntity i in comment.Media!) await mediaRepository.Delete(i.Id);
 		foreach (CommentEntity i in comment.Children!) await Delete(i.Id, ct);
+		foreach (NotificationEntity i in comment.Notifications!) await notificationRepository.Delete(i.Id);
 		dbContext.Set<CommentEntity>().Remove(comment);
 		await dbContext.SaveChangesAsync(ct);
 		return new GenericResponse();
