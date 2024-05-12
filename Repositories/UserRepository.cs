@@ -128,6 +128,7 @@ public class UserRepository(
 		if (dto.AppUserName.IsNotNullOrEmpty()) q = q.Where(x => x.AppUserName!.Contains(dto.AppUserName!));
 		if (dto.AppPhoneNumber.IsNotNullOrEmpty()) q = q.Where(x => x.AppPhoneNumber!.Contains(dto.AppPhoneNumber!));
 		if (dto.ShowPremiums.IsTrue()) q = q.Where(x => x.PremiumExpireDate > DateTime.UtcNow);
+		if (dto.ShowPremiums.IsFalse()) q = q.Where(x => x.PremiumExpireDate < DateTime.UtcNow);
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
 		if (dto.NoneOfMyFollowing.IsTrue()) {
 			UserEntity? user = dbContext.Set<UserEntity>().FirstOrDefault(x => x.Id == _userId);

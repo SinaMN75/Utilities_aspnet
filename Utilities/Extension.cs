@@ -20,6 +20,7 @@ public class GenericResponse(UtilitiesStatusCodes status = UtilitiesStatusCodes.
 
 public static class BoolExtension {
 	public static bool IsTrue(this bool? value) => value != null && value != false;
+	public static bool IsFalse(this bool? value) => value != null && value != true;
 }
 
 public static class EnumerableExtension {
