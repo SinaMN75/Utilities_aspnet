@@ -100,7 +100,9 @@ public class UserRepository(
 	}
 
 	public async Task<GenericResponse<UserEntity?>> Update(UserCreateUpdateDto dto) {
-		UserEntity? entity = await dbContext.Set<UserEntity>().Include(x => x.Categories).FirstOrDefaultAsync(x => x.Id == dto.Id);
+		UserEntity? entity = await dbContext.Set<UserEntity>()
+			.Include(x => x.Categories)
+			.FirstOrDefaultAsync(x => x.Id == dto.Id);
 		if (entity == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
 		await FillUserData(dto, entity);
 		await dbContext.SaveChangesAsync();
@@ -128,7 +130,6 @@ public class UserRepository(
 		if (dto.AppUserName.IsNotNullOrEmpty()) q = q.Where(x => x.AppUserName!.Contains(dto.AppUserName!));
 		if (dto.AppPhoneNumber.IsNotNullOrEmpty()) q = q.Where(x => x.AppPhoneNumber!.Contains(dto.AppPhoneNumber!));
 		if (dto.ShowPremiums.IsTrue()) q = q.Where(x => x.PremiumExpireDate > DateTime.UtcNow);
-		if (dto.ShowPremiums.IsFalse()) q = q.Where(x => x.PremiumExpireDate < DateTime.UtcNow);
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
 		if (dto.NoneOfMyFollowing.IsTrue()) {
 			UserEntity? user = dbContext.Set<UserEntity>().FirstOrDefault(x => x.Id == _userId);
