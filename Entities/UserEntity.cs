@@ -237,6 +237,10 @@ public class UserFilterDto : BaseFilterDto {
 	public bool? OrderByUserName { get; set; }
 	public bool? NoneOfMyFollowing { get; set; }
 	public bool? NoneOfMyFollower { get; set; }
+	public bool? OrderByCreatedAt { get; set; }
+	public bool? OrderByCreatedAtDesc { get; set; }
+	public bool? OrderByUpdatedAt { get; set; }
+	public bool? OrderByUpdatedAtDesc { get; set; }
 	public IEnumerable<string>? UserIds { get; set; }
 	public IEnumerable<string>? PhoneNumbers { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }

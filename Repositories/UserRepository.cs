@@ -159,6 +159,10 @@ public class UserRepository(
 		if (dto.ShowSuspend.IsTrue()) q = q.Where(x => x.Suspend == true);
 
 		if (dto.OrderByUserName.IsTrue()) q = q.OrderBy(x => x.UserName);
+		if (dto.OrderByCreatedAt.IsTrue()) q = q.OrderBy(x => x.CreatedAt);
+		if (dto.OrderByCreatedAtDesc.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
+		if (dto.OrderByUpdatedAt.IsTrue()) q = q.OrderBy(x => x.UpdatedAt);
+		if (dto.OrderByUpdatedAtDesc.IsTrue()) q = q.OrderByDescending(x => x.UpdatedAt);
 
 		if (dto.ShowMedia.IsTrue()) q = q.Include(u => u.Media);
 		if (dto.ShowCategories.IsTrue()) q = q.Include(u => u.Categories);
