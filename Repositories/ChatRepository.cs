@@ -22,7 +22,6 @@ public class ChatRepository(
 	IHttpContextAccessor httpContextAccessor,
 	IConfiguration config,
 	IPromotionRepository promotionRepository,
-	ISmsNotificationRepository smsNotificationRepository,
 	IMediaRepository mediaRepository,
 	INotificationRepository notificationRepository
 ) : IChatRepository {
@@ -128,15 +127,6 @@ public class ChatRepository(
 			GroupChatEntity gce = (await dbContext.Set<GroupChatEntity>().AsNoTracking()
 				.Include(x => x.Users)
 				.FirstOrDefaultAsync(x => x.Id == dto.GroupChatId))!;
-
-			foreach (UserEntity i in gce.Users ?? new List<UserEntity>()) {
-				await smsNotificationRepository.SendNotification(new NotificationCreateDto {
-					FcmToken = i.JsonDetail.FcmToken,
-					Title = "پیام جدید",
-					Body = dto.Message ?? "",
-				});
-			}
-			
 			
 			foreach (UserEntity i in gce.Users ?? []) {
 				await notificationRepository.Create(new NotificationCreateUpdateDto {
