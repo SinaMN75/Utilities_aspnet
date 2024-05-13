@@ -49,7 +49,7 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => (x.UserId ?? "").Contains(dto.UserId!));
 		if (dto.CreatorUserId.IsNotNullOrEmpty()) q = q.Where(x => (x.CreatorUserId ?? "").Contains(dto.CreatorUserId!));
 		if (dto.Message.IsNotNullOrEmpty()) q = q.Where(x => (x.Message ?? "").Contains(dto.Message!));
-		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
+		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.Any(y => x.Tags.Contains(y)));
 
 		int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
