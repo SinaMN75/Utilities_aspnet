@@ -60,13 +60,14 @@ public class AppSettingsRepository(IConfiguration config, DbContext dbContext) :
 				AppSettings = ReadAppSettings().Result,
 				Categories = dbContext.Set<CategoryEntity>().AsNoTracking()
 					.Include(x => x.Children)!.ThenInclude(x => x.Media)
-					.Include(x => x.Media),
+					.Include(x => x.Media).OrderByDescending(x => x.CreatedAt),
 				Contents = dbContext.Set<ContentEntity>().AsNoTracking()
-					.Include(x => x.Media),
+					.Include(x => x.Media).OrderByDescending(x => x.CreatedAt),
 				Products = dbContext.Set<ProductEntity>().AsNoTracking()
 					.Include(x => x.Media!.Where(y => y.ParentId == null)).ThenInclude(x => x.Children)
 					.Include(x => x.Categories)!.ThenInclude(x => x.Children)
 					.Include(x => x.Comments)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
+					.OrderByDescending(x => x.CreatedAt)
 			}
 		);
 }
