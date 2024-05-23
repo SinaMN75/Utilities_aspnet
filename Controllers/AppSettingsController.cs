@@ -14,7 +14,6 @@ public class AppSettingsController(IAppSettingsRepository repository) : BaseApiC
 	public ActionResult<GenericResponse<EverythingReadDto>> ReadEverything(
 		bool showProducts = true,
 		bool showCategories = true,
-		bool showContents = true,
-		List<TagProduct>? productTags = null
-	) => repository.ReadEverything(showProducts, showCategories, showContents, productTags);
+		bool showContents = true
+	) => repository.ReadEverything(showProducts, showCategories, showContents);
 }
