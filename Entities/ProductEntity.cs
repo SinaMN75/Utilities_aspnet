@@ -81,8 +81,9 @@ public class ProductJsonDetail {
 	public string? Type1 { get; set; }
 	public string? Type2 { get; set; }
 	public string? ClubName { get; set; }
+	public int? MaximumMembers { get; set; }
+	public List<string>? Policies { get; set; } = [];
 	public string? Color { get; set; }
-	public string? MaximumMembers { get; set; }
 	public string? AdminMessage { get; set; }
 	public int? ResponseTime { get; set; }
 	public int? OnTimeDelivery { get; set; }
@@ -104,7 +105,6 @@ public class ProductJsonDetail {
 	public List<Seat>? Seats { get; set; } = [];
 	public List<Guid>? RelatedProducts { get; set; } = [];
 	public List<Guid>? RelatedGroupChats { get; set; } = [];
-	public List<string>? Policies { get; set; } = [];
 	public List<UserReaction>? UsersReactions { get; set; } = [];
 }
 
@@ -169,6 +169,9 @@ public class ProductCreateUpdateDto {
 	public string? AdminMessage { get; set; }
 	public double? Latitude { get; set; }
 	public double? Longitude { get; set; }
+	public string? ClubName { get; set; }
+	public int? MaximumMembers { get; set; }
+	public List<string>? Policies { get; set; } = [];
 	public long? Price { get; set; }
 	public int? Length { get; set; }
 	public int? Width { get; set; }
@@ -222,7 +225,6 @@ public class ProductFilterDto : BaseFilterDto {
 	public bool? HasDiscount { get; set; }
 	public bool? ShowMedia { get; set; } = false;
 	public bool? ShowCategories { get; set; } = false;
-	public bool? ShowVisitProducts { get; set; } = false;
 	public bool? ShowCreator { get; set; } = false;
 	public bool? ShowCategoryMedia { get; set; } = false;
 	public bool? ShowChildren { get; set; } = false;

@@ -353,7 +353,10 @@ public static class ProductEntityExtension {
 			Seats = dto.Seats ?? entity.JsonDetail.Seats,
 			ReservationTimes = dto.ReservationTimes ?? entity.JsonDetail.ReservationTimes,
 			RelatedProducts = dto.RelatedProducts ?? [],
-			RelatedGroupChats = dto.RelatedGroupChats ?? []
+			RelatedGroupChats = dto.RelatedGroupChats ?? [],
+			ClubName = dto.ClubName ?? entity.JsonDetail.ClubName,
+			Policies = dto.Policies ?? entity.JsonDetail.Policies,
+			MaximumMembers = dto.MaximumMembers ?? entity.JsonDetail.MaximumMembers
 		};
 
 		if (dto.ScorePlus.HasValue) {
