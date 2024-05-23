@@ -7,7 +7,8 @@ public interface IAppSettingsRepository {
 	GenericResponse<EverythingReadDto> ReadEverything(
 		bool showProducts = true,
 		bool showCategories = true,
-		bool showContents = true
+		bool showContents = true,
+		List<TagProduct>? productTags = null
 	);
 }
 
@@ -63,11 +64,12 @@ public class AppSettingsRepository(IConfiguration config, DbContext dbContext) :
 	public GenericResponse<EverythingReadDto> ReadEverything(
 		bool showProducts = true,
 		bool showCategories = true,
-		bool showContents = true
+		bool showContents = true,
+		List<TagProduct>? productTags = null
 	) =>
 		new(new EverythingReadDto {
 				AppSettings = ReadAppSettings().Result,
-				Categories = showProducts
+				Categories = showCategories
 					? dbContext.Set<CategoryEntity>().AsNoTracking()
 						.Include(x => x.Children)!.ThenInclude(x => x.Media)
 						.Include(x => x.Media).OrderByDescending(x => x.CreatedAt)
@@ -77,7 +79,7 @@ public class AppSettingsRepository(IConfiguration config, DbContext dbContext) :
 						.Include(x => x.Media).OrderByDescending(x => x.CreatedAt)
 					: [],
 				Products = showProducts
-					? dbContext.Set<ProductEntity>().AsNoTracking()
+					? dbContext.Set<ProductEntity>().AsNoTracking().Where(x => productTags!.Any(y => x.Tags.Contains(y)))
 						.Include(x => x.Media!.Where(y => y.ParentId == null)).ThenInclude(x => x.Children)
 						.Include(x => x.Categories)!.ThenInclude(x => x.Children)
 						.Include(x => x.Comments)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
