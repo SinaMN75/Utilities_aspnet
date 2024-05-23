@@ -223,9 +223,30 @@ public class UserRepository(
 	}
 
 	public async Task<GenericResponse<UserEntity?>> Create(UserCreateUpdateDto dto) {
-		UserEntity? model = await dbContext.Set<UserEntity>()
-			.FirstOrDefaultAsync(x => x.UserName == dto.UserName || x.Email == dto.Email || x.PhoneNumber == dto.PhoneNumber);
-		if (model != null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.UserAlreadyExist);
+		UserEntity? sameUserName = await dbContext.Set<UserEntity>().AsNoTracking()
+			.FirstOrDefaultAsync(x => x.UserName == dto.UserName);
+		UserEntity? samePhoneNumber = await dbContext.Set<UserEntity>().AsNoTracking()
+			.FirstOrDefaultAsync(x => x.PhoneNumber == dto.PhoneNumber);
+		UserEntity? sameEmail = await dbContext.Set<UserEntity>().AsNoTracking()
+			.FirstOrDefaultAsync(x => x.Email == dto.Email);
+		if (sameUserName != null)
+			return new GenericResponse<UserEntity?>(
+				result: null,
+				status: UtilitiesStatusCodes.UserAlreadyExist,
+				message: $"{dto.UserName} is Already Taken"
+			);
+		if (samePhoneNumber != null)
+			return new GenericResponse<UserEntity?>(
+				result: null,
+				status: UtilitiesStatusCodes.UserAlreadyExist,
+				message: $"{dto.PhoneNumber} is Already Taken"
+			);
+		if (sameEmail != null)
+			return new GenericResponse<UserEntity?>(
+				result: null,
+				status: UtilitiesStatusCodes.UserAlreadyExist,
+				message: $"{dto.Email} is Already Taken"
+			);
 
 		UserEntity user = new() {
 			Wallet = 0,
@@ -460,10 +481,10 @@ public class UserRepository(
 		if (cachedData.IsNullOrEmpty()) cache.SetStringData(userId, newOtp, TimeSpan.FromSeconds(120));
 
 		UserEntity? user = await ReadByIdMinimal(userId);
-		
+
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
-		
+
 		await sms.SendSms(user?.PhoneNumber!, appSettings.SmsPanelSettings.PatternCode!, newOtp);
 		await dbContext.SaveChangesAsync();
 		return true;

@@ -4,8 +4,8 @@ namespace Utilities_aspnet.Controllers;
 [Route("api/user")]
 public class UserController(IUserRepository repository) : BaseApiController {
 	[HttpPost]
-	public async Task<ActionResult<GenericResponse>> Create(UserCreateUpdateDto dto) => Result(await repository.Create(dto));
-
+	public async Task<ActionResult<GenericResponse<UserEntity>>> Create(UserCreateUpdateDto dto) => Result(await repository.Create(dto));
+	
 	[HttpPost("LoginWithPassword")]
 	public async Task<ActionResult<GenericResponse>> LoginWithPassword(LoginWithPasswordDto dto) => Result(await repository.LoginWithPassword(dto));
 
