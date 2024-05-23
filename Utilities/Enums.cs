@@ -256,7 +256,8 @@ public enum TagCategory {
 	Payment = 181,
 	Favorites = 182,
 	Special = 183,
-	Recommended = 184
+	Recommended = 184,
+	Sport = 185
 }
 
 public enum TagContent {
