@@ -3,7 +3,12 @@ namespace Utilities_aspnet.Repositories;
 public interface IAppSettingsRepository {
 	GenericResponse<EnumDto> ReadAppSettings();
 	Task<GenericResponse<DashboardReadDto>> ReadDashboardData();
-	GenericResponse<EverythingReadDto> ReadEverything();
+
+	GenericResponse<EverythingReadDto> ReadEverything(
+		bool showProducts = true,
+		bool showCategories = true,
+		bool showContents = true
+	);
 }
 
 public class AppSettingsRepository(IConfiguration config, DbContext dbContext) : IAppSettingsRepository {
@@ -55,7 +60,11 @@ public class AppSettingsRepository(IConfiguration config, DbContext dbContext) :
 			NotAcceptedProducts = await dbContext.Set<ProductEntity>().AsNoTracking().Where(x => x.Tags.Contains(TagProduct.NotAccepted)).CountAsync()
 		});
 
-	public GenericResponse<EverythingReadDto> ReadEverything() =>
+	public GenericResponse<EverythingReadDto> ReadEverything(
+		bool showProducts = true,
+		bool showCategories = true,
+		bool showContents = true
+	) =>
 		new(new EverythingReadDto {
 				AppSettings = ReadAppSettings().Result,
 				Categories = dbContext.Set<CategoryEntity>().AsNoTracking()
@@ -70,4 +79,10 @@ public class AppSettingsRepository(IConfiguration config, DbContext dbContext) :
 					.OrderByDescending(x => x.CreatedAt)
 			}
 		);
+}
+
+class ReadEverything {
+	public bool ShowProducts { get; set; } = true;
+	public bool ShowCategories { get; set; }
+	public bool ShowContents { get; set; }
 }
