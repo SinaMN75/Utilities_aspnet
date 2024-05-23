@@ -14,7 +14,6 @@ public static class Seeder {
 			b.OwnsMany(i => i.VisitCounts);
 			b.OwnsMany(i => i.Seats);
 			b.OwnsMany(i => i.UsersReactions);
-			b.OwnsMany(i => i.Policies);
 		});
 		builder.Entity<CommentEntity>().OwnsOne(e => e.JsonDetail, b => {
 			b.ToJson();
