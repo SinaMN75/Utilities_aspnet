@@ -40,7 +40,7 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 		if (dto.ShowGroupChat.IsTrue()) q = q.Include(x => x.GroupChat);
 		if (dto.ShowComment.IsTrue()) {
 			q = q.Include(x => x.Comment)
-				.ThenInclude(x => x!.Product).ThenInclude(x => x.Media);
+				.ThenInclude(x => x!.Product).ThenInclude(x => x!.Media);
 			q = q.Include(x => x.Comment)
 				.ThenInclude(x => x!.User).ThenInclude(x => x!.Media);
 		}

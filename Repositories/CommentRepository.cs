@@ -103,7 +103,7 @@ public class CommentRepository(DbContext dbContext,
 			ParentId = dto.ParentId,
 			UserId = _userId,
 			Status = dto.Status,
-			Tags = dto.Tags
+			Tags = dto.Tags ?? []
 		};
 		await dbContext.AddAsync(comment, ct);
 		ProductEntity product = (await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == comment.ProductId, ct))!;

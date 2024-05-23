@@ -113,7 +113,7 @@ public class FollowBookmarkRepository(
 					await notificationRepository.Delete(exFollowedNotification.Id);
 				}
 			}
-			catch (Exception e) { }
+			catch (Exception) { }
 		}
 		else {
 			await userRepository.Update(new UserCreateUpdateDto {

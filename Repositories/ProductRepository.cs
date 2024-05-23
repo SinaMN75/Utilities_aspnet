@@ -347,7 +347,6 @@ public static class ProductEntityExtension {
 			EndDate = dto.EndDate ?? entity.JsonDetail.EndDate,
 			ShippingCost = dto.ShippingCost ?? entity.JsonDetail.ShippingCost,
 			ShippingTime = dto.ShippingTime ?? entity.JsonDetail.ShippingTime,
-			KeyValue = dto.KeyValue ?? entity.JsonDetail.KeyValue,
 			Type1 = dto.Type1 ?? entity.JsonDetail.Type1,
 			Type2 = dto.Type2 ?? entity.JsonDetail.Type2,
 			KeyValues = dto.KeyValues ?? entity.JsonDetail.KeyValues,
