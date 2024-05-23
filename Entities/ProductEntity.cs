@@ -81,6 +81,7 @@ public class ProductJsonDetail {
 	public string? Type1 { get; set; }
 	public string? Type2 { get; set; }
 	public string? ClubName { get; set; }
+	public string? Color { get; set; }
 	public string? MaximumMembers { get; set; }
 	public string? AdminMessage { get; set; }
 	public int? ResponseTime { get; set; }
