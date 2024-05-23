@@ -78,10 +78,10 @@ public class ProductJsonDetail {
 	public string? Website { get; set; }
 	public string? Email { get; set; }
 	public string? Unit { get; set; }
-	public string? KeyValue { get; set; }
 	public string? Type1 { get; set; }
 	public string? Type2 { get; set; }
-	public string? Color { get; set; }
+	public string? ClubName { get; set; }
+	public string? MaximumMembers { get; set; }
 	public string? AdminMessage { get; set; }
 	public int? ResponseTime { get; set; }
 	public int? OnTimeDelivery { get; set; }
@@ -103,6 +103,7 @@ public class ProductJsonDetail {
 	public List<Seat>? Seats { get; set; } = [];
 	public List<Guid>? RelatedProducts { get; set; } = [];
 	public List<Guid>? RelatedGroupChats { get; set; } = [];
+	public List<string>? Policies { get; set; } = [];
 	public List<UserReaction>? UsersReactions { get; set; } = [];
 }
 
