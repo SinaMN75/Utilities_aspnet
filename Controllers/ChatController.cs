@@ -32,7 +32,9 @@ public class ChatController(IChatRepository repository) : BaseApiController {
 	public ActionResult<GenericResponse<GroupChatMessageEntity?>> ReadGroupChatMessages(
 		Guid id,
 		[FromQuery] int pageSize = 100,
-		[FromQuery] int pageNumber = 1) => Result(repository.ReadGroupChatMessages(id, pageSize, pageNumber));
+		[FromQuery] int pageNumber = 1,
+		[FromQuery] string message = ""
+		) => Result(repository.ReadGroupChatMessages(id, pageSize, pageNumber, message));
 
 	[HttpPost("SeenGroupChatMessage/{id:guid}")]
 	public async Task<ActionResult<GenericResponse>> SeenGroupChatMesDeleteGroupChatsage(Guid id) => Result(await repository.SeenGroupChatMessage(id));

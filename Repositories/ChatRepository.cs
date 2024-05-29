@@ -11,7 +11,7 @@ public interface IChatRepository {
 	Task<GenericResponse<IQueryable<GroupChatEntity>>> FilterGroupChats(GroupChatFilterDto dto);
 	Task<GenericResponse<IQueryable<GroupChatEntity>>> FilterAllGroupChats(GroupChatFilterDto dto);
 	Task<GenericResponse<GroupChatEntity>> ReadGroupChatById(Guid id);
-	GenericResponse<IQueryable<GroupChatMessageEntity>?> ReadGroupChatMessages(Guid id, int pageSize, int pageNumber);
+	GenericResponse<IQueryable<GroupChatMessageEntity>?> ReadGroupChatMessages(Guid id, int pageSize, int pageNumber, string message = "");
 	Task<GenericResponse> SeenGroupChatMessage(Guid messageId);
 	Task<GenericResponse> ExitFromGroup(Guid id);
 	Task<GenericResponse> Mute(Guid id);
@@ -94,9 +94,11 @@ public class ChatRepository(
 		GroupChatEntity e = (await dbContext.Set<GroupChatEntity>()
 			.Include(x => x.GroupChatMessage)!.ThenInclude(x => x.Media)
 			.Include(x => x.Media)
+			.Include(x => x.Notifications)
 			.FirstOrDefaultAsync(x => x.Id == id))!;
 		await mediaRepository.DeleteMedia(e.Media);
 		foreach (GroupChatMessageEntity i in e.GroupChatMessage ?? []) await mediaRepository.DeleteMedia(i.Media);
+		foreach (NotificationEntity i in e.Notifications ?? []) await notificationRepository.Delete(i!.Id);
 		dbContext.Set<GroupChatMessageEntity>().RemoveRange(e.GroupChatMessage!);
 		dbContext.Set<GroupChatEntity>().Remove(e);
 		await dbContext.SaveChangesAsync();
@@ -221,6 +223,8 @@ public class ChatRepository(
 		if (dto.Department.IsNotNullOrEmpty()) q = q.Where(x => x.JsonDetail.Department == dto.Department);
 		if (dto.ChatStatus.HasValue) q = q.Where(x => x.JsonDetail.ChatStatus == dto.ChatStatus);
 		if (dto.Priority.HasValue) q = q.Where(x => x.JsonDetail.Priority == dto.Priority);
+		if (dto.StartDate.HasValue) q = q.Where(x => x.CreatedAt >= dto.StartDate);
+		if (dto.EndDate.HasValue) q = q.Where(x => x.CreatedAt <= dto.EndDate);
 
 		if (dto.ShowProducts.IsTrue()) q = q.Include(x => x.Products)!.ThenInclude(x => x.Media);
 		if (dto.ShowUsers.IsTrue()) q = q.Include(x => x.Users)!.ThenInclude(x => x.Media);
@@ -311,10 +315,11 @@ public class ChatRepository(
 
 		return new GenericResponse<GroupChatEntity>(e);
 	}
-
-	public GenericResponse<IQueryable<GroupChatMessageEntity>?> ReadGroupChatMessages(Guid id, int pageSize, int pageNumber) {
+	
+	public GenericResponse<IQueryable<GroupChatMessageEntity>?> ReadGroupChatMessages(Guid id, int pageSize, int pageNumber, string message) {
 		IQueryable<GroupChatMessageEntity> q = dbContext.Set<GroupChatMessageEntity>()
 			.Where(x => x.GroupChatId == id)
+			.Where(x => (x.Message ?? "").Contains(message))
 			.Include(x => x.Media)
 			.Include(x => x.Products)!.ThenInclude(x => x!.Media)
 			.Include(x => x.Products)!.ThenInclude(x => x!.User).ThenInclude(x => x!.Media)

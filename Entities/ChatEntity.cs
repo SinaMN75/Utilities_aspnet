@@ -17,6 +17,7 @@ public class GroupChatEntity : BaseEntity {
 	public IEnumerable<ProductEntity>? Products { get; set; }
 	public IEnumerable<GroupChatMessageEntity>? GroupChatMessage { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
+	public IEnumerable<NotificationEntity?>? Notifications { get; set; }
 
 	[NotMapped]
 	public int CountOfUnreadMessages { get; set; }
@@ -95,6 +96,8 @@ public class GroupChatFilterDto : BaseFilterDto {
 	public bool? OrderByCreatedDate { get; set; } = false;
 	public bool? OrderByCreaedDateDecending { get; set; } = false;
 	public bool Boosted { get; set; }
+	public DateTime? StartDate { get; set; }
+	public DateTime? EndDate { get; set; }
 }
 
 public class ChatCreateUpdateDto {

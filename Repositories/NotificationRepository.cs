@@ -43,6 +43,7 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 				.ThenInclude(x => x!.Product).ThenInclude(x => x!.Media);
 			q = q.Include(x => x.Comment)
 				.ThenInclude(x => x!.User).ThenInclude(x => x!.Media);
+			q = q.Include(x => x.Product).ThenInclude(x => x!.Media);
 		}
 
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));

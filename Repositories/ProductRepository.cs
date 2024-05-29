@@ -131,7 +131,7 @@ public class ProductRepository(
 			List<ProductEntity> tempQ = q.ToList();
 			foreach (ProductEntity item in tempQ) {
 				GenericResponse<IQueryable<CommentEntity>?> comments = commentRepository.ReadByProductId(item.Id);
-				if (comments.Result != null) item.CommentsCount = comments.Result.Count(w => w.ParentId == null);
+				if (comments.Result != null) item.CommentsCount = await comments.Result.CountAsync();
 			}
 
 			q = tempQ.AsQueryable();
@@ -263,12 +263,13 @@ public class ProductRepository(
 				UserId = _userId!
 			});
 
-		await notificationRepository.Create(new NotificationCreateUpdateDto {
-			UserId = p.UserId,
-			Tags = [TagNotification.ReceivedReactionOnProduct],
-			ProductId = p.Id,
-			CreatorUserId = _userId,
-		});
+		if (p.UserId != _userId)
+			await notificationRepository.Create(new NotificationCreateUpdateDto {
+				UserId = p.UserId,
+				Tags = [TagNotification.ReceivedReactionOnProduct],
+				ProductId = p.Id,
+				CreatorUserId = _userId,
+			});
 
 		await dbContext.SaveChangesAsync();
 		return new GenericResponse();
