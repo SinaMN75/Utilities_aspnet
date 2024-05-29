@@ -1,11 +1,27 @@
-namespace Utilities_aspnet.Entities;
-
 internal static class Converter {
 	public static readonly JsonSerializerSettings? Settings = new() {
 		MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
 		DateParseHandling = DateParseHandling.None,
 		Converters = { new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal } }
 	};
+}
+
+public class NGeniusAccessTokenReadDto {
+	[JsonProperty("access_token")]
+	public string? AccessToken { get; set; }
+
+	[JsonProperty("expires_in")]
+	public long? ExpiresIn { get; set; }
+
+	[JsonProperty("refresh_expires_in")]
+	public long? RefreshExpiresIn { get; set; }
+
+	[JsonProperty("token_type")]
+	public string? TokenType { get; set; }
+	
+	public static string ToJson(NGeniusAccessTokenReadDto self) => JsonConvert.SerializeObject(self, Converter.Settings);
+	public static NGeniusAccessTokenReadDto FromJson(string json) => JsonConvert.DeserializeObject<NGeniusAccessTokenReadDto>(json, Converter.Settings);
+
 }
 
 public class ZibalRequestCreateDto {
