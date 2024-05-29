@@ -5,6 +5,6 @@
 [Authorize]
 public class PaymentController(IPaymentRepository repository) : BaseApiController {
 	[HttpPost("ng")]
-	public async Task<ActionResult<GenericResponse<string>>> Create(long amount, string currency) =>
+	public async Task<ActionResult<GenericResponse<string>>> PayNg(long amount, string currency) =>
 		Result(await repository.PayNGenius(amount, currency));
 }
