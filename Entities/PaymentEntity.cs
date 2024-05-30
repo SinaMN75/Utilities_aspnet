@@ -11,6 +11,7 @@ public class NgeniusPaymentDto {
 	public string? EmailAddress { get; set; }
 	public string? Outlet { get; set; }
 	public string? Currency { get; set; }
+	public string? RedirectUrl { get; set; }
 	public long? Amount { get; set; }
 }
 

@@ -31,7 +31,7 @@ public static class PaymentDataSource {
 		requestAccessToken.AddHeader("Accept", "application/vnd.ni-identity.v1+json");
 		IRestResponse responseRequest = await new RestClient("https://api-gateway.sandbox.ngenius-payments.com/identity/auth/access-token").ExecuteAsync(requestAccessToken);
 		NGeniusAccessTokenReadDto accessTokenReadDto = NGeniusAccessTokenReadDto.FromJson(responseRequest.Content);
-		
+
 		RestRequest requestPay = new(Method.POST);
 		requestPay.AddHeader("Content-Type", "application/vnd.ni-payment.v2+json");
 		requestPay.AddHeader("Authorization", $"Bearer {accessTokenReadDto.AccessToken}");
@@ -39,7 +39,10 @@ public static class PaymentDataSource {
 		requestPay.AddJsonBody(new {
 				action = dto.Action,
 				amount = new { currencyCode = dto.Currency, value = dto.Amount },
-				emailAddress = dto.EmailAddress
+				emailAddress = dto.EmailAddress,
+				merchantAttributes = new {
+					redirectUrl = dto.RedirectUrl
+				}
 			}
 		);
 		IRestResponse responsePay = await new RestClient($"https://api-gateway.sandbox.ngenius-payments.com/transactions/outlets/{dto.Outlet}/orders").ExecuteAsync(requestPay);
