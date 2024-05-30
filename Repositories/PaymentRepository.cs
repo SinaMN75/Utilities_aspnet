@@ -3,7 +3,8 @@
 public interface IPaymentRepository {
 	Task<GenericResponse<string>> IncreaseWalletBalance(long amount);
 	Task<GenericResponse<string?>> PayOrder(Guid orderId);
-	Task<GenericResponse<NgeniusHostedResponse>> PayNGenius(NgeniusPaymentDto dto);
+	Task<GenericResponse<NgHostedResponse>> PayNg(NgPayDto dto);
+	Task<GenericResponse<NgVerifyResponse>> VerifyNg(string outlet, string id);
 	Task<GenericResponse> CallBack(int tagPayment, string id, long trackId);
 	Task<GenericResponse> CallBackPremiumFake(int tagPayment, string id, long trackId);
 }
@@ -62,8 +63,11 @@ public class PaymentRepository : IPaymentRepository {
 		return new GenericResponse<string?>("NULL");
 	}
 
-	public async Task<GenericResponse<NgeniusHostedResponse>> PayNGenius(NgeniusPaymentDto dto) =>
+	public async Task<GenericResponse<NgHostedResponse>> PayNg(NgPayDto dto) =>
 		new((await PaymentDataSource.PayNGenius(dto))!);
+	
+	public async Task<GenericResponse<NgVerifyResponse>> VerifyNg(string outlet, string id) =>
+		new((await PaymentDataSource.GetOrderStatus(outlet, id))!);
 
 	public async Task<GenericResponse> CallBack(int tagPayment, string id, long trackId) {
 		long amount = 0;

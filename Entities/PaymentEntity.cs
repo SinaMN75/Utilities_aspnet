@@ -6,7 +6,92 @@ internal static class Converter {
 	};
 }
 
-public class NgeniusPaymentDto {
+public class NgVerifyResponse {
+	[JsonProperty("_id")]
+	public string? Id { get; set; }
+
+	[JsonProperty("_links")]
+	public NgVerifyResponseLinks? Links { get; set; }
+
+	[JsonProperty("type")]
+	public string? Type { get; set; }
+
+	[JsonProperty("merchantDefinedData")]
+	public FormattedOrderSummary? MerchantDefinedData { get; set; }
+
+	[JsonProperty("action")]
+	public string? Action { get; set; }
+
+	[JsonProperty("amount")]
+	public Amount? Amount { get; set; }
+
+	[JsonProperty("language")]
+	public string? Language { get; set; }
+
+	[JsonProperty("merchantAttributes")]
+	public MerchantAttributes? MerchantAttributes { get; set; }
+
+	[JsonProperty("emailAddress")]
+	public string? EmailAddress { get; set; }
+
+	[JsonProperty("reference")]
+	public Guid? Reference { get; set; }
+
+	[JsonProperty("outletId")]
+	public Guid? OutletId { get; set; }
+
+	[JsonProperty("createDateTime")]
+	public DateTimeOffset? CreateDateTime { get; set; }
+
+	[JsonProperty("paymentMethods")]
+	public PaymentMethods? PaymentMethods { get; set; }
+
+	[JsonProperty("referrer")]
+	public string? Referrer { get; set; }
+
+	[JsonProperty("formattedOrderSummary")]
+	public FormattedOrderSummary? FormattedOrderSummary { get; set; }
+
+	[JsonProperty("formattedAmount")]
+	public string? FormattedAmount { get; set; }
+
+	[JsonProperty("_embedded")]
+	public Embedded? Embedded { get; set; }
+
+	public static string ToJson(NgVerifyResponse self) => JsonConvert.SerializeObject(self, Converter.Settings);
+
+	public static NgVerifyResponse FromJson(string json) => JsonConvert.DeserializeObject<NgVerifyResponse>(json, Converter.Settings);
+}
+
+public class NgVerifyResponseLinks {
+	[JsonProperty("cancel")]
+	public Cury? Cancel { get; set; }
+
+	[JsonProperty("cnp:payment-link")]
+	public Cury? CnpPaymentLink { get; set; }
+
+	[JsonProperty("payment-authorization")]
+	public Cury? PaymentAuthorization { get; set; }
+
+	[JsonProperty("self")]
+	public Cury? Self { get; set; }
+
+	[JsonProperty("tenant-brand")]
+	public Cury? TenantBrand { get; set; }
+
+	[JsonProperty("payment")]
+	public Cury? Payment { get; set; }
+
+	[JsonProperty("merchant-brand")]
+	public Cury? MerchantBrand { get; set; }
+}
+
+public class MerchantAttributes {
+	[JsonProperty("redirectUrl")]
+	public Uri? RedirectUrl { get; set; }
+}
+
+public class NgPayDto {
 	public string? Action { get; set; }
 	public string? EmailAddress { get; set; }
 	public string? Outlet { get; set; }
@@ -15,7 +100,7 @@ public class NgeniusPaymentDto {
 	public long? Amount { get; set; }
 }
 
-public class NGeniusAccessTokenReadDto {
+public class NgAccessTokenResponse {
 	[JsonProperty("access_token")]
 	public string? AccessToken { get; set; }
 
@@ -28,16 +113,16 @@ public class NGeniusAccessTokenReadDto {
 	[JsonProperty("token_type")]
 	public string? TokenType { get; set; }
 
-	public static string ToJson(NGeniusAccessTokenReadDto self) => JsonConvert.SerializeObject(self, Converter.Settings);
-	public static NGeniusAccessTokenReadDto FromJson(string json) => JsonConvert.DeserializeObject<NGeniusAccessTokenReadDto>(json, Converter.Settings);
+	public static string ToJson(NgAccessTokenResponse self) => JsonConvert.SerializeObject(self, Converter.Settings);
+	public static NgAccessTokenResponse FromJson(string json) => JsonConvert.DeserializeObject<NgAccessTokenResponse>(json, Converter.Settings);
 }
 
-public class NgeniusHostedResponse {
+public class NgHostedResponse {
 	[JsonProperty("_id")]
 	public string? Id { get; set; }
 
 	[JsonProperty("_links")]
-	public NgeniusHostedResponseLinks? Links { get; set; }
+	public NgHostedResponseLinks? Links { get; set; }
 
 	[JsonProperty("type")]
 	public string? Type { get; set; }
@@ -84,8 +169,8 @@ public class NgeniusHostedResponse {
 	[JsonProperty("_embedded")]
 	public Embedded? Embedded { get; set; }
 
-	public static NgeniusHostedResponse FromJson(string json) => JsonConvert.DeserializeObject<NgeniusHostedResponse>(json, Converter.Settings);
-	public static string ToJson(NgeniusHostedResponse self) => JsonConvert.SerializeObject(self, Converter.Settings);
+	public static NgHostedResponse FromJson(string json) => JsonConvert.DeserializeObject<NgHostedResponse>(json, Converter.Settings);
+	public static string ToJson(NgHostedResponse self) => JsonConvert.SerializeObject(self, Converter.Settings);
 }
 
 public class Amount {
@@ -154,7 +239,7 @@ public class Cury {
 
 public class FormattedOrderSummary;
 
-public class NgeniusHostedResponseLinks {
+public class NgHostedResponseLinks {
 	[JsonProperty("cancel")]
 	public Cury? Cancel { get; set; }
 
