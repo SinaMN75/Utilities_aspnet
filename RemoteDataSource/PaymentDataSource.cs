@@ -23,4 +23,26 @@ public static class PaymentDataSource {
 		IRestResponse responseRequest = await new RestClient().ExecuteAsync(requestRequest);
 		return ZibalVerifyReadDto.FromJson(responseRequest.Content);
 	}
+
+	public static async Task<NgeniusHostedResponse?> PayNGenius(NgeniusPaymentDto dto) {
+		RestRequest request = new(Method.POST);
+		request.AddHeader("content-type", "application/vnd.ni-identity.v1+json");
+		request.AddHeader("authorization", "Basic OTUyOTFhMzgtZDhjNy00Y2I1LWE3NTQtMmRhYmU1ZWZlY2E1OmMxYTA0OWJlLThiMGItNDg2My05NzQwLTgwNTY1Mjc4MTNiYQ==");
+		request.AddHeader("accept", "application/vnd.ni-identity.v1+json");
+		IRestResponse responseRequest = await new RestClient("https://api-gateway.sandbox.ngenius-payments.com/identity/auth/access-token").ExecuteAsync(request);
+		NGeniusAccessTokenReadDto accessTokenReadDto = NGeniusAccessTokenReadDto.FromJson(responseRequest.Content);
+
+		RestRequest requestPay = new(Method.POST);
+		requestPay.AddHeader("content-type", "application/vnd.ni-payment.v2+json");
+		requestPay.AddHeader("authorization", $"Bearer {accessTokenReadDto.AccessToken}");
+		requestPay.AddHeader("accept", "application/vnd.ni-payment.v2+json");
+		requestPay.AddBody(new {
+				action = dto.Action,
+				amount = new { currencyCode = dto.Currency, value = dto.Amount }
+			}
+		);
+		IRestResponse responsePay = await new RestClient($"https://api-gateway.sandbox.ngenius-payments.com/transactions/outlets/{dto.Outlet}/orders").ExecuteAsync(request);
+
+		return NgeniusHostedResponse.FromJson(responsePay.Content);
+	}
 }

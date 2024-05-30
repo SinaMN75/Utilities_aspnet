@@ -3,7 +3,7 @@
 public interface IPaymentRepository {
 	Task<GenericResponse<string>> IncreaseWalletBalance(long amount);
 	Task<GenericResponse<string?>> PayOrder(Guid orderId);
-	Task<GenericResponse<string>> PayNGenius(long amount, string currency);
+	Task<GenericResponse<NgeniusHostedResponse>> PayNGenius(NgeniusPaymentDto dto);
 	Task<GenericResponse> CallBack(int tagPayment, string id, long trackId);
 	Task<GenericResponse> CallBackPremiumFake(int tagPayment, string id, long trackId);
 }
@@ -62,27 +62,8 @@ public class PaymentRepository : IPaymentRepository {
 		return new GenericResponse<string?>("NULL");
 	}
 
-	public async Task<GenericResponse<string>> PayNGenius(long amount, string currency) {
-		RestRequest request = new(Method.POST);
-		request.AddHeader("content-type", "application/vnd.ni-identity.v1+json");
-		request.AddHeader("authorization", "Basic OTUyOTFhMzgtZDhjNy00Y2I1LWE3NTQtMmRhYmU1ZWZlY2E1OmMxYTA0OWJlLThiMGItNDg2My05NzQwLTgwNTY1Mjc4MTNiYQ==");
-		request.AddHeader("accept", "application/vnd.ni-identity.v1+json");
-		IRestResponse responseRequest = await new RestClient("https://api-gateway.sandbox.ngenius-payments.com/identity/auth/access-token").ExecuteAsync(request);
-		NGeniusAccessTokenReadDto dto = NGeniusAccessTokenReadDto.FromJson(responseRequest.Content);
-
-		RestRequest requestPay = new(Method.POST);
-		requestPay.AddHeader("content-type", "application/vnd.ni-payment.v2+json");
-		requestPay.AddHeader("authorization", $"Bearer {dto.AccessToken}");
-		requestPay.AddHeader("accept", "application/vnd.ni-payment.v2+json");
-		requestPay.AddBody(new {
-				action = "PURCHASE",
-				amount = new { currencyCode = "AED", value = 100 }
-			}
-		);
-		IRestResponse responsePay = await new RestClient("https://api-gateway.sandbox.ngenius-payments.com/transactions/outlets/mmm/orders").ExecuteAsync(request);
-
-		return new GenericResponse<string>(responsePay.Content);
-	}
+	public async Task<GenericResponse<NgeniusHostedResponse>> PayNGenius(NgeniusPaymentDto dto) =>
+		new((await PaymentDataSource.PayNGenius(dto))!);
 
 	public async Task<GenericResponse> CallBack(int tagPayment, string id, long trackId) {
 		long amount = 0;

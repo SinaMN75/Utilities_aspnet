@@ -6,6 +6,14 @@ internal static class Converter {
 	};
 }
 
+public class NgeniusPaymentDto {
+	public string? Action { get; set; }
+	public string? EmailAddress { get; set; }
+	public string? Outlet { get; set; }
+	public string? Currency { get; set; }
+	public long? Amount { get; set; }
+}
+
 public class NGeniusAccessTokenReadDto {
 	[JsonProperty("access_token")]
 	public string? AccessToken { get; set; }
@@ -18,10 +26,159 @@ public class NGeniusAccessTokenReadDto {
 
 	[JsonProperty("token_type")]
 	public string? TokenType { get; set; }
-	
+
 	public static string ToJson(NGeniusAccessTokenReadDto self) => JsonConvert.SerializeObject(self, Converter.Settings);
 	public static NGeniusAccessTokenReadDto FromJson(string json) => JsonConvert.DeserializeObject<NGeniusAccessTokenReadDto>(json, Converter.Settings);
+}
 
+public class NgeniusHostedResponse {
+	[JsonProperty("_id")]
+	public string? Id { get; set; }
+
+	[JsonProperty("_links")]
+	public NgeniusHostedResponseLinks? Links { get; set; }
+
+	[JsonProperty("type")]
+	public string? Type { get; set; }
+
+	[JsonProperty("merchantDefinedData")]
+	public FormattedOrderSummary MerchantDefinedData { get; set; }
+
+	[JsonProperty("action")]
+	public string? Action { get; set; }
+
+	[JsonProperty("amount")]
+	public Amount? Amount { get; set; }
+
+	[JsonProperty("language")]
+	public string? Language { get; set; }
+
+	[JsonProperty("merchantAttributes")]
+	public FormattedOrderSummary? MerchantAttributes { get; set; }
+
+	[JsonProperty("emailAddress")]
+	public string? EmailAddress { get; set; }
+
+	[JsonProperty("reference")]
+	public Guid? Reference { get; set; }
+
+	[JsonProperty("outletId")]
+	public Guid? OutletId { get; set; }
+
+	[JsonProperty("createDateTime")]
+	public DateTimeOffset? CreateDateTime { get; set; }
+
+	[JsonProperty("paymentMethods")]
+	public PaymentMethods? PaymentMethods { get; set; }
+
+	[JsonProperty("referrer")]
+	public string? Referrer { get; set; }
+
+	[JsonProperty("formattedOrderSummary")]
+	public FormattedOrderSummary? FormattedOrderSummary { get; set; }
+
+	[JsonProperty("formattedAmount")]
+	public string? FormattedAmount { get; set; }
+
+	[JsonProperty("_embedded")]
+	public Embedded? Embedded { get; set; }
+
+	public static NgeniusHostedResponse FromJson(string json) => JsonConvert.DeserializeObject<NgeniusHostedResponse>(json, Converter.Settings);
+	public static string ToJson(NgeniusHostedResponse self) => JsonConvert.SerializeObject(self, Converter.Settings);
+}
+
+public class Amount {
+	[JsonProperty("currencyCode")]
+	public string? CurrencyCode { get; set; }
+
+	[JsonProperty("value")]
+	public long? Value { get; set; }
+}
+
+public class Embedded {
+	[JsonProperty("payment")]
+	public Payment[]? Payment { get; set; }
+}
+
+public class Payment {
+	[JsonProperty("_id")]
+	public string? Id { get; set; }
+
+	[JsonProperty("_links")]
+	public PaymentLinks? Links { get; set; }
+
+	[JsonProperty("reference")]
+	public Guid? Reference { get; set; }
+
+	[JsonProperty("state")]
+	public string? State { get; set; }
+
+	[JsonProperty("amount")]
+	public Amount? Amount { get; set; }
+
+	[JsonProperty("updateDateTime")]
+	public DateTimeOffset? UpdateDateTime { get; set; }
+
+	[JsonProperty("outletId")]
+	public Guid? OutletId { get; set; }
+
+	[JsonProperty("orderReference")]
+	public Guid? OrderReference { get; set; }
+}
+
+public class PaymentLinks {
+	[JsonProperty("self")]
+	public Cury? Self { get; set; }
+
+	[JsonProperty("payment:card")]
+	public Cury? PaymentCard { get; set; }
+
+	[JsonProperty("payment:saved-card")]
+	public Cury? PaymentSavedCard { get; set; }
+
+	[JsonProperty("curies")]
+	public Cury[]? Curies { get; set; }
+}
+
+public class Cury {
+	[JsonProperty("name")]
+	public string? Name { get; set; }
+
+	[JsonProperty("href")]
+	public string? Href { get; set; }
+
+	[JsonProperty("templated")]
+	public bool? Templated { get; set; }
+}
+
+public class FormattedOrderSummary;
+
+public class NgeniusHostedResponseLinks {
+	[JsonProperty("cancel")]
+	public Cury? Cancel { get; set; }
+
+	[JsonProperty("cnp:payment-link")]
+	public Cury? CnpPaymentLink { get; set; }
+
+	[JsonProperty("payment-authorization")]
+	public Cury? PaymentAuthorization { get; set; }
+
+	[JsonProperty("self")]
+	public Cury? Self { get; set; }
+
+	[JsonProperty("tenant-brand")]
+	public Cury? TenantBrand { get; set; }
+
+	[JsonProperty("payment")]
+	public Cury? Payment { get; set; }
+
+	[JsonProperty("merchant-brand")]
+	public Cury? MerchantBrand { get; set; }
+}
+
+public class PaymentMethods {
+	[JsonProperty("card")]
+	public string[]? Card { get; set; }
 }
 
 public class ZibalRequestCreateDto {
