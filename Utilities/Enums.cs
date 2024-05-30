@@ -402,6 +402,7 @@ public enum TagProduct {
 	InQueue = 303,
 	Deleted = 304,
 	NotAccepted = 305,
+	AwaitingPayment = 306,
 	Special = 401,
 	Private = 501,
 	None = 502

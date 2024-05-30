@@ -81,10 +81,10 @@ public class ProductJsonDetail {
 	public string? Type1 { get; set; }
 	public string? Type2 { get; set; }
 	public string? ClubName { get; set; }
-	public int? MaximumMembers { get; set; }
-	public List<string>? Policies { get; set; } = [];
 	public string? Color { get; set; }
 	public string? AdminMessage { get; set; }
+	public string? PaymentRefId { get; set; }
+	public int? MaximumMembers { get; set; }
 	public int? ResponseTime { get; set; }
 	public int? OnTimeDelivery { get; set; }
 	public int? Length { get; set; }
@@ -92,11 +92,11 @@ public class ProductJsonDetail {
 	public int? Height { get; set; }
 	public int? Weight { get; set; }
 	public int? MinOrder { get; set; }
+	public int? ShippingCost { get; set; }
+	public int? ShippingTime { get; set; }
 	public long? MaxOrder { get; set; }
 	public long? MaxPrice { get; set; }
 	public long? MinPrice { get; set; }
-	public int? ShippingCost { get; set; }
-	public int? ShippingTime { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
 	public List<KeyValue>? KeyValues { get; set; } = [];
@@ -106,6 +106,7 @@ public class ProductJsonDetail {
 	public List<Guid>? RelatedProducts { get; set; } = [];
 	public List<Guid>? RelatedGroupChats { get; set; } = [];
 	public List<UserReaction>? UsersReactions { get; set; } = [];
+	public List<string>? Policies { get; set; } = [];
 }
 
 public class UserReaction {
@@ -167,6 +168,7 @@ public class ProductCreateUpdateDto {
 	public string? Region { get; set; }
 	public string? Color { get; set; }
 	public string? AdminMessage { get; set; }
+	public string? PaymentRefId { get; set; }
 	public double? Latitude { get; set; }
 	public double? Longitude { get; set; }
 	public string? ClubName { get; set; }

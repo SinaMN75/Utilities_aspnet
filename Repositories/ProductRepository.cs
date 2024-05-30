@@ -357,7 +357,8 @@ public static class ProductEntityExtension {
 			RelatedGroupChats = dto.RelatedGroupChats ?? [],
 			ClubName = dto.ClubName ?? entity.JsonDetail.ClubName,
 			Policies = dto.Policies ?? entity.JsonDetail.Policies,
-			MaximumMembers = dto.MaximumMembers ?? entity.JsonDetail.MaximumMembers
+			MaximumMembers = dto.MaximumMembers ?? entity.JsonDetail.MaximumMembers,
+			PaymentRefId = dto.PaymentRefId ?? entity.JsonDetail.PaymentRefId,
 		};
 
 		if (dto.ScorePlus.HasValue) {
