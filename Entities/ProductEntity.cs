@@ -242,7 +242,6 @@ public class ProductFilterDto : BaseFilterDto {
 	public bool? OrderByCreatedDateDescending { get; set; } = false;
 	public bool? OrderByAgeCategory { get; set; }
 	public bool? OrderByCategory { get; set; }
-	public bool? ShowCountOfComment { get; set; }
 	public Currency? Currency { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 	public List<TagProduct>? Tags { get; set; }
@@ -253,7 +252,6 @@ public class ProductFilterDto : BaseFilterDto {
 	public bool Boosted { get; set; }
 	public bool ShowWithChildren { get; set; } = false;
 	public bool? Shuffle1 { get; set; } = false;
-	public bool? Shuffle2 { get; set; } = false;
 }
 
 public class ReactionCreateUpdateDto {

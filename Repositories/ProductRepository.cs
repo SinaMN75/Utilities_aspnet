@@ -113,29 +113,9 @@ public class ProductRepository(
 		if (dto.OrderByCreatedDateDescending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 
 		if (dto.Shuffle1.IsTrue()) q = q.Shuffle();
-		if (dto.Shuffle2.IsTrue()) {
-			Random rand = new();
-			q = q.OrderBy(_ => rand.Next()).ToList().AsQueryable();
-		}
 
 		int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
-
-		if (!dto.ShowCountOfComment.IsTrue())
-			return new GenericResponse<IQueryable<ProductEntity>>(q) {
-				TotalCount = totalCount,
-				PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
-				PageSize = dto.PageSize
-			};
-		{
-			List<ProductEntity> tempQ = q.ToList();
-			foreach (ProductEntity item in tempQ) {
-				GenericResponse<IQueryable<CommentEntity>?> comments = commentRepository.ReadByProductId(item.Id);
-				if (comments.Result != null) item.CommentsCount = await comments.Result.CountAsync();
-			}
-
-			q = tempQ.AsQueryable();
-		}
 
 		return new GenericResponse<IQueryable<ProductEntity>>(q) {
 			TotalCount = totalCount,
