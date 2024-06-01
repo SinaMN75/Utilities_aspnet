@@ -6,12 +6,6 @@ public class CommentController(ICommentRepository commentRepository) : BaseApiCo
 	[HttpGet("{id:guid}")]
 	public async Task<ActionResult<GenericResponse<CommentEntity>>> ReadById(Guid id) => Result(await commentRepository.ReadById(id));
 
-	[HttpGet("ReadByProductId/{id:guid}")]
-	public ActionResult<GenericResponse<IQueryable<CommentEntity>?>> ReadByProductId(Guid id) => Result(commentRepository.ReadByProductId(id));
-
-	[HttpGet($"ReadByUserId/{{{nameof(id)}}}")]
-	public ActionResult<GenericResponse<IQueryable<CommentEntity>?>> ReadByUserId(string id) => Result(commentRepository.ReadByUserId(id));
-
 	[HttpPost]
 	[Authorize]
 	public async Task<ActionResult<GenericResponse>> Create(CommentCreateUpdateDto parameter, CancellationToken ct) =>
