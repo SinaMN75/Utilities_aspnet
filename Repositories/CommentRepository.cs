@@ -4,8 +4,6 @@ public interface ICommentRepository {
 	Task<GenericResponse<CommentEntity?>> Create(CommentCreateUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse> AddReactionToComment(Guid commentId, Reaction reaction, CancellationToken ct);
 	Task<GenericResponse<CommentEntity?>> ReadById(Guid id);
-	GenericResponse<IQueryable<CommentEntity>?> ReadByProductId(Guid id);
-	GenericResponse<IQueryable<CommentEntity>?> ReadByUserId(string id);
 	Task<GenericResponse<IQueryable<CommentEntity>?>> Filter(CommentFilterDto dto);
 	Task<GenericResponse<CommentEntity?>> Update(Guid id, CommentCreateUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
@@ -19,30 +17,6 @@ public class CommentRepository(DbContext dbContext,
 		)
 	: ICommentRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
-
-	public GenericResponse<IQueryable<CommentEntity>?> ReadByProductId(Guid id) {
-		IQueryable<CommentEntity> comment = dbContext.Set<CommentEntity>()
-			.Include(x => x.Media)
-			.Where(x => x.ProductId == id && x.ParentId == null)
-			.Include(x => x.User).ThenInclude(x => x!.Media)
-			.Include(x => x.TargetUser).ThenInclude(x => x!.Media)
-			.Include(x => x.Children)!.ThenInclude(x => x.Media)
-			.Include(x => x.Children)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
-			.OrderByDescending(x => x.CreatedAt).AsNoTracking();
-		return new GenericResponse<IQueryable<CommentEntity>?>(comment);
-	}
-
-	public GenericResponse<IQueryable<CommentEntity>?> ReadByUserId(string id) {
-		IQueryable<CommentEntity> comment = dbContext.Set<CommentEntity>()
-			.Include(x => x.Media)
-			.Where(x => x.TargetUserId == id && x.ParentId == null)
-			.Include(x => x.User).ThenInclude(x => x!.Media)
-			.Include(x => x.TargetUser).ThenInclude(x => x!.Media)
-			.Include(x => x.Children)!.ThenInclude(x => x.Media)
-			.Include(x => x.Children)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
-			.OrderByDescending(x => x.CreatedAt).AsNoTracking();
-		return new GenericResponse<IQueryable<CommentEntity>?>(comment);
-	}
 
 	public async Task<GenericResponse<IQueryable<CommentEntity>?>> Filter(CommentFilterDto dto) {
 		IQueryable<CommentEntity> q = dbContext.Set<CommentEntity>().AsNoTracking();
@@ -148,12 +122,10 @@ public class CommentRepository(DbContext dbContext,
 		if (dto.Status.HasValue) comment.Status = dto.Status;
 		if (dto.Tags.IsNotNullOrEmpty()) comment.Tags = dto.Tags!;
 		if (dto.RemoveTags.IsNotNullOrEmpty()) {
-			dto.RemoveTags!.ForEach(item => comment.Tags!.Remove(item));
+			dto.RemoveTags!.ForEach(item => comment.Tags.Remove(item));
 		}
 
-		if (dto.AddTags.IsNotNullOrEmpty()) {
-			comment.Tags!.AddRange(dto.AddTags!);
-		}
+		if (dto.AddTags.IsNotNullOrEmpty()) comment.Tags.AddRange(dto.AddTags!);
 
 		comment.UpdatedAt = DateTime.UtcNow;
 		dbContext.Set<CommentEntity>().Update(comment);
@@ -179,7 +151,7 @@ public class CommentRepository(DbContext dbContext,
 
 	public async Task<GenericResponse> AddReactionToComment(Guid commentId, Reaction reaction, CancellationToken ct) {
 		UserEntity? user = await dbContext.Set<UserEntity>().Where(w => w.Id == _userId).FirstOrDefaultAsync(ct);
-		if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound, "User Donest Logged In");
+		if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound, "User Did not Logged In");
 
 		CommentEntity? comment = await dbContext.Set<CommentEntity>().Where(w => w.Id == commentId).FirstOrDefaultAsync(ct);
 		if (comment is null) return new GenericResponse(UtilitiesStatusCodes.NotFound, "Comment Not Found");
