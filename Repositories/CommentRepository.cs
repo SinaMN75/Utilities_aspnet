@@ -19,7 +19,7 @@ public class CommentRepository(DbContext dbContext,
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	public async Task<GenericResponse<IQueryable<CommentEntity>?>> Filter(CommentFilterDto dto) {
-		IQueryable<CommentEntity> q = dbContext.Set<CommentEntity>().AsNoTracking();
+		IQueryable<CommentEntity> q = dbContext.Set<CommentEntity>().AsNoTracking().Where(x => x.ParentId == null);
 
 		if (dto.ProductId is not null) q = q.Where(x => x.ProductId == dto.ProductId);
 		if (dto.Status is not null) q = q.Where(x => x.Status == dto.Status);
@@ -35,7 +35,7 @@ public class CommentRepository(DbContext dbContext,
 			.Include(x => x.Children)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
 			.OrderByDescending(x => x.CreatedAt);
 
-		int totalCount = await q.CountAsync();
+		int totalCount = await dbContext.Set<CommentEntity>().AsNoTracking().Where(x => x.ProductId == dto.ProductId).CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
 		return new GenericResponse<IQueryable<CommentEntity>?>(q) {
