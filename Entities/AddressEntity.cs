@@ -20,7 +20,6 @@ public class AddressEntity : BaseEntity {
 	[MaxLength(20)]
 	public string PostalCode { get; set; } = null!;
 
-	public bool IsDefault { get; set; }
 	public UserEntity? User { get; set; }
 	public string? UserId { get; set; }
 }
@@ -42,7 +41,6 @@ public class AddressUpdateDto {
 	public string? Pelak { get; set; }
 	public string? Unit { get; set; }
 	public string? PostalCode { get; set; }
-	public bool IsDefault { get; set; } = false;
 }
 
 public class AddressFilterDto : BaseFilterDto {

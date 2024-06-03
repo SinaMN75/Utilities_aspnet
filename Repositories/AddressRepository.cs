@@ -19,7 +19,7 @@ public class AddressRepository(DbContext dbContext, IHttpContextAccessor httpCon
 			ReceiverFullName = addressDto.ReceiverFullName,
 			ReceiverPhoneNumber = addressDto.ReceiverPhoneNumber,
 			Unit = addressDto.Unit,
-			UserId = _userId
+			UserId = _userId,
 		}, ct);
 		await dbContext.SaveChangesAsync(ct);
 		return new GenericResponse<AddressEntity?>(e.Entity);
@@ -34,11 +34,6 @@ public class AddressRepository(DbContext dbContext, IHttpContextAccessor httpCon
 		if (dto.Address.IsNotNullOrEmpty()) e.Address = dto.Address!;
 		if (dto.ReceiverFullName.IsNotNullOrEmpty()) e.ReceiverFullName = dto.ReceiverFullName!;
 		if (dto.ReceiverPhoneNumber.IsNotNullOrEmpty()) e.ReceiverPhoneNumber = dto.ReceiverPhoneNumber!;
-		if (dto.IsDefault && dbContext.Set<AddressEntity>().Any(a => a.UserId == e.UserId && a.Id != e.Id && e.IsDefault))
-			foreach (AddressEntity? item in dbContext.Set<AddressEntity>().Where(a => a.UserId == e.UserId && a.Id != e.Id && e.IsDefault)) {
-				item.IsDefault = false;
-				dbContext.Update(item);
-			}
 
 		dbContext.Update(e);
 		await dbContext.SaveChangesAsync(ct);
@@ -61,7 +56,6 @@ public class AddressRepository(DbContext dbContext, IHttpContextAccessor httpCon
 			Pelak = x.Pelak,
 			Unit = x.Unit,
 			PostalCode = x.PostalCode,
-			IsDefault = x.IsDefault,
 			UserId = x.UserId
 		});
 		

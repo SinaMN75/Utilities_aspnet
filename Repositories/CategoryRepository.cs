@@ -4,7 +4,7 @@ public interface ICategoryRepository {
 	public Task<GenericResponse<CategoryEntity>> Create(CategoryCreateUpdateDto dto, CancellationToken ct);
 	public Task<GenericResponse<IEnumerable<CategoryEntity>>> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto, CancellationToken ct);
 	public Task<GenericResponse> ImportFromExcel(IFormFile file, CancellationToken ct);
-	public GenericResponse<IEnumerable<CategoryEntity>> Filter(CategoryFilterDto dto);
+	public Task<GenericResponse<IEnumerable<CategoryEntity>>> Filter(CategoryFilterDto dto);
 	public Task<GenericResponse<CategoryEntity?>> Update(CategoryCreateUpdateDto dto, CancellationToken ct);
 	public Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 }
@@ -15,7 +15,8 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 		if (dto.Id is not null) entity.Id = (Guid)dto.Id;
 		CategoryEntity i = entity.FillData(dto);
 		if (dto.IsUnique) {
-			CategoryEntity? exists = await context.Set<CategoryEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Title == dto.Title, ct);
+			CategoryEntity? exists = await context.Set<CategoryEntity>().AsNoTracking()
+				.FirstOrDefaultAsync(x => x.Title == dto.Title, ct);
 			if (exists != null) return new GenericResponse<CategoryEntity>(exists);
 			await context.AddAsync(i, ct);
 			await context.SaveChangesAsync(ct);
@@ -27,7 +28,10 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 		return new GenericResponse<CategoryEntity>(i);
 	}
 
-	public async Task<GenericResponse<IEnumerable<CategoryEntity>>> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto, CancellationToken ct) {
+	public async Task<GenericResponse<IEnumerable<CategoryEntity>>> BulkCreate(
+		IEnumerable<CategoryCreateUpdateDto> dto,
+		CancellationToken ct
+	) {
 		List<CategoryEntity> list = [];
 		foreach (CategoryCreateUpdateDto i in dto) {
 			GenericResponse<CategoryEntity> j = await Create(i, ct);
@@ -60,7 +64,7 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 		return new GenericResponse();
 	}
 
-	public GenericResponse<IEnumerable<CategoryEntity>> Filter(CategoryFilterDto dto) {
+	public async Task<GenericResponse<IEnumerable<CategoryEntity>>> Filter(CategoryFilterDto dto) {
 		IQueryable<CategoryEntity> q = context.Set<CategoryEntity>().AsNoTracking().Include(x => x.Children);
 
 		q = dto.ShowByChildren.IsTrue() ? q.Where(x => x.ParentId != null) : q.Where(x => x.ParentId == null);
@@ -78,7 +82,7 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 
 		if (dto.ShowMedia.IsTrue()) q = q.Include(x => x.Media);
 
-		int totalCount = q.Count();
+		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
 		return new GenericResponse<IEnumerable<CategoryEntity>>(q) {
@@ -89,7 +93,10 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 	}
 
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
-		CategoryEntity i = (await context.Set<CategoryEntity>().Include(x => x.Children).Include(x => x.Media).FirstOrDefaultAsync(x => x.Id == id, ct))!;
+		CategoryEntity i = (await context.Set<CategoryEntity>()
+			.Include(x => x.Children)
+			.Include(x => x.Media)
+			.FirstOrDefaultAsync(x => x.Id == id, ct))!;
 		foreach (CategoryEntity c in i.Children ?? new List<CategoryEntity>()) {
 			context.Remove(c);
 			await mediaRepository.DeleteMedia(c.Media);
@@ -133,15 +140,7 @@ public static class CategoryEntityExtension {
 			DiscountedPrice = dto.DiscountedPrice ?? entity.JsonDetail.DiscountedPrice,
 			SendPrice = dto.SendPrice ?? entity.JsonDetail.SendPrice
 		};
-
-		if (dto.RemoveTags.IsNotNullOrEmpty()) {
-			dto.RemoveTags?.ForEach(item => entity.Tags.Remove(item));
-		}
-
-		if (dto.AddTags.IsNotNullOrEmpty()) {
-			entity.Tags.AddRange(dto.AddTags!);
-		}
-
+		
 		return entity;
 	}
 }

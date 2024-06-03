@@ -18,11 +18,8 @@ public class CategoryController(ICategoryRepository repository) : BaseApiControl
 	public async Task<ActionResult<GenericResponse<IEnumerable<CategoryEntity>>>> ImportFromExcel(IFormFile file, CancellationToken ct) =>
 		Result(await repository.ImportFromExcel(file, ct));
 
-	[HttpGet]
-	public ActionResult<GenericResponse<IQueryable<CategoryEntity>>> Read([FromQuery] CategoryFilterDto dto) => Result(repository.Filter(dto));
-
 	[HttpPost("Filter")]
-	public ActionResult<GenericResponse<IQueryable<CategoryEntity>>> Filter(CategoryFilterDto dto) => Result(repository.Filter(dto));
+	public async Task<ActionResult<GenericResponse<IQueryable<CategoryEntity>>>> Filter(CategoryFilterDto dto) => Result(await repository.Filter(dto));
 
 	[HttpPut]
 	[Authorize]
