@@ -27,7 +27,7 @@ public class AddressRepository(DbContext dbContext, IHttpContextAccessor httpCon
 
 	public async Task<GenericResponse<AddressEntity?>> Update(AddressUpdateDto dto, CancellationToken ct) {
 		AddressEntity e = (await dbContext.Set<AddressEntity>().FirstOrDefaultAsync(f => f.Id == dto.Id, ct))!;
-		if (dto.PostalCode.IsNotNullOrEmpty()) e.UpdatedAt = DateTime.UtcNow;
+		e.UpdatedAt = DateTime.UtcNow;
 		if (dto.PostalCode.IsNotNullOrEmpty()) e.PostalCode = dto.PostalCode!;
 		if (dto.Pelak.IsNotNullOrEmpty()) e.Pelak = dto.Pelak!;
 		if (dto.Unit.IsNotNullOrEmpty()) e.Unit = dto.Unit!;
