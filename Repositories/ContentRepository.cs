@@ -29,7 +29,9 @@ public class ContentRepository(DbContext dbContext, IMediaRepository mediaReposi
 				Address2 = dto.Address2,
 				Address3 = dto.Address3,
 				Email1 = dto.Email1,
-				Email2 = dto.Email2
+				Email2 = dto.Email2,
+				Days = dto.Days,
+				Price = dto.Price
 			}
 		}, ct);
 		await dbContext.SaveChangesAsync(ct);
@@ -78,9 +80,8 @@ public class ContentRepository(DbContext dbContext, IMediaRepository mediaReposi
 		e.JsonDetail.Email1 = dto.Email1 ?? e.JsonDetail.Email1;
 		e.JsonDetail.Email2 = dto.Email2 ?? e.JsonDetail.Email2;
 		e.JsonDetail.Website = dto.Website ?? e.JsonDetail.Website;
-
-		if (dto.RemoveTags.IsNotNullOrEmpty()) dto.RemoveTags!.ForEach(item => e.Tags.Remove(item));
-		if (dto.AddTags.IsNotNullOrEmpty()) e.Tags.AddRange(dto.AddTags!);
+		e.JsonDetail.Price = dto.Price ?? e.JsonDetail.Price;
+		e.JsonDetail.Days = dto.Days ?? e.JsonDetail.Days;
 
 		dbContext.Update(e);
 		await dbContext.SaveChangesAsync(ct);
