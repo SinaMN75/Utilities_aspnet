@@ -6,7 +6,10 @@ public static class Seeder {
 		builder.Entity<UserEntity>().OwnsOne(e => e.JsonDetail, b => b.ToJson());
 		builder.Entity<GroupChatEntity>().OwnsOne(e => e.JsonDetail, b => b.ToJson());
 		builder.Entity<MediaEntity>().OwnsOne(e => e.JsonDetail, b => b.ToJson());
-		builder.Entity<ContentEntity>().OwnsOne(e => e.JsonDetail, b => b.ToJson());
+		builder.Entity<ContentEntity>().OwnsOne(e => e.JsonDetail, b => {
+			b.ToJson();
+			b.OwnsMany(i => i.KeyValues);
+		});
 		builder.Entity<ProductEntity>().OwnsOne(e => e.JsonDetail, b => {
 			b.ToJson();
 			b.OwnsMany(i => i.KeyValues);
