@@ -17,7 +17,7 @@ public class SubscriptionRepository(DbContext dbContext, IHttpContextAccessor ht
 			PaymentRefId = dto.PaymentRefId,
 			ExpiresIn = dto.ExpiresIn,
 			Tags = dto.Tags,
-			JsonDetail = new SubscriptionJsonDetail { KeyValues = dto.KeyValues, StringList = dto.StringList }
+			JsonDetail = new SubscriptionJsonDetail { KeyValues = dto.KeyValues, StringList = dto.StringList, Price = dto.Price}
 		}, ct);
 		await dbContext.SaveChangesAsync(ct);
 		return new GenericResponse<SubscriptionEntity?>(e.Entity);
@@ -49,12 +49,13 @@ public class SubscriptionRepository(DbContext dbContext, IHttpContextAccessor ht
 
 	public async Task<GenericResponse<SubscriptionEntity?>> Update(SubscriptionUpdateDto dto, CancellationToken ct) {
 		SubscriptionEntity e = (await dbContext.Set<SubscriptionEntity>().FirstOrDefaultAsync(f => f.Id == dto.Id, ct))!;
-		if (dto.PaymentRefId.IsNotNullOrEmpty()) e.PaymentRefId = dto.PaymentRefId!;
-		if (dto.Title.IsNotNullOrEmpty()) e.Title = dto.Title!;
-		if (dto.Tags.IsNotNullOrEmpty()) e.Tags = dto.Tags!;
-		if (dto.KeyValues.IsNotNullOrEmpty()) e.JsonDetail.KeyValues = dto.KeyValues!;
-		if (dto.StringList.IsNotNullOrEmpty()) e.JsonDetail.StringList = dto.StringList!;
-		if (dto.ExpiresIn.HasValue) e.ExpiresIn = dto.ExpiresIn ?? DateTime.UtcNow;
+		if (dto.PaymentRefId.IsNotNullOrEmpty()) e.PaymentRefId = dto.PaymentRefId  ?? e.PaymentRefId;
+		if (dto.Title.IsNotNullOrEmpty()) e.Title = dto.Title  ?? e.Title;
+		if (dto.Tags.IsNotNullOrEmpty()) e.Tags = dto.Tags  ?? e.Tags;
+		if (dto.KeyValues.IsNotNullOrEmpty()) e.JsonDetail.KeyValues = dto.KeyValues  ?? e.JsonDetail.KeyValues;
+		if (dto.Price.HasValue) e.JsonDetail.Price = dto.Price! ?? e.JsonDetail.Price  ?? e.JsonDetail.Price;
+		if (dto.StringList.IsNotNullOrEmpty()) e.JsonDetail.StringList = dto.StringList  ?? e.JsonDetail.StringList;
+		if (dto.ExpiresIn.HasValue) e.ExpiresIn = dto.ExpiresIn ?? e.ExpiresIn;
 
 		dbContext.Update(e);
 		await dbContext.SaveChangesAsync(ct);
