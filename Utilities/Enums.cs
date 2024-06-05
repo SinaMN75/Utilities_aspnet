@@ -394,6 +394,7 @@ public enum TagProduct {
 	Premium12Month = 187,
 	Post = 189,
 	Tournament = 190,
+	Subscription = 191,
 	New = 201,
 	KindOfNew = 202,
 	Used = 203,
