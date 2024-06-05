@@ -273,7 +273,11 @@ public enum TagContent {
 	SmallDetail1 = 110,
 	SmallDetail2 = 111,
 	News = 112,
-	Premium = 113
+	Premium = 113,
+	Premium1Month = 114,
+	Premium3Month = 115,
+	Premium6Month = 116,
+	Premium12Month = 117
 }
 
 public enum TagComment {

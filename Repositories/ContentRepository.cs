@@ -31,7 +31,8 @@ public class ContentRepository(DbContext dbContext, IMediaRepository mediaReposi
 				Email1 = dto.Email1,
 				Email2 = dto.Email2,
 				Days = dto.Days,
-				Price = dto.Price
+				Price = dto.Price,
+				KeyValues = dto.KeyValues
 			}
 		}, ct);
 		await dbContext.SaveChangesAsync(ct);
@@ -82,6 +83,7 @@ public class ContentRepository(DbContext dbContext, IMediaRepository mediaReposi
 		e.JsonDetail.Website = dto.Website ?? e.JsonDetail.Website;
 		e.JsonDetail.Price = dto.Price ?? e.JsonDetail.Price;
 		e.JsonDetail.Days = dto.Days ?? e.JsonDetail.Days;
+		e.JsonDetail.KeyValues = dto.KeyValues ?? e.JsonDetail.KeyValues;
 
 		dbContext.Update(e);
 		await dbContext.SaveChangesAsync(ct);

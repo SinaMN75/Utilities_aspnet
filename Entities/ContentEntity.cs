@@ -39,6 +39,7 @@ public class ContentJsonDetail {
 	public string? Address3 { get; set; }
 	public long? Price { get; set; }
 	public int? Days { get; set; }
+	public List<KeyValue> KeyValues { get; set; } = [];
 }
 
 public class ContentCreateDto {
@@ -63,6 +64,7 @@ public class ContentCreateDto {
 	public long? Price { get; set; }
 	public int? Days { get; set; }
 	public List<TagContent>? Tags { get; set; }
+	public List<KeyValue> KeyValues { get; set; } = [];
 }
 
 public class ContentUpdateDto {
@@ -89,4 +91,5 @@ public class ContentUpdateDto {
 	public int? Days { get; set; }
 	public DateTime? DeletedAt { get; set; }
 	public List<TagContent>? Tags { get; set; }
+	public List<KeyValue>? KeyValues { get; set; }
 }
