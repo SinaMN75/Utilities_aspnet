@@ -138,13 +138,14 @@ public class UserJsonDetail {
 
 public class UserSubscriptions {
 	public string? ContentId { get; set; }
-	public string Title { get; set; }
+	public string? Title { get; set; }
 	public string? SubTitle { get; set; }
 	public string? Description { get; set; }
 	public int? Days { get; set; }
 	public List<KeyValue> KeyValues { get; set; } = [];
 	public long? Price { get; set; }
 	public string? TransactionRefId { get; set; }
+	public List<TagSubscription>? Tags { get; set; }
 	public DateTime? ExpiresIn { get; set; }
 }
 
