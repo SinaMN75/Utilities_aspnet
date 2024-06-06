@@ -3,7 +3,10 @@ namespace Utilities_aspnet.Utilities;
 public static class Seeder {
 	public static void SetupModelBuilder(this ModelBuilder builder) {
 		builder.Entity<CategoryEntity>().OwnsOne(e => e.JsonDetail, b => b.ToJson());
-		builder.Entity<UserEntity>().OwnsOne(e => e.JsonDetail, b => b.ToJson());
+		builder.Entity<UserEntity>().OwnsOne(e => e.JsonDetail, b => {
+			b.ToJson();
+			b.OwnsMany(i => i.UserSubscriptions).OwnsMany(i => i.KeyValues);
+		});
 		builder.Entity<GroupChatEntity>().OwnsOne(e => e.JsonDetail, b => b.ToJson());
 		builder.Entity<MediaEntity>().OwnsOne(e => e.JsonDetail, b => b.ToJson());
 		builder.Entity<ContentEntity>().OwnsOne(e => e.JsonDetail, b => {

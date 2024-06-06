@@ -14,6 +14,7 @@ public interface IUserRepository {
 	Task<GenericResponse> TransferWalletToWallet(TransferFromWalletToWalletDto dto, CancellationToken ct);
 	Task<UserEntity?> ReadByIdMinimal(string? idOrUserName, string? token = null);
 	Task<GenericResponse> Authorize(AuthorizeUserDto dto);
+	Task<GenericResponse> Subscribe(string userId, Guid contentId, string transactionRefId);
 }
 
 public class UserRepository(
@@ -369,6 +370,24 @@ public class UserRepository(
 
 		dbContext.Set<UserEntity>().Update(user);
 		await dbContext.SaveChangesAsync();
+
+		return new GenericResponse();
+	}
+
+	public async Task<GenericResponse> Subscribe(string userId, Guid contentId, string transactionRefId) {
+		UserEntity user = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == userId))!;
+		ContentEntity content = (await dbContext.Set<ContentEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == contentId))!;
+		user.JsonDetail.UserSubscriptions!.Add(new UserSubscriptions {
+			ContentId = content.Id.ToString(),
+			Title = content.Title,
+			SubTitle = content.SubTitle,
+			Description = content.Description,
+			Days = content.JsonDetail.Days,
+			KeyValues = content.JsonDetail.KeyValues,
+			Price = content.JsonDetail.Price,
+			TransactionRefId = transactionRefId,
+			ExpiresIn = DateTime.UtcNow.AddDays(content.JsonDetail.Days ?? 0)
+		});
 
 		return new GenericResponse();
 	}

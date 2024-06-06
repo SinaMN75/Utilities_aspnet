@@ -50,4 +50,8 @@ public class UserController(IUserRepository repository) : BaseApiController {
 
 	[HttpPost("ToggleBlock/{id}")]
 	public async Task<ActionResult<GenericResponse>> Block(string id) => Result(await repository.ToggleBlock(id));
+	
+	[HttpPost("Subscribe")]
+	public async Task<ActionResult<GenericResponse>> Subscribe(string userId, Guid contentId, string transactionRefId) => 
+		Result(await repository.Subscribe(userId, contentId, transactionRefId));
 }
