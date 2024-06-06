@@ -446,6 +446,7 @@ public enum TagUser {
 	Female = 201,
 	Unknown = 202,
 	Legal = 203,
+	Guest = 204,
 	AdminCategoryRead = 300,
 	AdminCategoryUpdate = 301,
 	AdminProductRead = 302,
