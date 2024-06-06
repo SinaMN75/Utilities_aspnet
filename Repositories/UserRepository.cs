@@ -390,6 +390,9 @@ public class UserRepository(
 			ExpiresIn = DateTime.UtcNow.AddDays(content.JsonDetail.Days ?? 0)
 		});
 
+		dbContext.Update(user);
+		await dbContext.SaveChangesAsync();
+
 		return new GenericResponse();
 	}
 
