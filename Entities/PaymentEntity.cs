@@ -98,6 +98,7 @@ public class NgPayDto {
 	public string? Currency { get; set; }
 	public string? RedirectUrl { get; set; }
 	public long? Amount { get; set; }
+	public bool? SkipConfirmationPage { get; set; }
 }
 
 public class NgAccessTokenResponse {

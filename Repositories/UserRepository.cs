@@ -386,6 +386,7 @@ public class UserRepository(
 			KeyValues = content.JsonDetail.KeyValues,
 			Price = content.JsonDetail.Price,
 			TransactionRefId = transactionRefId,
+			Tags = [TagSubscription.Complete],
 			ExpiresIn = DateTime.UtcNow.AddDays(content.JsonDetail.Days ?? 0)
 		});
 

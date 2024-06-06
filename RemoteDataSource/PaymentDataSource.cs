@@ -54,7 +54,7 @@ public static class PaymentDataSource {
 				action = dto.Action,
 				amount = new { currencyCode = dto.Currency, value = dto.Amount },
 				emailAddress = dto.EmailAddress,
-				merchantAttributes = new { redirectUrl = dto.RedirectUrl }
+				merchantAttributes = new { redirectUrl = dto.RedirectUrl, skipConfirmationPage = true }
 			}
 		);
 		IRestResponse responsePay = await new RestClient($"https://api-gateway.sandbox.ngenius-payments.com/transactions/outlets/{dto.Outlet}/orders").ExecuteAsync(requestPay);
