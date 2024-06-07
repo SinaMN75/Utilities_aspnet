@@ -351,7 +351,7 @@ public static class ProductEntityExtension {
 			else entity.VoteCount -= dto.ScoreMinus;
 		}
 
-		if (dto.Categories.IsNotNull()) {
+		if (dto.Categories.IsNotNullOrEmpty()) {
 			List<CategoryEntity> listCategory = [];
 			foreach (Guid item in dto.Categories!) {
 				CategoryEntity? e = await context.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item);
@@ -361,19 +361,11 @@ public static class ProductEntityExtension {
 			entity.Categories = listCategory;
 		}
 
-		if (dto.Teams.IsNotNull()) {
+		if (dto.Teams.IsNotNullOrEmpty()) {
 			string temp = dto.Teams!.Aggregate("", (current, userId) => current + userId + ",");
 			entity.Teams = temp;
 		}
-
-		if (dto.RemoveTags.IsNotNullOrEmpty()) {
-			dto.RemoveTags?.ForEach(item => entity.Tags.Remove(item));
-		}
-
-		if (dto.AddTags.IsNotNullOrEmpty()) {
-			entity.Tags.AddRange(dto.AddTags!);
-		}
-
+		
 		if (dto.ParentId is null) return entity;
 
 		entity.ParentId = dto.ParentId ?? entity.ParentId;
