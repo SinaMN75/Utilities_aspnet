@@ -56,8 +56,9 @@ public class ProductRepository(
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
 		if (dto.Subtitle.IsNotNullOrEmpty()) q = q.Where(x => (x.Subtitle ?? "").Contains(dto.Subtitle!));
 		if (dto.Description.IsNotNullOrEmpty()) q = q.Where(x => (x.Description ?? "").Contains(dto.Description!));
-		if (dto.State.IsNotNullOrEmpty()) q = q.Where(x => x.State == dto.State);
-		if (dto.Region.IsNotNullOrEmpty()) q = q.Where(x => x.Region == dto.Region);
+		if (dto.State.IsNotNullOrEmpty()) q = q.Where(x => x.State!.Contains(dto.State ?? ""));
+		if (dto.Region.IsNotNullOrEmpty()) q = q.Where(x => x.Region!.Contains(dto.Region ?? ""));
+		if (dto.StateRegion.IsNotNullOrEmpty()) q = q.Where(x => x.Region!.Contains(dto.Region ?? "") || x.State!.Contains(dto.State ?? ""));
 		if (dto.StartPriceRange.HasValue) q = q.Where(x => x.Price >= dto.StartPriceRange);
 		if (dto.Currency.HasValue) q = q.Where(x => x.Currency == dto.Currency);
 		if (dto.HasDiscount.IsTrue()) q = q.Where(x => x.DiscountPercent != null || x.DiscountPrice != null);

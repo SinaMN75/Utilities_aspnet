@@ -163,7 +163,6 @@ public class ProductCreateUpdateDto {
 	public string? Type1 { get; set; }
 	public string? Type2 { get; set; }
 	public string? Unit { get; set; }
-	public string? KeyValue { get; set; }
 	public string? State { get; set; }
 	public string? Region { get; set; }
 	public string? Color { get; set; }
@@ -220,6 +219,7 @@ public class ProductFilterDto : BaseFilterDto {
 	public string? Description { get; set; }
 	public string? State { get; set; }
 	public string? Region { get; set; }
+	public string? StateRegion { get; set; }
 	public long? StartPriceRange { get; set; }
 	public long? EndPriceRange { get; set; }
 	public bool? IsFollowing { get; set; }
