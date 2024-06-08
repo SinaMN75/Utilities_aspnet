@@ -220,6 +220,7 @@ public class ProductFilterDto : BaseFilterDto {
 	public string? State { get; set; }
 	public string? Region { get; set; }
 	public string? StateRegion { get; set; }
+	public string? Query { get; set; }
 	public long? StartPriceRange { get; set; }
 	public long? EndPriceRange { get; set; }
 	public bool? IsFollowing { get; set; }
@@ -242,16 +243,17 @@ public class ProductFilterDto : BaseFilterDto {
 	public bool? OrderByCreatedDateDescending { get; set; } = false;
 	public bool? OrderByAgeCategory { get; set; }
 	public bool? OrderByCategory { get; set; }
+	public bool ShowExpired { get; set; } = false;
+	public bool Boosted { get; set; }
+	public bool ShowWithChildren { get; set; } = false;
+	public bool? Shuffle1 { get; set; } = false;
+	public DateTime? StartDate { get; set; }
+	public DateTime? EndDate { get; set; }
 	public Currency? Currency { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 	public List<TagProduct>? Tags { get; set; }
 	public IEnumerable<string>? UserIds { get; set; }
 	public IEnumerable<Guid>? Ids { get; set; }
-	public string? Query { get; set; }
-	public bool ShowExpired { get; set; } = false;
-	public bool Boosted { get; set; }
-	public bool ShowWithChildren { get; set; } = false;
-	public bool? Shuffle1 { get; set; } = false;
 }
 
 public class ReactionCreateUpdateDto {

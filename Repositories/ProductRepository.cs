@@ -63,6 +63,8 @@ public class ProductRepository(
 		if (dto.Currency.HasValue) q = q.Where(x => x.Currency == dto.Currency);
 		if (dto.HasDiscount.IsTrue()) q = q.Where(x => x.DiscountPercent != null || x.DiscountPrice != null);
 		if (dto.EndPriceRange.HasValue) q = q.Where(x => x.Price <= dto.EndPriceRange);
+		if (dto.StartDate.HasValue) q = q.Where(x => (x.JsonDetail.StartDate ?? DateTime.UtcNow) >= dto.StartDate);
+		if (dto.EndDate.HasValue) q = q.Where(x => (x.JsonDetail.EndDate ?? DateTime.UtcNow) <= dto.EndDate);
 		if (dto.Query.IsNotNullOrEmpty())
 			q = q.Where(x => (x.Title ?? "").Contains(dto.Query!) || (x.Subtitle ?? "").Contains(dto.Query!) || (x.Description ?? "").Contains(dto.Query!));
 
