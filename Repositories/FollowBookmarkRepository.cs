@@ -101,19 +101,16 @@ public class FollowBookmarkRepository(
 				FollowedUsers = targetUser.FollowedUsers.Replace($",{parameters.UserId}", "")
 			});
 
-			try {
-				List<NotificationEntity> exFollowedNotifications =
-					await notificationRepository.Filter(new NotificationFilterDto {
-						UserId = parameters.UserId,
-						CreatorUserId = _userId,
-						Tags = [TagNotification.Followed],
-					}).Result!.ToListAsync();
+			List<NotificationEntity> exFollowedNotifications =
+				await notificationRepository.Filter(new NotificationFilterDto {
+					UserId = parameters.UserId,
+					CreatorUserId = _userId,
+					Tags = [TagNotification.Followed],
+				}).Result!.ToListAsync();
 
-				foreach (NotificationEntity exFollowedNotification in exFollowedNotifications) {
-					await notificationRepository.Delete(exFollowedNotification.Id);
-				}
+			foreach (NotificationEntity exFollowedNotification in exFollowedNotifications) {
+				await notificationRepository.Delete(exFollowedNotification.Id);
 			}
-			catch (Exception) { }
 		}
 		else {
 			await userRepository.Update(new UserCreateUpdateDto {

@@ -61,6 +61,7 @@ public class ProductEntity : BaseEntity {
 	public IEnumerable<OrderDetailEntity>? OrderDetail { get; set; }
 	public IEnumerable<CommentEntity>? Comments { get; set; }
 	public IEnumerable<ReportEntity>? Reports { get; set; }
+	public IEnumerable<NotificationEntity>? Notifications { get; set; }
 
 	[NotMapped]
 	public IEnumerable<OrderEntity>? Orders { get; set; }

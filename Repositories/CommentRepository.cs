@@ -80,7 +80,7 @@ public class CommentRepository(DbContext dbContext,
 			Tags = dto.Tags ?? []
 		};
 		await dbContext.AddAsync(comment, ct);
-		ProductEntity product = (await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == comment.ProductId, ct))!;
+		ProductEntity product = (await dbContext.Set<ProductEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == comment.ProductId, ct))!;
 		product.CommentsCount += 1;
 
 		if (product.UserId != _userId)
@@ -150,8 +150,7 @@ public class CommentRepository(DbContext dbContext,
 	}
 
 	public async Task<GenericResponse> AddReactionToComment(Guid commentId, Reaction reaction, CancellationToken ct) {
-		UserEntity? user = await dbContext.Set<UserEntity>().Where(w => w.Id == _userId).FirstOrDefaultAsync(ct);
-		if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound, "User Did not Logged In");
+		UserEntity user = (await dbContext.Set<UserEntity>().Where(w => w.Id == _userId).FirstOrDefaultAsync(ct))!;
 
 		CommentEntity? comment = await dbContext.Set<CommentEntity>().Where(w => w.Id == commentId).FirstOrDefaultAsync(ct);
 		if (comment is null) return new GenericResponse(UtilitiesStatusCodes.NotFound, "Comment Not Found");

@@ -4,11 +4,6 @@ namespace Utilities_aspnet.Controllers;
 [Route("api/[controller]")]
 public class NotificationController(INotificationRepository repository) : BaseApiController {
 	[Authorize]
-	[AllowAnonymous]
-	[HttpGet]
-	public ActionResult<GenericResponse<IQueryable<NotificationEntity>>> Read() => Result(repository.Read());
-
-	[Authorize]
 	[HttpGet("{id:guid}")]
 	public async Task<ActionResult<GenericResponse<IQueryable<NotificationEntity>>>> ReadById(Guid id) => Result(await repository.ReadById(id));
 

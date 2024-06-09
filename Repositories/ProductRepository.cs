@@ -201,6 +201,7 @@ public class ProductRepository(
 			.Include(x => x.OrderDetail)
 			.Include(x => x.Reports)
 			.Include(x => x.Comments)
+			.Include(x => x.Notifications)
 			.Include(x => x.Bookmarks)!.ThenInclude(y => y.Media)
 			.Include(x => x.Bookmarks)!.ThenInclude(y => y.Children)!.ThenInclude(z => z.Media)
 			.Include(x => x.Children)!.ThenInclude(x => x.Media)
@@ -210,6 +211,7 @@ public class ProductRepository(
 		foreach (CommentEntity comment in i.Comments ?? new List<CommentEntity>()) await commentRepository.Delete(comment.Id, ct);
 		foreach (ReportEntity report in i.Reports ?? new List<ReportEntity>()) await reportRepository.Delete(report.Id);
 		foreach (OrderDetailEntity orderDetail in i.OrderDetail ?? new List<OrderDetailEntity>()) dbContext.Remove(orderDetail);
+		foreach (NotificationEntity notification in i.Notifications ?? new List<NotificationEntity>()) dbContext.Remove(notification);
 		foreach (BookmarkEntity bookmark in i.Bookmarks ?? new List<BookmarkEntity>()) {
 			foreach (BookmarkEntity bookmarkChild in bookmark.Children ?? new List<BookmarkEntity>()) {
 				await mediaRepository.DeleteMedia(bookmarkChild.Media);
