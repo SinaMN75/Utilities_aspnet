@@ -130,3 +130,10 @@ public class GroupChatMessageCreateUpdateDto {
 	public Guid? ParentId { get; set; }
 	public IEnumerable<Guid>? Products { get; set; } = new List<Guid>();
 }
+
+public class FilterGroupChatMessagesDto: BaseFilterDto {
+	public required Guid GroupChatId { get; set; }
+	public string? Message { get; set; }
+	public DateTime? StartDate { get; set; }
+	public DateTime? EndDate { get; set; }
+}
