@@ -33,7 +33,7 @@ public class ChatController(IChatRepository repository) : BaseApiController {
 		[FromQuery] string message = ""
 	) => Result(repository.ReadGroupChatMessages(id, pageSize, pageNumber, message));
 
-	[HttpGet("FilterGroupChatMessages")]
+	[HttpPost("FilterGroupChatMessages")]
 	public ActionResult<GenericResponse<GroupChatMessageEntity?>> FilterChatMessages(FilterGroupChatMessagesDto dto) =>
 		Result(repository.FilterGroupChatMessages(dto));
 
