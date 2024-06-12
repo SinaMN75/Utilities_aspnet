@@ -132,7 +132,7 @@ public class GroupChatMessageCreateUpdateDto {
 }
 
 public class FilterGroupChatMessagesDto: BaseFilterDto {
-	public required Guid GroupChatId { get; set; }
+	public Guid? GroupChatId { get; set; }
 	public string? Message { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }

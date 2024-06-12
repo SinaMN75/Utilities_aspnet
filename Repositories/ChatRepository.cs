@@ -322,10 +322,6 @@ public class ChatRepository(
 
 	public GenericResponse<IQueryable<GroupChatMessageEntity>?> FilterGroupChatMessages(FilterGroupChatMessagesDto dto) {
 		IQueryable<GroupChatMessageEntity> q = dbContext.Set<GroupChatMessageEntity>()
-			.Where(x => x.GroupChatId == dto.GroupChatId)
-			.Where(x => (x.Message ?? "").Contains(dto.Message ?? ""))
-			.Where(x => x.CreatedAt >= (dto.StartDate ?? new DateTime(2020)))
-			.Where(x => x.CreatedAt <= (dto.EndDate ?? new DateTime(2030)))
 			.Include(x => x.Media)
 			.Include(x => x.Products)!.ThenInclude(x => x!.Media)
 			.Include(x => x.Products)!.ThenInclude(x => x!.User).ThenInclude(x => x!.Media)
@@ -340,6 +336,11 @@ public class ChatRepository(
 			.OrderBy(o => o.CreatedAt)
 			.Reverse()
 			.AsNoTracking();
+
+		if (dto.GroupChatId.IsNotNullOrEmpty()) q = q.Where(x => x.GroupChatId == dto.GroupChatId);
+		if (dto.Message.IsNotNullOrEmpty()) q = q.Where(x => x.Message == dto.Message);
+		if (dto.StartDate.HasValue) q = q.Where(x => x.CreatedAt >= (dto.StartDate ?? new DateTime(2020)));
+		if (dto.EndDate.HasValue) q = q.Where(x => x.CreatedAt <= (dto.EndDate ?? new DateTime(2030)));
 
 		int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
