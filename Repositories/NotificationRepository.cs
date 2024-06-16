@@ -4,7 +4,6 @@ public interface INotificationRepository {
 	Task<GenericResponse> Create(NotificationCreateUpdateDto model);
 	Task<GenericResponse> Delete(Guid id);
 	GenericResponse<IQueryable<NotificationEntity>> Filter(NotificationFilterDto dto);
-	Task<GenericResponse<NotificationEntity?>> ReadById(Guid id);
 	Task<GenericResponse> UpdateSeenStatus(IEnumerable<Guid> ids, SeenStatus seenStatus);
 }
 
@@ -36,6 +35,7 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 		if (dto.CreatorUserId.IsNotNullOrEmpty()) q = q.Where(x => (x.CreatorUserId ?? "").Contains(dto.CreatorUserId!));
 		if (dto.Message.IsNotNullOrEmpty()) q = q.Where(x => (x.Message ?? "").Contains(dto.Message!));
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.Any(y => x.Tags.Contains(y)));
+		if (dto.SeenStatus.HasValue) q = q.Where(x => x.SeenStatus == dto.SeenStatus);
 
 		int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
@@ -46,24 +46,11 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 			PageSize = dto.PageSize
 		};
 	}
-
-	public async Task<GenericResponse<NotificationEntity?>> ReadById(Guid id) {
-		NotificationEntity? e = await dbContext.Set<NotificationEntity>().AsNoTracking()
-			.Include(x => x.Media)
-			.Include(x => x.CreatorUser).ThenInclude(x => x!.Media)
-			.Include(x => x.CreatorUser).ThenInclude(x => x!.Categories)
-			.FirstOrDefaultAsync(i => i.Id == id);
-		return e == null ? new GenericResponse<NotificationEntity?>(null, UtilitiesStatusCodes.NotFound) : new GenericResponse<NotificationEntity?>(e);
-	}
-
+	
 	public async Task<GenericResponse> UpdateSeenStatus(IEnumerable<Guid> ids, SeenStatus seenStatus) {
 		IQueryable<NotificationEntity> i = dbContext.Set<NotificationEntity>()
-			.Include(x => x.Media)
-			.Include(x => x.CreatorUser).ThenInclude(x => x!.Media)
-			.Include(x => x.CreatorUser).ThenInclude(x => x!.Categories)
 			.Where(x => x.UserId == null || x.UserId == _userId)
-			.Where(x => ids.Contains(x.Id))
-			.OrderByDescending(x => x.CreatedAt);
+			.Where(x => ids.Contains(x.Id));
 
 		foreach (NotificationEntity e in i) {
 			e.SeenStatus = seenStatus;

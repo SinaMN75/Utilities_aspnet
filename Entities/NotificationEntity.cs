@@ -59,7 +59,7 @@ public class NotificationFilterDto : BaseFilterDto {
 	public bool? ShowComment { get; set; }
 	public bool? ShowCreator { get; set; }
 	public bool? ShowUser { get; set; }
-	public bool? ShowChatMessage { get; set; }
 	public bool? ShowGroupChat { get; set; }
+	public SeenStatus? SeenStatus { get; set; }
 	public List<TagNotification>? Tags { get; set; }
 }
