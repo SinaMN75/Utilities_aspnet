@@ -16,7 +16,6 @@ public class ProductRepository(
 	IMediaRepository mediaRepository,
 	IUserRepository userRepository,
 	IConfiguration config,
-	IPromotionRepository promotionRepository,
 	INotificationRepository notificationRepository,
 	IReportRepository reportRepository,
 	ICommentRepository commentRepository
@@ -158,7 +157,6 @@ public class ProductRepository(
 
 		i.Orders = completeOrder.OrderByDescending(x => x.TotalPrice);
 
-		await promotionRepository.UserSeened(i.Id);
 		return new GenericResponse<ProductEntity?>(i);
 	}
 

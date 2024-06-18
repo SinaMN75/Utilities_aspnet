@@ -21,7 +21,6 @@ public class ChatRepository(
 	DbContext dbContext,
 	IHttpContextAccessor httpContextAccessor,
 	IConfiguration config,
-	IPromotionRepository promotionRepository,
 	IMediaRepository mediaRepository,
 	INotificationRepository notificationRepository
 ) : IChatRepository {
@@ -272,7 +271,6 @@ public class ChatRepository(
 		}
 
 		e.CountOfUnreadMessages = countOfMessage;
-		await promotionRepository.UserSeened(e.Id);
 
 		return new GenericResponse<GroupChatEntity>(e);
 	}
