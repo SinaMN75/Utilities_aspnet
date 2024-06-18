@@ -35,11 +35,11 @@ public class PromotionRepository(DbContext dbContext,
 		};
 		await dbContext.Set<PromotionEntity>().AddAsync(promotion);
 
-		ProductEntity? product = await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == dto.ProductId);
-		if (product is not null) {
-			product.Boosted = DateTime.UtcNow;
-			dbContext.Update(product);
-		}
+		// ProductEntity? product = await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(f => f.Id == dto.ProductId);
+		// if (product is not null) {
+		// 	product.Boosted = DateTime.UtcNow;
+		// 	dbContext.Update(product);
+		// }
 
 		GroupChatEntity? groupChat = await dbContext.Set<GroupChatEntity>().FirstOrDefaultAsync(f => f.Id == dto.GroupChatId);
 		if (groupChat is not null) {
