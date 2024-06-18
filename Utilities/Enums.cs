@@ -257,7 +257,8 @@ public enum TagCategory {
 	Favorites = 182,
 	Special = 183,
 	Recommended = 184,
-	Sport = 185
+	Sport = 185,
+	Enabled = 201
 }
 
 public enum TagContent {
