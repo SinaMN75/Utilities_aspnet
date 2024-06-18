@@ -24,7 +24,7 @@ public class ProductEntity : BaseEntity {
 	public double? Longitude { get; set; }
 
 	public int? Stock { get; set; }
-	public int? VoteCount { get; set; }
+	public int VoteCount { get; set; }
 	public int? DiscountPercent { get; set; }
 	public int? CommentsCount { get; set; }
 	public long? DiscountPrice { get; set; }
@@ -33,10 +33,7 @@ public class ProductEntity : BaseEntity {
 	public DateTime? ExpireDate { get; set; }
 
 	public string? SeenUsers { get; set; } = "";
-
-	[MaxLength(500)]
-	public string? Teams { get; set; } = "";
-
+	
 	public ProductEntity? Parent { get; set; }
 	public Guid? ParentId { get; set; }
 	public GroupChatMessageEntity? GroupChatMessageEntity { get; set; }
@@ -106,6 +103,7 @@ public class ProductJsonDetail {
 	public List<Guid>? RelatedGroupChats { get; set; } = [];
 	public List<UserReaction>? UsersReactions { get; set; } = [];
 	public List<string>? Policies { get; set; } = [];
+	public List<string>? Teams { get; set; } = [];
 }
 
 public class UserReaction {
@@ -202,9 +200,9 @@ public class ProductCreateUpdateDto {
 	public List<Guid>? RelatedGroupChats { get; set; }
 
 	public IEnumerable<Guid>? Categories { get; set; }
-	public IEnumerable<string>? Teams { get; set; }
 	public IEnumerable<ProductCreateUpdateDto>? Children { get; set; }
 	public List<ReservationTime>? ReservationTimes { get; set; }
+	public List<string>? Teams { get; set; }
 	public List<Seat>? Seats { get; set; }
 }
 

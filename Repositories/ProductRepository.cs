@@ -329,16 +329,10 @@ public static class ProductEntityExtension {
 		if (dto.Policies is not null) entity.JsonDetail.Policies = dto.Policies;
 		if (dto.MaximumMembers is not null) entity.JsonDetail.MaximumMembers = dto.MaximumMembers;
 		if (dto.PaymentRefId is not null) entity.JsonDetail.PaymentRefId = dto.PaymentRefId;
+		if (dto.Teams is not null) entity.JsonDetail.Teams = dto.Teams;
 
-		if (dto.ScorePlus.HasValue) {
-			if (entity.VoteCount == null) entity.VoteCount = 1;
-			else entity.VoteCount += dto.ScorePlus;
-		}
-
-		if (dto.ScoreMinus.HasValue) {
-			if (entity.VoteCount == null) entity.VoteCount = 1;
-			else entity.VoteCount -= dto.ScoreMinus;
-		}
+		if (dto.ScorePlus.HasValue) entity.VoteCount += dto.ScorePlus ?? 1;
+		if (dto.ScoreMinus.HasValue) entity.VoteCount -= dto.ScoreMinus ?? 1;
 
 		if (dto.Categories.IsNotNull()) {
 			List<CategoryEntity> listCategory = [];
@@ -348,11 +342,6 @@ public static class ProductEntityExtension {
 			}
 
 			entity.Categories = listCategory;
-		}
-
-		if (dto.Teams.IsNotNull()) {
-			string temp = dto.Teams!.Aggregate("", (current, userId) => current + userId + ",");
-			entity.Teams = temp;
 		}
 
 		if (dto.ParentId is null) return entity;
