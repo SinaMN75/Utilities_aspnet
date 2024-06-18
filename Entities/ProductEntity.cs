@@ -23,7 +23,6 @@ public class ProductEntity : BaseEntity {
 	public double? Latitude { get; set; }
 	public double? Longitude { get; set; }
 
-	public DateTime Boosted { get; set; }
 	public int? Stock { get; set; }
 	public int? VoteCount { get; set; }
 	public int? DiscountPercent { get; set; }
@@ -31,7 +30,6 @@ public class ProductEntity : BaseEntity {
 	public long? DiscountPrice { get; set; }
 	public long? Price { get; set; }
 	public Currency? Currency { get; set; }
-	public AgeCategory? AgeCategory { get; set; }
 	public DateTime? ExpireDate { get; set; }
 
 	public string? SeenUsers { get; set; } = "";
@@ -195,15 +193,11 @@ public class ProductCreateUpdateDto {
 	public DateTime? EndDate { get; set; }
 	public DateTime? ExpireDate { get; set; }
 	public Currency? Currency { get; set; }
-	public AgeCategory? AgeCategory { get; set; }
 	public int? ShippingTime { get; set; }
 	public int? ShippingCost { get; set; }
-	public DateTime? Boosted { get; set; }
 	public Guid? ParentId { get; set; }
 	public List<KeyValue>? KeyValues { get; set; }
 	public List<TagProduct>? Tags { get; set; }
-	public List<TagProduct>? RemoveTags { get; set; }
-	public List<TagProduct>? AddTags { get; set; }
 	public List<Guid>? RelatedProducts { get; set; }
 	public List<Guid>? RelatedGroupChats { get; set; }
 
@@ -242,10 +236,7 @@ public class ProductFilterDto : BaseFilterDto {
 	public bool? OrderByPriceDescending { get; set; } = false;
 	public bool? OrderByCreatedDate { get; set; } = true;
 	public bool? OrderByCreatedDateDescending { get; set; } = false;
-	public bool? OrderByAgeCategory { get; set; }
-	public bool? OrderByCategory { get; set; }
 	public bool ShowExpired { get; set; } = false;
-	public bool Boosted { get; set; }
 	public bool ShowWithChildren { get; set; } = false;
 	public bool? Shuffle1 { get; set; } = false;
 	public DateTime? StartDate { get; set; }

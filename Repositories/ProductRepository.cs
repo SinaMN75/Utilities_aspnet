@@ -86,13 +86,6 @@ public class ProductRepository(
 		if (dto.OrderByVotesDescending.IsTrue()) q = q.OrderByDescending(x => x.VoteCount);
 		if (dto.OrderByAtoZ.IsTrue()) q = q.OrderBy(x => x.Title);
 		if (dto.OrderByZtoA.IsTrue()) q = q.OrderByDescending(x => x.Title);
-		if (dto.OrderByAgeCategory.IsTrue()) q = q.OrderBy(o => o.AgeCategory);
-		if (dto.OrderByCategory.IsTrue())
-			q = q.AsEnumerable().OrderBy(o => o.Categories != null && o.Categories.Any()
-				? o.Categories.OrderBy(op => op.Title)
-					.Select(s => s.Title)
-					.FirstOrDefault() ?? string.Empty
-				: string.Empty).AsQueryable();
 		if (dto.ShowCreator.IsTrue()) {
 			q = q.Include(i => i.User).ThenInclude(x => x!.Media);
 			q = q.Include(i => i.User).ThenInclude(x => x!.Categories);
@@ -103,8 +96,6 @@ public class ProductRepository(
 			if (dto.IsFollowing.IsTrue()) q = q.Where(i => user.FollowingUsers.Contains(i.UserId!));
 			if (dto.IsBookmarked.IsTrue()) q = q.Where(i => user.BookmarkedProducts.Contains(i.Id.ToString()));
 		}
-
-		if (dto.Boosted) q = q.OrderByDescending(o => o.Boosted);
 
 		q = q.Include(x => x.Parent).ThenInclude(x => x!.Categories);
 		q = q.Include(x => x.Parent).ThenInclude(x => x!.Media);
@@ -290,61 +281,56 @@ public class ProductRepository(
 
 public static class ProductEntityExtension {
 	public static async Task<ProductEntity> FillData(this ProductEntity entity, ProductCreateUpdateDto dto, DbContext context) {
-		entity.Title = dto.Title ?? entity.Title;
-		entity.Subtitle = dto.Subtitle ?? entity.Subtitle;
-		entity.State = dto.State ?? entity.State;
-		entity.Region = dto.Region ?? entity.Region;
-		entity.DiscountPrice = dto.DiscountPrice ?? entity.DiscountPrice;
-		entity.DiscountPercent = dto.DiscountPercent ?? entity.DiscountPercent;
-		entity.Description = dto.Description ?? entity.Description;
-		entity.Price = dto.Price ?? entity.Price;
-		entity.Stock = dto.Stock ?? entity.Stock;
-		entity.CommentsCount = dto.CommentsCount ?? entity.CommentsCount;
-		entity.Currency = dto.Currency ?? entity.Currency;
-		entity.ExpireDate = dto.ExpireDate ?? entity.ExpireDate;
-		entity.AgeCategory = dto.AgeCategory ?? entity.AgeCategory;
-		entity.Boosted = dto.Boosted ?? entity.Boosted;
 		entity.UpdatedAt = DateTime.UtcNow;
-		entity.Tags = dto.Tags ?? entity.Tags;
-		entity.Latitude = dto.Latitude ?? entity.Latitude;
-		entity.Longitude = dto.Longitude ?? entity.Longitude;
-		entity.JsonDetail = new ProductJsonDetail {
-			Details = dto.Details ?? entity.JsonDetail.Details,
-			Color = dto.Color ?? entity.JsonDetail.Color,
-			AdminMessage = dto.AdminMessage ?? entity.JsonDetail.AdminMessage,
-			Author = dto.Author ?? entity.JsonDetail.Author,
-			PhoneNumber = dto.PhoneNumber ?? entity.JsonDetail.PhoneNumber,
-			Link = dto.Link ?? entity.JsonDetail.Link,
-			Website = dto.Website ?? entity.JsonDetail.Website,
-			Email = dto.Email ?? entity.JsonDetail.Email,
-			ResponseTime = dto.ResponseTime ?? entity.JsonDetail.ResponseTime,
-			OnTimeDelivery = dto.OnTimeDelivery ?? entity.JsonDetail.OnTimeDelivery,
-			Length = dto.Length ?? entity.JsonDetail.Length,
-			Width = dto.Width ?? entity.JsonDetail.Width,
-			Height = dto.Height ?? entity.JsonDetail.Height,
-			Weight = dto.Weight ?? entity.JsonDetail.Weight,
-			MinOrder = dto.MinOrder ?? entity.JsonDetail.MinOrder,
-			MaxOrder = dto.MaxOrder ?? entity.JsonDetail.MaxOrder,
-			MinPrice = dto.MinPrice ?? entity.JsonDetail.MinPrice,
-			MaxPrice = dto.MaxPrice ?? entity.JsonDetail.MaxPrice,
-			Unit = dto.Unit ?? entity.JsonDetail.Unit,
-			Address = dto.Address ?? entity.JsonDetail.Address,
-			StartDate = dto.StartDate ?? entity.JsonDetail.StartDate,
-			EndDate = dto.EndDate ?? entity.JsonDetail.EndDate,
-			ShippingCost = dto.ShippingCost ?? entity.JsonDetail.ShippingCost,
-			ShippingTime = dto.ShippingTime ?? entity.JsonDetail.ShippingTime,
-			Type1 = dto.Type1 ?? entity.JsonDetail.Type1,
-			Type2 = dto.Type2 ?? entity.JsonDetail.Type2,
-			KeyValues = dto.KeyValues ?? entity.JsonDetail.KeyValues,
-			Seats = dto.Seats ?? entity.JsonDetail.Seats,
-			ReservationTimes = dto.ReservationTimes ?? entity.JsonDetail.ReservationTimes,
-			RelatedProducts = dto.RelatedProducts ?? [],
-			RelatedGroupChats = dto.RelatedGroupChats ?? [],
-			ClubName = dto.ClubName ?? entity.JsonDetail.ClubName,
-			Policies = dto.Policies ?? entity.JsonDetail.Policies,
-			MaximumMembers = dto.MaximumMembers ?? entity.JsonDetail.MaximumMembers,
-			PaymentRefId = dto.PaymentRefId ?? entity.JsonDetail.PaymentRefId,
-		};
+		if (dto.Title is not null) entity.Title = dto.Title;
+		if (dto.Subtitle is not null) entity.Subtitle = dto.Subtitle;
+		if (dto.State is not null) entity.State = dto.State;
+		if (dto.Region is not null) entity.Region = dto.Region;
+		if (dto.DiscountPercent is not null) entity.DiscountPercent = dto.DiscountPercent;
+		if (dto.DiscountPrice is not null) entity.DiscountPrice = dto.DiscountPrice;
+		if (dto.Description is not null) entity.Description = dto.Description;
+		if (dto.Price is not null) entity.Price = dto.Price;
+		if (dto.Stock is not null) entity.Stock = dto.Stock;
+		if (dto.CommentsCount is not null) entity.CommentsCount = dto.CommentsCount;
+		if (dto.Currency is not null) entity.Currency = dto.Currency;
+		if (dto.ExpireDate is not null) entity.ExpireDate = dto.ExpireDate;
+		if (dto.Tags is not null) entity.Tags = dto.Tags;
+		if (dto.Latitude is not null) entity.Latitude = dto.Latitude;
+		if (dto.Longitude is not null) entity.Longitude = dto.Longitude;
+		if (dto.Seats is not null) entity.JsonDetail.Seats = dto.Seats;
+		if (dto.Color is not null) entity.JsonDetail.Color = dto.Color;
+		if (dto.AdminMessage is not null) entity.JsonDetail.AdminMessage = dto.AdminMessage;
+		if (dto.Author is not null) entity.JsonDetail.Author = dto.Author;
+		if (dto.PhoneNumber is not null) entity.JsonDetail.PhoneNumber = dto.PhoneNumber;
+		if (dto.Link is not null) entity.JsonDetail.Link = dto.Link;
+		if (dto.Website is not null) entity.JsonDetail.Website = dto.Website;
+		if (dto.Email is not null) entity.JsonDetail.Email = dto.Email;
+		if (dto.ResponseTime is not null) entity.JsonDetail.ResponseTime = dto.ResponseTime;
+		if (dto.OnTimeDelivery is not null) entity.JsonDetail.OnTimeDelivery = dto.OnTimeDelivery;
+		if (dto.Length is not null) entity.JsonDetail.Length = dto.Length;
+		if (dto.Width is not null) entity.JsonDetail.Width = dto.Width;
+		if (dto.Height is not null) entity.JsonDetail.Height = dto.Height;
+		if (dto.Weight is not null) entity.JsonDetail.Weight = dto.Weight;
+		if (dto.MinOrder is not null) entity.JsonDetail.MinOrder = dto.MinOrder;
+		if (dto.MaxOrder is not null) entity.JsonDetail.MaxOrder = dto.MaxOrder;
+		if (dto.MinPrice is not null) entity.JsonDetail.MinPrice = dto.MinPrice;
+		if (dto.MaxPrice is not null) entity.JsonDetail.MaxPrice = dto.MaxPrice;
+		if (dto.Unit is not null) entity.JsonDetail.Unit = dto.Unit;
+		if (dto.Address is not null) entity.JsonDetail.Address = dto.Address;
+		if (dto.StartDate is not null) entity.JsonDetail.StartDate = dto.StartDate;
+		if (dto.EndDate is not null) entity.JsonDetail.EndDate = dto.EndDate;
+		if (dto.ShippingCost is not null) entity.JsonDetail.ShippingCost = dto.ShippingCost;
+		if (dto.ShippingTime is not null) entity.JsonDetail.ShippingTime = dto.ShippingTime;
+		if (dto.Type1 is not null) entity.JsonDetail.Type1 = dto.Type1;
+		if (dto.Type2 is not null) entity.JsonDetail.Type2 = dto.Type2;
+		if (dto.KeyValues is not null) entity.JsonDetail.KeyValues = dto.KeyValues;
+		if (dto.ReservationTimes is not null) entity.JsonDetail.ReservationTimes = dto.ReservationTimes;
+		if (dto.RelatedProducts is not null) entity.JsonDetail.RelatedProducts = dto.RelatedProducts;
+		if (dto.RelatedGroupChats is not null) entity.JsonDetail.RelatedGroupChats = dto.RelatedGroupChats;
+		if (dto.ClubName is not null) entity.JsonDetail.ClubName = dto.ClubName;
+		if (dto.Policies is not null) entity.JsonDetail.Policies = dto.Policies;
+		if (dto.MaximumMembers is not null) entity.JsonDetail.MaximumMembers = dto.MaximumMembers;
+		if (dto.PaymentRefId is not null) entity.JsonDetail.PaymentRefId = dto.PaymentRefId;
 
 		if (dto.ScorePlus.HasValue) {
 			if (entity.VoteCount == null) entity.VoteCount = 1;
@@ -356,7 +342,7 @@ public static class ProductEntityExtension {
 			else entity.VoteCount -= dto.ScoreMinus;
 		}
 
-		if (dto.Categories.IsNotNullOrEmpty()) {
+		if (dto.Categories.IsNotNull()) {
 			List<CategoryEntity> listCategory = [];
 			foreach (Guid item in dto.Categories!) {
 				CategoryEntity? e = await context.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item);
@@ -366,11 +352,11 @@ public static class ProductEntityExtension {
 			entity.Categories = listCategory;
 		}
 
-		if (dto.Teams.IsNotNullOrEmpty()) {
+		if (dto.Teams.IsNotNull()) {
 			string temp = dto.Teams!.Aggregate("", (current, userId) => current + userId + ",");
 			entity.Teams = temp;
 		}
-		
+
 		if (dto.ParentId is null) return entity;
 
 		entity.ParentId = dto.ParentId ?? entity.ParentId;

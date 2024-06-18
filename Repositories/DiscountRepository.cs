@@ -5,7 +5,6 @@ public interface IDiscountRepository {
 	GenericResponse<IQueryable<DiscountEntity>> Filter(DiscountFilterDto dto);
 	Task<GenericResponse<DiscountEntity?>> Update(DiscountEntity dto);
 	Task<GenericResponse> Delete(Guid id);
-	Task<GenericResponse<DiscountEntity?>> ReadDiscountCode(string code);
 }
 
 public class DiscountRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) : IDiscountRepository {
