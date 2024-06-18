@@ -11,7 +11,7 @@ public class ContentRepository(DbContext dbContext, IMediaRepository mediaReposi
 	public async Task<GenericResponse<ContentEntity>> Create(ContentCreateDto dto, CancellationToken ct) {
 		EntityEntry<ContentEntity> e = await dbContext.AddAsync(new ContentEntity {
 			Description = dto.Description,
-			Title = dto.Title,
+			Title = dto.Title ?? "",
 			SubTitle = dto.SubTitle,
 			Tags = dto.Tags ?? [],
 			JsonDetail = new ContentJsonDetail {
