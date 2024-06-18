@@ -93,6 +93,8 @@ public static class StartupExtension {
 			options.UseCamelCasing(true);
 		});
 
+		builder.Services.AddTransient<IApiKeyValidation, ApiKeyValidation>();
+		builder.Services.AddScoped<ApiKeyAuthFilter>();
 		builder.Services.AddOutputCache();
 		builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 		builder.Services.AddScoped<AppSettings>();
@@ -129,12 +131,21 @@ public static class StartupExtension {
 				Type = SecuritySchemeType.ApiKey,
 				Scheme = "Bearer"
 			});
+			c.AddSecurityDefinition("apiKey", new OpenApiSecurityScheme() {
+				Description = "API KEY",
+				Name = "X-API-KEY",
+				In = ParameterLocation.Header,
+				Type = SecuritySchemeType.ApiKey
+			});
 
 			c.AddSecurityRequirement(new OpenApiSecurityRequirement {
 				{
 					new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } },
 					Array.Empty<string>()
-				}
+				}, {
+					new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "apiKey" } },
+					Array.Empty<string>()
+				},
 			});
 		});
 	}
@@ -178,12 +189,8 @@ public static class StartupExtension {
 		});
 		app.UseAuthentication();
 		app.UseAuthorization();
-		
-		app.UseRinDiagnosticsHandler();
 
-		//Encrypt/Decrypt
-		//app.UseMiddleware<EncryptionMiddleware>();
-		//Encrypt/Decrypt
+		app.UseRinDiagnosticsHandler();
 	}
 
 	private static void UseUtilitiesSwagger(this IApplicationBuilder app) {
