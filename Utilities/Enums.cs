@@ -41,23 +41,6 @@ public enum UtilitiesStatusCodes {
 	S3Error = 619
 }
 
-public enum TagFormField {
-	SingleLineText,
-	MultiLineText,
-	MultiSelect,
-	SingleSelect,
-	Bool,
-	Number,
-	File,
-	Image,
-	CarPlack,
-	PhoneNumber,
-	Password,
-	Date,
-	Time,
-	DateTime
-}
-
 public enum Currency {
 	Rial = 100,
 	Dolor = 101,
@@ -131,28 +114,6 @@ public enum NationalityType {
 public enum LegalAuthenticationType {
 	Authenticated = 100,
 	NotAutenticated = 101
-}
-
-public enum AgeCategory {
-	None = 100,
-	Kids = 101,
-	Tennager = 102,
-	Young = 103,
-	Adult = 104
-}
-
-public enum CallerType {
-	CreateGroupChat = 100,
-	CreateComment = 101,
-	CreateProduct = 102,
-	SendPost = 103,
-	None = 99999
-}
-
-public enum DisplayType {
-	None = 100,
-	Explore = 101,
-	Channels = 102
 }
 
 public enum TagTransaction {

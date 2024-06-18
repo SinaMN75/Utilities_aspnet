@@ -52,7 +52,6 @@ public class UserEntity {
 
 	public string? MutedChats { get; set; }
 	public GenderType? Gender { get; set; }
-	public long? Wallet { get; set; } = 0;
 	public double? Point { get; set; } = 0;
 	public DateTime? Birthdate { get; set; }
 	public DateTime? CreatedAt { get; set; }
@@ -190,7 +189,6 @@ public class UserCreateUpdateDto {
 	public string? FollowingUsers { get; set; }
 	public string? FcmToken { get; set; }
 	public string? BlockedUsers { get; set; }
-	public long? Wallet { get; set; }
 	public long? DeliveryPrice1 { get; set; }
 	public long? DeliveryPrice2 { get; set; }
 	public long? DeliveryPrice3 { get; set; }
@@ -219,8 +217,6 @@ public class UserCreateUpdateDto {
 	public string? ShebaNumber { get; set; }
 	public string? Address { get; set; }
 	public List<TagUser>? Tags { get; set; }
-	public List<TagUser>? RemoveTags { get; set; }
-	public List<TagUser>? AddTags { get; set; }
 }
 
 public class UserFilterDto : BaseFilterDto {

@@ -11,7 +11,6 @@ public interface IUserRepository {
 	Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model);
 	Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList();
 	Task<GenericResponse> ToggleBlock(string userId);
-	Task<GenericResponse> TransferWalletToWallet(TransferFromWalletToWalletDto dto, CancellationToken ct);
 	Task<UserEntity?> ReadByIdMinimal(string? idOrUserName, string? token = null);
 	Task<GenericResponse> Authorize(AuthorizeUserDto dto);
 	Task<GenericResponse> Subscribe(string userId, Guid contentId, string transactionRefId);
@@ -21,7 +20,6 @@ public class UserRepository(
 	DbContext dbContext,
 	ISmsNotificationRepository sms,
 	IHttpContextAccessor httpContextAccessor,
-	ITransactionRepository transactionRepository,
 	IDistributedCache cache,
 	IConfiguration config
 ) : IUserRepository {
@@ -49,7 +47,6 @@ public class UserRepository(
 				JobStatus = x.JobStatus,
 				MutedChats = x.MutedChats,
 				Gender = x.Gender,
-				Wallet = x.Wallet,
 				Point = x.Point,
 				Birthdate = x.Birthdate,
 				CreatedAt = x.CreatedAt,
@@ -250,7 +247,6 @@ public class UserRepository(
 			);
 
 		UserEntity user = new() {
-			Wallet = 0,
 			Suspend = false,
 			CreatedAt = DateTime.UtcNow
 		};
@@ -336,18 +332,6 @@ public class UserRepository(
 		return new GenericResponse();
 	}
 
-	public async Task<GenericResponse> TransferWalletToWallet(TransferFromWalletToWalletDto dto, CancellationToken ct) {
-		UserEntity fromUser = (await ReadByIdMinimal(dto.FromUserId))!;
-		UserEntity toUser = (await ReadByIdMinimal(dto.ToUserId))!;
-
-		if (fromUser.Wallet <= dto.Amount) return new GenericResponse(UtilitiesStatusCodes.NotEnoughMoney);
-		await Update(new UserCreateUpdateDto { Id = fromUser.Id, Wallet = fromUser.Wallet - dto.Amount });
-		await transactionRepository.Create(MakeTransaction(fromUser.Id, dto.Amount, "کسر"), ct);
-		await Update(new UserCreateUpdateDto { Id = toUser.Id, Wallet = toUser.Wallet + dto.Amount });
-		await transactionRepository.Create(MakeTransaction(toUser.Id, dto.Amount, "واریز"), ct);
-		return new GenericResponse();
-	}
-
 	public async Task<GenericResponse> Authorize(AuthorizeUserDto dto) {
 		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
 		if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound);
@@ -418,59 +402,54 @@ public class UserRepository(
 	}
 
 	private async Task FillUserData(UserCreateUpdateDto dto, UserEntity entity) {
-		entity.FirstName = dto.FirstName ?? entity.FirstName;
-		entity.LastName = dto.LastName ?? entity.LastName;
-		entity.FullName = dto.FullName ?? entity.FullName;
-		entity.Bio = dto.Bio ?? entity.Bio;
-		entity.AppUserName = dto.AppUserName ?? entity.AppUserName;
-		entity.UserName = dto.UserName ?? entity.UserName;
-		entity.PhoneNumber = dto.PhoneNumber ?? entity.PhoneNumber;
-		entity.AppEmail = dto.AppEmail ?? entity.AppEmail;
-		entity.Region = dto.Region ?? entity.Region;
-		entity.Suspend = dto.Suspend ?? entity.Suspend;
-		entity.Headline = dto.Headline ?? entity.Headline;
-		entity.AppPhoneNumber = dto.AppPhoneNumber ?? entity.AppPhoneNumber;
-		entity.Birthdate = dto.BirthDate ?? entity.Birthdate;
-		entity.Wallet = dto.Wallet ?? entity.Wallet;
-		entity.Gender = dto.Gender ?? entity.Gender;
-		entity.Email = dto.Email ?? entity.Email;
-		entity.State = dto.State ?? entity.State;
-		entity.Point = dto.Point ?? entity.Point;
-		entity.VisitedProducts = dto.VisitedProducts ?? entity.VisitedProducts;
-		entity.BookmarkedProducts = dto.BookmarkedProducts ?? entity.BookmarkedProducts;
-		entity.FollowingUsers = dto.FollowingUsers ?? entity.FollowingUsers;
-		entity.FollowedUsers = dto.FollowedUsers ?? entity.FollowedUsers;
-		entity.BlockedUsers = dto.BlockedUsers ?? entity.BlockedUsers;
-		entity.Badge = dto.Badge ?? entity.Badge;
-		entity.JobStatus = dto.JobStatus ?? entity.JobStatus;
-		entity.UpdatedAt = DateTime.UtcNow;
-		entity.Tags = dto.Tags ?? entity.Tags;
-		entity.Password = dto.Password ?? entity.Password;
-		entity.PremiumExpireDate = dto.PremiumExpireDate ?? entity.PremiumExpireDate;
-		entity.JsonDetail = new UserJsonDetail {
-			Instagram = dto.Instagram ?? entity.JsonDetail.Instagram,
-			Telegram = dto.Telegram ?? entity.JsonDetail.Telegram,
-			WhatsApp = dto.WhatsApp ?? entity.JsonDetail.WhatsApp,
-			LinkedIn = dto.LinkedIn ?? entity.JsonDetail.LinkedIn,
-			Dribble = dto.Dribble ?? entity.JsonDetail.Dribble,
-			SoundCloud = dto.SoundCloud ?? entity.JsonDetail.SoundCloud,
-			Address = dto.Address ?? entity.JsonDetail.Address,
-			Pinterest = dto.Pinterest ?? entity.JsonDetail.Pinterest,
-			Website = dto.Website ?? entity.JsonDetail.Website,
-			Activity = dto.Activity ?? entity.JsonDetail.Activity,
-			Color = dto.Color ?? entity.JsonDetail.Color,
-			PrivacyType = dto.PrivacyType ?? entity.JsonDetail.PrivacyType,
-			FcmToken = dto.FcmToken ?? entity.JsonDetail.FcmToken,
-			ShebaNumber = dto.ShebaNumber ?? entity.JsonDetail.ShebaNumber,
-			LegalAuthenticationType = dto.LegalAuthenticationType ?? entity.JsonDetail.LegalAuthenticationType,
-			NationalityType = dto.NationalityType ?? entity.JsonDetail.NationalityType,
-			Code = dto.Code ?? entity.JsonDetail.Code,
-			DeliveryPrice1 = dto.DeliveryPrice1 ?? entity.JsonDetail.DeliveryPrice1,
-			DeliveryPrice2 = dto.DeliveryPrice2 ?? entity.JsonDetail.DeliveryPrice2,
-			DeliveryPrice3 = dto.DeliveryPrice3 ?? entity.JsonDetail.DeliveryPrice3
-		};
+		if (dto.FirstName is not null) entity.FirstName = dto.FirstName;
+		if (dto.LastName is not null) entity.LastName = dto.LastName;
+		if (dto.FullName is not null) entity.FullName = dto.FullName;
+		if (dto.Bio is not null) entity.Bio = dto.Bio;
+		if (dto.AppUserName is not null) entity.AppUserName = dto.UserName;
+		if (dto.PhoneNumber is not null) entity.PhoneNumber = dto.PhoneNumber;
+		if (dto.AppEmail is not null) entity.AppEmail = dto.AppEmail;
+		if (dto.Region is not null) entity.Region = dto.Region;
+		if (dto.Suspend is not null) entity.Suspend = dto.Suspend;
+		if (dto.Headline is not null) entity.Headline = dto.Headline;
+		if (dto.AppPhoneNumber is not null) entity.AppPhoneNumber = dto.AppPhoneNumber;
+		if (dto.BirthDate is not null) entity.Birthdate = dto.BirthDate;
+		if (dto.Gender is not null) entity.Gender = dto.Gender;
+		if (dto.Email is not null) entity.Email = dto.Email;
+		if (dto.State is not null) entity.State = dto.State;
+		if (dto.Point is not null) entity.Point = dto.Point;
+		if (dto.VisitedProducts is not null) entity.VisitedProducts = dto.VisitedProducts;
+		if (dto.BookmarkedProducts is not null) entity.BookmarkedProducts = dto.BookmarkedProducts;
+		if (dto.FollowedUsers is not null) entity.FollowedUsers = dto.FollowedUsers;
+		if (dto.FollowingUsers is not null) entity.FollowingUsers = dto.FollowingUsers;
+		if (dto.BlockedUsers is not null) entity.BlockedUsers = dto.BlockedUsers;
+		if (dto.Badge is not null) entity.Badge = dto.Badge;
+		if (dto.JobStatus is not null) entity.JobStatus = dto.JobStatus;
+		if (dto.Tags is not null) entity.Tags = dto.Tags;
+		if (dto.Password is not null) entity.Password = dto.Password;
+		if (dto.PremiumExpireDate is not null) entity.PremiumExpireDate = dto.PremiumExpireDate;
+		if (dto.Instagram is not null) entity.JsonDetail.Instagram = dto.Instagram;
+		if (dto.Telegram is not null) entity.JsonDetail.Telegram = dto.Telegram;
+		if (dto.WhatsApp is not null) entity.JsonDetail.WhatsApp = dto.WhatsApp;
+		if (dto.LinkedIn is not null) entity.JsonDetail.LinkedIn = dto.LinkedIn;
+		if (dto.Dribble is not null) entity.JsonDetail.Dribble = dto.Dribble;
+		if (dto.SoundCloud is not null) entity.JsonDetail.SoundCloud = dto.SoundCloud;
+		if (dto.Address is not null) entity.JsonDetail.Address = dto.Address;
+		if (dto.Pinterest is not null) entity.JsonDetail.Pinterest = dto.Pinterest;
+		if (dto.Website is not null) entity.JsonDetail.Website = dto.Website;
+		if (dto.Activity is not null) entity.JsonDetail.Activity = dto.Activity;
+		if (dto.Color is not null) entity.JsonDetail.Color = dto.Color;
+		if (dto.PrivacyType is not null) entity.JsonDetail.PrivacyType = dto.PrivacyType;
+		if (dto.FcmToken is not null) entity.JsonDetail.FcmToken = dto.FcmToken;
+		if (dto.ShebaNumber is not null) entity.JsonDetail.ShebaNumber = dto.ShebaNumber;
+		if (dto.LegalAuthenticationType is not null) entity.JsonDetail.LegalAuthenticationType = dto.LegalAuthenticationType;
+		if (dto.NationalityType is not null) entity.JsonDetail.NationalityType = dto.NationalityType;
+		if (dto.Code is not null) entity.JsonDetail.Code = dto.Code;
+		if (dto.DeliveryPrice1 is not null) entity.JsonDetail.DeliveryPrice1 = dto.DeliveryPrice1;
+		if (dto.DeliveryPrice2 is not null) entity.JsonDetail.DeliveryPrice2 = dto.DeliveryPrice2;
+		if (dto.DeliveryPrice3 is not null) entity.JsonDetail.DeliveryPrice3 = dto.DeliveryPrice3;
 
-		if (dto.Categories.IsNotNullOrEmpty()) {
+		if (dto.Categories.IsNotNull()) {
 			List<CategoryEntity> list = [];
 			foreach (Guid item in dto.Categories!) {
 				CategoryEntity? e = await dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item);
@@ -479,22 +458,7 @@ public class UserRepository(
 
 			entity.Categories = list;
 		}
-
-		if (dto.RemoveTags.IsNotNullOrEmpty()) {
-			dto.RemoveTags?.ForEach(item => entity.Tags.Remove(item));
-		}
-
-		if (dto.AddTags.IsNotNullOrEmpty()) {
-			entity.Tags.AddRange(dto.AddTags!);
-		}
 	}
-
-	private static TransactionCreateDto MakeTransaction(string userId, long amount, string description) => new() {
-		BuyerId = userId,
-		Amount = amount,
-		Descriptions = description,
-		Tags = [TagTransaction.WalletToWallet]
-	};
 
 	private async Task<bool> SendOtp(string userId) {
 		if (await cache.GetStringAsync(userId) != null) return false;

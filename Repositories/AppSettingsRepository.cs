@@ -25,7 +25,6 @@ public class AppSettingsRepository(IConfiguration config, DbContext dbContext) :
 				ChatStatus = EnumExtension.GetValues<ChatStatus>(),
 				Reaction = EnumExtension.GetValues<Reaction>(),
 				GenderType = EnumExtension.GetValues<GenderType>(),
-				AgeCategory = EnumExtension.GetValues<AgeCategory>(),
 				ChatTypes = EnumExtension.GetValues<ChatType>(),
 				PrivacyType = EnumExtension.GetValues<PrivacyType>(),
 				Nationality = EnumExtension.GetValues<NationalityType>(),

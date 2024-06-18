@@ -35,12 +35,7 @@ public class UserController(IUserRepository repository) : BaseApiController {
 	[HttpPut]
 	[Authorize]
 	public async Task<ActionResult<GenericResponse<UserEntity>>> Update(UserCreateUpdateDto dto) => Result(await repository.Update(dto));
-
-	[HttpPost("TransferWalletToWallet")]
-	[Authorize]
-	public async Task<ActionResult<GenericResponse>> TransferWalletToWallet(TransferFromWalletToWalletDto dto, CancellationToken ct) =>
-		Result(await repository.TransferWalletToWallet(dto, ct));
-
+	
 	[HttpPost("Authorize")]
 	[Authorize]
 	public async Task<ActionResult<GenericResponse>> Authorize(AuthorizeUserDto dto) => Result(await repository.Authorize(dto));

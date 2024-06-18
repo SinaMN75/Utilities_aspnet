@@ -16,7 +16,7 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 		List<List<TransactionEntity>> i = list.GroupBy(x => x.SellerId).Select(x => x.ToList()).ToList();
 
 		List<MediaEntity> generatedFiles = [];
-		foreach (List<TransactionEntity> transactionEntities in i) generatedFiles.Add(new MediaEntity { FileName = GenerateExcel(transactionEntities) });
+		generatedFiles.AddRange(i.Select(transactionEntities => new MediaEntity { FileName = GenerateExcel(transactionEntities) }));
 
 		return new GenericResponse<List<MediaEntity>>(generatedFiles);
 	}
