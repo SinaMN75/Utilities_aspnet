@@ -1,13 +1,14 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
 public interface IUserRepository {
+	Task<GenericResponse<UserEntity?>> Create(UserCreateUpdateDto dto);
 	GenericResponse<IQueryable<UserEntity>> Filter(UserFilterDto dto);
 	Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null);
 	Task<GenericResponse<UserEntity?>> Update(UserCreateUpdateDto dto);
+	Task<GenericResponse> Delete(string id);
 	Task<GenericResponse<UserEntity?>> GetTokenForTest(string? mobile);
 	Task<GenericResponse<UserEntity?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto);
 	Task<GenericResponse<UserEntity?>> VerifyCodeForLogin(VerifyMobileForLoginDto dto);
-	Task<GenericResponse<UserEntity?>> Create(UserCreateUpdateDto dto);
 	Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model);
 	Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList();
 	Task<GenericResponse> ToggleBlock(string userId);
@@ -105,6 +106,11 @@ public class UserRepository(
 		await FillUserData(dto, entity);
 		await dbContext.SaveChangesAsync();
 		return new GenericResponse<UserEntity?>(entity);
+	}
+
+	public async Task<GenericResponse> Delete(string id) {
+		UserEntity user = (await dbContext.Set<UserEntity>().Include(x => x).FirstOrDefaultAsync(x => x.Id == id))!;
+		return new GenericResponse();
 	}
 
 	public GenericResponse<IQueryable<UserEntity>> Filter(UserFilterDto dto) {
@@ -264,15 +270,11 @@ public class UserRepository(
 	}
 
 	public async Task<GenericResponse<UserEntity?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto) {
-		string mobile = dto.Mobile.DeleteAdditionsInsteadNumber();
-		mobile = mobile.GetLast(10);
-		mobile = mobile.Insert(0, "0");
-		if (mobile.Length is > 12 or < 9) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.BadRequest);
-		UserEntity? existingUser = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Email == mobile ||
-		                                                                                      x.PhoneNumber == mobile ||
-		                                                                                      x.AppUserName == mobile ||
-		                                                                                      x.AppPhoneNumber == mobile ||
-		                                                                                      x.UserName == mobile);
+		UserEntity? existingUser = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Email == dto.Mobile ||
+		                                                                                      x.PhoneNumber == dto.Mobile ||
+		                                                                                      x.AppUserName == dto.Mobile ||
+		                                                                                      x.AppPhoneNumber == dto.Mobile ||
+		                                                                                      x.UserName == dto.Mobile);
 
 		if (existingUser != null) {
 			if (!await SendOtp(existingUser.Id)) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.MaximumLimitReached);
@@ -282,8 +284,8 @@ public class UserRepository(
 		}
 
 		UserEntity user = new() {
-			PhoneNumber = mobile,
-			UserName = mobile,
+			PhoneNumber = dto.Mobile,
+			UserName = dto.Mobile,
 			CreatedAt = DateTime.UtcNow
 		};
 

@@ -40,17 +40,7 @@ public static class GuidExtension {
 }
 
 public static class StringExtension {
-	public static string DeleteAdditionsInsteadNumber(this string str) {
-		str = str.Replace("@", "");
-		str = str.Replace("#", "");
-		str = str.Replace("+", "");
-		str = str.Replace("*", "");
-		str = str.Replace(" ", "");
-		return str;
-	}
-
-	public static string GetLast(this string source, int tailLength) => tailLength >= source.Length ? source : source[^tailLength..];
-
+	
 	public static bool IsNotNullOrEmpty(this string? s) => s is { Length: > 0 };
 
 	public static bool IsNullOrEmpty(this string? s) => string.IsNullOrEmpty(s);

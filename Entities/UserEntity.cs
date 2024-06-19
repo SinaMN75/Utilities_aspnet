@@ -125,7 +125,6 @@ public class UserJsonDetail {
 	public string? ShebaNumber { get; set; }
 	public string? Address { get; set; }
 	public string? FcmToken { get; set; }
-	public DateTime? Boosted { get; set; }
 	public long? DeliveryPrice1 { get; set; }
 	public long? DeliveryPrice2 { get; set; }
 	public long? DeliveryPrice3 { get; set; }
@@ -189,11 +188,6 @@ public class UserCreateUpdateDto {
 	public string? FollowingUsers { get; set; }
 	public string? FcmToken { get; set; }
 	public string? BlockedUsers { get; set; }
-	public long? DeliveryPrice1 { get; set; }
-	public long? DeliveryPrice2 { get; set; }
-	public long? DeliveryPrice3 { get; set; }
-	public double? Point { get; set; } = 0;
-	public bool? Suspend { get; set; }
 	public string? Instagram { get; set; }
 	public string? Telegram { get; set; }
 	public string? JobStatus { get; set; }
@@ -206,6 +200,14 @@ public class UserCreateUpdateDto {
 	public string? Activity { get; set; }
 	public string? Color { get; set; }
 	public string? Password { get; set; }
+	public string? Code { get; set; }
+	public string? ShebaNumber { get; set; }
+	public string? Address { get; set; }
+	public long? DeliveryPrice1 { get; set; }
+	public long? DeliveryPrice2 { get; set; }
+	public long? DeliveryPrice3 { get; set; }
+	public double? Point { get; set; } = 0;
+	public bool? Suspend { get; set; }
 	public GenderType? Gender { get; set; }
 	public LegalAuthenticationType? LegalAuthenticationType { get; set; }
 	public NationalityType? NationalityType { get; set; }
@@ -213,9 +215,6 @@ public class UserCreateUpdateDto {
 	public DateTime? BirthDate { get; set; }
 	public DateTime? PremiumExpireDate { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
-	public string? Code { get; set; }
-	public string? ShebaNumber { get; set; }
-	public string? Address { get; set; }
 	public List<TagUser>? Tags { get; set; }
 }
 
@@ -255,12 +254,6 @@ public class UserFilterDto : BaseFilterDto {
 	public IEnumerable<string>? PhoneNumbers { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 	public List<TagUser>? Tags { get; set; }
-}
-
-public class TransferFromWalletToWalletDto {
-	public string FromUserId { get; set; } = null!;
-	public string ToUserId { get; set; } = null!;
-	public long Amount { get; set; }
 }
 
 public class AuthorizeUserDto {
