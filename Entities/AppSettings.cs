@@ -68,7 +68,6 @@ public class EnumDto {
 	public IEnumerable<IdTitleDto>? Priority { get; set; }
 	public IEnumerable<IdTitleDto>? ChatStatus { get; set; }
 	public IEnumerable<IdTitleDto>? Reaction { get; set; }
-	public IEnumerable<IdTitleDto>? AgeCategory { get; set; }
 	public IEnumerable<IdTitleDto>? ChatTypes { get; set; }
 	public IEnumerable<IdTitleDto>? GenderType { get; set; }
 	public IEnumerable<IdTitleDto>? PrivacyType { get; set; }

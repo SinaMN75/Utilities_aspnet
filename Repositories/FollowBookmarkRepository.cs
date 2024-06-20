@@ -53,11 +53,13 @@ public class FollowBookmarkRepository(
 
 	public GenericResponse<IQueryable<BookmarkEntity>?> ReadBookmarks(string? userId) {
 		string uId = userId ?? _userId;
-		IQueryable<BookmarkEntity> bookmark = dbContext.Set<BookmarkEntity>().Include(x => x.Media)
+		IQueryable<BookmarkEntity> bookmark = dbContext.Set<BookmarkEntity>().AsNoTracking()
+			.Include(x => x.Media)
 			.Where(x => x.UserId == uId)
 			.Include(x => x.Product).ThenInclude(x => x!.Media)
 			.Include(x => x.Product).ThenInclude(x => x!.Parent)
-			.Include(x => x.Children)!.ThenInclude(x => x.Product)
+			.Include(x => x.Product).ThenInclude(x => x!.Parent).ThenInclude(x => x!.User)
+			.Include(x => x.Children)!.ThenInclude(x => x.Product).ThenInclude(x => x!.User)
 			.Include(x => x.Children).Include(x => x.Product).ThenInclude(x => x!.Media)
 			.Include(x => x.Children).Include(x => x.Product).ThenInclude(x => x!.Parent)
 			.Include(x => x.Parent);
