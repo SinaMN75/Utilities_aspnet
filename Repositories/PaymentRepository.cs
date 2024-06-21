@@ -128,10 +128,6 @@ public class PaymentRepository : IPaymentRepository {
 				return new GenericResponse();
 			}
 			case 102: {
-				UserEntity user = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!;
-				user.Wallet += amount;
-				_dbContext.Update(user);
-				await _dbContext.SaveChangesAsync();
 				break;
 			}
 			case 103: {
