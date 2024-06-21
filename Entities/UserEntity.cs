@@ -63,8 +63,35 @@ public class UserEntity {
 	public List<TagUser> Tags { get; set; } = [];
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
-	
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public IEnumerable<TransactionEntity>? Transactions { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public IEnumerable<OrderEntity>? Orders { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public IEnumerable<AddressEntity>? Addresses { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public IEnumerable<GroupChatMessageEntity>? GroupChatsMessages { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public IEnumerable<CommentEntity>? Comments { get; set; }
+
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public IEnumerable<ReportEntity>? Reports { get; set; }
+
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
 	public IEnumerable<GroupChatEntity>? GroupChats { get; set; }

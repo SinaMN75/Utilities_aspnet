@@ -5,7 +5,7 @@ public interface IUserRepository {
 	GenericResponse<IQueryable<UserEntity>> Filter(UserFilterDto dto);
 	Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null);
 	Task<GenericResponse<UserEntity?>> Update(UserCreateUpdateDto dto);
-	Task<GenericResponse> Delete(string id);
+	Task<GenericResponse> Delete(string id, CancellationToken ct);
 	Task<GenericResponse<UserEntity?>> GetTokenForTest(string? mobile);
 	Task<GenericResponse<UserEntity?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto);
 	Task<GenericResponse<UserEntity?>> VerifyCodeForLogin(VerifyMobileForLoginDto dto);
@@ -21,6 +21,13 @@ public class UserRepository(
 	DbContext dbContext,
 	ISmsNotificationRepository sms,
 	IHttpContextAccessor httpContextAccessor,
+	IMediaRepository mediaRepository,
+	IOrderRepository orderRepository,
+	ITransactionRepository transactionRepository,
+	IChatRepository chatRepository,
+	ICommentRepository commentRepository,
+	IReportRepository reportRepository,
+	IAddressRepository addressRepository,
 	IDistributedCache cache,
 	IConfiguration config
 ) : IUserRepository {
@@ -108,8 +115,47 @@ public class UserRepository(
 		return new GenericResponse<UserEntity?>(entity);
 	}
 
-	public async Task<GenericResponse> Delete(string id) {
-		UserEntity user = (await dbContext.Set<UserEntity>().Include(x => x).FirstOrDefaultAsync(x => x.Id == id))!;
+	public async Task<GenericResponse> Delete(string id, CancellationToken ct) {
+		UserEntity user = (await dbContext.Set<UserEntity>()
+			.Include(x => x.Media)
+			.Include(x => x.Transactions)
+			.Include(x => x.Orders)!.ThenInclude(x => x.OrderDetails)
+			.Include(x => x.Addresses)
+			.Include(x => x.GroupChatsMessages)
+			.Include(x => x.Comments)
+			.Include(x => x.Reports)
+			.Include(x => x.GroupChats)
+			.FirstOrDefaultAsync(x => x.Id == id, cancellationToken: ct))!;
+
+		await mediaRepository.DeleteMedia(user.Media);
+		foreach (TransactionEntity transactionEntity in user.Transactions ?? [])
+			await transactionRepository.Delete(transactionEntity.Id, ct);
+
+		foreach (OrderEntity orderEntity in user.Orders ?? [])
+			await orderRepository.Delete(orderEntity.Id);
+
+		foreach (AddressEntity addressEntity in user.Addresses ?? [])
+			await addressRepository.Delete(addressEntity.Id, ct);
+
+		foreach (GroupChatMessageEntity groupChatMessageEntity in user.GroupChatsMessages ?? [])
+			await chatRepository.DeleteGroupChatMessage(groupChatMessageEntity.Id);
+
+		foreach (GroupChatEntity groupChatEntity in user.GroupChats ?? [])
+			await chatRepository.DeleteGroupChat(groupChatEntity.Id);
+
+		foreach (CommentEntity commentEntity in user.Comments ?? [])
+			await commentRepository.Delete(commentEntity.Id, ct);
+
+		foreach (ReportEntity reportEntity in user.Reports ?? [])
+			await reportRepository.Delete(reportEntity.Id);
+
+		foreach (GroupChatEntity groupChatEntity in user.GroupChats ?? [])
+			await chatRepository.DeleteGroupChat(groupChatEntity.Id);
+
+		dbContext.Remove(user);
+
+		await dbContext.SaveChangesAsync(ct);
+
 		return new GenericResponse();
 	}
 
