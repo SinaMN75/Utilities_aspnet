@@ -58,8 +58,8 @@ public class FollowBookmarkRepository(
 			.Where(x => x.UserId == uId)
 			.Include(x => x.Product).ThenInclude(x => x!.Media)
 			.Include(x => x.Product).ThenInclude(x => x!.Parent)
-			.Include(x => x.Product).ThenInclude(x => x!.Parent).ThenInclude(x => x!.User)
-			.Include(x => x.Children)!.ThenInclude(x => x.Product).ThenInclude(x => x!.User)
+			.Include(x => x.Product).ThenInclude(x => x!.Parent).ThenInclude(x => x!.User).ThenInclude(x => x!.Media)
+			.Include(x => x.Children)!.ThenInclude(x => x.Product).ThenInclude(x => x!.User).ThenInclude(x => x!.Media)
 			.Include(x => x.Children).Include(x => x.Product).ThenInclude(x => x!.Media)
 			.Include(x => x.Children).Include(x => x.Product).ThenInclude(x => x!.Parent)
 			.Include(x => x.Parent);
