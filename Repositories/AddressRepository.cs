@@ -4,7 +4,7 @@ public interface IAddressRepository {
 	Task<GenericResponse<AddressEntity?>> Create(AddressCreateDto dto, CancellationToken ct);
 	Task<GenericResponse<IQueryable<AddressEntity>>> Filter(AddressFilterDto dto);
 	Task<GenericResponse<AddressEntity?>> Update(AddressUpdateDto dto, CancellationToken ct);
-	Task<GenericResponse> Delete(Guid addressId, CancellationToken ct);
+	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 }
 
 public class AddressRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) : IAddressRepository {

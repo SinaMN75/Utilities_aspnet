@@ -28,6 +28,7 @@ public class UserRepository(
 	ICommentRepository commentRepository,
 	IReportRepository reportRepository,
 	IAddressRepository addressRepository,
+	INotificationRepository notificationRepository,
 	IDistributedCache cache,
 	IConfiguration config
 ) : IUserRepository {
@@ -113,50 +114,6 @@ public class UserRepository(
 		await FillUserData(dto, entity);
 		await dbContext.SaveChangesAsync();
 		return new GenericResponse<UserEntity?>(entity);
-	}
-
-	public async Task<GenericResponse> Delete(string id, CancellationToken ct) {
-		UserEntity user = (await dbContext.Set<UserEntity>()
-			.Include(x => x.Media)
-			.Include(x => x.Transactions)
-			.Include(x => x.Orders)!.ThenInclude(x => x.OrderDetails)
-			.Include(x => x.Addresses)
-			.Include(x => x.GroupChatsMessages)
-			.Include(x => x.Comments)
-			.Include(x => x.Reports)
-			.Include(x => x.GroupChats)
-			.FirstOrDefaultAsync(x => x.Id == id, cancellationToken: ct))!;
-
-		await mediaRepository.DeleteMedia(user.Media);
-		foreach (TransactionEntity transactionEntity in user.Transactions ?? [])
-			await transactionRepository.Delete(transactionEntity.Id, ct);
-
-		foreach (OrderEntity orderEntity in user.Orders ?? [])
-			await orderRepository.Delete(orderEntity.Id);
-
-		foreach (AddressEntity addressEntity in user.Addresses ?? [])
-			await addressRepository.Delete(addressEntity.Id, ct);
-
-		foreach (GroupChatMessageEntity groupChatMessageEntity in user.GroupChatsMessages ?? [])
-			await chatRepository.DeleteGroupChatMessage(groupChatMessageEntity.Id);
-
-		foreach (GroupChatEntity groupChatEntity in user.GroupChats ?? [])
-			await chatRepository.DeleteGroupChat(groupChatEntity.Id);
-
-		foreach (CommentEntity commentEntity in user.Comments ?? [])
-			await commentRepository.Delete(commentEntity.Id, ct);
-
-		foreach (ReportEntity reportEntity in user.Reports ?? [])
-			await reportRepository.Delete(reportEntity.Id);
-
-		foreach (GroupChatEntity groupChatEntity in user.GroupChats ?? [])
-			await chatRepository.DeleteGroupChat(groupChatEntity.Id);
-
-		dbContext.Remove(user);
-
-		await dbContext.SaveChangesAsync(ct);
-
-		return new GenericResponse();
 	}
 
 	public GenericResponse<IQueryable<UserEntity>> Filter(UserFilterDto dto) {
@@ -523,5 +480,26 @@ public class UserRepository(
 		await sms.SendSms(user?.PhoneNumber!, appSettings.SmsPanelSettings.PatternCode!, newOtp);
 		await dbContext.SaveChangesAsync();
 		return true;
+	}
+	
+	public async Task<GenericResponse> Delete(string id, CancellationToken ct) {
+		UserEntity user = (await dbContext.Set<UserEntity>()
+			.Include(x => x.Media)
+			.FirstOrDefaultAsync(x => x.Id == id, cancellationToken: ct))!;
+
+		await mediaRepository.DeleteMedia(user.Media);
+		foreach (CommentEntity commentEntity in dbContext.Set<CommentEntity>().Where(x => x.UserId == id || x.TargetUserId == id)) await commentRepository.Delete(commentEntity.Id, ct);
+		foreach (NotificationEntity notificationEntity in dbContext.Set<NotificationEntity>().Where(x => x.UserId == id || x.CreatorUserId == _userId)) await notificationRepository.Delete(notificationEntity.Id);
+		foreach (ReportEntity reportEntity in dbContext.Set<ReportEntity>().Where(x => x.UserId == id || x.CreatorUserId == _userId)) await reportRepository.Delete(reportEntity.Id);
+		foreach (OrderEntity orderEntity in dbContext.Set<OrderEntity>().Where(x => x.UserId == id)) await orderRepository.Delete(orderEntity.Id);
+		foreach (TransactionEntity transactionEntity in dbContext.Set<TransactionEntity>().Where(x => x.BuyerId == id || x.SellerId == id)) await transactionRepository.Delete(transactionEntity.Id, ct);
+		foreach (AddressEntity addressEntity in dbContext.Set<AddressEntity>().Where(x => x.UserId == id)) await addressRepository.Delete(addressEntity.Id, ct);
+		foreach (GroupChatEntity groupChatEntity in dbContext.Set<GroupChatEntity>().Where(x => x.CreatorUserId == id)) await chatRepository.DeleteGroupChat(groupChatEntity.Id);
+		
+		dbContext.Remove(user);
+
+		await dbContext.SaveChangesAsync(ct);
+
+		return new GenericResponse();
 	}
 }
