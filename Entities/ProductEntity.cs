@@ -30,7 +30,6 @@ public class ProductEntity : BaseEntity {
 	public long? DiscountPrice { get; set; }
 	public long? Price { get; set; }
 	public Currency? Currency { get; set; }
-	public DateTime? ExpireDate { get; set; }
 
 	public string? SeenUsers { get; set; } = "";
 	
@@ -189,7 +188,6 @@ public class ProductCreateUpdateDto {
 	public int? Stock { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
-	public DateTime? ExpireDate { get; set; }
 	public Currency? Currency { get; set; }
 	public int? ShippingTime { get; set; }
 	public int? ShippingCost { get; set; }
@@ -234,7 +232,6 @@ public class ProductFilterDto : BaseFilterDto {
 	public bool? OrderByPriceDescending { get; set; } = false;
 	public bool? OrderByCreatedDate { get; set; } = true;
 	public bool? OrderByCreatedDateDescending { get; set; } = false;
-	public bool ShowExpired { get; set; } = false;
 	public bool ShowWithChildren { get; set; } = false;
 	public bool? Shuffle1 { get; set; } = false;
 	public DateTime? StartDate { get; set; }

@@ -48,7 +48,6 @@ public class ProductRepository(
 
 	public async Task<GenericResponse<IQueryable<ProductEntity>>> Filter(ProductFilterDto dto) {
 		IQueryable<ProductEntity> q = dbContext.Set<ProductEntity>().AsNoTracking();
-		if (!dto.ShowExpired) q = q.Where(w => w.ExpireDate == null || w.ExpireDate >= DateTime.UtcNow);
 		q = !dto.ShowWithChildren ? q.Where(x => x.ParentId == null) : q.Include(x => x.Parent);
 
 		if (dto.Ids.IsNotNullOrEmpty()) q = q.Where(x => dto.Ids!.Contains(x.Id));
@@ -291,7 +290,6 @@ public static class ProductEntityExtension {
 		if (dto.Stock is not null) entity.Stock = dto.Stock;
 		if (dto.CommentsCount is not null) entity.CommentsCount = dto.CommentsCount;
 		if (dto.Currency is not null) entity.Currency = dto.Currency;
-		if (dto.ExpireDate is not null) entity.ExpireDate = dto.ExpireDate;
 		if (dto.Tags is not null) entity.Tags = dto.Tags;
 		if (dto.Latitude is not null) entity.Latitude = dto.Latitude;
 		if (dto.Longitude is not null) entity.Longitude = dto.Longitude;
@@ -319,6 +317,7 @@ public static class ProductEntityExtension {
 		if (dto.EndDate is not null) entity.JsonDetail.EndDate = dto.EndDate;
 		if (dto.ShippingCost is not null) entity.JsonDetail.ShippingCost = dto.ShippingCost;
 		if (dto.ShippingTime is not null) entity.JsonDetail.ShippingTime = dto.ShippingTime;
+		if (dto.Details is not null) entity.JsonDetail.Details = dto.Details;
 		if (dto.Type1 is not null) entity.JsonDetail.Type1 = dto.Type1;
 		if (dto.Type2 is not null) entity.JsonDetail.Type2 = dto.Type2;
 		if (dto.KeyValues is not null) entity.JsonDetail.KeyValues = dto.KeyValues;
