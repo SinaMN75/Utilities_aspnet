@@ -9,12 +9,13 @@ public interface ICommentRepository {
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 }
 
-public class CommentRepository(DbContext dbContext,
-		IHttpContextAccessor httpContextAccessor,
-		INotificationRepository notificationRepository,
-		IConfiguration config,
-		IMediaRepository mediaRepository
-		)
+public class CommentRepository(
+	DbContext dbContext,
+	IHttpContextAccessor httpContextAccessor,
+	INotificationRepository notificationRepository,
+	IConfiguration config,
+	IMediaRepository mediaRepository
+)
 	: ICommentRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
@@ -63,7 +64,7 @@ public class CommentRepository(DbContext dbContext,
 	public async Task<GenericResponse<CommentEntity?>> Create(CommentCreateUpdateDto dto, CancellationToken ct) {
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
-		
+
 		UserEntity? trgtUser = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == dto.UserId, ct);
 
 		CommentEntity comment = new() {
@@ -156,11 +157,24 @@ public class CommentRepository(DbContext dbContext,
 		if (comment is null) return new GenericResponse(UtilitiesStatusCodes.NotFound, "Comment Not Found");
 
 		CommentReacts? oldReaction = comment.JsonDetail.Reacts.FirstOrDefault(w => w.UserId == _userId);
-		if (oldReaction is null) comment.JsonDetail.Reacts.Add(new CommentReacts { Reaction = reaction, UserId = user.Id });
-		else if (oldReaction.Reaction != reaction)
+		if (oldReaction is null) {
+			comment.JsonDetail.Reacts.Add(new CommentReacts { Reaction = reaction, UserId = user.Id });
+			if (comment.UserId != _userId) {
+				await notificationRepository.Create(new NotificationCreateUpdateDto {
+					UserId = comment.UserId,
+					Tags = [TagNotification.ReceivedReactionOnComment],
+					CommentId = comment.Id,
+					CreatorUserId = _userId
+				});
+			}
+		}
+		else if (oldReaction.Reaction != reaction) {
 			oldReaction.Reaction = reaction;
-		else
+		}
+		else {
 			comment.JsonDetail.Reacts.Remove(oldReaction);
+		}
+
 		await dbContext.SaveChangesAsync(ct);
 		return new GenericResponse();
 	}

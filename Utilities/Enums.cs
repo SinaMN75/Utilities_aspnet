@@ -454,7 +454,8 @@ public enum TagNotification {
 	ReceivedComment = 101,
 	ReceivedChat = 102,
 	Followed = 103,
-	ReceivedReactionOnProduct = 104
+	ReceivedReactionOnProduct = 104,
+	ReceivedReactionOnComment = 105
 }
 
 public enum TagSubscription {
