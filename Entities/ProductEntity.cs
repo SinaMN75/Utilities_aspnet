@@ -37,6 +37,9 @@ public class ProductEntity : BaseEntity {
 	public Guid? ParentId { get; set; }
 	public GroupChatMessageEntity? GroupChatMessageEntity { get; set; }
 	public Guid? GroupChatMessageId { get; set; }
+	
+	public DateTime? StartDate { get; set; }
+	public DateTime? EndDate { get; set; }
 
 	[InverseProperty("Parent")]
 	public IEnumerable<ProductEntity>? Children { get; set; }

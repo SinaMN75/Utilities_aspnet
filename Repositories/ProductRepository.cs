@@ -61,8 +61,8 @@ public class ProductRepository(
 		if (dto.Currency.HasValue) q = q.Where(x => x.Currency == dto.Currency);
 		if (dto.HasDiscount.IsTrue()) q = q.Where(x => x.DiscountPercent != null || x.DiscountPrice != null);
 		if (dto.EndPriceRange.HasValue) q = q.Where(x => x.Price <= dto.EndPriceRange);
-		if (dto.StartDate.HasValue) q = q.Where(x => (x.JsonDetail.StartDate ?? DateTime.UtcNow) >= dto.StartDate);
-		if (dto.EndDate.HasValue) q = q.Where(x => (x.JsonDetail.EndDate ?? DateTime.UtcNow) <= dto.EndDate);
+		if (dto.StartDate.HasValue) q = q.Where(x => x.StartDate >= dto.StartDate);
+		if (dto.EndDate.HasValue) q = q.Where(x => x.EndDate <= dto.EndDate);
 		if (dto.Query.IsNotNullOrEmpty())
 			q = q.Where(x => (x.Title ?? "").Contains(dto.Query!) || (x.Subtitle ?? "").Contains(dto.Query!) || (x.Description ?? "").Contains(dto.Query!));
 
@@ -288,6 +288,8 @@ public static class ProductEntityExtension {
 		if (dto.Description is not null) entity.Description = dto.Description;
 		if (dto.Price is not null) entity.Price = dto.Price;
 		if (dto.Stock is not null) entity.Stock = dto.Stock;
+		if (dto.StartDate is not null) entity.StartDate = dto.StartDate;
+		if (dto.EndDate is not null) entity.EndDate = dto.EndDate;
 		if (dto.CommentsCount is not null) entity.CommentsCount = dto.CommentsCount;
 		if (dto.Currency is not null) entity.Currency = dto.Currency;
 		if (dto.Tags is not null) entity.Tags = dto.Tags;
