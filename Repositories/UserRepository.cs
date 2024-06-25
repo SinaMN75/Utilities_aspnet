@@ -411,7 +411,7 @@ public class UserRepository(
 		if (dto.LastName is not null) entity.LastName = dto.LastName;
 		if (dto.FullName is not null) entity.FullName = dto.FullName;
 		if (dto.Bio is not null) entity.Bio = dto.Bio;
-		if (dto.AppUserName is not null) entity.AppUserName = dto.UserName;
+		if (dto.AppUserName is not null) entity.AppUserName = dto.AppUserName;
 		if (dto.PhoneNumber is not null) entity.PhoneNumber = dto.PhoneNumber;
 		if (dto.AppEmail is not null) entity.AppEmail = dto.AppEmail;
 		if (dto.Region is not null) entity.Region = dto.Region;
