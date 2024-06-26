@@ -219,6 +219,7 @@ public enum TagCategory {
 	Special = 183,
 	Recommended = 184,
 	Sport = 185,
+	Couch = 186,
 	Enabled = 201
 }
 
@@ -360,6 +361,7 @@ public enum TagProduct {
 	Premium12Month = 187,
 	Post = 189,
 	Tournament = 190,
+	Couch = 191,
 	New = 201,
 	KindOfNew = 202,
 	Used = 203,
