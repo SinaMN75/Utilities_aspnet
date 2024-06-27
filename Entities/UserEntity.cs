@@ -124,6 +124,14 @@ public class UserJsonDetail {
 	public string? Code { get; set; }
 	public string? ShebaNumber { get; set; }
 	public string? Address { get; set; }
+	public string? FatherName { get; set; }
+	public string? NationalCode { get; set; }
+	public string? SchoolName { get; set; }
+	public string? Height { get; set; }
+	public string? Weight { get; set; }
+	public string? FoodAllergies { get; set; }
+	public string? Sickness { get; set; }
+	public string? UsedDrugs { get; set; }
 	public string? FcmToken { get; set; }
 	public long? DeliveryPrice1 { get; set; }
 	public long? DeliveryPrice2 { get; set; }
@@ -203,6 +211,14 @@ public class UserCreateUpdateDto {
 	public string? Code { get; set; }
 	public string? ShebaNumber { get; set; }
 	public string? Address { get; set; }
+	public string? FatherName { get; set; }
+	public string? NationalCode { get; set; }
+	public string? SchoolName { get; set; }
+	public string? Height { get; set; }
+	public string? Weight { get; set; }
+	public string? FoodAllergies { get; set; }
+	public string? Sickness { get; set; }
+	public string? UsedDrugs { get; set; }
 	public long? DeliveryPrice1 { get; set; }
 	public long? DeliveryPrice2 { get; set; }
 	public long? DeliveryPrice3 { get; set; }
