@@ -221,8 +221,7 @@ public class UserRepository(
 		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Email == model.Email ||
 		                                                                              x.UserName == model.Email ||
 		                                                                              x.PhoneNumber == model.Email ||
-		                                                                              x.Password == model.Password || 
-		                                                                              x.JsonDetail.NationalCode == model.Email
+		                                                                              x.Password == model.Password
 		);
 
 		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
