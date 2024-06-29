@@ -257,7 +257,8 @@ public class UserRepository(
 
 		UserEntity user = new() {
 			Suspend = false,
-			CreatedAt = DateTime.UtcNow
+			CreatedAt = DateTime.UtcNow,
+			UpdatedAt = DateTime.UtcNow
 		};
 
 		await FillUserData(dto, user);
@@ -442,7 +443,14 @@ public class UserRepository(
 		if (dto.Address is not null) entity.JsonDetail.Address = dto.Address;
 		if (dto.Pinterest is not null) entity.JsonDetail.Pinterest = dto.Pinterest;
 		if (dto.Website is not null) entity.JsonDetail.Website = dto.Website;
-		if (dto.Activity is not null) entity.JsonDetail.Activity = dto.Activity;
+		if (dto.FatherName is not null) entity.JsonDetail.FatherName = dto.FatherName;
+		if (dto.NationalCode is not null) entity.JsonDetail.NationalCode = dto.NationalCode;
+		if (dto.SchoolName is not null) entity.JsonDetail.SchoolName = dto.SchoolName;
+		if (dto.Height is not null) entity.JsonDetail.Height = dto.Height;
+		if (dto.Weight is not null) entity.JsonDetail.Weight = dto.Weight;
+		if (dto.FoodAllergies is not null) entity.JsonDetail.FoodAllergies = dto.FoodAllergies;
+		if (dto.Sickness is not null) entity.JsonDetail.Sickness = dto.Sickness;
+		if (dto.UsedDrugs is not null) entity.JsonDetail.UsedDrugs = dto.UsedDrugs;
 		if (dto.Color is not null) entity.JsonDetail.Color = dto.Color;
 		if (dto.PrivacyType is not null) entity.JsonDetail.PrivacyType = dto.PrivacyType;
 		if (dto.FcmToken is not null) entity.JsonDetail.FcmToken = dto.FcmToken;

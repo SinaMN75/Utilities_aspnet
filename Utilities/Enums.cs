@@ -240,7 +240,8 @@ public enum TagContent {
 	Premium1Month = 114,
 	Premium3Month = 115,
 	Premium6Month = 116,
-	Premium12Month = 117
+	Premium12Month = 117,
+	Questionnaire = 118
 }
 
 public enum TagComment {
@@ -411,6 +412,8 @@ public enum TagUser {
 	Unknown = 202,
 	Legal = 203,
 	Guest = 204,
+	Teacher = 205,
+	Student = 205,
 	AdminCategoryRead = 300,
 	AdminCategoryUpdate = 301,
 	AdminProductRead = 302,
