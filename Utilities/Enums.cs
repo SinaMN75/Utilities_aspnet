@@ -413,7 +413,7 @@ public enum TagUser {
 	Legal = 203,
 	Guest = 204,
 	Teacher = 205,
-	Student = 205,
+	Student = 206,
 	AdminCategoryRead = 300,
 	AdminCategoryUpdate = 301,
 	AdminProductRead = 302,
