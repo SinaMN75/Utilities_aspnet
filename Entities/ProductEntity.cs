@@ -29,6 +29,8 @@ public class ProductEntity : BaseEntity {
 	public int? CommentsCount { get; set; }
 	public long? DiscountPrice { get; set; }
 	public long? Price { get; set; }
+	public long? Price1 { get; set; }
+	public long? Price2 { get; set; }
 	public Currency? Currency { get; set; }
 
 	public string? SeenUsers { get; set; } = "";
@@ -181,6 +183,8 @@ public class ProductCreateUpdateDto {
 	public int? MaxOrder { get; set; }
 	public long? MaxPrice { get; set; }
 	public long? MinPrice { get; set; }
+	public long? Price1 { get; set; }
+	public long? Price2 { get; set; }
 	public int? ScorePlus { get; set; }
 	public int? ScoreMinus { get; set; }
 	public long? DiscountPrice { get; set; }
@@ -217,6 +221,8 @@ public class ProductFilterDto : BaseFilterDto {
 	public string? Query { get; set; }
 	public long? StartPriceRange { get; set; }
 	public long? EndPriceRange { get; set; }
+	public long? Price1 { get; set; }
+	public long? Price2 { get; set; }
 	public bool? IsFollowing { get; set; }
 	public bool? IsBookmarked { get; set; }
 	public bool? HasDiscount { get; set; }

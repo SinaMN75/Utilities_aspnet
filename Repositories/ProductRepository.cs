@@ -291,6 +291,8 @@ public static class ProductEntityExtension {
 		if (dto.StartDate is not null) entity.StartDate = dto.StartDate;
 		if (dto.EndDate is not null) entity.EndDate = dto.EndDate;
 		if (dto.CommentsCount is not null) entity.CommentsCount = dto.CommentsCount;
+		if (dto.Price1 is not null) entity.Price1 = dto.Price1;
+		if (dto.Price2 is not null) entity.Price2 = dto.Price2;
 		if (dto.Currency is not null) entity.Currency = dto.Currency;
 		if (dto.Tags is not null) entity.Tags = dto.Tags;
 		if (dto.Latitude is not null) entity.Latitude = dto.Latitude;

@@ -64,6 +64,8 @@ public class UserRepository(
 				JsonDetail = x.JsonDetail,
 				Tags = x.Tags,
 				PremiumExpireDate = x.PremiumExpireDate,
+				FollowedUsers = x.FollowedUsers,
+				FollowingUsers = x.FollowingUsers,
 				Media = x.Media!.Select(y => new MediaEntity {
 					Id = y.Id,
 					FileName = y.FileName,
@@ -100,8 +102,8 @@ public class UserRepository(
 			if (myUser.FollowingUsers.Contains(entity.Id)) entity.IsFollowing = true;
 		}
 
-		entity.CountFollowing = entity.FollowingUsers.Split(",").Count(w => w.Length >= 10);
-		entity.CountFollowers = entity.FollowedUsers.Split(",").Count(w => w.Length >= 10);
+		entity.CountFollowing = entity.FollowingUsers.Split(",").Length;
+		entity.CountFollowers = entity.FollowedUsers.Split(",").Length;
 
 		return new GenericResponse<UserEntity?>(entity);
 	}
