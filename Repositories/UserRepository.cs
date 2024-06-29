@@ -221,7 +221,9 @@ public class UserRepository(
 		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Email == model.Email ||
 		                                                                              x.UserName == model.Email ||
 		                                                                              x.PhoneNumber == model.Email ||
-		                                                                              x.Password == model.Password);
+		                                                                              x.Password == model.Password || 
+		                                                                              x.JsonDetail.NationalCode == model.Email
+		);
 
 		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
 
@@ -491,21 +493,25 @@ public class UserRepository(
 		await dbContext.SaveChangesAsync();
 		return true;
 	}
-	
+
 	public async Task<GenericResponse> Delete(string id, CancellationToken ct) {
 		UserEntity user = (await dbContext.Set<UserEntity>()
 			.Include(x => x.Media)
 			.FirstOrDefaultAsync(x => x.Id == id, cancellationToken: ct))!;
 
 		await mediaRepository.DeleteMedia(user.Media);
-		foreach (CommentEntity commentEntity in dbContext.Set<CommentEntity>().Where(x => x.UserId == id || x.TargetUserId == id)) await commentRepository.Delete(commentEntity.Id, ct);
-		foreach (NotificationEntity notificationEntity in dbContext.Set<NotificationEntity>().Where(x => x.UserId == id || x.CreatorUserId == _userId)) await notificationRepository.Delete(notificationEntity.Id);
-		foreach (ReportEntity reportEntity in dbContext.Set<ReportEntity>().Where(x => x.UserId == id || x.CreatorUserId == _userId)) await reportRepository.Delete(reportEntity.Id);
+		foreach (CommentEntity commentEntity in dbContext.Set<CommentEntity>().Where(x => x.UserId == id || x.TargetUserId == id))
+			await commentRepository.Delete(commentEntity.Id, ct);
+		foreach (NotificationEntity notificationEntity in dbContext.Set<NotificationEntity>().Where(x => x.UserId == id || x.CreatorUserId == _userId))
+			await notificationRepository.Delete(notificationEntity.Id);
+		foreach (ReportEntity reportEntity in dbContext.Set<ReportEntity>().Where(x => x.UserId == id || x.CreatorUserId == _userId))
+			await reportRepository.Delete(reportEntity.Id);
 		foreach (OrderEntity orderEntity in dbContext.Set<OrderEntity>().Where(x => x.UserId == id)) await orderRepository.Delete(orderEntity.Id);
-		foreach (TransactionEntity transactionEntity in dbContext.Set<TransactionEntity>().Where(x => x.BuyerId == id || x.SellerId == id)) await transactionRepository.Delete(transactionEntity.Id, ct);
+		foreach (TransactionEntity transactionEntity in dbContext.Set<TransactionEntity>().Where(x => x.BuyerId == id || x.SellerId == id))
+			await transactionRepository.Delete(transactionEntity.Id, ct);
 		foreach (AddressEntity addressEntity in dbContext.Set<AddressEntity>().Where(x => x.UserId == id)) await addressRepository.Delete(addressEntity.Id, ct);
 		foreach (GroupChatEntity groupChatEntity in dbContext.Set<GroupChatEntity>().Where(x => x.CreatorUserId == id)) await chatRepository.DeleteGroupChat(groupChatEntity.Id);
-		
+
 		dbContext.Remove(user);
 
 		await dbContext.SaveChangesAsync(ct);
