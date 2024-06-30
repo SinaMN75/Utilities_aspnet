@@ -84,7 +84,7 @@ public class CategoryFilterDto : BaseFilterDto {
 	public string? TitleTr2 { get; set; }
 	public List<TagCategory>? Tags { get; set; }
 	public Guid? ParentId { get; set; }
-	public bool? ShowByChildren { get; set; }
+	public bool? MultiLevel { get; set; }
 	public bool? ShowMedia { get; set; }
 	public bool? OrderByOrder { get; set; }
 	public bool? OrderByOrderDescending { get; set; }

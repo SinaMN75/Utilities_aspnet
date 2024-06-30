@@ -65,10 +65,14 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 	}
 
 	public async Task<GenericResponse<IEnumerable<CategoryEntity>>> Filter(CategoryFilterDto dto) {
-		IQueryable<CategoryEntity> q = context.Set<CategoryEntity>().AsNoTracking()
-			.Include(x => x.Children)!.ThenInclude(x => x.Children)!.ThenInclude(x => x.Children);
+		IQueryable<CategoryEntity> q = context.Set<CategoryEntity>().Include(x => x.Children).AsNoTracking();
 
-		q = dto.ShowByChildren.IsTrue() ? q.Where(x => x.ParentId != null) : q.Where(x => x.ParentId == null);
+		if (dto.MultiLevel.IsTrue()) {
+			q = q.Include(x => x.Children)!
+				.ThenInclude(x => x.Children)!
+				.ThenInclude(x => x.Children);
+		}
+
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => x.Title!.Contains(dto.Title!));
 		if (dto.TitleTr1.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr1!.Contains(dto.TitleTr1!));
 		if (dto.TitleTr2.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr2!.Contains(dto.TitleTr2!));
@@ -141,7 +145,7 @@ public static class CategoryEntityExtension {
 			DiscountedPrice = dto.DiscountedPrice ?? entity.JsonDetail.DiscountedPrice,
 			SendPrice = dto.SendPrice ?? entity.JsonDetail.SendPrice
 		};
-		
+
 		return entity;
 	}
 }
