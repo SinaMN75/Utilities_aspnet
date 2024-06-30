@@ -140,6 +140,7 @@ public class UserJsonDetail {
 	public LegalAuthenticationType? LegalAuthenticationType { get; set; }
 	public NationalityType? NationalityType { get; set; }
 	public List<UserSubscriptions>? UserSubscriptions { get; set; } = [];
+	public List<KeyValue>? KeyValues1 { get; set; } = [];
 }
 
 public class UserSubscriptions {
@@ -232,6 +233,7 @@ public class UserCreateUpdateDto {
 	public DateTime? PremiumExpireDate { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 	public List<TagUser>? Tags { get; set; }
+	public List<KeyValue>? KeyValues { get; set; }
 }
 
 public class UserFilterDto : BaseFilterDto {
