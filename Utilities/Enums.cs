@@ -46,6 +46,7 @@ public enum Currency {
 	Dolor = 101,
 	Lira = 102,
 	Euro = 103,
+	AED = 104,
 	Btc = 200
 }
 
