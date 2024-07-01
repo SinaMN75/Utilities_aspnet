@@ -220,8 +220,7 @@ public class UserRepository(
 	public async Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model) {
 		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Email == model.Email ||
 		                                                                              x.UserName == model.Email ||
-		                                                                              x.PhoneNumber == model.Email ||
-		                                                                              x.Password == model.Password
+		                                                                              x.PhoneNumber == model.Email
 		);
 
 		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
