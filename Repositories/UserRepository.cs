@@ -234,11 +234,11 @@ public class UserRepository(
 
 	public async Task<GenericResponse<UserEntity?>> Create(UserCreateUpdateDto dto) {
 		UserEntity? sameUserName = await dbContext.Set<UserEntity>().AsNoTracking()
-			.FirstOrDefaultAsync(x => x.UserName == (dto.UserName ?? ""));
+			.FirstOrDefaultAsync(x => x.UserName == (dto.UserName ?? "null"));
 		UserEntity? samePhoneNumber = await dbContext.Set<UserEntity>().AsNoTracking()
-			.FirstOrDefaultAsync(x => x.PhoneNumber == (dto.PhoneNumber ?? ""));
+			.FirstOrDefaultAsync(x => x.PhoneNumber == (dto.PhoneNumber ?? "null"));
 		UserEntity? sameEmail = await dbContext.Set<UserEntity>().AsNoTracking()
-			.FirstOrDefaultAsync(x => x.Email == (dto.Email ?? ""));
+			.FirstOrDefaultAsync(x => x.Email == (dto.Email ?? "null"));
 		if (sameUserName != null)
 			return new GenericResponse<UserEntity?>(
 				result: null,
