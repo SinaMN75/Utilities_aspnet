@@ -65,7 +65,8 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 	}
 
 	public async Task<GenericResponse<IEnumerable<CategoryEntity>>> Filter(CategoryFilterDto dto) {
-		IQueryable<CategoryEntity> q = context.Set<CategoryEntity>().Include(x => x.Children).AsNoTracking();
+		IQueryable<CategoryEntity> q = context.Set<CategoryEntity>().Where(x => x.ParentId == null)
+			.Include(x => x.Children).AsNoTracking();
 
 		if (dto.MultiLevel.IsTrue()) {
 			q = q.Include(x => x.Children)!
