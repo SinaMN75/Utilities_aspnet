@@ -220,7 +220,8 @@ public class UserRepository(
 	public async Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model) {
 		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Email == model.Email ||
 		                                                                              x.UserName == model.Email ||
-		                                                                              x.PhoneNumber == model.Email
+		                                                                              x.PhoneNumber == model.Email ||
+		                                                                              x.Password == model.Password
 		);
 
 		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
@@ -233,11 +234,11 @@ public class UserRepository(
 
 	public async Task<GenericResponse<UserEntity?>> Create(UserCreateUpdateDto dto) {
 		UserEntity? sameUserName = await dbContext.Set<UserEntity>().AsNoTracking()
-			.FirstOrDefaultAsync(x => x.UserName == dto.UserName);
+			.FirstOrDefaultAsync(x => x.UserName == (dto.UserName ?? ""));
 		UserEntity? samePhoneNumber = await dbContext.Set<UserEntity>().AsNoTracking()
-			.FirstOrDefaultAsync(x => x.PhoneNumber == dto.PhoneNumber);
+			.FirstOrDefaultAsync(x => x.PhoneNumber == (dto.PhoneNumber ?? ""));
 		UserEntity? sameEmail = await dbContext.Set<UserEntity>().AsNoTracking()
-			.FirstOrDefaultAsync(x => x.Email == dto.Email);
+			.FirstOrDefaultAsync(x => x.Email == (dto.Email ?? ""));
 		if (sameUserName != null)
 			return new GenericResponse<UserEntity?>(
 				result: null,
