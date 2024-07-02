@@ -134,6 +134,7 @@ public class UserJsonDetail {
 	public string? UsedDrugs { get; set; }
 	public string? FcmToken { get; set; }
 	public string? Degree { get; set; }
+	public string? Institute { get; set; }
 	public long? DeliveryPrice1 { get; set; }
 	public long? DeliveryPrice2 { get; set; }
 	public long? DeliveryPrice3 { get; set; }
@@ -222,6 +223,7 @@ public class UserCreateUpdateDto {
 	public string? Sickness { get; set; }
 	public string? UsedDrugs { get; set; }
 	public string? Degree { get; set; }
+	public string? Institute { get; set; }
 	public long? DeliveryPrice1 { get; set; }
 	public long? DeliveryPrice2 { get; set; }
 	public long? DeliveryPrice3 { get; set; }
