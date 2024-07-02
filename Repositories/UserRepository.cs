@@ -459,6 +459,7 @@ public class UserRepository(
 		if (dto.FcmToken is not null) entity.JsonDetail.FcmToken = dto.FcmToken;
 		if (dto.ShebaNumber is not null) entity.JsonDetail.ShebaNumber = dto.ShebaNumber;
 		if (dto.LegalAuthenticationType is not null) entity.JsonDetail.LegalAuthenticationType = dto.LegalAuthenticationType;
+		if (dto.Degree is not null) entity.JsonDetail.Degree = dto.Degree;
 		if (dto.NationalityType is not null) entity.JsonDetail.NationalityType = dto.NationalityType;
 		if (dto.Code is not null) entity.JsonDetail.Code = dto.Code;
 		if (dto.DeliveryPrice1 is not null) entity.JsonDetail.DeliveryPrice1 = dto.DeliveryPrice1;
