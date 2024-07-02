@@ -8,7 +8,7 @@ public interface IQuestionnaireRepository {
 	Task<GenericResponse<QuestionnaireAnswersEntity>> CreateAnswer(QuestionnaireAnswerCreateDto dto, CancellationToken ct);
 	Task<GenericResponse<QuestionnaireAnswersEntity?>> UpdateAnswer(QuestionnaireAnswerUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse> DeleteAnswer(Guid id, CancellationToken ct);
-	Task<GenericResponse> SubmitQuestionnaireHistory(QuestionnaireHistoryCreateDto dto, CancellationToken ct);
+	Task<GenericResponse> CreateQuestionnaireHistory(QuestionnaireHistoryCreateDto dto, CancellationToken ct);
 }
 
 public class QuestionnaireRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) : IQuestionnaireRepository {
@@ -92,7 +92,7 @@ public class QuestionnaireRepository(DbContext dbContext, IHttpContextAccessor h
 		return new GenericResponse();
 	}
 
-	public async Task<GenericResponse> SubmitQuestionnaireHistory(QuestionnaireHistoryCreateDto dto, CancellationToken ct) {
+	public async Task<GenericResponse> CreateQuestionnaireHistory(QuestionnaireHistoryCreateDto dto, CancellationToken ct) {
 		EntityEntry<QuestionnaireHistoryEntity> e = await dbContext.Set<QuestionnaireHistoryEntity>().AddAsync(new QuestionnaireHistoryEntity {
 			UserId = dto.UserId,
 			CreatedAt = DateTime.UtcNow,
