@@ -116,6 +116,7 @@ public static class StartupExtension {
 		builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 		builder.Services.AddScoped<IAppSettingsRepository, AppSettingsRepository>();
 		builder.Services.AddScoped<IAmazonS3Repository, AmazonS3Repository>();
+		builder.Services.AddScoped<IQuestionnaireRepository, QuestionnaireRepository>();
 	}
 
 	private static void AddUtilitiesSwagger(this IHostApplicationBuilder builder, IServiceProvider? serviceProvider) {

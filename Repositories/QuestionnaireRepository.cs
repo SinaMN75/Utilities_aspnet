@@ -8,6 +8,7 @@ public interface IQuestionnaireRepository {
 	Task<GenericResponse<QuestionnaireAnswersEntity>> CreateAnswer(QuestionnaireAnswerCreateDto dto, CancellationToken ct);
 	Task<GenericResponse<QuestionnaireAnswersEntity?>> UpdateAnswer(QuestionnaireAnswerUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse> DeleteAnswer(Guid id, CancellationToken ct);
+	Task<GenericResponse> SubmitQuestionnaireHistory(QuestionnaireHistoryCreateDto dto, CancellationToken ct);
 }
 
 public class QuestionnaireRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) : IQuestionnaireRepository {
@@ -48,7 +49,9 @@ public class QuestionnaireRepository(DbContext dbContext, IHttpContextAccessor h
 			Question = x.Question,
 			Answers = x.Answers.Select(y => new QuestionnaireAnswersEntity {
 				Title = y.Title,
-				QuestionnaireId = y.Id
+				QuestionnaireId = y.Id,
+				Value = y.Value,
+				Point = y.Point
 			})
 		});
 		
@@ -61,12 +64,13 @@ public class QuestionnaireRepository(DbContext dbContext, IHttpContextAccessor h
 		};
 	}
 	
-	
 	public async Task<GenericResponse<QuestionnaireAnswersEntity>> CreateAnswer(QuestionnaireAnswerCreateDto dto, CancellationToken ct) {
 		EntityEntry<QuestionnaireAnswersEntity> e = await dbContext.Set<QuestionnaireAnswersEntity>().AddAsync(new QuestionnaireAnswersEntity {
 			CreatedAt = DateTime.UtcNow,
 			UpdatedAt = DateTime.UtcNow,
 			Title = dto.Title,
+			Value = dto.Value,
+			Point = dto.Point,
 			QuestionnaireId = dto.QuestionnaireId
 		}, ct);
 		await dbContext.SaveChangesAsync(ct);
@@ -86,5 +90,17 @@ public class QuestionnaireRepository(DbContext dbContext, IHttpContextAccessor h
 	public async Task<GenericResponse> DeleteAnswer(Guid id, CancellationToken ct) {
 		await dbContext.Set<QuestionnaireEntity>().Where(f => f.Id == id).ExecuteDeleteAsync(ct);
 		return new GenericResponse();
+	}
+
+	public async Task<GenericResponse> SubmitQuestionnaireHistory(QuestionnaireHistoryCreateDto dto, CancellationToken ct) {
+		EntityEntry<QuestionnaireHistoryEntity> e = await dbContext.Set<QuestionnaireHistoryEntity>().AddAsync(new QuestionnaireHistoryEntity {
+			UserId = dto.UserId,
+			CreatedAt = DateTime.UtcNow,
+			UpdatedAt = DateTime.UtcNow,
+			JsonDetail = new QuestionnaireHistoryJsonDetail { QuestionnaireHistoryQa = dto.QuestionnaireHistoryQa }
+		}, ct);
+		
+		await dbContext.SaveChangesAsync(ct);
+		return new GenericResponse<QuestionnaireHistoryEntity>(e.Entity);
 	}
 }

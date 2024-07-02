@@ -11,6 +11,8 @@ public class QuestionnaireEntity : BaseEntity {
 [Table("QuestionnaireAnswers")]
 public class QuestionnaireAnswersEntity : BaseEntity {
 	public required string Title { get; set; }
+	public required string Value { get; set; }
+	public required int Point { get; set; }
 
 	public QuestionnaireEntity Questionnaire { get; set; } = null!;
 	public required Guid QuestionnaireId { get; set; }
@@ -28,9 +30,16 @@ public class QuestionnaireHistoryJsonDetail {
 	public List<QuestionnaireHistoryQa> QuestionnaireHistoryQa { get; set; } = [];
 }
 
+public class QuestionnaireHistoryCreateDto {
+	public required string UserId { get; set; }
+	public required List<QuestionnaireHistoryQa> QuestionnaireHistoryQa { get; set; }
+}
+
 public class QuestionnaireHistoryQa {
 	public required string Question { get; set; }
 	public required string Answer { get; set; }
+	public required string Value { get; set; }
+	public required int Point { get; set; }
 }
 
 public class QuestionnaireCreateDto {
@@ -46,8 +55,10 @@ public class QuestionnaireUpdateDto {
 
 public class QuestionnaireAnswerCreateDto {
 	public required string Title { get; set; }
+	public required string Value { get; set; }
+	public required int Point { get; set; }
 	public required Guid QuestionnaireId { get; set; }
-}
+} 
 
 public class QuestionnaireAnswerUpdateDto {
 	public required Guid Id { get; set; }
