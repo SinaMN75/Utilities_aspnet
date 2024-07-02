@@ -452,6 +452,7 @@ public class UserRepository(
 		if (dto.Height is not null) entity.JsonDetail.Height = dto.Height;
 		if (dto.Weight is not null) entity.JsonDetail.Weight = dto.Weight;
 		if (dto.FoodAllergies is not null) entity.JsonDetail.FoodAllergies = dto.FoodAllergies;
+		if (dto.Institute is not null) entity.JsonDetail.Institute = dto.Institute;
 		if (dto.Sickness is not null) entity.JsonDetail.Sickness = dto.Sickness;
 		if (dto.UsedDrugs is not null) entity.JsonDetail.UsedDrugs = dto.UsedDrugs;
 		if (dto.Color is not null) entity.JsonDetail.Color = dto.Color;
