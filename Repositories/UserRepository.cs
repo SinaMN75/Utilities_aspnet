@@ -83,7 +83,7 @@ public class UserRepository(
 					Order = y.Order,
 					JsonDetail = y.JsonDetail,
 					Tags = y.Tags,
-					Media = x.Media!.Select(z => new MediaEntity {
+					Media = y.Media!.Select(z => new MediaEntity {
 						Id = z.Id,
 						FileName = z.FileName,
 						Order = z.Order,

@@ -252,6 +252,11 @@ public enum TagComment {
 	Private = 501
 }
 
+public enum TagQuestionnaire {
+	Teacher = 100,
+	Student = 101
+}
+
 public enum TagMedia {
 	All = 100,
 	Image = 101,

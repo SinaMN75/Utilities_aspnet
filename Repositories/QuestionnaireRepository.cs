@@ -15,13 +15,26 @@ public class QuestionnaireRepository(DbContext dbContext, IHttpContextAccessor h
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	public async Task<GenericResponse<QuestionnaireEntity>> Create(QuestionnaireCreateDto dto, CancellationToken ct) {
-		EntityEntry<QuestionnaireEntity> e = await dbContext.Set<QuestionnaireEntity>().AddAsync(new QuestionnaireEntity {
+		QuestionnaireEntity e = new() {
 			CreatedAt = DateTime.UtcNow,
 			Question = dto.Question,
-			Title = dto.Title
-		}, ct);
+			Title = dto.Title,
+			Tags = dto.Tags,
+		};
+		
+		if (dto.Categories.IsNotNull()) {
+			List<CategoryEntity> listCategory = [];
+			foreach (Guid item in dto.Categories!) {
+				CategoryEntity? c = await dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item, ct);
+				if (c != null) listCategory.Add(c);
+			}
+
+			e.Categories = listCategory;
+		}
+		
+		await dbContext.Set<QuestionnaireEntity>().AddAsync(e, ct);
 		await dbContext.SaveChangesAsync(ct);
-		return new GenericResponse<QuestionnaireEntity>(e.Entity);
+		return new GenericResponse<QuestionnaireEntity>(e);
 	}
 
 	public async Task<GenericResponse<QuestionnaireEntity?>> Update(QuestionnaireUpdateDto dto, CancellationToken ct) {
@@ -29,6 +42,7 @@ public class QuestionnaireRepository(DbContext dbContext, IHttpContextAccessor h
 		e.UpdatedAt = DateTime.UtcNow;
 		if (dto.Title is not null) e.Title = dto.Title;
 		if (dto.Question is not null) e.Title = dto.Question;
+		if (dto.Tags is not null) e.Tags = dto.Tags;
 
 		dbContext.Update(e);
 		await dbContext.SaveChangesAsync(ct);
@@ -47,6 +61,24 @@ public class QuestionnaireRepository(DbContext dbContext, IHttpContextAccessor h
 			UpdatedAt = x.UpdatedAt,
 			Title = x.Title,
 			Question = x.Question,
+			Tags = x.Tags,
+			Categories = x.Categories!.Select(y => new CategoryEntity {
+				Id = y.Id,
+				CreatedAt = y.CreatedAt,
+				UpdatedAt = y.UpdatedAt,
+				Title = y.Title,
+				TitleTr1 = y.TitleTr1,
+				TitleTr2 = y.TitleTr2,
+				Order = y.Order,
+				JsonDetail = y.JsonDetail,
+				Tags = y.Tags,
+				Media = y.Media!.Select(z => new MediaEntity {
+					Id = z.Id,
+					FileName = z.FileName,
+					JsonDetail = z.JsonDetail,
+					Tags = z.Tags
+				})
+			}),
 			Answers = x.Answers.Select(y => new QuestionnaireAnswersEntity {
 				Title = y.Title,
 				QuestionnaireId = y.Id,
@@ -81,6 +113,8 @@ public class QuestionnaireRepository(DbContext dbContext, IHttpContextAccessor h
 		QuestionnaireAnswersEntity e = (await dbContext.Set<QuestionnaireAnswersEntity>().FirstOrDefaultAsync(f => f.Id == dto.Id, ct))!;
 		e.UpdatedAt = DateTime.UtcNow;
 		if (dto.Title is not null) e.Title = dto.Title;
+		if (dto.Point is not null) e.Point = dto.Point ?? 0;
+		if (dto.Value is not null) e.Value = dto.Value;
 
 		dbContext.Update(e);
 		await dbContext.SaveChangesAsync(ct);

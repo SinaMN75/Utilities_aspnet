@@ -6,6 +6,13 @@ public class QuestionnaireEntity : BaseEntity {
 	public required string Question { get; set; }
 
 	public IEnumerable<QuestionnaireAnswersEntity> Answers { get; set; } = null!;
+	
+	[System.Text.Json.Serialization.JsonIgnore]
+	[JsonIgnore]
+	public IEnumerable<CategoryEntity>? Categories { get; set; }
+	
+	public required List<TagQuestionnaire> Tags { get; set; }
+	
 }
 
 [Table("QuestionnaireAnswers")]
@@ -45,12 +52,15 @@ public class QuestionnaireHistoryQa {
 public class QuestionnaireCreateDto {
 	public required string Title { get; set; }
 	public required string Question { get; set; }
+	public IEnumerable<Guid>? Categories { get; set; }
+	public required List<TagQuestionnaire> Tags { get; set; }
 }
 
 public class QuestionnaireUpdateDto {
 	public required Guid Id { get; set; }
 	public string? Title { get; set; }
 	public string? Question { get; set; }
+	public List<TagQuestionnaire>? Tags { get; set; }
 }
 
 public class QuestionnaireAnswerCreateDto {
@@ -63,6 +73,8 @@ public class QuestionnaireAnswerCreateDto {
 public class QuestionnaireAnswerUpdateDto {
 	public required Guid Id { get; set; }
 	public string? Title { get; set; }
+	public int? Point { get; set; }
+	public string? Value { get; set; }
 }
 
 public class QuestionnaireFilterDto : BaseFilterDto;
