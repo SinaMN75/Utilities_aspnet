@@ -69,6 +69,7 @@ public static class StartupExtension {
 					break;
 				case UtilitiesDatabaseType.Postgres:
 					options.UseNpgsql(connectionStrings, o => {
+						AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 						o.EnableRetryOnFailure(maxRetryCount: 2);
 						o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
 					});

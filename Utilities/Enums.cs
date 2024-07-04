@@ -46,7 +46,8 @@ public enum Currency {
 	Dolor = 101,
 	Lira = 102,
 	Euro = 103,
-	AED = 104,
+	Aed = 104,
+	Gbp = 105,
 	Btc = 200
 }
 
@@ -369,6 +370,7 @@ public enum TagProduct {
 	Post = 189,
 	Tournament = 190,
 	Couch = 191,
+	Match = 192,
 	New = 201,
 	KindOfNew = 202,
 	Used = 203,

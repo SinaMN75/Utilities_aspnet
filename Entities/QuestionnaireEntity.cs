@@ -47,6 +47,7 @@ public class QuestionnaireHistoryQa {
 	public required string Answer { get; set; }
 	public required string Value { get; set; }
 	public required int Point { get; set; }
+	public required string CategoryId { get; set; }
 }
 
 public class QuestionnaireCreateDto {
