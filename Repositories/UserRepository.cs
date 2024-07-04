@@ -41,6 +41,8 @@ public class UserRepository(
 				Id = x.Id,
 				FirstName = x.FirstName,
 				LastName = x.LastName,
+				Title = x.Title,
+				Subtitle = x.Subtitle,
 				FullName = x.FullName,
 				Headline = x.Headline,
 				Bio = x.Bio,
@@ -414,6 +416,8 @@ public class UserRepository(
 		if (dto.FirstName is not null) entity.FirstName = dto.FirstName;
 		if (dto.LastName is not null) entity.LastName = dto.LastName;
 		if (dto.FullName is not null) entity.FullName = dto.FullName;
+		if (dto.Title is not null) entity.Title = dto.Title;
+		if (dto.Subtitle is not null) entity.Subtitle = dto.Subtitle;
 		if (dto.Bio is not null) entity.Bio = dto.Bio;
 		if (dto.AppUserName is not null) entity.AppUserName = dto.AppUserName;
 		if (dto.PhoneNumber is not null) entity.PhoneNumber = dto.PhoneNumber;

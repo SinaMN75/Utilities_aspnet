@@ -13,6 +13,12 @@ public class UserEntity {
 
 	[MaxLength(50)]
 	public string? FullName { get; set; }
+	
+	[MaxLength(50)]
+	public string? Title { get; set; }
+	
+	[MaxLength(50)]
+	public string? Subtitle { get; set; }
 
 	[MaxLength(100)]
 	public string? Headline { get; set; }
@@ -182,6 +188,8 @@ public class UserCreateUpdateDto {
 	public string? Email { get; set; }
 	public string? FirstName { get; set; }
 	public string? UserName { get; set; }
+	public string? Title { get; set; }
+	public string? Subtitle { get; set; }
 	public string? PhoneNumber { get; set; }
 	public string? LastName { get; set; }
 	public string? FullName { get; set; }
