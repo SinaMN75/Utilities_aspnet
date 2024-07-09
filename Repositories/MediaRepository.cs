@@ -18,7 +18,7 @@ public class MediaRepository(
 		List<MediaEntity> medias = [];
 
 		if (model.File is not null) {
-			List<string> allowedExtensions = [".png", ".gif", ".jpg", ".jpeg", ".mp4", ".mp3", ".pdf", ".aac", ".apk", ".zip", ".rar", ".mkv"];
+			List<string> allowedExtensions = [".png", ".gif", ".jpg", ".jpeg",".svg", ".mp4", ".mp3", ".pdf", ".aac", ".apk", ".zip", ".rar", ".mkv"];
 			if (!allowedExtensions.Contains(Path.GetExtension(model.File!.FileName.ToLower())))
 				return new GenericResponse<IEnumerable<MediaEntity>?>(null, UtilitiesStatusCodes.BadRequest);
 
