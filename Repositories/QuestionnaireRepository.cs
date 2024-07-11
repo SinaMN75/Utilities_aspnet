@@ -19,7 +19,7 @@ public class QuestionnaireRepository(DbContext dbContext, IHttpContextAccessor h
 			CreatedAt = DateTime.UtcNow,
 			Question = dto.Question,
 			Title = dto.Title,
-			Tags = dto.Tags,
+			Tag = dto.Tag
 		};
 		
 		if (dto.Categories.IsNotNull()) {
@@ -42,7 +42,7 @@ public class QuestionnaireRepository(DbContext dbContext, IHttpContextAccessor h
 		e.UpdatedAt = DateTime.UtcNow;
 		if (dto.Title is not null) e.Title = dto.Title;
 		if (dto.Question is not null) e.Title = dto.Question;
-		if (dto.Tags is not null) e.Tags = dto.Tags;
+		if (dto.Tag is not null) e.Tag = dto.Tag;
 
 		dbContext.Update(e);
 		await dbContext.SaveChangesAsync(ct);
@@ -61,7 +61,7 @@ public class QuestionnaireRepository(DbContext dbContext, IHttpContextAccessor h
 			UpdatedAt = x.UpdatedAt,
 			Title = x.Title,
 			Question = x.Question,
-			Tags = x.Tags,
+			Tag = x.Tag,
 			Categories = x.Categories!.Select(y => new CategoryEntity {
 				Id = y.Id,
 				CreatedAt = y.CreatedAt,

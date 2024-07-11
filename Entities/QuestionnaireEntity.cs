@@ -11,7 +11,7 @@ public class QuestionnaireEntity : BaseEntity {
 	[JsonIgnore]
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
 	
-	public required List<TagQuestionnaire> Tags { get; set; }
+	public required string Tag { get; set; }
 	
 }
 
@@ -54,14 +54,14 @@ public class QuestionnaireCreateDto {
 	public required string Title { get; set; }
 	public required string Question { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
-	public required List<TagQuestionnaire> Tags { get; set; }
+	public required string Tag { get; set; }
 }
 
 public class QuestionnaireUpdateDto {
 	public required Guid Id { get; set; }
 	public string? Title { get; set; }
 	public string? Question { get; set; }
-	public List<TagQuestionnaire>? Tags { get; set; }
+	public string? Tag { get; set; }
 }
 
 public class QuestionnaireAnswerCreateDto {

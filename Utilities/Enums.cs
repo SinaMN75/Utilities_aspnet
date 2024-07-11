@@ -222,6 +222,7 @@ public enum TagCategory {
 	Recommended = 184,
 	Sport = 185,
 	Couch = 186,
+	Questionnaire = 187,
 	Enabled = 201
 }
 
@@ -251,11 +252,6 @@ public enum TagComment {
 	InQueue = 101,
 	Rejected = 102,
 	Private = 501
-}
-
-public enum TagQuestionnaire {
-	Teacher = 100,
-	Student = 101
 }
 
 public enum TagMedia {
