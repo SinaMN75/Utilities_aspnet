@@ -462,6 +462,9 @@ public class UserRepository(
 		if (dto.Color is not null) entity.JsonDetail.Color = dto.Color;
 		if (dto.PrivacyType is not null) entity.JsonDetail.PrivacyType = dto.PrivacyType;
 		if (dto.FcmToken is not null) entity.JsonDetail.FcmToken = dto.FcmToken;
+		if (dto.HouseholdNumber is not null) entity.JsonDetail.HouseholdNumber = dto.HouseholdNumber;
+		if (dto.UniqueId is not null) entity.JsonDetail.UniqueId = dto.UniqueId;
+		if (dto.PassportNumber is not null) entity.JsonDetail.PassportNumber = dto.PassportNumber;
 		if (dto.ShebaNumber is not null) entity.JsonDetail.ShebaNumber = dto.ShebaNumber;
 		if (dto.LegalAuthenticationType is not null) entity.JsonDetail.LegalAuthenticationType = dto.LegalAuthenticationType;
 		if (dto.Degree is not null) entity.JsonDetail.Degree = dto.Degree;
