@@ -411,6 +411,7 @@ public enum TagUser {
 	Authorized = 100,
 	Private = 101,
 	Public = 102,
+	AwaitingAuthorization = 103,
 	Male = 200,
 	Female = 201,
 	Unknown = 202,
@@ -443,7 +444,7 @@ public enum TagUser {
 	BuysPrivate = 407,
 	SellsPrivate = 408,
 	FollowingsPrivate = 409,
-	FollowersPrivate = 410
+	FollowersPrivate = 410,
 }
 
 public enum TagPayment {
