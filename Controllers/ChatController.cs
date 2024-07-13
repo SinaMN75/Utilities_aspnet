@@ -27,8 +27,8 @@ public class ChatController(IChatRepository repository) : BaseApiController {
 		Result(await repository.CreateGroupChatMessage(dto));
 	
 	[HttpPost("FilterGroupChatMessages")]
-	public ActionResult<GenericResponse<GroupChatMessageEntity?>> FilterChatMessages(FilterGroupChatMessagesDto dto) =>
-		Result(repository.FilterGroupChatMessages(dto));
+	public async Task<ActionResult<GenericResponse<GroupChatMessageEntity?>>> FilterChatMessages(FilterGroupChatMessagesDto dto) =>
+		Result(await repository.FilterGroupChatMessages(dto));
 
 	[HttpPost("SeenGroupChatMessage/{id:guid}")]
 	public async Task<ActionResult<GenericResponse>> SeenGroupChatMesDeleteGroupChatsage(Guid id) => Result(await repository.SeenGroupChatMessage(id));
