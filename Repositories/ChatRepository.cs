@@ -105,7 +105,8 @@ public class ChatRepository(
 
 	public async Task<GenericResponse<GroupChatMessageEntity?>> CreateGroupChatMessage(GroupChatMessageCreateUpdateDto dto) {
 		List<ProductEntity?> products = [];
-		foreach (Guid id in dto.Products ?? new List<Guid>()) products.Add(await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id));
+		foreach (Guid id in dto.Products ?? new List<Guid>())
+			products.Add(await dbContext.Set<ProductEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == id));
 
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
@@ -118,7 +119,7 @@ public class ChatRepository(
 			ParentId = dto.ParentId,
 			UserId = _userId,
 			Products = products,
-			ForwardedMessageId = dto.ForwardedMessageId
+			ForwardedMessageId = dto.ForwardedMessageId,
 		};
 
 		EntityEntry<GroupChatMessageEntity> e = await dbContext.Set<GroupChatMessageEntity>().AddAsync(entity);
@@ -300,21 +301,21 @@ public class ChatRepository(
 		int totalCount = q.Count();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
-		List<GroupChatMessageEntity> tempGroupChatsMessage = await q.ToListAsync();
-		IQueryable<SeenUsers> messageSeen = dbContext.Set<SeenUsers>().Where(w => w.FkGroupChat == dto.GroupChatId);
-		foreach (GroupChatMessageEntity? item in tempGroupChatsMessage) {
-			List<UserEntity> usersMessage = [];
-			foreach (SeenUsers? seenTbl in messageSeen) {
-				GroupChatMessageEntity? lastMessageThatUserSaw = q.FirstOrDefault(f => f.Id == seenTbl.FkGroupChatMessage);
-				UserEntity? user = dbContext.Set<UserEntity>().Where(w => w.Id == seenTbl.FkUserId).Include(x => x.Media).FirstOrDefault();
-				if (user is not null && (lastMessageThatUserSaw?.CreatedAt > item.CreatedAt || lastMessageThatUserSaw?.Id == item.Id))
-					usersMessage.Add(user);
-			}
+		// List<GroupChatMessageEntity> tempGroupChatsMessage = await q.ToListAsync();
+		// IQueryable<SeenUsers> messageSeen = dbContext.Set<SeenUsers>().Where(w => w.FkGroupChat == dto.GroupChatId);
+		// foreach (GroupChatMessageEntity? item in tempGroupChatsMessage) {
+		// 	List<UserEntity> usersMessage = [];
+		// 	foreach (SeenUsers? seenTbl in messageSeen) {
+		// 		GroupChatMessageEntity? lastMessageThatUserSaw = await q.FirstOrDefaultAsync(f => f.Id == seenTbl.FkGroupChatMessage);
+		// 		UserEntity? user = await dbContext.Set<UserEntity>().Where(w => w.Id == seenTbl.FkUserId).Include(x => x.Media).FirstOrDefaultAsync();
+		// 		if (user is not null && (lastMessageThatUserSaw?.CreatedAt > item.CreatedAt || lastMessageThatUserSaw?.Id == item.Id))
+		// 			usersMessage.Add(user);
+		// 	}
+		//
+		// 	item.MessageSeenBy = usersMessage;
+		// }
 
-			item.MessageSeenBy = usersMessage;
-		}
-
-		return new GenericResponse<IEnumerable<GroupChatMessageEntity>?>(tempGroupChatsMessage) {
+		return new GenericResponse<IEnumerable<GroupChatMessageEntity>?>(q) {
 			TotalCount = totalCount,
 			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
 			PageSize = dto.PageSize
