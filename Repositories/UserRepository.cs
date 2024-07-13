@@ -463,6 +463,7 @@ public class UserRepository(
 		if (dto.PrivacyType is not null) entity.JsonDetail.PrivacyType = dto.PrivacyType;
 		if (dto.FcmToken is not null) entity.JsonDetail.FcmToken = dto.FcmToken;
 		if (dto.HouseholdNumber is not null) entity.JsonDetail.HouseholdNumber = dto.HouseholdNumber;
+		if (dto.RegistrationNumber is not null) entity.JsonDetail.RegistrationNumber = dto.RegistrationNumber;
 		if (dto.UniqueId is not null) entity.JsonDetail.UniqueId = dto.UniqueId;
 		if (dto.PassportNumber is not null) entity.JsonDetail.PassportNumber = dto.PassportNumber;
 		if (dto.ShebaNumber is not null) entity.JsonDetail.ShebaNumber = dto.ShebaNumber;
@@ -474,6 +475,8 @@ public class UserRepository(
 		if (dto.DeliveryPrice2 is not null) entity.JsonDetail.DeliveryPrice2 = dto.DeliveryPrice2;
 		if (dto.DeliveryPrice3 is not null) entity.JsonDetail.DeliveryPrice3 = dto.DeliveryPrice3;
 		if (dto.StringList is not null) entity.JsonDetail.StringList = dto.StringList;
+		if (dto.PostalCode is not null) entity.JsonDetail.PostalCode = dto.PostalCode;
+		if (dto.LandlinePhone is not null) entity.JsonDetail.LandlinePhone = dto.LandlinePhone;
 
 		if (dto.Categories.IsNotNull()) {
 			List<CategoryEntity> list = [];

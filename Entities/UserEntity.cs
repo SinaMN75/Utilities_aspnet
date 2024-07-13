@@ -132,6 +132,9 @@ public class UserJsonDetail {
 	public string? Address { get; set; }
 	public string? FatherName { get; set; }
 	public string? NationalCode { get; set; }
+	public string? RegistrationNumber { get; set; }
+	public string? PostalCode { get; set; }
+	public string? LandlinePhone { get; set; }
 	public string? SchoolName { get; set; }
 	public string? Height { get; set; }
 	public string? Weight { get; set; }
@@ -213,6 +216,9 @@ public class UserCreateUpdateDto {
 	public string? BlockedUsers { get; set; }
 	public string? Instagram { get; set; }
 	public string? Telegram { get; set; }
+	public string? RegistrationNumber { get; set; }
+	public string? PostalCode { get; set; }
+	public string? LandlinePhone { get; set; }
 	public string? JobStatus { get; set; }
 	public string? WhatsApp { get; set; }
 	public string? LinkedIn { get; set; }
