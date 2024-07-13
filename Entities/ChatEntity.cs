@@ -100,14 +100,6 @@ public class GroupChatFilterDto : BaseFilterDto {
 	public DateTime? EndDate { get; set; }
 }
 
-public class ChatCreateUpdateDto {
-	public Guid? Id { get; set; }
-	public string? UserId { get; set; }
-	public string? MessageText { get; set; }
-	public IEnumerable<Guid>? Products { get; set; }
-	public Guid? ParentId { get; set; }
-}
-
 public class GroupChatCreateUpdateDto {
 	public Guid? Id { get; set; }
 	public string? Title { get; set; }
