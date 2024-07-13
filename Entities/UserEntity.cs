@@ -152,6 +152,7 @@ public class UserJsonDetail {
 	public NationalityType? NationalityType { get; set; }
 	public List<UserSubscriptions>? UserSubscriptions { get; set; } = [];
 	public List<KeyValue>? KeyValues1 { get; set; } = [];
+	public List<string> StringList { get; set; } = [];
 }
 
 public class UserSubscriptions {
@@ -252,6 +253,7 @@ public class UserCreateUpdateDto {
 	public IEnumerable<Guid>? Categories { get; set; }
 	public List<TagUser>? Tags { get; set; }
 	public List<KeyValue>? KeyValues { get; set; }
+	public List<string>? StringList { get; set; }
 }
 
 public class UserFilterDto : BaseFilterDto {

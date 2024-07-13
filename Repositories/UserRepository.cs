@@ -473,6 +473,7 @@ public class UserRepository(
 		if (dto.DeliveryPrice1 is not null) entity.JsonDetail.DeliveryPrice1 = dto.DeliveryPrice1;
 		if (dto.DeliveryPrice2 is not null) entity.JsonDetail.DeliveryPrice2 = dto.DeliveryPrice2;
 		if (dto.DeliveryPrice3 is not null) entity.JsonDetail.DeliveryPrice3 = dto.DeliveryPrice3;
+		if (dto.StringList is not null) entity.JsonDetail.StringList = dto.StringList;
 
 		if (dto.Categories.IsNotNull()) {
 			List<CategoryEntity> list = [];
