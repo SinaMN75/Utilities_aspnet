@@ -3,6 +3,7 @@ namespace Utilities_aspnet.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
+[ApiKey]
 public class TransactionController(ITransactionRepository repository) : BaseApiController {
 	[HttpPost]
 	public async Task<ActionResult<GenericResponse<IQueryable<TransactionEntity>>>> Create(TransactionCreateDto dto, CancellationToken ct)

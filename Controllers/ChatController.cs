@@ -3,6 +3,7 @@ namespace Utilities_aspnet.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/[controller]")]
+[ApiKey]
 public class ChatController(IChatRepository repository) : BaseApiController {
 	[HttpPost("CreateGroupChat")]
 	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> CreateGroupChat(GroupChatCreateUpdateDto dto) =>
@@ -21,18 +22,7 @@ public class ChatController(IChatRepository repository) : BaseApiController {
 	[HttpPost("CreateGroupChatMessage")]
 	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> CreateGroupChatMessage(GroupChatMessageCreateUpdateDto dto) =>
 		Result(await repository.CreateGroupChatMessage(dto));
-
-	[HttpGet("ReadMyGroupChats")]
-	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> ReadMyGroupChats() => Result(await repository.ReadMyGroupChats());
-
-	[HttpGet("ReadGroupChatMessages/{id:guid}")]
-	public ActionResult<GenericResponse<GroupChatMessageEntity?>> ReadGroupChatMessages(
-		Guid id,
-		[FromQuery] int pageSize = 100,
-		[FromQuery] int pageNumber = 1,
-		[FromQuery] string message = ""
-	) => Result(repository.ReadGroupChatMessages(id, pageSize, pageNumber, message));
-
+	
 	[HttpPost("FilterGroupChatMessages")]
 	public ActionResult<GenericResponse<GroupChatMessageEntity?>> FilterChatMessages(FilterGroupChatMessagesDto dto) =>
 		Result(repository.FilterGroupChatMessages(dto));

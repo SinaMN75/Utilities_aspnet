@@ -2,6 +2,7 @@ namespace Utilities_aspnet.Controllers;
 
 [ApiController]
 [Route("api/user")]
+[ApiKey]
 public class UserController(IUserRepository repository) : BaseApiController {
 	[HttpPost]
 	public async Task<ActionResult<GenericResponse<UserEntity>>> Create(UserCreateUpdateDto dto) => Result(await repository.Create(dto));

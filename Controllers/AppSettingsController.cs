@@ -2,6 +2,7 @@
 
 [ApiController]
 [Route("api/[controller]")]
+[ApiKey]
 public class AppSettingsController(IAppSettingsRepository repository) : BaseApiController {
 	[HttpGet]
 	public ActionResult<GenericResponse<EnumDto>> Read() => repository.ReadAppSettings();

@@ -2,6 +2,7 @@ namespace Utilities_aspnet.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[ApiKey]
 public class OrderController(IOrderRepository repository) : BaseApiController {
 	[HttpPut]
 	[Authorize]

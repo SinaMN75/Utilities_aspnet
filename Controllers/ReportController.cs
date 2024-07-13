@@ -3,6 +3,7 @@
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
+[ApiKey]
 public class ReportController(IReportRepository repository) : BaseApiController {
 	[HttpPost("Filter")]
 	public ActionResult<GenericResponse<IEnumerable<ReportEntity>>> Filter() => Result(repository.Filter());

@@ -2,6 +2,7 @@
 
 [ApiController]
 [Route("api/[controller]")]
+[ApiKey]
 public class MediaController(IMediaRepository repository) : BaseApiController {
 	[HttpPost]
 	[Authorize]

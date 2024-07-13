@@ -3,6 +3,7 @@ namespace Utilities_aspnet.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
+[ApiKey]
 public class DiscountController(IDiscountRepository repository) : BaseApiController {
 	[HttpPost]
 	public async Task<ActionResult<GenericResponse<DiscountEntity>>> Create(DiscountEntity dto) => Result(await repository.Create(dto));

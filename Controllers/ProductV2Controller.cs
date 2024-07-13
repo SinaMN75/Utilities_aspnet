@@ -2,6 +2,7 @@ namespace Utilities_aspnet.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[ApiKey]
 public class ProductV2Controller(IProductRepository repository) : BaseApiController {
 	[HttpPost]
 	[Authorize]

@@ -2,6 +2,7 @@ namespace Utilities_aspnet.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[ApiKey]
 public class ContentController(IContentRepository repository) : BaseApiController {
 	[HttpGet]
 	public ActionResult<GenericResponse<IQueryable<ContentEntity>>> Read() => Result(repository.Read());

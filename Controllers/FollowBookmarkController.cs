@@ -2,6 +2,7 @@
 
 [ApiController]
 [Route("api/[controller]")]
+[ApiKey]
 public class FollowBookmarkController(IFollowBookmarkRepository repository) : BaseApiController {
 	[HttpPost("ReadFollowers/{userId}")]
 	[Authorize]

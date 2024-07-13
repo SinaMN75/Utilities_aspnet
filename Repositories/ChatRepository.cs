@@ -6,12 +6,10 @@ public interface IChatRepository {
 	Task<GenericResponse<GroupChatEntity?>> UpdateGroupChat(GroupChatCreateUpdateDto dto);
 	Task<GenericResponse> DeleteGroupChat(Guid id);
 	Task<GenericResponse<GroupChatMessageEntity?>> CreateGroupChatMessage(GroupChatMessageCreateUpdateDto dto);
-	Task<GenericResponse<IEnumerable<GroupChatEntity>?>> ReadMyGroupChats();
+	GenericResponse<IQueryable<GroupChatMessageEntity>?> FilterGroupChatMessages(FilterGroupChatMessagesDto dto);
+	Task<GenericResponse<GroupChatEntity>> ReadGroupChatById(Guid id);
 	Task<GenericResponse<GroupChatMessageEntity?>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto);
 	Task<GenericResponse> DeleteGroupChatMessage(Guid id);
-	Task<GenericResponse<GroupChatEntity>> ReadGroupChatById(Guid id);
-	GenericResponse<IQueryable<GroupChatMessageEntity>?> ReadGroupChatMessages(Guid id, int pageSize, int pageNumber, string message = "");
-	GenericResponse<IQueryable<GroupChatMessageEntity>?> FilterGroupChatMessages(FilterGroupChatMessagesDto dto);
 	Task<GenericResponse> SeenGroupChatMessage(Guid messageId);
 	Task<GenericResponse> ExitFromGroup(Guid id);
 	Task<GenericResponse> Mute(Guid id);
@@ -119,7 +117,6 @@ public class ChatRepository(
 			ParentId = dto.ParentId,
 			UserId = _userId,
 			Products = products,
-			ForwardedMessageId = dto.ForwardedMessageId
 		};
 
 		EntityEntry<GroupChatMessageEntity> e = await dbContext.Set<GroupChatMessageEntity>().AddAsync(entity);
@@ -144,46 +141,6 @@ public class ChatRepository(
 
 		await dbContext.SaveChangesAsync();
 		return new GenericResponse<GroupChatMessageEntity?>(e.Entity);
-	}
-
-	public async Task<GenericResponse<IEnumerable<GroupChatEntity>?>> ReadMyGroupChats() {
-		await DeleteEmptyGroups();
-		List<GroupChatEntity> e = await dbContext.Set<GroupChatEntity>()
-			.Where(x => x.Users!.Any(y => y.Id == _userId))
-			.Include(x => x.Users)!.ThenInclude(x => x.Media)
-			.Include(x => x.Media)
-			.Include(x => x.GroupChatMessage!.OrderByDescending(y => y.CreatedAt).Take(1)).ThenInclude(x => x.Media)
-			.ToListAsync();
-
-		foreach (GroupChatEntity groupChatEntity in e.Where(groupChatEntity => groupChatEntity.Type == ChatType.Private))
-			if (groupChatEntity.Users!.First().Id == _userId) {
-				UserEntity u = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == groupChatEntity.Users!.Last().Id))!;
-				groupChatEntity.Title = u.AppUserName;
-			}
-			else {
-				UserEntity u = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == groupChatEntity.Users!.First().Id))!;
-				groupChatEntity.Title = u.AppUserName;
-			}
-
-		List<GroupChatEntity> myGroupChats = [];
-
-		foreach (GroupChatEntity? item in e) {
-			int countOfMessage;
-			SeenUsers? seenUsers = dbContext.Set<SeenUsers>().FirstOrDefault(w => w.FkGroupChat == item.Id && w.FkUserId == _userId);
-			IQueryable<GroupChatMessageEntity> groupChatMessages = dbContext.Set<GroupChatMessageEntity>().Where(w => w.GroupChatId == item.Id);
-			if (seenUsers is null) {
-				countOfMessage = groupChatMessages.Count();
-			}
-			else {
-				GroupChatMessageEntity lastSeenMessage = (await groupChatMessages.Where(w => w.Id == seenUsers.FkGroupChatMessage!.Value).FirstOrDefaultAsync())!;
-				countOfMessage = await groupChatMessages.Where(w => w.CreatedAt > lastSeenMessage.CreatedAt).CountAsync();
-			}
-
-			item.CountOfUnreadMessages = countOfMessage;
-			myGroupChats.Add(item);
-		}
-
-		return new GenericResponse<IEnumerable<GroupChatEntity>?>(myGroupChats);
 	}
 
 	public async Task<GenericResponse<GroupChatMessageEntity?>> UpdateGroupChatMessage(GroupChatMessageCreateUpdateDto dto) {
@@ -274,50 +231,7 @@ public class ChatRepository(
 
 		return new GenericResponse<GroupChatEntity>(e);
 	}
-
-	public GenericResponse<IQueryable<GroupChatMessageEntity>?> ReadGroupChatMessages(Guid id, int pageSize, int pageNumber, string message) {
-		IQueryable<GroupChatMessageEntity> q = dbContext.Set<GroupChatMessageEntity>()
-			.Where(x => x.GroupChatId == id)
-			.Where(x => (x.Message ?? "").Contains(message))
-			.Include(x => x.Media)
-			.Include(x => x.Products)!.ThenInclude(x => x!.Media)
-			.Include(x => x.Products)!.ThenInclude(x => x!.User).ThenInclude(x => x!.Media)
-			.Include(x => x.Parent).ThenInclude(x => x!.Media)
-			.Include(x => x.Parent).ThenInclude(x => x!.Products)!.ThenInclude(x => x!.Media)
-			.Include(x => x.Parent).ThenInclude(x => x!.User).ThenInclude(x => x!.Media)
-			.Include(x => x.User).ThenInclude(x => x!.Media)
-			.Include(x => x.ForwardedMessage).ThenInclude(x => x!.Media)
-			.Include(x => x.ForwardedMessage).ThenInclude(x => x!.Products)!.ThenInclude(x => x!.Media)
-			.Include(x => x.ForwardedMessage).ThenInclude(x => x!.Parent).ThenInclude(x => x!.Media)
-			.Include(x => x.ForwardedMessage).ThenInclude(x => x!.User).ThenInclude(x => x!.Media)
-			.OrderBy(o => o.CreatedAt)
-			.Reverse()
-			.AsNoTracking();
-
-		int totalCount = q.Count();
-		q = q.Skip((pageNumber - 1) * pageSize).Take(pageSize);
-
-		List<GroupChatMessageEntity> tempGroupChatsMessage = q.ToList();
-		IQueryable<SeenUsers> messageSeen = dbContext.Set<SeenUsers>().Where(w => w.FkGroupChat == id);
-		foreach (GroupChatMessageEntity? item in tempGroupChatsMessage) {
-			List<UserEntity> usersMessage = [];
-			foreach (SeenUsers? seenTbl in messageSeen) {
-				GroupChatMessageEntity? lastMessageThatUserSaw = q.FirstOrDefault(f => f.Id == seenTbl.FkGroupChatMessage);
-				UserEntity? user = dbContext.Set<UserEntity>().Where(w => w.Id == seenTbl.FkUserId).Include(x => x.Media).FirstOrDefault();
-				if (user is not null && (lastMessageThatUserSaw?.CreatedAt > item.CreatedAt || lastMessageThatUserSaw?.Id == item.Id))
-					usersMessage.Add(user);
-			}
-
-			item.MessageSeenBy = usersMessage;
-		}
-
-		return new GenericResponse<IQueryable<GroupChatMessageEntity>?>(tempGroupChatsMessage.AsQueryable()) {
-			TotalCount = totalCount,
-			PageCount = totalCount % pageSize == 0 ? totalCount / pageSize : totalCount / pageSize + 1,
-			PageSize = pageSize
-		};
-	}
-
+	
 	public GenericResponse<IQueryable<GroupChatMessageEntity>?> FilterGroupChatMessages(FilterGroupChatMessagesDto dto) {
 		IQueryable<GroupChatMessageEntity> q = dbContext.Set<GroupChatMessageEntity>()
 			.Include(x => x.Media)

@@ -3,6 +3,7 @@
 [ApiController]
 [Route("api/questionnaire")]
 [Authorize]
+[ApiKey]
 public class QuestionnaireController(IQuestionnaireRepository repository) : BaseApiController {
 	[HttpPost("Questionnaire")]
 	public async Task<ActionResult<GenericResponse<QuestionnaireEntity>>> CreateQuestionnaire(QuestionnaireCreateDto dto, CancellationToken ct) =>

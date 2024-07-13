@@ -3,6 +3,7 @@
 [ApiController]
 [Route("api/payment")]
 [Authorize]
+[ApiKey]
 public class PaymentController(IPaymentRepository repository) : BaseApiController {
 	[HttpPost("payNG")]
 	public async Task<ActionResult<GenericResponse<NgHostedResponse>>> PayNg(NgPayDto dto) =>
