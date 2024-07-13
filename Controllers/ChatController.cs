@@ -15,6 +15,9 @@ public class ChatController(IChatRepository repository) : BaseApiController {
 	[HttpPut("UpdateGroupChat")]
 	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> UpdateGroupChat(GroupChatCreateUpdateDto dto) =>
 		Result(await repository.UpdateGroupChat(dto));
+	
+	[HttpGet("ReadMyGroupChats")]
+	public async Task<ActionResult<GenericResponse<GroupChatEntity?>>> ReadMyGroupChats() => Result(await repository.ReadMyGroupChats());
 
 	[HttpDelete("DeleteGroupChat/{id:guid}")]
 	public async Task<ActionResult<GenericResponse>> DeleteGroupChat(Guid id) => Result(await repository.DeleteGroupChat(id));
