@@ -4,6 +4,7 @@ public interface IPaymentRepository {
 	Task<GenericResponse<string>> IncreaseWalletBalance(long amount);
 	Task<GenericResponse<string?>> PayOrder(Guid orderId);
 	Task<GenericResponse<NgHostedResponse>> PayNg(NgPayDto dto);
+	Task<GenericResponse<ZibalRequestReadDto>> PayZibal(NgPayDto dto);
 	Task<GenericResponse<NgVerifyResponse>> VerifyNg(string outlet, string id);
 	Task<GenericResponse> CallBack(int tagPayment, string id, long trackId);
 	Task<GenericResponse> CallBackPremiumFake(int tagPayment, string id, long trackId);
@@ -65,7 +66,17 @@ public class PaymentRepository : IPaymentRepository {
 
 	public async Task<GenericResponse<NgHostedResponse>> PayNg(NgPayDto dto) =>
 		new((await PaymentDataSource.PayNGenius(dto))!);
-	
+
+	public async Task<GenericResponse<ZibalRequestReadDto>> PayZibal(NgPayDto dto) {
+		ZibalRequestReadDto response = (await PaymentDataSource.PayZibal(new ZibalRequestCreateDto {
+			Merchant = dto.Outlet,
+			Amount = dto.Amount ?? 0,
+			CallbackUrl = dto.RedirectUrl
+		}))!;
+
+		return new GenericResponse<ZibalRequestReadDto>(response);
+	}
+
 	public async Task<GenericResponse<NgVerifyResponse>> VerifyNg(string outlet, string id) =>
 		new((await PaymentDataSource.GetOrderStatus(outlet, id))!);
 

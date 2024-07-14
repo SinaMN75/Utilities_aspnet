@@ -8,6 +8,10 @@ public class PaymentController(IPaymentRepository repository) : BaseApiControlle
 	[HttpPost("payNG")]
 	public async Task<ActionResult<GenericResponse<NgHostedResponse>>> PayNg(NgPayDto dto) =>
 		Result(await repository.PayNg(dto));
+	
+	[HttpPost("payZibal")]
+	public async Task<ActionResult<GenericResponse<NgHostedResponse>>> PayZibal(NgPayDto dto) =>
+		Result(await repository.PayZibal(dto));
 
 	[HttpPost("verifyNG/{outlet}/{id}")]
 	public async Task<ActionResult<GenericResponse<NgHostedResponse>>> VerifyNg(string outlet, string id) =>
