@@ -70,7 +70,7 @@ public class PaymentRepository : IPaymentRepository {
 	public async Task<GenericResponse<ZibalRequestReadDto>> PayZibal(NgPayDto dto) {
 		ZibalRequestReadDto response = (await PaymentDataSource.PayZibal(new ZibalRequestCreateDto {
 			Merchant = dto.Outlet,
-			Amount = dto.Amount ?? 0,
+			Amount = dto.Amount,
 			CallbackUrl = dto.RedirectUrl
 		}))!;
 

@@ -97,7 +97,7 @@ public class NgPayDto {
 	public string? Outlet { get; set; }
 	public string? Currency { get; set; }
 	public string? RedirectUrl { get; set; }
-	public long? Amount { get; set; }
+	public long Amount { get; set; }
 	public bool? SkipConfirmationPage { get; set; }
 }
 
