@@ -52,7 +52,8 @@ public class UserRepository(
 				PhoneNumber = x.PhoneNumber,
 				AppEmail = x.AppEmail,
 				Email = x.Email,
-				Region = x.Region,
+				Country = x.Country,
+				City = x.City,
 				State = x.State,
 				Badge = x.Badge,
 				JobStatus = x.JobStatus,
@@ -131,7 +132,8 @@ public class UserRepository(
 		if (dto.Gender != null) q = q.Where(x => x.Gender == dto.Gender);
 		if (dto.Headline.IsNotNullOrEmpty()) q = q.Where(x => x.Headline!.Contains(dto.Headline!));
 		if (dto.JobStatus.IsNotNullOrEmpty()) q = q.Where(x => x.Headline!.Contains(dto.JobStatus!));
-		if (dto.Region.IsNotNullOrEmpty()) q = q.Where(x => x.Region!.Contains(dto.Region!));
+		if (dto.City.IsNotNullOrEmpty()) q = q.Where(x => x.City!.Contains(dto.City!));
+		if (dto.Country.IsNotNullOrEmpty()) q = q.Where(x => x.Country!.Contains(dto.Country!));
 		if (dto.State.IsNotNullOrEmpty()) q = q.Where(x => x.State!.Contains(dto.State!));
 		if (dto.AppEmail.IsNotNullOrEmpty()) q = q.Where(x => x.AppEmail!.Contains(dto.AppEmail!));
 		if (dto.FirstName.IsNotNullOrEmpty()) q = q.Where(x => x.FirstName!.Contains(dto.FirstName!));
@@ -422,14 +424,15 @@ public class UserRepository(
 		if (dto.AppUserName is not null) entity.AppUserName = dto.AppUserName;
 		if (dto.PhoneNumber is not null) entity.PhoneNumber = dto.PhoneNumber;
 		if (dto.AppEmail is not null) entity.AppEmail = dto.AppEmail;
-		if (dto.Region is not null) entity.Region = dto.Region;
 		if (dto.Suspend is not null) entity.Suspend = dto.Suspend;
 		if (dto.Headline is not null) entity.Headline = dto.Headline;
 		if (dto.AppPhoneNumber is not null) entity.AppPhoneNumber = dto.AppPhoneNumber;
 		if (dto.BirthDate is not null) entity.Birthdate = dto.BirthDate;
 		if (dto.Gender is not null) entity.Gender = dto.Gender;
 		if (dto.Email is not null) entity.Email = dto.Email;
+		if (dto.Country is not null) entity.Country = dto.Country;
 		if (dto.State is not null) entity.State = dto.State;
+		if (dto.City is not null) entity.City = dto.City;
 		if (dto.Point is not null) entity.Point = dto.Point;
 		if (dto.VisitedProducts is not null) entity.VisitedProducts = dto.VisitedProducts;
 		if (dto.BookmarkedProducts is not null) entity.BookmarkedProducts = dto.BookmarkedProducts;

@@ -55,8 +55,9 @@ public class ProductRepository(
 		if (dto.Subtitle.IsNotNullOrEmpty()) q = q.Where(x => (x.Subtitle ?? "").Contains(dto.Subtitle!));
 		if (dto.Description.IsNotNullOrEmpty()) q = q.Where(x => (x.Description ?? "").Contains(dto.Description!));
 		if (dto.State.IsNotNullOrEmpty()) q = q.Where(x => x.State!.Contains(dto.State ?? ""));
-		if (dto.Region.IsNotNullOrEmpty()) q = q.Where(x => x.Region!.Contains(dto.Region ?? ""));
-		if (dto.StateRegion.IsNotNullOrEmpty()) q = q.Where(x => x.Region!.Contains(dto.Region ?? "") || x.State!.Contains(dto.State ?? ""));
+		if (dto.Country.IsNotNullOrEmpty()) q = q.Where(x => x.Country!.Contains(dto.Country ?? ""));
+		if (dto.City.IsNotNullOrEmpty()) q = q.Where(x => x.City!.Contains(dto.City ?? ""));
+		if (dto.StateRegion.IsNotNullOrEmpty()) q = q.Where(x => x.Country!.Contains(dto.Country ?? "") || x.State!.Contains(dto.StateRegion ?? "") || x.City!.Contains(dto.StateRegion ?? ""));
 		if (dto.StartPriceRange.HasValue) q = q.Where(x => x.Price >= dto.StartPriceRange);
 		if (dto.Currency.HasValue) q = q.Where(x => x.Currency == dto.Currency);
 		if (dto.HasDiscount.IsTrue()) q = q.Where(x => x.DiscountPercent != null || x.DiscountPrice != null);
@@ -282,7 +283,8 @@ public static class ProductEntityExtension {
 		if (dto.Title is not null) entity.Title = dto.Title;
 		if (dto.Subtitle is not null) entity.Subtitle = dto.Subtitle;
 		if (dto.State is not null) entity.State = dto.State;
-		if (dto.Region is not null) entity.Region = dto.Region;
+		if (dto.City is not null) entity.City = dto.City;
+		if (dto.Country is not null) entity.Country = dto.Country;
 		if (dto.DiscountPercent is not null) entity.DiscountPercent = dto.DiscountPercent;
 		if (dto.DiscountPrice is not null) entity.DiscountPrice = dto.DiscountPrice;
 		if (dto.Description is not null) entity.Description = dto.Description;

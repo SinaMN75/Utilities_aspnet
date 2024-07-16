@@ -45,10 +45,13 @@ public class UserEntity {
 	public string? Email { get; set; }
 
 	[MaxLength(100)]
-	public string? Region { get; set; }
-
+	public string? Country { get; set; }
+	
 	[MaxLength(100)]
 	public string? State { get; set; }
+	
+	[MaxLength(100)]
+	public string? City { get; set; }
 
 	[MaxLength(100)]
 	public string? Badge { get; set; }
@@ -205,8 +208,9 @@ public class UserCreateUpdateDto {
 	public string? AppUserName { get; set; }
 	public string? AppPhoneNumber { get; set; }
 	public string? AppEmail { get; set; }
-	public string? Region { get; set; }
 	public string? State { get; set; }
+	public string? Country { get; set; }
+	public string? City { get; set; }
 	public string? Badge { get; set; }
 	public string? VisitedProducts { get; set; }
 	public string? BookmarkedProducts { get; set; }
@@ -279,8 +283,9 @@ public class UserFilterDto : BaseFilterDto {
 	public string? AppPhoneNumber { get; set; }
 	public string? AppEmail { get; set; }
 	public GenderType? Gender { get; set; } = null!;
-	public string? Region { get; set; }
 	public string? State { get; set; }
+	public string? Country { get; set; }
+	public string? City { get; set; }
 	public string? Badge { get; set; }
 	public bool? ShowMedia { get; set; }
 	public bool? ShowPremiums { get; set; }

@@ -15,10 +15,13 @@ public class ProductEntity : BaseEntity {
 	public string? Description { get; set; }
 
 	[MaxLength(100)]
+	public string? Country { get; set; }
+	
+	[MaxLength(100)]
 	public string? State { get; set; }
 
 	[MaxLength(100)]
-	public string? Region { get; set; }
+	public string? City { get; set; }
 
 	public double? Latitude { get; set; }
 	public double? Longitude { get; set; }
@@ -164,8 +167,9 @@ public class ProductCreateUpdateDto {
 	public string? Type1 { get; set; }
 	public string? Type2 { get; set; }
 	public string? Unit { get; set; }
+	public string? Country { get; set; }
+	public string? City { get; set; }
 	public string? State { get; set; }
-	public string? Region { get; set; }
 	public string? Color { get; set; }
 	public string? AdminMessage { get; set; }
 	public string? PaymentRefId { get; set; }
@@ -216,7 +220,8 @@ public class ProductFilterDto : BaseFilterDto {
 	public string? Subtitle { get; set; }
 	public string? Description { get; set; }
 	public string? State { get; set; }
-	public string? Region { get; set; }
+	public string? City { get; set; }
+	public string? Country { get; set; }
 	public string? StateRegion { get; set; }
 	public string? Query { get; set; }
 	public long? StartPriceRange { get; set; }
