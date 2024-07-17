@@ -94,10 +94,10 @@ public class MerchantAttributes {
 public class NgPayDto {
 	public string? Action { get; set; }
 	public string? EmailAddress { get; set; }
-	public string? Outlet { get; set; }
+	public required string Outlet { get; set; }
 	public string? Currency { get; set; }
-	public string? RedirectUrl { get; set; }
-	public long Amount { get; set; }
+	public required string RedirectUrl { get; set; }
+	public required long Amount { get; set; }
 	public bool? SkipConfirmationPage { get; set; }
 }
 
@@ -302,6 +302,8 @@ public class ZibalRequestReadDto {
 
 	[JsonProperty("trackId", NullValueHandling = NullValueHandling.Ignore)]
 	public long? TrackId { get; set; }
+
+	public string? PaymentLink => $"https://gateway.zibal.ir/start/{TrackId}";
 
 	public static ZibalRequestReadDto? FromJson(string json) => JsonConvert.DeserializeObject<ZibalRequestReadDto>(json, Converter.Settings);
 
