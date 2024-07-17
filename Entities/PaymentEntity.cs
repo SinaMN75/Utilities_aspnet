@@ -1,3 +1,5 @@
+namespace Utilities_aspnet.Entities;
+
 internal static class Converter {
 	public static readonly JsonSerializerSettings? Settings = new() {
 		MetadataPropertyHandling = MetadataPropertyHandling.Ignore,

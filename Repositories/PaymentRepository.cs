@@ -5,6 +5,7 @@ public interface IPaymentRepository {
 	Task<GenericResponse<string?>> PayOrder(Guid orderId);
 	Task<GenericResponse<NgHostedResponse>> PayNg(NgPayDto dto);
 	Task<GenericResponse<ZibalRequestReadDto>> PayZibal(NgPayDto dto);
+	Task<GenericResponse<ZibalVerifyReadDto>> VerifyZibal(string outlet, string id);
 	Task<GenericResponse<NgVerifyResponse>> VerifyNg(string outlet, string id);
 	Task<GenericResponse> CallBack(int tagPayment, string id, long trackId);
 	Task<GenericResponse> CallBackPremiumFake(int tagPayment, string id, long trackId);
@@ -68,17 +69,31 @@ public class PaymentRepository : IPaymentRepository {
 		new((await PaymentDataSource.PayNGenius(dto))!);
 
 	public async Task<GenericResponse<ZibalRequestReadDto>> PayZibal(NgPayDto dto) {
-		ZibalRequestReadDto response = (await PaymentDataSource.PayZibal(new ZibalRequestCreateDto {
+		RestRequest requestRequest = new("https://gateway.zibal.ir/v1/request", Method.POST);
+		requestRequest.AddJsonBody(ZibalRequestCreateDto.ToJson(new ZibalRequestCreateDto {
 			Merchant = dto.Outlet,
 			Amount = dto.Amount,
 			CallbackUrl = dto.RedirectUrl
-		}))!;
+		}));
+		requestRequest.AddHeader("Content-Type", "application/json");
 
-		return new GenericResponse<ZibalRequestReadDto>(response);
+		IRestResponse responseRequest = await new RestClient().ExecuteAsync(requestRequest);
+		return new GenericResponse<ZibalRequestReadDto>(ZibalRequestReadDto.FromJson(responseRequest.Content)!);
+	}
+
+	public async Task<GenericResponse<ZibalVerifyReadDto>> VerifyZibal(string outlet, string id) {
+		RestRequest requestRequest = new("https://gateway.zibal.ir/v1/verify", Method.POST);
+		requestRequest.AddJsonBody(new { merchant = outlet, trackId = id });
+		requestRequest.AddHeader("Content-Type", "application/json");
+
+		IRestResponse responseRequest = await new RestClient().ExecuteAsync(requestRequest);
+
+		Console.WriteLine(responseRequest.Request.Body.Value);
+		return new GenericResponse<ZibalVerifyReadDto>(ZibalVerifyReadDto.FromJson(responseRequest.Content)!);
 	}
 
 	public async Task<GenericResponse<NgVerifyResponse>> VerifyNg(string outlet, string id) =>
-		new((await PaymentDataSource.GetOrderStatus(outlet, id))!);
+		new(await PaymentDataSource.GetOrderStatus(outlet, id));
 
 	public async Task<GenericResponse> CallBack(int tagPayment, string id, long trackId) {
 		long amount = 0;
