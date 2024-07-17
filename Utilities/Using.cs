@@ -34,7 +34,6 @@ global using Microsoft.Extensions.Caching.Distributed;
 global using Utilities_aspnet.Utilities;
 global using Utilities_aspnet.Entities;
 global using Utilities_aspnet.Repositories;
-global using Utilities_aspnet.RemoteDataSource;
 global using Newtonsoft.Json;
 global using Newtonsoft.Json.Serialization;
 global using Newtonsoft.Json.Converters;

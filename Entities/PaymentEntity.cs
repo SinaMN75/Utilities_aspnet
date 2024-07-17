@@ -18,9 +18,6 @@ public class NgVerifyResponse {
 	[JsonProperty("type")]
 	public string? Type { get; set; }
 
-	[JsonProperty("merchantDefinedData")]
-	public FormattedOrderSummary? MerchantDefinedData { get; set; }
-
 	[JsonProperty("action")]
 	public string? Action { get; set; }
 
@@ -50,9 +47,6 @@ public class NgVerifyResponse {
 
 	[JsonProperty("referrer")]
 	public string? Referrer { get; set; }
-
-	[JsonProperty("formattedOrderSummary")]
-	public FormattedOrderSummary? FormattedOrderSummary { get; set; }
 
 	[JsonProperty("formattedAmount")]
 	public string? FormattedAmount { get; set; }
@@ -130,9 +124,6 @@ public class NgHostedResponse {
 	[JsonProperty("type")]
 	public string? Type { get; set; }
 
-	[JsonProperty("merchantDefinedData")]
-	public FormattedOrderSummary MerchantDefinedData { get; set; }
-
 	[JsonProperty("action")]
 	public string? Action { get; set; }
 
@@ -141,9 +132,6 @@ public class NgHostedResponse {
 
 	[JsonProperty("language")]
 	public string? Language { get; set; }
-
-	[JsonProperty("merchantAttributes")]
-	public FormattedOrderSummary? MerchantAttributes { get; set; }
 
 	[JsonProperty("emailAddress")]
 	public string? EmailAddress { get; set; }
@@ -162,9 +150,6 @@ public class NgHostedResponse {
 
 	[JsonProperty("referrer")]
 	public string? Referrer { get; set; }
-
-	[JsonProperty("formattedOrderSummary")]
-	public FormattedOrderSummary? FormattedOrderSummary { get; set; }
 
 	[JsonProperty("formattedAmount")]
 	public string? FormattedAmount { get; set; }
@@ -240,8 +225,6 @@ public class Cury {
 	public bool? Templated { get; set; }
 }
 
-public class FormattedOrderSummary;
-
 public class NgHostedResponseLinks {
 	[JsonProperty("cancel")]
 	public Cury? Cancel { get; set; }
@@ -270,32 +253,7 @@ public class PaymentMethods {
 	public string[]? Card { get; set; }
 }
 
-public class ZibalRequestCreateDto {
-	[JsonProperty("merchant")]
-	public string? Merchant { get; set; }
-
-	[JsonProperty("amount")]
-	public long Amount { get; set; }
-
-	[JsonProperty("callbackUrl")]
-	public string? CallbackUrl { get; set; }
-
-	public static ZibalRequestCreateDto? FromJson(string json) => JsonConvert.DeserializeObject<ZibalRequestCreateDto>(json, Converter.Settings);
-	public static string ToJson(ZibalRequestCreateDto self) => JsonConvert.SerializeObject(self, Converter.Settings);
-}
-
-public class ZibalVerifyCreateDto {
-	[JsonProperty("merchant")]
-	public required string Merchant { get; set; }
-
-	[JsonProperty("trackId")]
-	public required long TrackId { get; set; }
-
-	public static ZibalVerifyCreateDto? FromJson(string json) => JsonConvert.DeserializeObject<ZibalVerifyCreateDto>(json, Converter.Settings);
-	public static string ToJson(ZibalVerifyCreateDto self) => JsonConvert.SerializeObject(self, Converter.Settings);
-}
-
-public class ZibalRequestReadDto {
+public class ZibalRequestResponse {
 	[JsonProperty("message", NullValueHandling = NullValueHandling.Ignore)]
 	public string? Message { get; set; }
 
@@ -307,12 +265,12 @@ public class ZibalRequestReadDto {
 
 	public string? PaymentLink => $"https://gateway.zibal.ir/start/{TrackId}";
 
-	public static ZibalRequestReadDto? FromJson(string json) => JsonConvert.DeserializeObject<ZibalRequestReadDto>(json, Converter.Settings);
+	public static ZibalRequestResponse? FromJson(string json) => JsonConvert.DeserializeObject<ZibalRequestResponse>(json, Converter.Settings);
 
-	public static string ToJson(ZibalRequestReadDto self) => JsonConvert.SerializeObject(self, Converter.Settings);
+	public static string ToJson(ZibalRequestResponse self) => JsonConvert.SerializeObject(self, Converter.Settings);
 }
 
-public class ZibalVerifyReadDto {
+public class ZibalVerifyResponse {
 	[JsonProperty("message", NullValueHandling = NullValueHandling.Ignore)]
 	public string? Message { get; set; }
 
@@ -340,7 +298,7 @@ public class ZibalVerifyReadDto {
 	[JsonProperty("orderId", NullValueHandling = NullValueHandling.Ignore)]
 	public long? OrderId { get; set; }
 
-	public static ZibalVerifyReadDto? FromJson(string json) => JsonConvert.DeserializeObject<ZibalVerifyReadDto>(json, Converter.Settings);
+	public static ZibalVerifyResponse? FromJson(string json) => JsonConvert.DeserializeObject<ZibalVerifyResponse>(json, Converter.Settings);
 
-	public static string ToJson(ZibalVerifyReadDto self) => JsonConvert.SerializeObject(self, Converter.Settings);
+	public static string ToJson(ZibalVerifyResponse self) => JsonConvert.SerializeObject(self, Converter.Settings);
 }
