@@ -28,6 +28,7 @@ public class CommentRepository(
 		if (dto.ProductOwnerId is not null) q = q.Where(x => x.Product!.UserId == dto.ProductOwnerId);
 		if (dto.Tags is not null) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
 		if (dto.TargetUserId is not null) q = q.Where(x => x.TargetUserId == dto.TargetUserId);
+		if (dto.FromDate is not null) q = q.Where(x => x.CreatedAt > dto.FromDate);
 
 		q = q.Include(x => x.User).ThenInclude(x => x!.Media)
 			.Include(x => x.Media)
