@@ -1,17 +1,25 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
 public interface IDiscountRepository {
-	Task<GenericResponse<DiscountEntity>> Create(DiscountEntity dto);
+	Task<GenericResponse<DiscountEntity>> Create(DiscountCreateDto dto);
 	GenericResponse<IQueryable<DiscountEntity>> Filter(DiscountFilterDto dto);
-	Task<GenericResponse<DiscountEntity?>> Update(DiscountEntity dto);
+	Task<GenericResponse<DiscountEntity?>> Update(DiscountUpdateDto dto);
 	Task<GenericResponse> Delete(Guid id);
 }
 
 public class DiscountRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) : IDiscountRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
-	public async Task<GenericResponse<DiscountEntity>> Create(DiscountEntity dto) {
-		EntityEntry<DiscountEntity> i = await dbContext.AddAsync(dto);
+	public async Task<GenericResponse<DiscountEntity>> Create(DiscountCreateDto dto) {
+		EntityEntry<DiscountEntity> i = await dbContext.AddAsync(new DiscountEntity {
+			Title = dto.Title,
+			Code = dto.Code,
+			DiscountPrice = dto.DiscountPrice,
+			NumberUses = dto.NumberUses,
+			StartDate = dto.StartDate,
+			EndDate = dto.EndDate,
+			UserId = dto.UserId
+		});
 		await dbContext.SaveChangesAsync();
 		return new GenericResponse<DiscountEntity>(i.Entity);
 	}
@@ -36,15 +44,16 @@ public class DiscountRepository(DbContext dbContext, IHttpContextAccessor httpCo
 		};
 	}
 
-	public async Task<GenericResponse<DiscountEntity?>> Update(DiscountEntity dto) {
+	public async Task<GenericResponse<DiscountEntity?>> Update(DiscountUpdateDto dto) {
 		DiscountEntity? e = await dbContext.Set<DiscountEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id);
 
 		if (e == null) return new GenericResponse<DiscountEntity?>(null, UtilitiesStatusCodes.NotFound);
-		e.Title = dto.Title;
-		e.NumberUses = dto.NumberUses;
-		e.Code = dto.Code;
-		e.StartDate = dto.StartDate;
-		e.EndDate = dto.EndDate;
+		if (dto.Title is not null) e.Title = dto.Title;
+		if (dto.NumberUses is not null) e.NumberUses = dto.NumberUses.Value;
+		if (dto.Code is not null) e.Code = dto.Code;
+		if (dto.StartDate is not null) e.StartDate = dto.StartDate.Value;
+		if (dto.EndDate is not null) e.EndDate = dto.EndDate.Value;
+		if (dto.Title is not null) e.Title = dto.Title;
 		e.UpdatedAt = DateTime.UtcNow;
 		await dbContext.SaveChangesAsync();
 		return new GenericResponse<DiscountEntity?>(e);
