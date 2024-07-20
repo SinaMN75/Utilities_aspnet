@@ -40,8 +40,6 @@ public class ProductEntity : BaseEntity {
 	
 	public ProductEntity? Parent { get; set; }
 	public Guid? ParentId { get; set; }
-	public GroupChatMessageEntity? GroupChatMessageEntity { get; set; }
-	public Guid? GroupChatMessageId { get; set; }
 	
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
@@ -64,6 +62,7 @@ public class ProductEntity : BaseEntity {
 	public IEnumerable<CommentEntity>? Comments { get; set; }
 	public IEnumerable<ReportEntity>? Reports { get; set; }
 	public IEnumerable<NotificationEntity>? Notifications { get; set; }
+	public IEnumerable<GroupChatMessageEntity>? Products { get; set; }
 
 	[NotMapped]
 	public IEnumerable<OrderEntity>? Orders { get; set; }
