@@ -105,8 +105,8 @@ public class ChatRepository(
 
 	public async Task<GenericResponse<GroupChatMessageEntity?>> CreateGroupChatMessage(GroupChatMessageCreateUpdateDto dto) {
 		List<ProductEntity?> products = [];
-		foreach (Guid id in dto.Products ?? new List<Guid>())
-			products.Add(await dbContext.Set<ProductEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == id));
+		foreach (Guid id in dto.Products ?? [])
+			products.Add(await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == id));
 
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
@@ -119,7 +119,7 @@ public class ChatRepository(
 			ParentId = dto.ParentId,
 			UserId = _userId,
 			Products = products,
-			ForwardedMessageId = dto.ForwardedMessageId,
+			ForwardedMessageId = dto.ForwardedMessageId
 		};
 
 		EntityEntry<GroupChatMessageEntity> e = await dbContext.Set<GroupChatMessageEntity>().AddAsync(entity);
