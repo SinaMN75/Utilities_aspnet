@@ -227,6 +227,7 @@ public class ProductFilterDto : BaseFilterDto {
 	public long? EndPriceRange { get; set; }
 	public long? Price1 { get; set; }
 	public long? Price2 { get; set; }
+	public bool? HasMedia { get; set; }
 	public bool? IsFollowing { get; set; }
 	public bool? IsBookmarked { get; set; }
 	public bool? HasDiscount { get; set; }
