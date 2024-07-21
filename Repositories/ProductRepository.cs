@@ -83,7 +83,7 @@ public class ProductRepository(
 		if (dto.ShowCategoryMedia.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.Media);
 		if (dto.ShowMedia.IsTrue()) {
 			q = q.Include(i => i.Media!.Where(j => j.ParentId == null)).ThenInclude(i => i.Children);
-			if (dto.HasMedia.IsTrue()) q = q.Where(x => x.Media.IsNotNullOrEmpty());
+			if (dto.HasMedia.IsTrue()) q = q.Where(x => x.Media!.Count() != 0);
 		}
 		if (dto.OrderByVotes.IsTrue()) q = q.OrderBy(x => x.VoteCount);
 		if (dto.OrderByVotesDescending.IsTrue()) q = q.OrderByDescending(x => x.VoteCount);
