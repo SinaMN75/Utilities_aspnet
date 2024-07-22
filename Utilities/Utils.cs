@@ -99,7 +99,7 @@ public static class StartupExtension {
 		builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 		builder.Services.AddScoped<AppSettings>();
 
-		builder.Services.AddSignalRCore();
+		builder.Services.AddSignalR();
 
 		builder.Services.AddScoped<IReportRepository, ReportRepository>();
 		builder.Services.AddScoped<IUserRepository, UserRepository>();
