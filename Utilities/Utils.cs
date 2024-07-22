@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Hosting;
-using static System.TimeSpan;
+﻿using static System.TimeSpan;
 
 namespace Utilities_aspnet.Utilities;
 
@@ -99,6 +98,9 @@ public static class StartupExtension {
 		builder.Services.AddOutputCache();
 		builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 		builder.Services.AddScoped<AppSettings>();
+
+		builder.Services.AddSignalRCore();
+
 		builder.Services.AddScoped<IReportRepository, ReportRepository>();
 		builder.Services.AddScoped<IUserRepository, UserRepository>();
 		builder.Services.AddScoped<IMediaRepository, MediaRepository>();
@@ -193,6 +195,8 @@ public static class StartupExtension {
 		app.UseAuthorization();
 
 		app.UseRinDiagnosticsHandler();
+
+		app.MapHub<ChatHub>("/chatHub");
 	}
 
 	private static void UseUtilitiesSwagger(this IApplicationBuilder app) {

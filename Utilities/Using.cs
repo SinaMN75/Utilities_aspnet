@@ -45,5 +45,8 @@ global using Swashbuckle.AspNetCore.SwaggerUI;
 global using OfficeOpenXml;
 global using System.Data;
 global using ClosedXML.Excel;
+global using Microsoft.AspNetCore.SignalR;
+global using Microsoft.Extensions.Hosting;
+global using Utilities_aspnet.Hubs;
 
 #endregion
