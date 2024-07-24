@@ -11,7 +11,9 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	public async Task<GenericResponse> Delete(Guid id) {
-		await dbContext.Set<NotificationEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
+		NotificationEntity e = (await dbContext.Set<NotificationEntity>().FirstOrDefaultAsync(x => x.Id == id))!;
+		dbContext.Remove(e);
+		await dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}
 
@@ -46,7 +48,7 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 			PageSize = dto.PageSize
 		};
 	}
-	
+
 	public async Task<GenericResponse> UpdateSeenStatus(IEnumerable<Guid> ids, SeenStatus seenStatus) {
 		IQueryable<NotificationEntity> i = dbContext.Set<NotificationEntity>()
 			.Where(x => x.UserId == null || x.UserId == _userId)

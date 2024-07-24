@@ -21,6 +21,10 @@ public class UserController(IUserRepository repository) : BaseApiController {
 	public async Task<ActionResult<GenericResponse>> GetTokenForTest(string? mobile) => Result(await repository.GetTokenForTest(mobile));
 
 	[Authorize]
+	[HttpDelete]
+	public async Task<ActionResult<GenericResponse>> Delete(string id, CancellationToken ct) => Result(await repository.Delete(id,ct));
+
+	[Authorize]
 	[AllowAnonymous]
 	[HttpPost("Filter")]
 	public ActionResult<GenericResponse<IEnumerable<UserEntity>>> Filter(UserFilterDto dto) => Result(repository.Filter(dto));

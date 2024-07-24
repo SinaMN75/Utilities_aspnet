@@ -517,7 +517,7 @@ public class UserRepository(
 		await mediaRepository.DeleteMedia(user.Media);
 		foreach (CommentEntity commentEntity in dbContext.Set<CommentEntity>().Where(x => x.UserId == id || x.TargetUserId == id))
 			await commentRepository.Delete(commentEntity.Id, ct);
-		foreach (NotificationEntity notificationEntity in dbContext.Set<NotificationEntity>().Where(x => x.UserId == id || x.CreatorUserId == _userId))
+		foreach (NotificationEntity notificationEntity in dbContext.Set<NotificationEntity>().Where(x => x.UserId == id || x.CreatorUserId == id))
 			await notificationRepository.Delete(notificationEntity.Id);
 		foreach (ReportEntity reportEntity in dbContext.Set<ReportEntity>().Where(x => x.UserId == id || x.CreatorUserId == _userId))
 			await reportRepository.Delete(reportEntity.Id);
