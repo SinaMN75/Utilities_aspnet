@@ -57,7 +57,8 @@ public class ProductRepository(
 		if (dto.State.IsNotNullOrEmpty()) q = q.Where(x => x.State!.Contains(dto.State ?? ""));
 		if (dto.Country.IsNotNullOrEmpty()) q = q.Where(x => x.Country!.Contains(dto.Country ?? ""));
 		if (dto.City.IsNotNullOrEmpty()) q = q.Where(x => x.City!.Contains(dto.City ?? ""));
-		if (dto.StateRegion.IsNotNullOrEmpty()) q = q.Where(x => x.Country!.Contains(dto.Country ?? "") || x.State!.Contains(dto.StateRegion ?? "") || x.City!.Contains(dto.StateRegion ?? ""));
+		if (dto.StateRegion.IsNotNullOrEmpty())
+			q = q.Where(x => x.Country!.Contains(dto.Country ?? "") || x.State!.Contains(dto.StateRegion ?? "") || x.City!.Contains(dto.StateRegion ?? ""));
 		if (dto.StartPriceRange.HasValue) q = q.Where(x => x.Price >= dto.StartPriceRange);
 		if (dto.Currency.HasValue) q = q.Where(x => x.Currency == dto.Currency);
 		if (dto.HasDiscount.IsTrue()) q = q.Where(x => x.DiscountPercent != null || x.DiscountPrice != null);
@@ -85,6 +86,7 @@ public class ProductRepository(
 			q = q.Include(i => i.Media!.Where(j => j.ParentId == null)).ThenInclude(i => i.Children);
 			if (dto.MinMedia is not null) q = q.Where(x => x.Media!.Count() >= dto.MinMedia);
 		}
+
 		if (dto.OrderByVotes.IsTrue()) q = q.OrderBy(x => x.VoteCount);
 		if (dto.OrderByVotesDescending.IsTrue()) q = q.OrderByDescending(x => x.VoteCount);
 		if (dto.OrderByAtoZ.IsTrue()) q = q.OrderBy(x => x.Title);
@@ -137,13 +139,14 @@ public class ProductRepository(
 		if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound);
 
 		if (i.JsonDetail.VisitCounts.IsNullOrEmpty()) i.JsonDetail.VisitCounts = [new VisitCount { UserId = _userId ?? "", Count = 1 }];
-		else
-			foreach (VisitCount j in i.JsonDetail.VisitCounts ?? []) {
-				if (j.UserId == _userId) j.Count += 1;
-				else {
-					i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId, Count = 0 });
-				}
+		else {
+			if (i.JsonDetail.VisitCounts!.Any(x => x.UserId == _userId)) {
+				i.JsonDetail.VisitCounts!.First(x => x.UserId == _userId).Count += 1;
 			}
+			else {
+				i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId, Count = 0 });
+			}
+		}
 
 		if (_userId.IsNotNullOrEmpty()) {
 			UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId, ct);

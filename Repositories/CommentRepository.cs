@@ -70,8 +70,6 @@ public class CommentRepository(
 
 		CommentEntity comment = new() {
 			Id = Guid.NewGuid(),
-			CreatedAt = DateTime.UtcNow,
-			UpdatedAt = DateTime.UtcNow,
 			Comment = dto.Comment,
 			ProductId = dto.ProductId,
 			TargetUserId = dto.UserId,
