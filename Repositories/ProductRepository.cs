@@ -138,17 +138,17 @@ public class ProductRepository(
 			.FirstOrDefaultAsync(i => i.Id == id, ct);
 		if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound);
 
-		if (i.JsonDetail.VisitCounts.IsNullOrEmpty()) i.JsonDetail.VisitCounts = [new VisitCount { UserId = _userId ?? "", Count = 1 }];
-		else {
-			if (i.JsonDetail.VisitCounts!.Any(x => x.UserId == _userId)) {
-				i.JsonDetail.VisitCounts!.First(x => x.UserId == _userId).Count += 1;
-			}
-			else {
-				i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId, Count = 0 });
-			}
-		}
-
 		if (_userId.IsNotNullOrEmpty()) {
+			if (i.JsonDetail.VisitCounts.IsNullOrEmpty()) i.JsonDetail.VisitCounts = [new VisitCount { UserId = _userId ?? "", Count = 1 }];
+			else {
+				if (i.JsonDetail.VisitCounts!.Any(x => x.UserId == _userId)) {
+					i.JsonDetail.VisitCounts!.First(x => x.UserId == _userId).Count += 1;
+				}
+				else {
+					i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId, Count = 1 });
+				}
+			}
+			
 			UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId, ct);
 			if (!user!.VisitedProducts.Contains(i.Id.ToString()))
 				await userRepository.Update(new UserCreateUpdateDto { Id = _userId, VisitedProducts = user.VisitedProducts + "," + i.Id });
