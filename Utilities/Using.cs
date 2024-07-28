@@ -20,7 +20,6 @@ global using Microsoft.AspNetCore.Mvc.Infrastructure;
 global using Microsoft.AspNetCore.Http.Features;
 global using Microsoft.OpenApi.Models;
 global using Microsoft.AspNetCore.Mvc;
-global using Microsoft.Extensions.Logging;
 global using Microsoft.EntityFrameworkCore.ChangeTracking;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.IdentityModel.Tokens;
@@ -45,8 +44,6 @@ global using Swashbuckle.AspNetCore.SwaggerUI;
 global using OfficeOpenXml;
 global using System.Data;
 global using ClosedXML.Excel;
-global using Microsoft.AspNetCore.SignalR;
 global using Microsoft.Extensions.Hosting;
-global using Utilities_aspnet.Hubs;
 
 #endregion

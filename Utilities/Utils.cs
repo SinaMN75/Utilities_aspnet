@@ -200,8 +200,6 @@ public static class StartupExtension {
 		// 	Console.WriteLine(str);
 		// 	await context.Response.WriteAsync(str);
 		// });
-
-		app.MapHub<ChatHub>("/chatHub");
 	}
 
 	private static void UseUtilitiesSwagger(this IApplicationBuilder app) {
