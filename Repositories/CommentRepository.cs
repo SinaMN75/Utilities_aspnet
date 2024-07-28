@@ -65,9 +65,7 @@ public class CommentRepository(
 	public async Task<GenericResponse<CommentEntity?>> Create(CommentCreateUpdateDto dto, CancellationToken ct) {
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
-
-		UserEntity? trgtUser = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == dto.UserId, ct);
-
+		
 		CommentEntity comment = new() {
 			Id = Guid.NewGuid(),
 			Comment = dto.Comment,
@@ -80,30 +78,33 @@ public class CommentRepository(
 			Tags = dto.Tags ?? []
 		};
 		await dbContext.AddAsync(comment, ct);
-		ProductEntity product = (await dbContext.Set<ProductEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == comment.ProductId, ct))!;
-		product.CommentsCount += 1;
 
-		if (product.UserId != _userId)
-			await notificationRepository.Create(new NotificationCreateUpdateDto {
-				UserId = product.UserId,
-				Message = dto.Comment ?? "",
-				Title = "Comment",
-				CreatorUserId = comment.UserId,
-				Link = product.Id.ToString(),
-				CommentId = comment.Id,
-				Tags = [TagNotification.ReceivedComment],
-				ProductId = product.Id
-			});
-		if (dto.UserId != null) {
-			if (trgtUser!.Id != _userId)
+		if (dto.ProductId is not null) {
+			ProductEntity product = (await dbContext.Set<ProductEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == dto.ProductId, ct))!;
+			product.CommentsCount += 1;
+			
+			if (product.UserId != _userId)
 				await notificationRepository.Create(new NotificationCreateUpdateDto {
-					UserId = trgtUser.Id,
+					UserId = product.UserId,
 					Message = dto.Comment ?? "",
 					Title = "Comment",
+					CreatorUserId = _userId,
+					Link = product.Id.ToString(),
 					CommentId = comment.Id,
 					Tags = [TagNotification.ReceivedComment],
+					ProductId = product.Id
+				});
+		}
+		
+		if (dto.UserId is not null) {
+			if (dto.UserId != _userId)
+				await notificationRepository.Create(new NotificationCreateUpdateDto {
+					UserId = dto.UserId,
+					Message = dto.Comment ?? "",
+					Title = "Comment",
 					CreatorUserId = comment.UserId,
-					Link = product.Id.ToString()
+					CommentId = comment.Id,
+					Tags = [TagNotification.ReceivedComment],
 				});
 		}
 
