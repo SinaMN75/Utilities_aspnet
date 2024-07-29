@@ -78,10 +78,6 @@ public class ProductRepository(
 			q = q.Where(w => w.User != null);
 		}
 
-		if (dto.ShowBlockedUsers.IsTrue()) {
-			UserEntity user = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId))!;
-			q = q.Where(x => user.BlockedUsers.Contains(x.UserId));
-		}
 		if (dto.ShowChildren.IsTrue()) q = q.Include(i => i.Children)!.ThenInclude(x => x.Media);
 		if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(x => x.Children);
 		if (dto.ShowComments.IsTrue()) q = q.Include(i => i.Comments!.Where(x => x.Parent == null));
@@ -102,6 +98,7 @@ public class ProductRepository(
 
 		if (_userId.IsNotNullOrEmpty()) {
 			UserEntity user = (await userRepository.ReadByIdMinimal(_userId))!;
+			if (dto.HideBlockedUsers.IsTrue()) q = q.Where(x => !user.BlockedUsers.Contains(x.UserId!));
 			if (dto.IsFollowing.IsTrue()) q = q.Where(i => user.FollowingUsers.Contains(i.UserId!));
 			if (dto.IsBookmarked.IsTrue()) q = q.Where(i => user.BookmarkedProducts.Contains(i.Id.ToString()));
 		}
@@ -152,7 +149,7 @@ public class ProductRepository(
 					i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId, Count = 1 });
 				}
 			}
-			
+
 			UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId, ct);
 			if (!user!.VisitedProducts.Contains(i.Id.ToString()))
 				await userRepository.Update(new UserCreateUpdateDto { Id = _userId, VisitedProducts = user.VisitedProducts + "," + i.Id });

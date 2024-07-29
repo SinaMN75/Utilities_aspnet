@@ -16,7 +16,7 @@ public class ProductEntity : BaseEntity {
 
 	[MaxLength(100)]
 	public string? Country { get; set; }
-	
+
 	[MaxLength(100)]
 	public string? State { get; set; }
 
@@ -37,10 +37,10 @@ public class ProductEntity : BaseEntity {
 	public Currency? Currency { get; set; }
 
 	public string? SeenUsers { get; set; } = "";
-	
+
 	public ProductEntity? Parent { get; set; }
 	public Guid? ParentId { get; set; }
-	
+
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
 
@@ -235,7 +235,7 @@ public class ProductFilterDto : BaseFilterDto {
 	public bool? ShowCategories { get; set; } = false;
 	public bool? ShowCreator { get; set; } = false;
 	public bool? ShowCategoryMedia { get; set; } = false;
-	public bool? ShowBlockedUsers { get; set; } = false;
+	public bool? HideBlockedUsers { get; set; } = true;
 	public bool? ShowChildren { get; set; } = false;
 	public bool? ShowPostOfPrivateUser { get; set; }
 	public bool? ShowComments { get; set; }
