@@ -3,23 +3,23 @@
 [ApiController]
 [Route("api/[controller]")]
 [ApiKey]
-public class FollowBookmarkController(IFollowBookmarkRepository repository) : BaseApiController {
+public class FollowBookmarkController(IFollowBookmarkRepository repository, IUserRepository userRepository) : BaseApiController {
 	[HttpPost("ReadFollowers/{userId}")]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse<IEnumerable<UserEntity>>>> ReadFollowers(string userId) => Result(await repository.GetFollowers(userId));
+	public async Task<ActionResult<GenericResponse<IEnumerable<UserEntity>>>> ReadFollowers(string userId) => Result(await userRepository.GetFollowers(userId));
 
 	[HttpPost("ReadFollowings/{userId}")]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse<IEnumerable<UserEntity>>>> ReadFollowings(string userId) => Result(await repository.GetFollowing(userId));
+	public async Task<ActionResult<GenericResponse<IEnumerable<UserEntity>>>> ReadFollowings(string userId) => Result(await userRepository.GetFollowing(userId));
 
 	[HttpPost("ToggleFolllow")]
 	[EnableRateLimiting("follow")]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse>> ToggleFollow(FollowCreateDto dto) => Result(await repository.ToggleFollow(dto));
+	public async Task<ActionResult<GenericResponse>> ToggleFollow(FollowCreateDto dto) => Result(await userRepository.ToggleFollow(dto));
 
 	[HttpPost("RemoveFollowing")]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse>> RemoveFollowing(FollowCreateDto dto) => Result(await repository.RemoveFollowings(dto));
+	public async Task<ActionResult<GenericResponse>> RemoveFollowing(FollowCreateDto dto) => Result(await userRepository.RemoveFollowings(dto));
 
 	[HttpPost("ToggleBookmark")]
 	[Authorize]
