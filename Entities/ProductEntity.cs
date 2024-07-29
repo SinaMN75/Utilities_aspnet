@@ -235,6 +235,7 @@ public class ProductFilterDto : BaseFilterDto {
 	public bool? ShowCategories { get; set; } = false;
 	public bool? ShowCreator { get; set; } = false;
 	public bool? ShowCategoryMedia { get; set; } = false;
+	public bool? ShowBlockedUsers { get; set; } = false;
 	public bool? ShowChildren { get; set; } = false;
 	public bool? ShowPostOfPrivateUser { get; set; }
 	public bool? ShowComments { get; set; }

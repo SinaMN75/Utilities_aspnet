@@ -15,6 +15,10 @@ public interface IUserRepository {
 	Task<UserEntity?> ReadByIdMinimal(string? idOrUserName, string? token = null);
 	Task<GenericResponse> Authorize(AuthorizeUserDto dto);
 	Task<GenericResponse> Subscribe(string userId, Guid contentId, string transactionRefId);
+	Task<GenericResponse<IQueryable<UserEntity>>> GetFollowers(string id);
+	Task<GenericResponse<IQueryable<UserEntity>>> GetFollowing(string id);
+	Task<GenericResponse> ToggleFollow(FollowCreateDto dto);
+	Task<GenericResponse> RemoveFollowings(FollowCreateDto dto);
 }
 
 public class UserRepository(
@@ -339,9 +343,27 @@ public class UserRepository(
 
 	public async Task<GenericResponse> ToggleBlock(string userId) {
 		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
-		if (user!.BlockedUsers.Contains(userId))
+		UserEntity? targetUser = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == userId);
+		if (user!.BlockedUsers.Contains(userId)) {
 			await Update(new UserCreateUpdateDto { Id = user.Id, BlockedUsers = user.BlockedUsers.Replace($",{userId}", "") });
-		else await Update(new UserCreateUpdateDto { Id = user.Id, BlockedUsers = user.BlockedUsers + "," + userId });
+		}
+		else {
+			await Update(new UserCreateUpdateDto {
+				Id = user.Id,
+				BlockedUsers = user.BlockedUsers + "," + userId,
+			});
+			await RemoveFollowings(new FollowCreateDto { UserId = userId });
+			
+			await Update(new UserCreateUpdateDto {
+				Id = _userId,
+				FollowingUsers = user.FollowingUsers.Replace($",{userId}", "")
+			});
+
+			await Update(new UserCreateUpdateDto {
+				Id = userId,
+				FollowedUsers = targetUser!.FollowedUsers.Replace($",{_userId}", "")
+			});
+		}
 		return new GenericResponse();
 	}
 
@@ -531,6 +553,86 @@ public class UserRepository(
 
 		await dbContext.SaveChangesAsync(ct);
 
+		return new GenericResponse();
+	}
+	
+		public async Task<GenericResponse<IQueryable<UserEntity>>> GetFollowers(string id) {
+		UserEntity myUser = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!;
+		GenericResponse<IQueryable<UserEntity>> q = Filter(new UserFilterDto {
+				UserIds = myUser.FollowedUsers.Split(","),
+				ShowCategories = true,
+				ShowMedia = true
+			}
+		);
+		return new GenericResponse<IQueryable<UserEntity>>(q.Result!);
+	}
+
+	public async Task<GenericResponse<IQueryable<UserEntity>>> GetFollowing(string id) {
+		UserEntity myUser = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!;
+		GenericResponse<IQueryable<UserEntity>> q = Filter(new UserFilterDto {
+				UserIds = myUser.FollowingUsers.Split(","),
+				ShowCategories = true,
+				ShowMedia = true
+			}
+		);
+		return new GenericResponse<IQueryable<UserEntity>>(q.Result!);
+	}
+
+	public async Task<GenericResponse> ToggleFollow(FollowCreateDto parameters) {
+		UserEntity myUser = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId))!;
+		UserEntity targetUser = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == parameters.UserId))!;
+
+		if (myUser.FollowingUsers.Contains(parameters.UserId)) {
+			await Update(new UserCreateUpdateDto {
+				Id = _userId,
+				FollowingUsers = myUser.FollowingUsers.Replace($",{parameters.UserId}", "")
+			});
+
+			await Update(new UserCreateUpdateDto {
+				Id = parameters.UserId,
+				FollowedUsers = targetUser.FollowedUsers.Replace($",{parameters.UserId}", "")
+			});
+
+			List<NotificationEntity> exFollowedNotifications =
+				await notificationRepository.Filter(new NotificationFilterDto {
+					UserId = parameters.UserId,
+					CreatorUserId = _userId,
+					Tags = [TagNotification.Followed],
+				}).Result!.ToListAsync();
+
+			foreach (NotificationEntity exFollowedNotification in exFollowedNotifications) {
+				await notificationRepository.Delete(exFollowedNotification.Id);
+			}
+		}
+		else {
+			await Update(new UserCreateUpdateDto {
+				Id = _userId,
+				FollowingUsers = myUser.FollowingUsers + "," + parameters.UserId
+			});
+
+			await Update(new UserCreateUpdateDto {
+				Id = parameters.UserId,
+				FollowedUsers = targetUser.FollowedUsers + "," + myUser.Id
+			});
+
+			await notificationRepository.Create(new NotificationCreateUpdateDto {
+				UserId = parameters.UserId,
+				Message = "You are being followed by " + myUser.UserName,
+				Title = "Follow",
+				Tags = [TagNotification.Followed],
+				CreatorUserId = _userId
+			});
+		}
+
+		return new GenericResponse();
+	}
+
+	public async Task<GenericResponse> RemoveFollowings(FollowCreateDto parameters) {
+		UserEntity myUser = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId))!;
+		await Update(new UserCreateUpdateDto {
+			Id = parameters.UserId,
+			FollowedUsers = myUser.FollowedUsers.Replace($",{parameters.UserId}", "")
+		});
 		return new GenericResponse();
 	}
 }

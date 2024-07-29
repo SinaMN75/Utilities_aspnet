@@ -78,6 +78,10 @@ public class ProductRepository(
 			q = q.Where(w => w.User != null);
 		}
 
+		if (dto.ShowBlockedUsers.IsTrue()) {
+			UserEntity user = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId))!;
+			q = q.Where(x => user.BlockedUsers.Contains(x.UserId));
+		}
 		if (dto.ShowChildren.IsTrue()) q = q.Include(i => i.Children)!.ThenInclude(x => x.Media);
 		if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(x => x.Children);
 		if (dto.ShowComments.IsTrue()) q = q.Include(i => i.Comments!.Where(x => x.Parent == null));
