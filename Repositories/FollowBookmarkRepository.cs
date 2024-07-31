@@ -65,7 +65,7 @@ public class FollowBookmarkRepository(
 
 	public async Task<GenericResponse<IQueryable<UserEntity>>> GetFollowers(string id) {
 		UserEntity myUser = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!;
-		GenericResponse<IQueryable<UserEntity>> q = userRepository.Filter(new UserFilterDto {
+		GenericResponse<IQueryable<UserEntity>> q = await userRepository.Filter(new UserFilterDto {
 				UserIds = myUser.FollowedUsers.Split(","),
 				ShowCategories = true,
 				ShowMedia = true
