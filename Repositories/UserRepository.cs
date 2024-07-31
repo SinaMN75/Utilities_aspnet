@@ -25,6 +25,7 @@ public class UserRepository(
 	DbContext dbContext,
 	ISmsNotificationRepository sms,
 	IHttpContextAccessor httpContextAccessor,
+	IProductRepository productRepository,
 	IMediaRepository mediaRepository,
 	IOrderRepository orderRepository,
 	ITransactionRepository transactionRepository,
@@ -353,7 +354,7 @@ public class UserRepository(
 				BlockedUsers = user.BlockedUsers + "," + userId,
 			});
 			await RemoveFollowings(new FollowCreateDto { UserId = userId });
-			
+
 			await Update(new UserCreateUpdateDto {
 				Id = _userId,
 				FollowingUsers = user.FollowingUsers.Replace($",{userId}", "")
@@ -364,6 +365,7 @@ public class UserRepository(
 				FollowedUsers = targetUser!.FollowedUsers.Replace($",{_userId}", "")
 			});
 		}
+
 		return new GenericResponse();
 	}
 
@@ -548,6 +550,7 @@ public class UserRepository(
 			await transactionRepository.Delete(transactionEntity.Id, ct);
 		foreach (AddressEntity addressEntity in dbContext.Set<AddressEntity>().Where(x => x.UserId == id)) await addressRepository.Delete(addressEntity.Id, ct);
 		foreach (GroupChatEntity groupChatEntity in dbContext.Set<GroupChatEntity>().Where(x => x.CreatorUserId == id)) await chatRepository.DeleteGroupChat(groupChatEntity.Id);
+		foreach (ProductEntity productEntity in dbContext.Set<ProductEntity>().Where(x => x.UserId == id)) await productRepository.Delete(productEntity.Id, ct);
 
 		dbContext.Remove(user);
 
@@ -555,8 +558,8 @@ public class UserRepository(
 
 		return new GenericResponse();
 	}
-	
-		public async Task<GenericResponse<IQueryable<UserEntity>>> GetFollowers(string id) {
+
+	public async Task<GenericResponse<IQueryable<UserEntity>>> GetFollowers(string id) {
 		UserEntity myUser = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!;
 		GenericResponse<IQueryable<UserEntity>> q = Filter(new UserFilterDto {
 				UserIds = myUser.FollowedUsers.Split(","),
