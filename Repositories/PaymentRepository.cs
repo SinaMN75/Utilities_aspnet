@@ -5,12 +5,17 @@ public interface IPaymentRepository {
 	Task<GenericResponse<NgVerifyResponse>> VerifyNg(string outlet, string id);
 	Task<GenericResponse<ZibalRequestResponse>> PayZibal(NgPayDto dto);
 	Task<GenericResponse<ZibalVerifyResponse>> VerifyZibal(string outlet, string id);
+	Task<GenericResponse> CallBackZibalJadooAuthorize(string outlet, string id, string userId);
 }
 
 public class PaymentRepository : IPaymentRepository {
 	private readonly AppSettings _appSettings = new();
+	private readonly DbContext _dbContext;
+	private readonly IUserRepository _userRepository;
 
-	public PaymentRepository(IConfiguration config) {
+	public PaymentRepository(IConfiguration config, DbContext dbContext, IUserRepository userRepository) {
+		_dbContext = dbContext;
+		_userRepository = userRepository;
 		config.GetSection("AppSettings").Bind(_appSettings);
 	}
 
@@ -36,12 +41,12 @@ public class PaymentRepository : IPaymentRepository {
 	public async Task<GenericResponse<ZibalRequestResponse>> PayZibal(NgPayDto dto) {
 		RestRequest requestRequest = new("https://gateway.zibal.ir/v1/request", Method.POST);
 
-		requestRequest.AddJsonBody( new {
+		requestRequest.AddJsonBody(new {
 			merchant = dto.Outlet,
 			amount = dto.Amount,
 			callbackUrl = dto.RedirectUrl
 		});
-		
+
 		requestRequest.AddHeader("Content-Type", "application/json");
 
 		IRestResponse responseRequest = await new RestClient().ExecuteAsync(requestRequest);
@@ -76,5 +81,16 @@ public class PaymentRepository : IPaymentRepository {
 		requestAccessToken.AddHeader("Accept", "application/vnd.ni-identity.v1+json");
 		IRestResponse responseRequest = await new RestClient("https://api-gateway.sandbox.ngenius-payments.com/identity/auth/access-token").ExecuteAsync(requestAccessToken);
 		return NgAccessTokenResponse.FromJson(responseRequest.Content);
+	}
+
+	public async Task<GenericResponse> CallBackZibalJadooAuthorize(string outlet, string id, string userId) {
+		GenericResponse<ZibalVerifyResponse> i = await VerifyZibal(outlet, id);
+
+		UserEntity user = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == userId))!;
+		List<TagUser> tags = user.Tags;
+		tags.Add(TagUser.Authorized);
+		await _userRepository.Update(new UserCreateUpdateDto { Tags = tags });
+
+		return new GenericResponse();
 	}
 }
