@@ -25,7 +25,7 @@ public class UserRepository(
 	DbContext dbContext,
 	ISmsNotificationRepository sms,
 	IHttpContextAccessor httpContextAccessor,
-	IProductRepository productRepository,
+	// IProductRepository productRepository,
 	IMediaRepository mediaRepository,
 	IOrderRepository orderRepository,
 	ITransactionRepository transactionRepository,
@@ -555,7 +555,7 @@ public class UserRepository(
 			await transactionRepository.Delete(transactionEntity.Id, ct);
 		foreach (AddressEntity addressEntity in dbContext.Set<AddressEntity>().Where(x => x.UserId == id)) await addressRepository.Delete(addressEntity.Id, ct);
 		foreach (GroupChatEntity groupChatEntity in dbContext.Set<GroupChatEntity>().Where(x => x.CreatorUserId == id)) await chatRepository.DeleteGroupChat(groupChatEntity.Id);
-		foreach (ProductEntity productEntity in dbContext.Set<ProductEntity>().Where(x => x.UserId == id)) await productRepository.Delete(productEntity.Id, ct);
+		// foreach (ProductEntity productEntity in dbContext.Set<ProductEntity>().Where(x => x.UserId == id)) await productRepository.Delete(productEntity.Id, ct);
 
 		dbContext.Remove(user);
 
