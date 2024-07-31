@@ -291,6 +291,7 @@ public class UserFilterDto : BaseFilterDto {
 	public bool? ShowPremiums { get; set; }
 	public bool? ShowCategories { get; set; }
 	public bool? ShowSuspend { get; set; }
+	public bool? HideBlockedUsers { get; set; } = true;
 	public bool? ShowMyCustomers { get; set; }
 	public bool? OrderByUserName { get; set; }
 	public bool? NoneOfMyFollowing { get; set; }

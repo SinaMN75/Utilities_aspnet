@@ -2,7 +2,7 @@
 
 public interface IUserRepository {
 	Task<GenericResponse<UserEntity?>> Create(UserCreateUpdateDto dto);
-	GenericResponse<IQueryable<UserEntity>> Filter(UserFilterDto dto);
+	Task<GenericResponse<IQueryable<UserEntity>>> Filter(UserFilterDto dto);
 	Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null);
 	Task<GenericResponse<UserEntity?>> Update(UserCreateUpdateDto dto);
 	Task<GenericResponse> Delete(string id, CancellationToken ct);
@@ -126,7 +126,7 @@ public class UserRepository(
 		return new GenericResponse<UserEntity?>(entity);
 	}
 
-	public GenericResponse<IQueryable<UserEntity>> Filter(UserFilterDto dto) {
+	public async Task<GenericResponse<IQueryable<UserEntity>>> Filter(UserFilterDto dto) {
 		IQueryable<UserEntity> q = dbContext.Set<UserEntity>();
 
 		if (dto.UserNameExact.IsNotNullOrEmpty()) q = q.Where(x => x.AppUserName == dto.UserNameExact || x.UserName == dto.UserNameExact);
@@ -185,6 +185,11 @@ public class UserRepository(
 
 		if (dto.ShowMedia.IsTrue()) q = q.Include(u => u.Media);
 		if (dto.ShowCategories.IsTrue()) q = q.Include(u => u.Categories);
+
+		if (_userId is not null) {
+			UserEntity user = (await ReadByIdMinimal(_userId))!;
+			if (dto.HideBlockedUsers.IsTrue()) q = q.Where(x => !user.BlockedUsers.Contains(x.Id));
+		}
 
 		if (dto.ShowMyCustomers.IsTrue()) {
 			IQueryable<OrderEntity> orders = dbContext.Set<OrderEntity>()
@@ -335,7 +340,7 @@ public class UserRepository(
 
 	public async Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList() {
 		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
-		GenericResponse<IQueryable<UserEntity>> blockedUsers = Filter(new UserFilterDto {
+		GenericResponse<IQueryable<UserEntity>> blockedUsers = await Filter(new UserFilterDto {
 			ShowMedia = true,
 			UserIds = user?.BlockedUsers.Split(",")
 		});
@@ -561,7 +566,7 @@ public class UserRepository(
 
 	public async Task<GenericResponse<IQueryable<UserEntity>>> GetFollowers(string id) {
 		UserEntity myUser = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!;
-		GenericResponse<IQueryable<UserEntity>> q = Filter(new UserFilterDto {
+		GenericResponse<IQueryable<UserEntity>> q = await Filter(new UserFilterDto {
 				UserIds = myUser.FollowedUsers.Split(","),
 				ShowCategories = true,
 				ShowMedia = true
@@ -572,7 +577,7 @@ public class UserRepository(
 
 	public async Task<GenericResponse<IQueryable<UserEntity>>> GetFollowing(string id) {
 		UserEntity myUser = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!;
-		GenericResponse<IQueryable<UserEntity>> q = Filter(new UserFilterDto {
+		GenericResponse<IQueryable<UserEntity>> q = await Filter(new UserFilterDto {
 				UserIds = myUser.FollowingUsers.Split(","),
 				ShowCategories = true,
 				ShowMedia = true

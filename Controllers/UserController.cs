@@ -27,11 +27,8 @@ public class UserController(IUserRepository repository) : BaseApiController {
 	[Authorize]
 	[AllowAnonymous]
 	[HttpPost("Filter")]
-	public ActionResult<GenericResponse<IEnumerable<UserEntity>>> Filter(UserFilterDto dto) => Result(repository.Filter(dto));
-
-	[HttpGet]
-	public ActionResult<GenericResponse<IEnumerable<UserEntity>>> Read([FromQuery] UserFilterDto dto) => Result(repository.Filter(dto));
-
+	public async Task<ActionResult<GenericResponse<IEnumerable<UserEntity>>>> Filter(UserFilterDto dto) => Result(await repository.Filter(dto));
+	
 	[Authorize]
 	[AllowAnonymous]
 	[HttpGet("{id}")]
