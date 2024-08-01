@@ -240,7 +240,7 @@ public class UserRepository(
 		                                                                              x.Password == model.Password
 		);
 
-		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
+		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound, "UserName or Password is Wrong.");
 
 		await dbContext.SaveChangesAsync();
 		JwtSecurityToken token = CreateToken(user);
