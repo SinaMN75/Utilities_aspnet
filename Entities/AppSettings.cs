@@ -2,7 +2,7 @@
 
 public class AppSettings {
 	public SmsPanelSettings SmsPanelSettings { get; set; } = null!;
-	public PaymentSettings PaymentSettings { get; set; } = null!;
+	public Zibal Zibal { get; set; } = null!;
 	public PushNotificationSetting PushNotificationSetting { get; set; } = null!;
 	public AmazonS3Settings AmazonS3Settings { get; set; } = null!;
 	public int? WithdrawalLimit { get; set; }
@@ -42,9 +42,8 @@ public class AmazonS3Settings {
 	public string? DefaultBucket { get; set; }
 }
 
-public class PaymentSettings {
+public class Zibal {
 	public string? Id { get; set; }
-	public string? Provider { get; set; }
 }
 
 public class PushNotificationSetting {
