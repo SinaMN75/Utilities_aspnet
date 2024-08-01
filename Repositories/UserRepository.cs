@@ -110,8 +110,10 @@ public class UserRepository(
 			if (myUser.FollowingUsers.Contains(entity.Id)) entity.IsFollowing = true;
 		}
 
-		entity.CountFollowing = entity.FollowingUsers.Split(",").Length;
-		entity.CountFollowers = entity.FollowedUsers.Split(",").Length;
+		int countFollowing = entity.FollowingUsers.Split(",").Length;
+		int countFollowers = entity.FollowedUsers.Split(",").Length;
+		entity.CountFollowing = countFollowing - 1 <= 0 ? 0 : countFollowing;
+		entity.CountFollowers = countFollowers - 1 <= 0 ? 0 : countFollowers;
 
 		return new GenericResponse<UserEntity?>(entity);
 	}
