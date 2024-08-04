@@ -30,6 +30,8 @@ public class CommentEntity : BaseEntity {
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	
+	public IEnumerable<ReportEntity>? Reports { get; set; }
+	
 	public IEnumerable<NotificationEntity>? Notifications { get; set; }
 }
 

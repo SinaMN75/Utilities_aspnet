@@ -13,6 +13,7 @@ public class CommentRepository(
 	DbContext dbContext,
 	IHttpContextAccessor httpContextAccessor,
 	INotificationRepository notificationRepository,
+	IReportRepository reportRepository,
 	IConfiguration config,
 	IMediaRepository mediaRepository
 )
@@ -137,6 +138,7 @@ public class CommentRepository(
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
 		CommentEntity? comment = await dbContext.Set<CommentEntity>()
 			.Include(i => i.Media)
+			.Include(i => i.Reports)
 			.Include(i => i.Children)!.ThenInclude(i => i.Notifications)
 			.Include(i => i.Children)!.ThenInclude(i => i.Media)
 			.Include(i => i.Notifications)
@@ -145,6 +147,7 @@ public class CommentRepository(
 		foreach (MediaEntity i in comment.Media!) await mediaRepository.Delete(i.Id);
 		foreach (CommentEntity i in comment.Children!) await Delete(i.Id, ct);
 		foreach (NotificationEntity i in comment.Notifications!) await notificationRepository.Delete(i.Id);
+		foreach (ReportEntity i in comment.Reports!) await reportRepository.Delete(i.Id);
 		dbContext.Set<CommentEntity>().Remove(comment);
 		await dbContext.SaveChangesAsync(ct);
 		return new GenericResponse();
