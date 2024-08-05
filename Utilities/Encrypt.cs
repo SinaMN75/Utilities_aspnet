@@ -3,47 +3,31 @@ using System.Text;
 
 namespace Utilities_aspnet.Utilities;
 
-public class AesOperation {
-	public static string EncryptString(string key, string plainText) {
-		byte[] iv = new byte[16];
-		byte[] array;
+public class Encryption {
+	public static string EncryptString(string plainText, string key) {
+		using Aes aes = Aes.Create();
+		aes.Key = Encoding.UTF8.GetBytes(key);
+		aes.GenerateIV();
 
-		using (Aes aes = Aes.Create()) {
-			aes.Key = Encoding.UTF8.GetBytes(key);
-			aes.IV = iv;
+		using MemoryStream msEncrypt = new();
+		msEncrypt.Write(aes.IV, 0, aes.IV.Length);
 
-			ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-
-			using (MemoryStream memoryStream = new()) {
-				using (CryptoStream cryptoStream = new(memoryStream, encryptor, CryptoStreamMode.Write)) {
-					using (StreamWriter streamWriter = new(cryptoStream)) {
-						streamWriter.Write(plainText);
-					}
-
-					array = memoryStream.ToArray();
-				}
-			}
+		using (CryptoStream cryptoStream = new(msEncrypt, aes.CreateEncryptor(), CryptoStreamMode.Write))
+		using (StreamWriter streamWriter = new(cryptoStream)) {
+			streamWriter.Write(plainText);
 		}
 
-		return Convert.ToBase64String(array);
+		byte[] encrypted = msEncrypt.ToArray();
+		return Convert.ToBase64String(encrypted);
 	}
 
-	public static string DecryptString(string key, string cipherText) {
-		byte[] iv = new byte[16];
-		byte[] buffer = Convert.FromBase64String(cipherText);
+	public static string Base64Encode(string plainText) {
+		byte[] plainTextBytes = Encoding.UTF8.GetBytes(plainText);
+		return Convert.ToBase64String(plainTextBytes);
+	}
 
-		using (Aes aes = Aes.Create()) {
-			aes.Key = Encoding.UTF8.GetBytes(key);
-			aes.IV = iv;
-			ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
-
-			using (MemoryStream memoryStream = new(buffer)) {
-				using (CryptoStream cryptoStream = new(memoryStream, decryptor, CryptoStreamMode.Read)) {
-					using (StreamReader streamReader = new(cryptoStream)) {
-						return streamReader.ReadToEnd();
-					}
-				}
-			}
-		}
+	public static string Base64Decode(string base64EncodedData) {
+		byte[] base64EncodedBytes = Convert.FromBase64String(base64EncodedData);
+		return Encoding.UTF8.GetString(base64EncodedBytes);
 	}
 }
