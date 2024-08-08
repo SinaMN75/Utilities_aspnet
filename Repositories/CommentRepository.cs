@@ -55,6 +55,8 @@ public class CommentRepository(
 			.Include(x => x.TargetUser)
 			.Include(x => x.Children)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
 			.Include(x => x.Children)!.ThenInclude(x => x.Media)
+			.Include(x => x.Children)!.ThenInclude(x => x.Children)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
+			.Include(x => x.Children)!.ThenInclude(x => x.Children)!.ThenInclude(x => x.Media)
 			.Where(x => x.Id == id)
 			.OrderByDescending(x => x.CreatedAt)
 			.AsNoTracking()
