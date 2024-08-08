@@ -15,18 +15,19 @@ public class ProductRepository(
 	IHttpContextAccessor httpContextAccessor,
 	IMediaRepository mediaRepository,
 	IUserRepository userRepository,
-	IConfiguration config,
 	INotificationRepository notificationRepository,
 	IReportRepository reportRepository,
 	ICommentRepository commentRepository
-)
-	: IProductRepository {
+) : IProductRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	public async Task<GenericResponse<ProductEntity?>> Create(ProductCreateUpdateDto dto, CancellationToken ct) {
-		AppSettings appSettings = new();
-		config.GetSection("AppSettings").Bind(appSettings);
-
+		int productsToday = await dbContext.Set<ProductEntity>()
+			.Where(x => x.UserId == _userId && x.CreatedAt >= DateTime.Now.Subtract(TimeSpan.FromDays(1)))
+			.AsNoTracking()
+			.CountAsync(ct);
+		if (productsToday >= 30) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.Overused);
+		
 		ProductEntity e = await new ProductEntity().FillData(dto, dbContext);
 		e.UserId = _userId;
 		e.CreatedAt = DateTime.UtcNow;
@@ -235,15 +236,18 @@ public class ProductRepository(
 	public async Task<GenericResponse> CreateReaction(ReactionCreateUpdateDto dto) {
 		ProductEntity p = (await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
 
-		if (p.JsonDetail.UsersReactions.IsNullOrEmpty())
+		if (p.JsonDetail.UsersReactions.IsNullOrEmpty()) {
 			p.JsonDetail.UsersReactions = new List<UserReaction> { new() { Reaction = dto.Reaction, UserId = _userId! } };
-		else if (p.JsonDetail.UsersReactions!.Any(x => x.UserId == _userId))
+		}
+		else if (p.JsonDetail.UsersReactions!.Any(x => x.UserId == _userId)) {
 			p.JsonDetail.UsersReactions!.First(x => x.UserId == _userId).Reaction = dto.Reaction;
-		else
+		}
+		else {
 			p.JsonDetail.UsersReactions?.Add(new UserReaction {
 				Reaction = dto.Reaction,
 				UserId = _userId!
 			});
+		}
 
 		if (p.UserId != _userId)
 			await notificationRepository.Create(new NotificationCreateUpdateDto {

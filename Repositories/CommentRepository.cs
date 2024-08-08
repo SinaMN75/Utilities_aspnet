@@ -68,7 +68,13 @@ public class CommentRepository(
 	public async Task<GenericResponse<CommentEntity?>> Create(CommentCreateUpdateDto dto, CancellationToken ct) {
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
-		
+
+		int commentsToday = await dbContext.Set<CommentEntity>()
+			.Where(x => x.UserId == _userId && x.CreatedAt >= DateTime.Now.Subtract(TimeSpan.FromDays(1)))
+			.AsNoTracking()
+			.CountAsync(ct);
+		if (commentsToday >= 30) return new GenericResponse<CommentEntity?>(null, UtilitiesStatusCodes.Overused);
+
 		CommentEntity comment = new() {
 			Id = Guid.NewGuid(),
 			Comment = dto.Comment,
@@ -85,7 +91,7 @@ public class CommentRepository(
 		if (dto.ProductId is not null) {
 			ProductEntity product = (await dbContext.Set<ProductEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == dto.ProductId, ct))!;
 			product.CommentsCount += 1;
-			
+
 			if (product.UserId != _userId)
 				await notificationRepository.Create(new NotificationCreateUpdateDto {
 					UserId = product.UserId,
@@ -98,7 +104,7 @@ public class CommentRepository(
 					ProductId = product.Id
 				});
 		}
-		
+
 		if (dto.UserId is not null) {
 			if (dto.UserId != _userId)
 				await notificationRepository.Create(new NotificationCreateUpdateDto {
