@@ -1,5 +1,3 @@
-using System.Security.Cryptography;
-using System.Text;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Utilities_aspnet.Utilities;
@@ -40,35 +38,16 @@ public class ApiKeyAuthFilter(IApiKeyValidation apiKeyValidation) : IAuthorizati
 //
 
 public class EncryptResponseAttribute : ActionFilterAttribute {
-	private static readonly string encryptionKey = "dxrytuhkjbmvncbxfdghtgjyhbmvcbxf"; // Should be a 16, 24, or 32 byte key for AES  
-	
 	public override async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next) {
 		if (context.Result is ObjectResult objectResult && objectResult.Value != null) {
 			string jsonString = System.Text.Json.JsonSerializer.Serialize(objectResult.Value);
-			string encryptedData = EncryptString(jsonString, encryptionKey);
+			string encryptedData = Encryption.Base64Encode(jsonString);
 			context.Result = new ContentResult {
 				Content = encryptedData,
-				ContentType = "application/json",
-				StatusCode = 200
+				ContentType = "application/text",
+				StatusCode = context.HttpContext.Response.StatusCode
 			};
 			await next();
 		}
-	}
-
-	private static string EncryptString(string plainText, string key) {
-		using Aes aes = Aes.Create();
-		aes.Key = Encoding.UTF8.GetBytes(key);
-		aes.GenerateIV();
-
-		using MemoryStream msEncrypt = new();
-		msEncrypt.Write(aes.IV, 0, aes.IV.Length);
-
-		using (CryptoStream cryptoStream = new(msEncrypt, aes.CreateEncryptor(), CryptoStreamMode.Write))
-		using (StreamWriter streamWriter = new(cryptoStream)) {
-			streamWriter.Write(plainText);
-		}
-
-		byte[] encrypted = msEncrypt.ToArray();
-		return Convert.ToBase64String(encrypted);
 	}
 }
