@@ -448,6 +448,7 @@ public class UserRepository(
 	private async Task FillUserData(UserCreateUpdateDto dto, UserEntity entity) {
 		if (dto.FirstName is not null) entity.FirstName = dto.FirstName;
 		if (dto.LastName is not null) entity.LastName = dto.LastName;
+		if (dto.UserName is not null) entity.UserName = dto.UserName;
 		if (dto.FullName is not null) entity.FullName = dto.FullName;
 		if (dto.Title is not null) entity.Title = dto.Title;
 		if (dto.Subtitle is not null) entity.Subtitle = dto.Subtitle;
