@@ -15,6 +15,7 @@ public class RegistrationRepository(DbContext dbContext, IHttpContextAccessor ht
 			ProductId = dto.ProductId,
 			UserId = dto.UserId,
 			Title = dto.Title,
+			Subtitle = dto.Subtitle,
 			Column = dto.Column,
 			Row = dto.Row
 		}, ct);
@@ -26,6 +27,7 @@ public class RegistrationRepository(DbContext dbContext, IHttpContextAccessor ht
 		RegistrationEntity e = (await dbContext.Set<RegistrationEntity>().FirstOrDefaultAsync(f => f.Id == dto.Id, ct))!;
 		e.UpdatedAt = DateTime.UtcNow;
 		if (dto.Title is not null) e.Title = dto.Title!;
+		if (dto.Subtitle is not null) e.Subtitle = dto.Subtitle!;
 		if (dto.Row is not null) e.Row = dto.Row!;
 		if (dto.Column is not null) e.Column = dto.Column!;
 
@@ -47,6 +49,7 @@ public class RegistrationRepository(DbContext dbContext, IHttpContextAccessor ht
 			UserId = x.UserId,
 			ProductId = x.ProductId,
 			Title = x.Title,
+			Subtitle = x.Subtitle,
 			Column = x.Column,
 			Row = x.Row,
 			User = new UserEntity {

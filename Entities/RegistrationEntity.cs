@@ -3,6 +3,7 @@ namespace Utilities_aspnet.Entities;
 [Table("Registration")]
 public class RegistrationEntity : BaseEntity {
 	public string? Title { get; set; }
+	public string? Subtitle { get; set; }
 	public int? Row { get; set; }
 	public int? Column { get; set; }
 
@@ -15,6 +16,7 @@ public class RegistrationEntity : BaseEntity {
 
 public class RegistrationCreateDto {
 	public string? Title { get; set; }
+	public string? Subtitle { get; set; }
 	public int? Row { get; set; }
 	public int? Column { get; set; }
 
@@ -26,6 +28,7 @@ public class RegistrationCreateDto {
 public class RegistrationUpdateDto {
 	public required Guid Id { get; set; }
 	public string? Title { get; set; }
+	public string? Subtitle { get; set; }
 	public int? Row { get; set; }
 	public int? Column { get; set; }
 }
