@@ -73,6 +73,7 @@ public class UserEntity {
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
+	public IEnumerable<RegistrationEntity>? Registrations { get; set; }
 
 	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
