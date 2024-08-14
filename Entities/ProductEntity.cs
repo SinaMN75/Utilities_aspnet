@@ -121,6 +121,7 @@ public class UserReaction {
 public class Seat {
 	public string? ChairId { get; set; } = Guid.NewGuid().ToString();
 	public string? Title { get; set; }
+	public string? Subtitle { get; set; }
 	public string? Description { get; set; }
 	public string? Date { get; set; }
 	public string? Sans { get; set; }
