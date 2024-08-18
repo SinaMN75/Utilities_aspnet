@@ -22,11 +22,11 @@ public class ProductRepository(
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	public async Task<GenericResponse<ProductEntity?>> Create(ProductCreateUpdateDto dto, CancellationToken ct) {
-		int productsToday = await dbContext.Set<ProductEntity>()
-			.Where(x => x.UserId == _userId && x.CreatedAt >= DateTime.Now.Subtract(TimeSpan.FromDays(1)))
-			.AsNoTracking()
-			.CountAsync(ct);
-		if (productsToday >= 30) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.Overused);
+		// int productsToday = await dbContext.Set<ProductEntity>()
+			// .Where(x => x.UserId == _userId && x.CreatedAt >= DateTime.Now.Subtract(TimeSpan.FromDays(1)))
+			// .AsNoTracking()
+			// .CountAsync(ct);
+		// if (productsToday >= 30) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.Overused);
 		
 		ProductEntity e = await new ProductEntity().FillData(dto, dbContext);
 		e.UserId = _userId;
