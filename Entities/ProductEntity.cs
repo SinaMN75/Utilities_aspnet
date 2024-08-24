@@ -256,6 +256,7 @@ public class ProductFilterDto : BaseFilterDto {
 	public Currency? Currency { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 	public List<TagProduct>? Tags { get; set; }
+	public List<TagProduct>? TagsInclude { get; set; }
 	public IEnumerable<string>? UserIds { get; set; }
 	public IEnumerable<Guid>? Ids { get; set; }
 }

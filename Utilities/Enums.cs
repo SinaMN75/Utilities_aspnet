@@ -223,6 +223,10 @@ public enum TagCategory {
 	Sport = 185,
 	Couch = 186,
 	Questionnaire = 187,
+	Skills = 188,
+	Business = 189,
+	Estate = 190,
+	Rent = 191,
 	Enabled = 201
 }
 
@@ -367,6 +371,7 @@ public enum TagProduct {
 	Tournament = 190,
 	Couch = 191,
 	Match = 192,
+	Business = 193,
 	New = 201,
 	KindOfNew = 202,
 	Used = 203,
