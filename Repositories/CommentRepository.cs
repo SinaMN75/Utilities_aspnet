@@ -69,11 +69,12 @@ public class CommentRepository(
 		AppSettings appSettings = new();
 		config.GetSection("AppSettings").Bind(appSettings);
 
-		// int commentsToday = await dbContext.Set<CommentEntity>()
-		//  .Where(x => x.UserId == _userId && x.CreatedAt >= DateTime.Now.Subtract(TimeSpan.FromDays(1)))
-		// 	.AsNoTracking()
-		// 	.CountAsync(ct);
-		// if (commentsToday >= 30) return new GenericResponse<CommentEntity?>(null, UtilitiesStatusCodes.Overused);
+		DateTime yesterday = DateTime.Now.Subtract(TimeSpan.FromDays(1));
+		int commentsToday = await dbContext.Set<CommentEntity>()
+		.Where(x => x.UserId == _userId && x.CreatedAt >= yesterday)
+			.AsNoTracking()
+			.CountAsync(ct);
+		if (commentsToday >= 30) return new GenericResponse<CommentEntity?>(null, UtilitiesStatusCodes.Overused);
 
 		CommentEntity comment = new() {
 			Id = Guid.NewGuid(),
