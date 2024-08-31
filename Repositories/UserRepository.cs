@@ -133,6 +133,7 @@ public class UserRepository(
 
 		if (dto.UserNameExact.IsNotNullOrEmpty()) q = q.Where(x => x.AppUserName == dto.UserNameExact || x.UserName == dto.UserNameExact);
 		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => x.Id == dto.UserId);
+		if (dto.HasAppUserName.IsTrue()) q = q.Where(x => x.AppUserName != null);
 		if (dto.Badge.IsNotNullOrEmpty()) q = q.Where(x => x.Badge!.Contains(dto.Badge!));
 		if (dto.Bio.IsNotNullOrEmpty()) q = q.Where(x => x.Bio!.Contains(dto.Bio!));
 		if (dto.Email.IsNotNullOrEmpty()) q = q.Where(x => x.Email!.Contains(dto.Email!));
@@ -542,9 +543,11 @@ public class UserRepository(
 	}
 
 	public async Task<GenericResponse> Delete(string id, CancellationToken ct) {
-		UserEntity user = (await dbContext.Set<UserEntity>()
+		UserEntity? user = await dbContext.Set<UserEntity>()
 			.Include(x => x.Media)
-			.FirstOrDefaultAsync(x => x.Id == id, cancellationToken: ct))!;
+			.FirstOrDefaultAsync(x => x.Id == id, cancellationToken: ct);
+
+		if (user is null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
 
 		await mediaRepository.DeleteMedia(user.Media);
 		foreach (CommentEntity commentEntity in dbContext.Set<CommentEntity>().Where(x => x.UserId == id || x.TargetUserId == id))

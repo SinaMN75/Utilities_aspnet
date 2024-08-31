@@ -288,6 +288,7 @@ public class UserFilterDto : BaseFilterDto {
 	public string? Country { get; set; }
 	public string? City { get; set; }
 	public string? Badge { get; set; }
+	public bool? HasAppUserName { get; set; }
 	public bool? ShowMedia { get; set; }
 	public bool? ShowPremiums { get; set; }
 	public bool? ShowCategories { get; set; }
