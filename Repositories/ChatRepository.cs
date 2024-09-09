@@ -165,13 +165,13 @@ public class ChatRepository(
 			.FirstOrDefaultAsync(x => x.Id == id))!;
 
 		await mediaRepository.DeleteMedia(e.Media);
-		
-		dbContext.RemoveRange(e.SeenUsers!);
+
+		if (e.SeenUsers is not null) dbContext.RemoveRange(e.SeenUsers!);
 		dbContext.Remove(e);
 		await dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}
-	
+
 	public async Task<GenericResponse<IEnumerable<GroupChatEntity>?>> ReadMyGroupChats() {
 		await DeleteEmptyGroups();
 		List<GroupChatEntity> e = await dbContext.Set<GroupChatEntity>()
@@ -278,7 +278,7 @@ public class ChatRepository(
 
 		return new GenericResponse<GroupChatEntity>(e);
 	}
-	
+
 	public async Task<GenericResponse<IEnumerable<GroupChatMessageEntity>?>> FilterGroupChatMessages(FilterGroupChatMessagesDto dto) {
 		IQueryable<GroupChatMessageEntity> q = dbContext.Set<GroupChatMessageEntity>()
 			.Where(x => x.GroupChatId == dto.GroupChatId)
