@@ -513,6 +513,8 @@ public class UserRepository(
 		if (dto.StringList is not null) entity.JsonDetail.StringList = dto.StringList;
 		if (dto.PostalCode is not null) entity.JsonDetail.PostalCode = dto.PostalCode;
 		if (dto.LandlinePhone is not null) entity.JsonDetail.LandlinePhone = dto.LandlinePhone;
+		if (dto.HealthReport1 is not null) entity.JsonDetail.HealthReport1 = dto.HealthReport1;
+		if (dto.HealthReport2 is not null) entity.JsonDetail.HealthReport2 = dto.HealthReport2;
 
 		if (dto.Categories.IsNotNull()) {
 			List<CategoryEntity> list = [];

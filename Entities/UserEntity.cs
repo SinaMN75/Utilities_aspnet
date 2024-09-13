@@ -151,6 +151,8 @@ public class UserJsonDetail {
 	public string? HouseholdNumber { get; set; }
 	public string? UniqueId { get; set; }
 	public string? PassportNumber { get; set; }
+	public string? HealthReport1 { get; set; }
+	public string? HealthReport2 { get; set; }
 	public long? DeliveryPrice1 { get; set; }
 	public long? DeliveryPrice2 { get; set; }
 	public long? DeliveryPrice3 { get; set; }
@@ -250,6 +252,8 @@ public class UserCreateUpdateDto {
 	public string? HouseholdNumber { get; set; }
 	public string? UniqueId { get; set; }
 	public string? PassportNumber { get; set; }
+	public string? HealthReport1 { get; set; }
+	public string? HealthReport2 { get; set; }
 	public long? DeliveryPrice1 { get; set; }
 	public long? DeliveryPrice2 { get; set; }
 	public long? DeliveryPrice3 { get; set; }
