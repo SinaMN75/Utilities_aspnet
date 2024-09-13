@@ -276,6 +276,7 @@ public class UserRepository(
 			);
 
 		UserEntity user = new() {
+			Id = dto.Id ?? Guid.NewGuid().ToString(),
 			Suspend = false,
 			CreatedAt = DateTime.UtcNow,
 			UpdatedAt = DateTime.UtcNow
