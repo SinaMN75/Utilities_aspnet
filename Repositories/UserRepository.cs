@@ -29,6 +29,7 @@ public class UserRepository(
 	IMediaRepository mediaRepository,
 	IOrderRepository orderRepository,
 	ITransactionRepository transactionRepository,
+	ISmsNotificationRepository smsNotificationRepository,
 	IChatRepository chatRepository,
 	ICommentRepository commentRepository,
 	IReportRepository reportRepository,
@@ -125,6 +126,10 @@ public class UserRepository(
 		if (entity == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
 		await FillUserData(dto, entity);
 		await dbContext.SaveChangesAsync();
+
+		if ((dto.Tags ?? []).Contains(TagUser.Authorized)) {
+			await smsNotificationRepository.SendSms(entity.PhoneNumber ?? "", "upgradeAcoount", "کاربر گرامی");
+		}
 		return new GenericResponse<UserEntity?>(entity);
 	}
 
