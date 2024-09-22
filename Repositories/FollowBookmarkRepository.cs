@@ -9,8 +9,8 @@ public interface IFollowBookmarkRepository {
 public class FollowBookmarkRepository(
 	DbContext dbContext,
 	IHttpContextAccessor httpContextAccessor,
-	INotificationRepository notificationRepository,
-	IUserRepository userRepository)
+	IUserRepository userRepository
+)
 	: IFollowBookmarkRepository {
 	private readonly string _userId = httpContextAccessor.HttpContext!.User.Identity!.Name!;
 

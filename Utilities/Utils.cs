@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography;
-using static System.TimeSpan;
+﻿using static System.TimeSpan;
 
 namespace Utilities_aspnet.Utilities;
 
@@ -7,10 +6,9 @@ public static class StartupExtension {
 	public static void SetupUtilities<T>(
 		this WebApplicationBuilder builder,
 		string connectionStrings,
-		UtilitiesDatabaseType databaseType = UtilitiesDatabaseType.SqlServer,
 		string? redisConnectionString = null
 	) where T : DbContext {
-		builder.AddUtilitiesServices<T>(connectionStrings, databaseType, redisConnectionString);
+		builder.AddUtilitiesServices<T>(connectionStrings, redisConnectionString);
 
 		builder.AddUtilitiesSwagger(builder.Services.BuildServiceProvider().GetService<IServiceProvider>());
 		builder.AddUtilitiesIdentity();
@@ -26,11 +24,10 @@ public static class StartupExtension {
 	private static void AddUtilitiesServices<T>(
 		this WebApplicationBuilder builder,
 		string connectionStrings,
-		UtilitiesDatabaseType databaseType,
 		string? redisConnectionString
 	) where T : DbContext {
 		builder.Services.AddOptions();
-
+		
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
 		builder.Services.AddRateLimiter(x => {
@@ -57,25 +54,11 @@ public static class StartupExtension {
 		});
 		builder.Services.AddScoped<DbContext, T>();
 
-		builder.Services.AddDbContextPool<T>(options => {
-			switch (databaseType) {
-				case UtilitiesDatabaseType.SqlServer:
-					options.UseSqlServer(connectionStrings, o => {
-						o.EnableRetryOnFailure(maxRetryCount: 2, maxRetryDelay: FromSeconds(1), errorNumbersToAdd: Array.Empty<int>());
-						o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-					});
-					break;
-				case UtilitiesDatabaseType.Postgres:
-					options.UseNpgsql(connectionStrings, o => {
-						AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-						o.EnableRetryOnFailure(maxRetryCount: 2);
-						o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-					});
-					break;
-				default:
-					throw new ArgumentOutOfRangeException(nameof(databaseType), databaseType, null);
-			}
-		});
+		builder.Services.AddDbContextPool<T>(options => options.UseNpgsql(connectionStrings, o => {
+			AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+			o.EnableRetryOnFailure(maxRetryCount: 2);
+			o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+		}));
 
 		if (redisConnectionString is not null) {
 			builder.Services.AddStackExchangeRedisCache(options => { options.Configuration = redisConnectionString; });
@@ -210,7 +193,7 @@ public static class StartupExtension {
 			c.DefaultModelsExpandDepth(2);
 		});
 	}
-	
+
 	// private static CryptoStream EncryptStream(Stream responseStream) {
 	// 	Aes aes = GetEncryptionAlgorithm();
 	// 	CryptoStream base64EncodedStream = new CryptoStream(responseStream, new ToBase64Transform(), CryptoStreamMode.Write);
