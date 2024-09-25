@@ -13,6 +13,7 @@ public class GroupChatEntity : BaseEntity {
 	public GroupChatJsonDetail JsonDetail { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
+	public IEnumerable<TagGroupChat> Tags { get; set; } = [];
 	public IEnumerable<UserEntity>? Users { get; set; }
 	public IEnumerable<ProductEntity>? Products { get; set; }
 	public IEnumerable<GroupChatMessageEntity>? GroupChatMessage { get; set; }
@@ -109,6 +110,7 @@ public class GroupChatCreateUpdateDto {
 	public ChatStatus? ChatStatus { get; set; }
 	public ChatType? Type { get; set; }
 	public Priority? Priority { get; set; }
+	public IEnumerable<TagGroupChat>? Tags { get; set; }
 	public IEnumerable<string>? UserIds { get; set; } = new List<string>();
 	public IEnumerable<Guid>? Products { get; set; } = new List<Guid>();
 	public IEnumerable<Guid>? Categories { get; set; } = new List<Guid>();

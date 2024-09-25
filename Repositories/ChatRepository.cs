@@ -26,9 +26,6 @@ public class ChatRepository(
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	public async Task<GenericResponse<GroupChatEntity?>> CreateGroupChat(GroupChatCreateUpdateDto dto) {
-		AppSettings appSettings = new();
-		config.GetSection("AppSettings").Bind(appSettings);
-
 		if (dto.Type != ChatType.Private) return await CreateGroupChatLogic(dto);
 		string firstUserId = dto.UserIds!.ToList()[0];
 		string secondUserId = dto.UserIds!.ToList()[1];
@@ -73,6 +70,8 @@ public class ChatRepository(
 
 		e.Title = dto.Title ?? e.Title;
 		e.Type = dto.Type ?? e.Type;
+		e.Tags = dto.Tags ?? e.Tags;
+		
 		e.UpdatedAt = DateTime.UtcNow;
 
 		e.JsonDetail = new GroupChatJsonDetail {
@@ -400,6 +399,7 @@ public class ChatRepository(
 			UpdatedAt = DateTime.UtcNow,
 			CreatorUserId = _userId!,
 			Users = users,
+			Tags = dto.Tags ?? [],
 			Products = products,
 			JsonDetail = new GroupChatJsonDetail {
 				ChatStatus = dto.ChatStatus,

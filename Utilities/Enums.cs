@@ -9,11 +9,6 @@ public static class UtilitiesStatusCodesExtension {
 	public static int Value(this UtilitiesStatusCodes statusCode) => (int)statusCode;
 }
 
-public enum UtilitiesDatabaseType {
-	SqlServer = 100,
-	Postgres = 101
-}
-
 public enum UtilitiesStatusCodes {
 	Success = 200,
 	BadRequest = 400,
@@ -412,6 +407,11 @@ public enum TagOrder {
 	Cancelled = 411,
 	Private = 501,
 	Visible = 601
+}
+
+public enum TagGroupChat {
+	Normal = 100,
+	Sale = 101
 }
 
 public enum TagUser {
