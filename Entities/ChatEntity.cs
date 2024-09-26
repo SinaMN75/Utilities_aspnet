@@ -83,7 +83,7 @@ public class GroupChatFilterDto : BaseFilterDto {
 	public IEnumerable<Guid>? Ids { get; set; }
 	public IEnumerable<string>? UsersIds { get; set; }
 	public IEnumerable<Guid>? ProductsIds { get; set; }
-	public IEnumerable<TagChat> Tags { get; set; } = [];
+	public IEnumerable<TagChat>? Tags { get; set; }
 	public string? Title { get; set; }
 	public string? Description { get; set; }
 	public string? Value { get; set; }
