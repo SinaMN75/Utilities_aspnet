@@ -61,6 +61,7 @@ public class IdTitleDto {
 public class EnumDto {
 	public DateTime? DateTime { get; set; }
 	public DateTime? UtcDateTime { get; set; }
+	public IEnumerable<IdTitleDto>? TagChat { get; set; }
 	public IEnumerable<IdTitleDto>? UtilitiesStatusCodes { get; set; }
 	public IEnumerable<IdTitleDto>? Currency { get; set; }
 	public IEnumerable<IdTitleDto>? SeenStatus { get; set; }
