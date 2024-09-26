@@ -118,7 +118,8 @@ public class ChatRepository(
 			ParentId = dto.ParentId,
 			UserId = _userId,
 			Products = products,
-			ForwardedMessageId = dto.ForwardedMessageId
+			ForwardedMessageId = dto.ForwardedMessageId,
+			Tags = dto.Tags ?? []
 		};
 
 		EntityEntry<GroupChatMessageEntity> e = await dbContext.Set<GroupChatMessageEntity>().AddAsync(entity);
@@ -151,6 +152,7 @@ public class ChatRepository(
 
 		e.Message = dto.Message ?? e.Message;
 		e.UpdatedAt = DateTime.UtcNow;
+		e.Tags = dto.Tags ?? e.Tags;
 
 		EntityEntry<GroupChatMessageEntity> entity = dbContext.Set<GroupChatMessageEntity>().Update(e);
 		await dbContext.SaveChangesAsync();
@@ -296,8 +298,10 @@ public class ChatRepository(
 			.OrderBy(o => o.CreatedAt)
 			.Reverse()
 			.AsNoTracking();
+		
+		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
 
-		int totalCount = q.Count();
+		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
 		// List<GroupChatMessageEntity> tempGroupChatsMessage = await q.ToListAsync();

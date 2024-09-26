@@ -409,9 +409,9 @@ public enum TagOrder {
 	Visible = 601
 }
 
-public enum TagGroupChat {
-	Normal = 100,
-	Sale = 101
+public enum TagChat {
+	Product = 100,
+	Shop = 101
 }
 
 public enum TagUser {
