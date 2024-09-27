@@ -13,7 +13,7 @@ public class GroupChatEntity : BaseEntity {
 	public GroupChatJsonDetail JsonDetail { get; set; } = new();
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
-	public IEnumerable<TagChat> Tags { get; set; } = [];
+	public List<TagChat> Tags { get; set; } = [];
 	public IEnumerable<UserEntity>? Users { get; set; }
 	public IEnumerable<ProductEntity>? Products { get; set; }
 	public IEnumerable<GroupChatMessageEntity>? GroupChatMessage { get; set; }
@@ -47,7 +47,7 @@ public class GroupChatMessageEntity : BaseEntity {
 	public UserEntity? User { get; set; }
 	public string? UserId { get; set; }
 	
-	public IEnumerable<TagChat> Tags { get; set; } = [];
+	public List<TagChat> Tags { get; set; } = [];
 
 	[ForeignKey(nameof(ForwardedMessageId))]
 	public GroupChatMessageEntity? ForwardedMessage { get; set; }
@@ -83,7 +83,7 @@ public class GroupChatFilterDto : BaseFilterDto {
 	public IEnumerable<Guid>? Ids { get; set; }
 	public IEnumerable<string>? UsersIds { get; set; }
 	public IEnumerable<Guid>? ProductsIds { get; set; }
-	public IEnumerable<TagChat>? Tags { get; set; }
+	public List<TagChat>? Tags { get; set; }
 	public string? Title { get; set; }
 	public string? Description { get; set; }
 	public string? Value { get; set; }
@@ -113,7 +113,7 @@ public class GroupChatCreateUpdateDto {
 	public ChatStatus? ChatStatus { get; set; }
 	public ChatType? Type { get; set; }
 	public Priority? Priority { get; set; }
-	public IEnumerable<TagChat>? Tags { get; set; }
+	public List<TagChat>? Tags { get; set; }
 	public IEnumerable<string>? UserIds { get; set; } = new List<string>();
 	public IEnumerable<Guid>? Products { get; set; } = new List<Guid>();
 	public IEnumerable<Guid>? Categories { get; set; } = new List<Guid>();
@@ -126,7 +126,7 @@ public class GroupChatMessageCreateUpdateDto {
 	public Guid? GroupChatId { get; set; }
 	public Guid? ParentId { get; set; }
 	public IEnumerable<Guid>? Products { get; set; } = new List<Guid>();
-	public IEnumerable<TagChat>? Tags { get; set; }
+	public List<TagChat>? Tags { get; set; }
 }
 
 public class FilterGroupChatMessagesDto: BaseFilterDto {
@@ -134,5 +134,5 @@ public class FilterGroupChatMessagesDto: BaseFilterDto {
 	public string? Message { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
-	public IEnumerable<TagChat>? Tags { get; set; }
+	public List<TagChat>? Tags { get; set; }
 }
