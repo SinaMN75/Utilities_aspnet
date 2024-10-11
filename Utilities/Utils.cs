@@ -45,13 +45,6 @@ public static class StartupExtension {
 		});
 
 		builder.Services.AddCors(c => c.AddPolicy("AllowOrigin", option => option.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
-		builder.Services.Configure<BrotliCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
-		builder.Services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
-		builder.Services.AddResponseCompression(options => {
-			options.EnableForHttps = true;
-			options.Providers.Add<BrotliCompressionProvider>();
-			options.Providers.Add<GzipCompressionProvider>();
-		});
 		builder.Services.AddScoped<DbContext, T>();
 
 		builder.Services.AddDbContextPool<T>(options => options.UseNpgsql(connectionStrings, o => {
@@ -77,7 +70,6 @@ public static class StartupExtension {
 
 		builder.Services.AddTransient<IApiKeyValidation, ApiKeyValidation>();
 		builder.Services.AddScoped<ApiKeyAuthFilter>();
-		builder.Services.AddOutputCache();
 		builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 		builder.Services.AddScoped<AppSettings>();
 		builder.Services.AddScoped<IReportRepository, ReportRepository>();
@@ -161,7 +153,6 @@ public static class StartupExtension {
 	public static void UseUtilitiesServices(this WebApplication app) {
 		app.UseCors(option => option.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 		app.UseRateLimiter();
-		app.UseOutputCache();
 		app.UseDeveloperExceptionPage();
 		app.UseUtilitiesSwagger();
 		app.UseStaticFiles();
@@ -173,17 +164,6 @@ public static class StartupExtension {
 
 		app.UseAuthentication();
 		app.UseAuthorization();
-
-		// app.Use((httpContext, next) => {
-		// 	httpContext.Response.Body = EncryptStream(httpContext.Response.Body);
-		// 	// httpContext.Request.Body = DecryptStream(httpContext.Request.Body);
-		// 	return next();
-		// });
-		// app.Run(async context => {
-		// 	string str = "nnnnnnnnnnnnnnnnnnnnnnnnnnn";
-		// 	Console.WriteLine(str);
-		// 	await context.Response.WriteAsync(str);
-		// });
 	}
 
 	private static void UseUtilitiesSwagger(this IApplicationBuilder app) {
@@ -193,28 +173,4 @@ public static class StartupExtension {
 			c.DefaultModelsExpandDepth(2);
 		});
 	}
-
-	// private static CryptoStream EncryptStream(Stream responseStream) {
-	// 	Aes aes = GetEncryptionAlgorithm();
-	// 	CryptoStream base64EncodedStream = new CryptoStream(responseStream, new ToBase64Transform(), CryptoStreamMode.Write);
-	// 	CryptoStream cryptoStream = new CryptoStream(base64EncodedStream, aes.CreateEncryptor(aes.Key, aes.IV), CryptoStreamMode.Write);
-	// 	//CryptoStream.FlushFinalBlock() // this will not work because this needs to be push at the end of stream.
-	// 	return cryptoStream;
-	// }
-	//
-	// private static Stream DecryptStream(Stream cipherStream) {
-	// 	Aes aes = GetEncryptionAlgorithm();
-	// 	CryptoStream base64DecodedStream = new CryptoStream(cipherStream, new FromBase64Transform(FromBase64TransformMode.IgnoreWhiteSpaces), CryptoStreamMode.Read);
-	// 	CryptoStream decryptedStream = new CryptoStream(base64DecodedStream, aes.CreateDecryptor(aes.Key, aes.IV), CryptoStreamMode.Read);
-	// 	return decryptedStream;
-	// }
-	//
-	// private static Aes GetEncryptionAlgorithm() {
-	// 	AesManaged aes = new AesManaged {
-	// 		Padding = PaddingMode.PKCS7,
-	// 		Key = Convert.FromBase64String("73kczzrPtnn5GXxQtOI6m4AewK34F4IkT/yaeYZxr+M="),
-	// 		IV = Convert.FromBase64String("b8LAfmzY8WxGNrZeTye4hw=="),
-	// 	};
-	// 	return aes;
-	// }
 }
