@@ -3,12 +3,8 @@
 namespace Utilities_aspnet.Utilities;
 
 public static class StartupExtension {
-	public static void SetupUtilities<T>(
-		this WebApplicationBuilder builder,
-		string connectionStrings,
-		string? redisConnectionString = null
-	) where T : DbContext {
-		builder.AddUtilitiesServices<T>(connectionStrings, redisConnectionString);
+	public static void SetupUtilities<T>(this WebApplicationBuilder builder) where T : DbContext {
+		builder.AddUtilitiesServices<T>();
 
 		builder.AddUtilitiesSwagger(builder.Services.BuildServiceProvider().GetService<IServiceProvider>());
 		builder.AddUtilitiesIdentity();
@@ -21,13 +17,9 @@ public static class StartupExtension {
 		builder.Services.Configure<IISServerOptions>(options => options.MaxRequestBodySize = int.MaxValue);
 	}
 
-	private static void AddUtilitiesServices<T>(
-		this WebApplicationBuilder builder,
-		string connectionStrings,
-		string? redisConnectionString
-	) where T : DbContext {
+	private static void AddUtilitiesServices<T>(this WebApplicationBuilder builder) where T : DbContext {
 		builder.Services.AddOptions();
-		
+
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
 		builder.Services.AddRateLimiter(x => {
@@ -47,15 +39,13 @@ public static class StartupExtension {
 		builder.Services.AddCors(c => c.AddPolicy("AllowOrigin", option => option.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 		builder.Services.AddScoped<DbContext, T>();
 
-		builder.Services.AddDbContextPool<T>(options => options.UseNpgsql(connectionStrings, o => {
+		builder.Services.AddDbContextPool<T>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("ServerPostgres"), o => {
 			AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 			o.EnableRetryOnFailure(maxRetryCount: 2);
 			o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
 		}));
 
-		if (redisConnectionString is not null) {
-			builder.Services.AddStackExchangeRedisCache(options => { options.Configuration = redisConnectionString; });
-		}
+		builder.Services.AddStackExchangeRedisCache(o => o.Configuration = builder.Configuration.GetConnectionString("Redis"));
 
 		builder.Services.AddHttpContextAccessor();
 		builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
