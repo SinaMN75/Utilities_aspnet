@@ -58,7 +58,28 @@ public class CategoryJsonDetail {
 	public DateTime? Date2 { get; set; }
 }
 
-public class CategoryCreateUpdateDto {
+public class CategoryCreateDto {
+	public required string Title { get; set; }
+	public string? TitleTr1 { get; set; }
+	public string? TitleTr2 { get; set; }
+	public string? Subtitle { get; set; }
+	public string? Color { get; set; }
+	public string? Link { get; set; }
+	public double? Latitude { get; set; }
+	public double? Longitude { get; set; }
+	public long? Price { get; set; }
+	public long? DiscountedPrice { get; set; }
+	public long? SendPrice { get; set; }
+	public int? Value { get; set; }
+	public int? Stock { get; set; }
+	public int? Order { get; set; }
+	public DateTime? Date1 { get; set; }
+	public DateTime? Date2 { get; set; }
+	public Guid? ParentId { get; set; }
+	public required List<TagCategory> Tags { get; set; }
+}
+
+public class CategoryUpdateDto {
 	public Guid? Id { get; set; }
 	public string? Title { get; set; }
 	public string? TitleTr1 { get; set; }
@@ -76,8 +97,6 @@ public class CategoryCreateUpdateDto {
 	public int? Order { get; set; }
 	public DateTime? Date1 { get; set; }
 	public DateTime? Date2 { get; set; }
-	public Guid? ParentId { get; set; }
-	public bool IsUnique { get; set; } = true;
 	public List<TagCategory>? Tags { get; set; }
 }
 
@@ -87,7 +106,6 @@ public class CategoryFilterDto : BaseFilterDto {
 	public string? TitleTr2 { get; set; }
 	public List<TagCategory>? Tags { get; set; }
 	public Guid? ParentId { get; set; }
-	public bool? MultiLevel { get; set; }
 	public bool? ShowMedia { get; set; }
 	public bool? OrderByOrder { get; set; }
 	public bool? OrderByOrderDescending { get; set; }

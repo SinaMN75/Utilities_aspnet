@@ -6,12 +6,12 @@ namespace Utilities_aspnet.Controllers;
 public class CategoryController(ICategoryRepository repository) : BaseApiController {
 	[HttpPost]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Create(CategoryCreateUpdateDto dto, CancellationToken ct) =>
+	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Create(CategoryCreateDto dto, CancellationToken ct) =>
 		Result(await repository.Create(dto, ct));
 
 	[HttpPost("BulkCreate")]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse<IEnumerable<CategoryEntity>>>> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto, CancellationToken ct) =>
+	public async Task<ActionResult<GenericResponse<IEnumerable<CategoryEntity>>>> BulkCreate(IEnumerable<CategoryCreateDto> dto, CancellationToken ct) =>
 		Result(await repository.BulkCreate(dto, ct));
 	
 	[HttpPost("ImportFromExcel")]
@@ -24,7 +24,7 @@ public class CategoryController(ICategoryRepository repository) : BaseApiControl
 
 	[HttpPut]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Update(CategoryCreateUpdateDto dto, CancellationToken ct) =>
+	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Update(CategoryUpdateDto dto, CancellationToken ct) =>
 		Result(await repository.Update(dto, ct));
 
 	[HttpDelete("{id:guid}")]

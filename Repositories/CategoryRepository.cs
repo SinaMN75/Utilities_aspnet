@@ -1,39 +1,51 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
 public interface ICategoryRepository {
-	public Task<GenericResponse<CategoryEntity>> Create(CategoryCreateUpdateDto dto, CancellationToken ct);
-	public Task<GenericResponse<IEnumerable<CategoryEntity>>> BulkCreate(IEnumerable<CategoryCreateUpdateDto> dto, CancellationToken ct);
+	public Task<GenericResponse<CategoryEntity>> Create(CategoryCreateDto dto, CancellationToken ct);
+	public Task<GenericResponse<IEnumerable<CategoryEntity>>> BulkCreate(IEnumerable<CategoryCreateDto> dto, CancellationToken ct);
 	public Task<GenericResponse> ImportFromExcel(IFormFile file, CancellationToken ct);
 	public Task<GenericResponse<IEnumerable<CategoryEntity>>> Filter(CategoryFilterDto dto);
-	public Task<GenericResponse<CategoryEntity?>> Update(CategoryCreateUpdateDto dto, CancellationToken ct);
+	public Task<GenericResponse<CategoryEntity?>> Update(CategoryUpdateDto dto, CancellationToken ct);
 	public Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 }
 
 public class CategoryRepository(DbContext context, IMediaRepository mediaRepository) : ICategoryRepository {
-	public async Task<GenericResponse<CategoryEntity>> Create(CategoryCreateUpdateDto dto, CancellationToken ct) {
-		CategoryEntity entity = new();
-		if (dto.Id is not null) entity.Id = (Guid)dto.Id;
-		CategoryEntity i = entity.FillData(dto);
-		if (dto.IsUnique) {
-			CategoryEntity? exists = await context.Set<CategoryEntity>().AsNoTracking()
-				.FirstOrDefaultAsync(x => x.Title == dto.Title, ct);
-			if (exists != null) return new GenericResponse<CategoryEntity>(exists);
-			await context.AddAsync(i, ct);
-			await context.SaveChangesAsync(ct);
-			return new GenericResponse<CategoryEntity>(i);
-		}
-
-		await context.AddAsync(i, ct);
+	public async Task<GenericResponse<CategoryEntity>> Create(CategoryCreateDto dto, CancellationToken ct) {
+		CategoryEntity entity = new() {
+			CreatedAt = DateTime.UtcNow,
+			UpdatedAt = DateTime.UtcNow,
+			Title = dto.Title,
+			TitleTr1 = dto.TitleTr1,
+			TitleTr2 = dto.TitleTr2,
+			Order = dto.Order,
+			Tags = dto.Tags,
+			ParentId = dto.ParentId,
+			JsonDetail = new CategoryJsonDetail {
+				Subtitle = dto.Subtitle,
+				Price = dto.Price,
+				Color = dto.Color,
+				Stock = dto.Stock,
+				Link = dto.Link,
+				Latitude = dto.Latitude,
+				Longitude = dto.Longitude,
+				Date1 = dto.Date1,
+				Date2 = dto.Date2,
+				Value = dto.Value,
+				DiscountedPrice = dto.DiscountedPrice,
+				SendPrice = dto.SendPrice
+			}
+		};
+		await context.AddAsync(entity, ct);
 		await context.SaveChangesAsync(ct);
-		return new GenericResponse<CategoryEntity>(i);
+		return new GenericResponse<CategoryEntity>(entity);
 	}
 
 	public async Task<GenericResponse<IEnumerable<CategoryEntity>>> BulkCreate(
-		IEnumerable<CategoryCreateUpdateDto> dto,
+		IEnumerable<CategoryCreateDto> dto,
 		CancellationToken ct
 	) {
 		List<CategoryEntity> list = [];
-		foreach (CategoryCreateUpdateDto i in dto) {
+		foreach (CategoryCreateDto i in dto) {
 			GenericResponse<CategoryEntity> j = await Create(i, ct);
 			list.Add(j.Result!);
 		}
@@ -42,20 +54,18 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 	}
 
 	public async Task<GenericResponse> ImportFromExcel(IFormFile file, CancellationToken ct) {
-		List<CategoryCreateUpdateDto> list = [];
+		List<CategoryCreateDto> list = [];
 		using MemoryStream stream = new();
 		await file.CopyToAsync(stream, ct);
 		using ExcelPackage package = new(stream);
 		ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
 		int rowCount = worksheet.Dimension.Rows;
 		for (int i = 2; i < rowCount; i++) {
-			list.Add(new CategoryCreateUpdateDto {
-				Id = Guid.TryParse(worksheet.Cells[i, 0].Value.ToString(), out _) ? Guid.Parse(worksheet.Cells[i, 0].Value.ToString()!) : null,
-				Title = worksheet.Cells[i, 2].Value.ToString(),
+			list.Add(new CategoryCreateDto {
+				Title = worksheet.Cells[i, 2].Value.ToString()!,
 				TitleTr1 = worksheet.Cells[i, 3].Value.ToString(),
 				ParentId = Guid.TryParse(worksheet.Cells[i, 4].Value.ToString(), out _) ? Guid.Parse(worksheet.Cells[i, 4].Value.ToString()!) : null,
-				Tags = new List<TagCategory> { TagCategory.Category },
-				IsUnique = false
+				Tags = [TagCategory.Category],
 			});
 		}
 
@@ -65,14 +75,9 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 	}
 
 	public async Task<GenericResponse<IEnumerable<CategoryEntity>>> Filter(CategoryFilterDto dto) {
-		IQueryable<CategoryEntity> q = context.Set<CategoryEntity>().Where(x => x.ParentId == null)
+		IQueryable<CategoryEntity> q = context.Set<CategoryEntity>()
+			.Where(x => x.ParentId == null)
 			.Include(x => x.Children).AsNoTracking();
-
-		if (dto.MultiLevel.IsTrue()) {
-			q = q.Include(x => x.Children)!
-				.ThenInclude(x => x.Children)!
-				.ThenInclude(x => x.Children);
-		}
 
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => x.Title!.Contains(dto.Title!));
 		if (dto.TitleTr1.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr1!.Contains(dto.TitleTr1!));
@@ -84,7 +89,6 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 		if (dto.OrderByCreatedAtDescending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 		if (dto.OrderByOrder.IsTrue()) q = q.OrderBy(x => x.Order);
 		if (dto.OrderByOrderDescending.IsTrue()) q = q.OrderByDescending(x => x.Order);
-		if (dto.OrderByCreatedAtDescending.IsTrue()) q = q.OrderByDescending(x => x.Order);
 
 		if (dto.ShowMedia.IsTrue()) q = q.Include(x => x.Media);
 
@@ -113,40 +117,28 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 		await context.SaveChangesAsync(ct);
 		return new GenericResponse();
 	}
-
-	public async Task<GenericResponse<CategoryEntity?>> Update(CategoryCreateUpdateDto dto, CancellationToken ct) {
-		CategoryEntity? entity = await context.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id, ct);
-		if (entity == null) return new GenericResponse<CategoryEntity?>(null, UtilitiesStatusCodes.NotFound);
-		entity.FillData(dto);
+	
+	public async Task<GenericResponse<CategoryEntity?>> Update(CategoryUpdateDto dto, CancellationToken ct) {
+		CategoryEntity entity = (await context.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id, ct))!;
+		entity.UpdatedAt = DateTime.UtcNow;
+		if (dto.Title is not null) entity.Title = dto.Title;
+		if (dto.TitleTr1 is not null) entity.TitleTr1 = dto.TitleTr1;
+		if (dto.TitleTr2 is not null) entity.TitleTr2 = dto.TitleTr2;
+		if (dto.Tags is not null) entity.Tags = dto.Tags;
+		if (dto.Order is not null) entity.Order = dto.Order;
+		if (dto.Subtitle is not null) entity.JsonDetail.Subtitle = dto.Subtitle;
+		if (dto.Price is not null) entity.JsonDetail.Price = dto.Price;
+		if (dto.Color is not null) entity.JsonDetail.Color = dto.Color;
+		if (dto.Stock is not null) entity.JsonDetail.Stock = dto.Stock;
+		if (dto.Link is not null) entity.JsonDetail.Link = dto.Link;
+		if (dto.Latitude is not null) entity.JsonDetail.Latitude = dto.Latitude;
+		if (dto.Longitude is not null) entity.JsonDetail.Longitude = dto.Longitude;
+		if (dto.Date1 is not null) entity.JsonDetail.Date1 = dto.Date1;
+		if (dto.Date2 is not null) entity.JsonDetail.Date2 = dto.Date2;
+		if (dto.Value is not null) entity.JsonDetail.Value = dto.Value;
+		if (dto.DiscountedPrice is not null) entity.JsonDetail.DiscountedPrice = dto.DiscountedPrice;
+		if (dto.SendPrice is not null) entity.JsonDetail.SendPrice = dto.SendPrice;
 		await context.SaveChangesAsync(ct);
 		return new GenericResponse<CategoryEntity?>(entity);
-	}
-}
-
-public static class CategoryEntityExtension {
-	public static CategoryEntity FillData(this CategoryEntity entity, CategoryCreateUpdateDto dto) {
-		entity.Title = dto.Title ?? entity.Title;
-		entity.TitleTr1 = dto.TitleTr1 ?? entity.TitleTr1;
-		entity.TitleTr2 = dto.TitleTr2 ?? entity.TitleTr2;
-		entity.UpdatedAt = DateTime.UtcNow;
-		entity.Order = dto.Order ?? entity.Order;
-		entity.ParentId = dto.ParentId ?? entity.ParentId;
-		entity.Tags = dto.Tags ?? entity.Tags;
-		entity.JsonDetail = new CategoryJsonDetail {
-			Subtitle = dto.Subtitle ?? entity.JsonDetail.Subtitle,
-			Price = dto.Price ?? entity.JsonDetail.Price,
-			Color = dto.Color ?? entity.JsonDetail.Color,
-			Stock = dto.Stock ?? entity.JsonDetail.Stock,
-			Link = dto.Link ?? entity.JsonDetail.Link,
-			Latitude = dto.Latitude ?? entity.JsonDetail.Latitude,
-			Longitude = dto.Longitude ?? entity.JsonDetail.Longitude,
-			Date1 = dto.Date1 ?? entity.JsonDetail.Date1,
-			Date2 = dto.Date2 ?? entity.JsonDetail.Date2,
-			Value = dto.Value ?? entity.JsonDetail.Value,
-			DiscountedPrice = dto.DiscountedPrice ?? entity.JsonDetail.DiscountedPrice,
-			SendPrice = dto.SendPrice ?? entity.JsonDetail.SendPrice
-		};
-
-		return entity;
 	}
 }
