@@ -1,6 +1,7 @@
 ﻿namespace Utilities_aspnet.Entities;
 
 public class AppSettings {
+	public static AppSettings Settings { get; private set; }
 	public SmsPanelSettings SmsPanelSettings { get; set; } = null!;
 	public Zibal Zibal { get; set; } = null!;
 	public PushNotificationSetting PushNotificationSetting { get; set; } = null!;
@@ -16,14 +17,8 @@ public class AppSettings {
 	public string? IosDownloadLink1 { get; set; }
 	public string? IosDownloadLink2 { get; set; }
 
-	public static AppSettings GetCurrentSettings() {
-		AppSettings appSettings = new();
-		new ConfigurationBuilder()
-			.SetBasePath(Directory.GetCurrentDirectory())
-			.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-			.AddEnvironmentVariables().Build().GetSection("AppSettings").Bind(appSettings);
-		return appSettings;
-	}
+	public static void Initialize(IConfiguration configuration) => 
+		Settings = configuration.GetSection("AppSettings").Get<AppSettings>()!;
 }
 
 public class SmsPanelSettings {

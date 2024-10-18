@@ -9,9 +9,7 @@ public class ContentEntity : BaseEntity {
 	public string? SubTitle { get; set; }
 
 	[MaxLength(5000)]
-	public string? Description { get; set; }
-
-	public DateTime? DeletedAt { get; set; }
+	public required string Description { get; set; }
 
 	[MaxLength(100)]
 	public required List<TagContent> Tags { get; set; } = [];
@@ -43,9 +41,9 @@ public class ContentJsonDetail {
 }
 
 public class ContentCreateDto {
-	public string? Title { get; set; }
+	public required string Title { get; set; }
+	public required string Description { get; set; }
 	public string? SubTitle { get; set; }
-	public string? Description { get; set; }
 	public string? Instagram { get; set; }
 	public string? Telegram { get; set; }
 	public string? WhatsApp { get; set; }
@@ -63,7 +61,7 @@ public class ContentCreateDto {
 	public string? Address3 { get; set; }
 	public long? Price { get; set; }
 	public int? Days { get; set; }
-	public List<TagContent>? Tags { get; set; }
+	public required List<TagContent> Tags { get; set; }
 	public List<KeyValue> KeyValues { get; set; } = [];
 }
 
@@ -89,7 +87,6 @@ public class ContentUpdateDto {
 	public string? Address3 { get; set; }
 	public long? Price { get; set; }
 	public int? Days { get; set; }
-	public DateTime? DeletedAt { get; set; }
 	public List<TagContent>? Tags { get; set; }
 	public List<KeyValue>? KeyValues { get; set; }
 }

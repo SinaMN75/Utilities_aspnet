@@ -21,7 +21,7 @@ public static class StartupExtension {
 		builder.Services.AddOptions();
 
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
-
+		AppSettings.Initialize(builder.Configuration);  
 		builder.Services.AddRateLimiter(x => {
 			x.RejectionStatusCode = 429;
 			x.AddFixedWindowLimiter("fixed", y => {
