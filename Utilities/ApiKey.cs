@@ -39,7 +39,7 @@ public class ApiKeyAuthFilter(IApiKeyValidation apiKeyValidation) : IAuthorizati
 //
 public class EncryptResponseAttribute : ActionFilterAttribute {
 	public override async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next) {
-		if (context.Result is ObjectResult objectResult && objectResult.Value != null) {
+		if (context.Result is ObjectResult { Value: not null } objectResult) {
 			string jsonString = JsonConvert.SerializeObject(objectResult.Value,
 				new JsonSerializerSettings {
 					ContractResolver = new CamelCasePropertyNamesContractResolver(),

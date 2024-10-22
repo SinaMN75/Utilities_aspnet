@@ -7,46 +7,45 @@ public interface IAddressRepository {
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 }
 
-public class AddressRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) : IAddressRepository {
-	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
-
-	public async Task<GenericResponse<AddressEntity?>> Create(AddressCreateDto addressDto, CancellationToken ct) {
-		EntityEntry<AddressEntity> e = await dbContext.Set<AddressEntity>().AddAsync(new AddressEntity {
-			Address = addressDto.Address,
+public class AddressRepository(DbContext context) : IAddressRepository {
+	public async Task<GenericResponse<AddressEntity?>> Create(AddressCreateDto dto, CancellationToken ct) {
+		EntityEntry<AddressEntity> e = await context.Set<AddressEntity>().AddAsync(new AddressEntity {
+			Address = dto.Address,
 			CreatedAt = DateTime.UtcNow,
-			Pelak = addressDto.Pelak,
-			PostalCode = addressDto.PostalCode,
-			ReceiverFullName = addressDto.ReceiverFullName,
-			ReceiverPhoneNumber = addressDto.ReceiverPhoneNumber,
-			Unit = addressDto.Unit,
-			UserId = _userId,
+			UpdatedAt = DateTime.UtcNow,
+			Pelak = dto.Pelak,
+			PostalCode = dto.PostalCode,
+			ReceiverFullName = dto.ReceiverFullName,
+			ReceiverPhoneNumber = dto.ReceiverPhoneNumber,
+			Unit = dto.Unit,
+			UserId = dto.UserId,
 		}, ct);
-		await dbContext.SaveChangesAsync(ct);
+		await context.SaveChangesAsync(ct);
 		return new GenericResponse<AddressEntity?>(e.Entity);
 	}
 
 	public async Task<GenericResponse<AddressEntity?>> Update(AddressUpdateDto dto, CancellationToken ct) {
-		AddressEntity e = (await dbContext.Set<AddressEntity>().FirstOrDefaultAsync(f => f.Id == dto.Id, ct))!;
+		AddressEntity e = (await context.Set<AddressEntity>().FirstOrDefaultAsync(f => f.Id == dto.Id, ct))!;
 		e.UpdatedAt = DateTime.UtcNow;
-		if (dto.PostalCode.IsNotNullOrEmpty()) e.PostalCode = dto.PostalCode!;
-		if (dto.Pelak.IsNotNullOrEmpty()) e.Pelak = dto.Pelak!;
-		if (dto.Unit.IsNotNullOrEmpty()) e.Unit = dto.Unit!;
-		if (dto.Address.IsNotNullOrEmpty()) e.Address = dto.Address!;
-		if (dto.ReceiverFullName.IsNotNullOrEmpty()) e.ReceiverFullName = dto.ReceiverFullName!;
-		if (dto.ReceiverPhoneNumber.IsNotNullOrEmpty()) e.ReceiverPhoneNumber = dto.ReceiverPhoneNumber!;
+		if (dto.PostalCode is not null) e.PostalCode = dto.PostalCode!;
+		if (dto.Pelak is not null) e.Pelak = dto.Pelak!;
+		if (dto.Unit is not null) e.Unit = dto.Unit!;
+		if (dto.Address is not null) e.Address = dto.Address!;
+		if (dto.ReceiverFullName is not null) e.ReceiverFullName = dto.ReceiverFullName!;
+		if (dto.ReceiverPhoneNumber is not null) e.ReceiverPhoneNumber = dto.ReceiverPhoneNumber!;
 
-		dbContext.Update(e);
-		await dbContext.SaveChangesAsync(ct);
+		context.Update(e);
+		await context.SaveChangesAsync(ct);
 		return new GenericResponse<AddressEntity?>(e);
 	}
 
-	public async Task<GenericResponse> Delete(Guid addressId, CancellationToken ct) {
-		await dbContext.Set<AddressEntity>().Where(f => f.Id == addressId).ExecuteDeleteAsync(ct);
+	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {
+		await context.Set<AddressEntity>().Where(f => f.Id == id).ExecuteDeleteAsync(ct);
 		return new GenericResponse();
 	}
 
 	public async Task<GenericResponse<IQueryable<AddressEntity>>> Filter(AddressFilterDto dto) {
-		IQueryable<AddressEntity> q = dbContext.Set<AddressEntity>().AsNoTracking().Select(x => new AddressEntity {
+		IQueryable<AddressEntity> q = context.Set<AddressEntity>().AsNoTracking().Select(x => new AddressEntity {
 			Id = x.Id,
 			CreatedAt = x.CreatedAt,
 			UpdatedAt = x.UpdatedAt,
@@ -59,7 +58,7 @@ public class AddressRepository(DbContext dbContext, IHttpContextAccessor httpCon
 			UserId = x.UserId
 		});
 		
-		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(o => o.UserId == dto.UserId);
+		if (dto.UserId is not null) q = q.Where(o => o.UserId == dto.UserId);
 
 		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);

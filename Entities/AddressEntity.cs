@@ -31,6 +31,7 @@ public class AddressCreateDto {
 	public required string Pelak { get; set; }
 	public required string Unit { get; set; }
 	public required string PostalCode { get; set; }
+	public required string UserId { get; set; }
 }
 
 public class AddressUpdateDto {
