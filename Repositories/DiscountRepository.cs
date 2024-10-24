@@ -7,9 +7,7 @@ public interface IDiscountRepository {
 	Task<GenericResponse> Delete(Guid id);
 }
 
-public class DiscountRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) : IDiscountRepository {
-	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
-
+public class DiscountRepository(DbContext dbContext) : IDiscountRepository {
 	public async Task<GenericResponse<DiscountEntity>> Create(DiscountCreateDto dto) {
 		EntityEntry<DiscountEntity> i = await dbContext.AddAsync(new DiscountEntity {
 			Title = dto.Title,
@@ -62,15 +60,5 @@ public class DiscountRepository(DbContext dbContext, IHttpContextAccessor httpCo
 	public async Task<GenericResponse> Delete(Guid id) {
 		await dbContext.Set<DiscountEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
-	}
-
-	public async Task<GenericResponse<DiscountEntity?>> ReadDiscountCode(string code) {
-		DiscountEntity? discountEntity = await dbContext.Set<DiscountEntity>().FirstOrDefaultAsync(p => p.Code == code);
-		if (discountEntity == null) return new GenericResponse<DiscountEntity?>(null, UtilitiesStatusCodes.NotFound);
-		IQueryable<OrderEntity> orders = dbContext.Set<OrderEntity>()
-			.Where(p => p.UserId == _userId && p.DiscountCode == code);
-		return await orders.CountAsync() >= discountEntity.NumberUses
-			? new GenericResponse<DiscountEntity?>(null, UtilitiesStatusCodes.MaximumLimitReached)
-			: new GenericResponse<DiscountEntity?>(discountEntity);
 	}
 }

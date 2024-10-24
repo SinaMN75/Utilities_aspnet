@@ -41,12 +41,6 @@ public class UserController(IUserRepository repository) : BaseApiController {
 	[HttpPost("Authorize")]
 	[Authorize]
 	public async Task<ActionResult<GenericResponse>> Authorize(AuthorizeUserDto dto) => Result(await repository.Authorize(dto));
-
-	[HttpGet("ReadMyBlockList")]
-	public async Task<ActionResult<GenericResponse<IQueryable<UserEntity>>>> ReadMyBlockList() => Result(await repository.ReadMyBlockList());
-
-	[HttpPost("ToggleBlock/{id}")]
-	public async Task<ActionResult<GenericResponse>> Block(string id) => Result(await repository.ToggleBlock(id));
 	
 	[HttpPost("Subscribe")]
 	public async Task<ActionResult<GenericResponse>> Subscribe(string userId, Guid contentId, string transactionRefId) => 

@@ -1,6 +1,5 @@
 ﻿#region
 
-global using CompressionLevel = System.IO.Compression.CompressionLevel;
 global using System;
 global using System.Collections.Generic;
 global using System.Threading.Tasks;
@@ -26,8 +25,6 @@ global using Microsoft.IdentityModel.Tokens;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.AspNetCore.Hosting;
 global using Microsoft.AspNetCore.Authorization;
-global using Microsoft.AspNetCore.ResponseCompression;
-global using Microsoft.AspNetCore.OutputCaching;
 global using Microsoft.AspNetCore.RateLimiting;
 global using Microsoft.Extensions.Caching.Distributed;
 global using Utilities_aspnet.Utilities;

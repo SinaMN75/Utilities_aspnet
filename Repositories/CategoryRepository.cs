@@ -65,7 +65,7 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 				Title = worksheet.Cells[i, 2].Value.ToString()!,
 				TitleTr1 = worksheet.Cells[i, 3].Value.ToString(),
 				ParentId = Guid.TryParse(worksheet.Cells[i, 4].Value.ToString(), out _) ? Guid.Parse(worksheet.Cells[i, 4].Value.ToString()!) : null,
-				Tags = [TagCategory.Category],
+				Tags = [TagCategory.Category]
 			});
 		}
 

@@ -45,7 +45,7 @@ public class EncryptResponseAttribute : ActionFilterAttribute {
 					ContractResolver = new CamelCasePropertyNamesContractResolver(),
 					PreserveReferencesHandling = PreserveReferencesHandling.Objects,
 					ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-					NullValueHandling = NullValueHandling.Ignore,
+					NullValueHandling = NullValueHandling.Ignore
 				}
 			);
 			string encryptedData = Encryption.Base64Encode(jsonString);

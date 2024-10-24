@@ -8,7 +8,6 @@ public interface IRegistrationRepository {
 }
 
 public class RegistrationRepository(DbContext dbContext, IHttpContextAccessor httpContextAccessor) : IRegistrationRepository {
-	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
 	public async Task<GenericResponse<RegistrationEntity?>> Create(RegistrationCreateDto dto, CancellationToken ct) {
 		EntityEntry<RegistrationEntity> e = await dbContext.Set<RegistrationEntity>().AddAsync(new RegistrationEntity {
@@ -53,7 +52,7 @@ public class RegistrationRepository(DbContext dbContext, IHttpContextAccessor ht
 			Column = x.Column,
 			Row = x.Row,
 			User = new UserEntity {
-				Id = x.User!.Id,
+				Id = x.User.Id,
 				Tags = x.User.Tags,
 				JsonDetail = x.User.JsonDetail,
 				FirstName = x.User.FirstName,

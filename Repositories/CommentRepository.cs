@@ -114,7 +114,7 @@ public class CommentRepository(
 					Title = "Comment",
 					CreatorUserId = comment.UserId,
 					CommentId = comment.Id,
-					Tags = [TagNotification.ReceivedComment],
+					Tags = [TagNotification.ReceivedComment]
 				});
 		}
 

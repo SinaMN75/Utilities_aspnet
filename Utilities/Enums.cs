@@ -451,7 +451,7 @@ public enum TagUser {
 	BuysPrivate = 407,
 	SellsPrivate = 408,
 	FollowingsPrivate = 409,
-	FollowersPrivate = 410,
+	FollowersPrivate = 410
 }
 
 public enum TagPayment {

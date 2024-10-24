@@ -21,7 +21,7 @@ public static class StartupExtension {
 		builder.Services.AddOptions();
 
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
-		AppSettings.Initialize(builder.Configuration);  
+		AppSettings.Initialize(builder.Configuration);
 		builder.Services.AddRateLimiter(x => {
 			x.RejectionStatusCode = 429;
 			x.AddFixedWindowLimiter("fixed", y => {
@@ -65,7 +65,6 @@ public static class StartupExtension {
 		builder.Services.AddScoped<IReportRepository, ReportRepository>();
 		builder.Services.AddScoped<IUserRepository, UserRepository>();
 		builder.Services.AddScoped<IMediaRepository, MediaRepository>();
-		builder.Services.AddScoped<IFollowBookmarkRepository, FollowBookmarkRepository>();
 		builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 		builder.Services.AddScoped<IProductRepository, ProductRepository>();
 		builder.Services.AddScoped<IChatRepository, ChatRepository>();
@@ -80,7 +79,6 @@ public static class StartupExtension {
 		builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 		builder.Services.AddScoped<IAppSettingsRepository, AppSettingsRepository>();
 		builder.Services.AddScoped<IAmazonS3Repository, AmazonS3Repository>();
-		builder.Services.AddScoped<IQuestionnaireRepository, QuestionnaireRepository>();
 		builder.Services.AddScoped<IRegistrationRepository, RegistrationRepository>();
 	}
 
@@ -97,7 +95,7 @@ public static class StartupExtension {
 				Type = SecuritySchemeType.ApiKey,
 				Scheme = "Bearer"
 			});
-			c.AddSecurityDefinition("apiKey", new OpenApiSecurityScheme() {
+			c.AddSecurityDefinition("apiKey", new OpenApiSecurityScheme {
 				Description = "API KEY",
 				Name = "X-API-KEY",
 				In = ParameterLocation.Header,
@@ -111,7 +109,7 @@ public static class StartupExtension {
 				}, {
 					new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "apiKey" } },
 					Array.Empty<string>()
-				},
+				}
 			});
 		});
 	}

@@ -32,9 +32,5 @@ public static class Seeder {
 			b.OwnsMany(i => i.Seats);
 			b.OwnsMany(i => i.OrderDetailHistories);
 		});
-		builder.Entity<QuestionnaireHistoryEntity>().OwnsOne(e => e.JsonDetail, b => {
-			b.ToJson();
-			b.OwnsMany(i => i.QuestionnaireHistoryQa);
-		});
 	}
 }

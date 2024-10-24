@@ -10,22 +10,14 @@ public interface IUserRepository {
 	Task<GenericResponse<UserEntity?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto);
 	Task<GenericResponse<UserEntity?>> VerifyCodeForLogin(VerifyMobileForLoginDto dto);
 	Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model);
-	Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList();
-	Task<GenericResponse> ToggleBlock(string userId);
-	Task<UserEntity?> ReadByIdMinimal(string? idOrUserName, string? token = null);
 	Task<GenericResponse> Authorize(AuthorizeUserDto dto);
 	Task<GenericResponse> Subscribe(string userId, Guid contentId, string transactionRefId);
-	Task<GenericResponse<IQueryable<UserEntity>>> GetFollowers(string id);
-	Task<GenericResponse<IQueryable<UserEntity>>> GetFollowing(string id);
-	Task<GenericResponse> ToggleFollow(FollowCreateDto dto);
-	Task<GenericResponse> RemoveFollowings(FollowCreateDto dto);
 }
 
 public class UserRepository(
 	DbContext dbContext,
 	ISmsNotificationRepository sms,
 	IHttpContextAccessor httpContextAccessor,
-	// IProductRepository productRepository,
 	IMediaRepository mediaRepository,
 	IOrderRepository orderRepository,
 	ITransactionRepository transactionRepository,
@@ -73,8 +65,6 @@ public class UserRepository(
 				JsonDetail = x.JsonDetail,
 				Tags = x.Tags,
 				PremiumExpireDate = x.PremiumExpireDate,
-				FollowedUsers = x.FollowedUsers,
-				FollowingUsers = x.FollowingUsers,
 				Media = x.Media!.Select(y => new MediaEntity {
 					Id = y.Id,
 					FileName = y.FileName,
@@ -99,22 +89,12 @@ public class UserRepository(
 						JsonDetail = z.JsonDetail,
 						Tags = z.Tags
 					})
-				}),
+				})
 			})
 			.FirstOrDefaultAsync(u => isUserId ? u.Id == idOrUserName : u.UserName == idOrUserName);
 
 		if (entity == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
 		entity.Token = token;
-
-		if (_userId.IsNotNullOrEmpty()) {
-			UserEntity myUser = (await ReadByIdMinimal(_userId))!;
-			if (myUser.FollowingUsers.Contains(entity.Id)) entity.IsFollowing = true;
-		}
-
-		int countFollowing = entity.FollowingUsers.Split(",").Length;
-		int countFollowers = entity.FollowedUsers.Split(",").Length;
-		entity.CountFollowing = countFollowing - 1 <= 0 ? 0 : countFollowing;
-		entity.CountFollowers = countFollowers - 1 <= 0 ? 0 : countFollowers;
 
 		return new GenericResponse<UserEntity?>(entity);
 	}
@@ -130,6 +110,7 @@ public class UserRepository(
 		if ((dto.Tags ?? []).Contains(TagUser.Authorized)) {
 			await smsNotificationRepository.SendSms(entity.PhoneNumber ?? "", "upgradeAcoount", "کاربر گرامی");
 		}
+
 		return new GenericResponse<UserEntity?>(entity);
 	}
 
@@ -157,17 +138,6 @@ public class UserRepository(
 		if (dto.AppPhoneNumber.IsNotNullOrEmpty()) q = q.Where(x => x.AppPhoneNumber!.Contains(dto.AppPhoneNumber!));
 		if (dto.ShowPremiums.IsTrue()) q = q.Where(x => x.PremiumExpireDate > DateTime.UtcNow);
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
-		if (dto.NoneOfMyFollowing.IsTrue()) {
-			UserEntity? user = dbContext.Set<UserEntity>().FirstOrDefault(x => x.Id == _userId);
-			string[] myFollowing = user!.FollowingUsers.Split(",");
-			q = q.Where(x => !myFollowing.Contains(x.Id));
-		}
-
-		if (dto.NoneOfMyFollower.IsTrue()) {
-			UserEntity? user = dbContext.Set<UserEntity>().FirstOrDefault(x => x.Id == _userId);
-			string[] myFollower = user!.FollowedUsers.Split(",");
-			q = q.Where(x => !myFollower.Contains(x.Id));
-		}
 
 		if (dto.Query.IsNotNullOrEmpty())
 			q = q.Where(x => x.FirstName!.Contains(dto.Query!) ||
@@ -194,11 +164,6 @@ public class UserRepository(
 		if (dto.ShowMedia.IsTrue()) q = q.Include(u => u.Media);
 		if (dto.ShowCategories.IsTrue()) q = q.Include(u => u.Categories);
 
-		if (_userId is not null) {
-			UserEntity user = (await ReadByIdMinimal(_userId))!;
-			if (dto.HideBlockedUsers.IsTrue()) q = q.Where(x => !user.BlockedUsers.Contains(x.Id));
-		}
-
 		if (dto.ShowMyCustomers.IsTrue()) {
 			IQueryable<OrderEntity> orders = dbContext.Set<OrderEntity>()
 				.Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p!.Media)
@@ -215,7 +180,7 @@ public class UserRepository(
 			}
 		}
 
-		int totalCount = q.Count();
+		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
 		return new GenericResponse<IQueryable<UserEntity>>(q.AsSingleQuery()) {
@@ -231,12 +196,6 @@ public class UserRepository(
 		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
 		JwtSecurityToken token = CreateToken(user);
 		return new GenericResponse<UserEntity?>(ReadByIdMinimal(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result);
-	}
-
-	public async Task<UserEntity?> ReadByIdMinimal(string? idOrUserName, string? token = null) {
-		UserEntity e = (await dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(u => u.Id == idOrUserName || u.UserName == idOrUserName))!;
-		e.Token = token;
-		return e;
 	}
 
 	public async Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model) {
@@ -347,42 +306,6 @@ public class UserRepository(
 			: new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.WrongVerificationCode);
 	}
 
-	public async Task<GenericResponse<IEnumerable<UserEntity>>> ReadMyBlockList() {
-		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
-		GenericResponse<IQueryable<UserEntity>> blockedUsers = await Filter(new UserFilterDto {
-			ShowMedia = true,
-			UserIds = user?.BlockedUsers.Split(",")
-		});
-		return new GenericResponse<IEnumerable<UserEntity>>(blockedUsers.Result!);
-	}
-
-	public async Task<GenericResponse> ToggleBlock(string userId) {
-		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
-		UserEntity? targetUser = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == userId);
-		if (user!.BlockedUsers.Contains(userId)) {
-			await Update(new UserCreateUpdateDto { Id = user.Id, BlockedUsers = user.BlockedUsers.Replace($",{userId}", "") });
-		}
-		else {
-			await Update(new UserCreateUpdateDto {
-				Id = user.Id,
-				BlockedUsers = user.BlockedUsers + "," + userId,
-			});
-			await RemoveFollowings(new FollowCreateDto { UserId = userId });
-
-			await Update(new UserCreateUpdateDto {
-				Id = _userId,
-				FollowingUsers = user.FollowingUsers.Replace($",{userId}", "")
-			});
-
-			await Update(new UserCreateUpdateDto {
-				Id = userId,
-				FollowedUsers = targetUser!.FollowedUsers.Replace($",{_userId}", "")
-			});
-		}
-
-		return new GenericResponse();
-	}
-
 	public async Task<GenericResponse> Authorize(AuthorizeUserDto dto) {
 		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
 		if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound);
@@ -473,11 +396,6 @@ public class UserRepository(
 		if (dto.State is not null) entity.State = dto.State;
 		if (dto.City is not null) entity.City = dto.City;
 		if (dto.Point is not null) entity.Point = dto.Point;
-		if (dto.VisitedProducts is not null) entity.VisitedProducts = dto.VisitedProducts;
-		if (dto.BookmarkedProducts is not null) entity.BookmarkedProducts = dto.BookmarkedProducts;
-		if (dto.FollowedUsers is not null) entity.FollowedUsers = dto.FollowedUsers;
-		if (dto.FollowingUsers is not null) entity.FollowingUsers = dto.FollowingUsers;
-		if (dto.BlockedUsers is not null) entity.BlockedUsers = dto.BlockedUsers;
 		if (dto.Badge is not null) entity.Badge = dto.Badge;
 		if (dto.JobStatus is not null) entity.JobStatus = dto.JobStatus;
 		if (dto.Tags is not null) entity.Tags = dto.Tags;
@@ -569,7 +487,6 @@ public class UserRepository(
 			await transactionRepository.Delete(transactionEntity.Id, ct);
 		foreach (AddressEntity addressEntity in dbContext.Set<AddressEntity>().Where(x => x.UserId == id)) await addressRepository.Delete(addressEntity.Id, ct);
 		foreach (GroupChatEntity groupChatEntity in dbContext.Set<GroupChatEntity>().Where(x => x.CreatorUserId == id)) await chatRepository.DeleteGroupChat(groupChatEntity.Id);
-		// foreach (ProductEntity productEntity in dbContext.Set<ProductEntity>().Where(x => x.UserId == id)) await productRepository.Delete(productEntity.Id, ct);
 
 		dbContext.Remove(user);
 
@@ -578,83 +495,9 @@ public class UserRepository(
 		return new GenericResponse();
 	}
 
-	public async Task<GenericResponse<IQueryable<UserEntity>>> GetFollowers(string id) {
-		UserEntity myUser = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!;
-		GenericResponse<IQueryable<UserEntity>> q = await Filter(new UserFilterDto {
-				UserIds = myUser.FollowedUsers.Split(","),
-				ShowCategories = true,
-				ShowMedia = true
-			}
-		);
-		return new GenericResponse<IQueryable<UserEntity>>(q.Result!);
-	}
-
-	public async Task<GenericResponse<IQueryable<UserEntity>>> GetFollowing(string id) {
-		UserEntity myUser = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == id))!;
-		GenericResponse<IQueryable<UserEntity>> q = await Filter(new UserFilterDto {
-				UserIds = myUser.FollowingUsers.Split(","),
-				ShowCategories = true,
-				ShowMedia = true
-			}
-		);
-		return new GenericResponse<IQueryable<UserEntity>>(q.Result!);
-	}
-
-	public async Task<GenericResponse> ToggleFollow(FollowCreateDto parameters) {
-		UserEntity myUser = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId))!;
-		UserEntity targetUser = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == parameters.UserId))!;
-
-		if (myUser.FollowingUsers.Contains(parameters.UserId)) {
-			await Update(new UserCreateUpdateDto {
-				Id = _userId,
-				FollowingUsers = myUser.FollowingUsers.Replace($",{parameters.UserId}", "")
-			});
-
-			await Update(new UserCreateUpdateDto {
-				Id = parameters.UserId,
-				FollowedUsers = targetUser.FollowedUsers.Replace($",{parameters.UserId}", "")
-			});
-
-			List<NotificationEntity> exFollowedNotifications =
-				await notificationRepository.Filter(new NotificationFilterDto {
-					UserId = parameters.UserId,
-					CreatorUserId = _userId,
-					Tags = [TagNotification.Followed],
-				}).Result!.ToListAsync();
-
-			foreach (NotificationEntity exFollowedNotification in exFollowedNotifications) {
-				await notificationRepository.Delete(exFollowedNotification.Id);
-			}
-		}
-		else {
-			await Update(new UserCreateUpdateDto {
-				Id = _userId,
-				FollowingUsers = myUser.FollowingUsers + "," + parameters.UserId
-			});
-
-			await Update(new UserCreateUpdateDto {
-				Id = parameters.UserId,
-				FollowedUsers = targetUser.FollowedUsers + "," + myUser.Id
-			});
-
-			await notificationRepository.Create(new NotificationCreateUpdateDto {
-				UserId = parameters.UserId,
-				Message = "You are being followed by " + myUser.UserName,
-				Title = "Follow",
-				Tags = [TagNotification.Followed],
-				CreatorUserId = _userId
-			});
-		}
-
-		return new GenericResponse();
-	}
-
-	public async Task<GenericResponse> RemoveFollowings(FollowCreateDto parameters) {
-		UserEntity myUser = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId))!;
-		await Update(new UserCreateUpdateDto {
-			Id = parameters.UserId,
-			FollowedUsers = myUser.FollowedUsers.Replace($",{parameters.UserId}", "")
-		});
-		return new GenericResponse();
+	private async Task<UserEntity?> ReadByIdMinimal(string? idOrUserName, string? token = null) {
+		UserEntity e = (await dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(u => u.Id == idOrUserName || u.UserName == idOrUserName))!;
+		e.Token = token;
+		return e;
 	}
 }

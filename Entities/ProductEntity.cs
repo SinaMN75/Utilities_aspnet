@@ -55,7 +55,6 @@ public class ProductEntity : BaseEntity {
 	[MaxLength(100)]
 	public List<TagProduct> Tags { get; set; } = [];
 
-	public IEnumerable<BookmarkEntity>? Bookmarks { get; set; }
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
 	public IEnumerable<OrderDetailEntity>? OrderDetail { get; set; }

@@ -14,7 +14,6 @@ public class ProductRepository(
 	DbContext dbContext,
 	IHttpContextAccessor httpContextAccessor,
 	IMediaRepository mediaRepository,
-	IUserRepository userRepository,
 	INotificationRepository notificationRepository,
 	IReportRepository reportRepository,
 	ICommentRepository commentRepository
@@ -98,14 +97,7 @@ public class ProductRepository(
 			q = q.Include(i => i.User).ThenInclude(x => x!.Media);
 			q = q.Include(i => i.User).ThenInclude(x => x!.Categories);
 		}
-
-		if (_userId.IsNotNullOrEmpty()) {
-			UserEntity user = (await userRepository.ReadByIdMinimal(_userId))!;
-			if (dto.HideBlockedUsers.IsTrue()) q = q.Where(x => !user.BlockedUsers.Contains(x.UserId!));
-			if (dto.IsFollowing.IsTrue()) q = q.Where(i => user.FollowingUsers.Contains(i.UserId!));
-			if (dto.IsBookmarked.IsTrue()) q = q.Where(i => user.BookmarkedProducts.Contains(i.Id.ToString()));
-		}
-
+		
 		q = q.Include(x => x.Parent).ThenInclude(x => x!.Categories);
 		q = q.Include(x => x.Parent).ThenInclude(x => x!.Media);
 		q = q.Include(x => x.Parent).ThenInclude(x => x!.User).ThenInclude(x => x!.Media);
@@ -117,7 +109,7 @@ public class ProductRepository(
 
 		if (dto.Shuffle1.IsTrue()) q = q.Shuffle();
 
-		int totalCount = q.Count();
+		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
 		return new GenericResponse<IQueryable<ProductEntity>>(q) {
@@ -152,10 +144,6 @@ public class ProductRepository(
 					i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId, Count = 1 });
 				}
 			}
-
-			UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == _userId, ct);
-			if (!user!.VisitedProducts.Contains(i.Id.ToString()))
-				await userRepository.Update(new UserCreateUpdateDto { Id = _userId, VisitedProducts = user.VisitedProducts + "," + i.Id });
 
 			dbContext.Update(i);
 			await dbContext.SaveChangesAsync(ct);
@@ -202,8 +190,6 @@ public class ProductRepository(
 			.Include(x => x.Reports)
 			.Include(x => x.Comments)
 			.Include(x => x.Notifications)
-			.Include(x => x.Bookmarks)!.ThenInclude(y => y.Media)
-			.Include(x => x.Bookmarks)!.ThenInclude(y => y.Children)!.ThenInclude(z => z.Media)
 			.Include(x => x.Children)!.ThenInclude(x => x.Media)
 			.Include(x => x.Children)!.ThenInclude(x => x.OrderDetail)
 			.Include(x => x.Children)!.ThenInclude(x => x.Comments)
@@ -212,15 +198,6 @@ public class ProductRepository(
 		foreach (ReportEntity report in i.Reports ?? new List<ReportEntity>()) await reportRepository.Delete(report.Id);
 		foreach (OrderDetailEntity orderDetail in i.OrderDetail ?? new List<OrderDetailEntity>()) dbContext.Remove(orderDetail);
 		foreach (NotificationEntity notification in i.Notifications ?? new List<NotificationEntity>()) dbContext.Remove(notification);
-		foreach (BookmarkEntity bookmark in i.Bookmarks ?? new List<BookmarkEntity>()) {
-			foreach (BookmarkEntity bookmarkChild in bookmark.Children ?? new List<BookmarkEntity>()) {
-				await mediaRepository.DeleteMedia(bookmarkChild.Media);
-				dbContext.Remove(bookmarkChild);
-			}
-
-			await mediaRepository.DeleteMedia(bookmark.Media);
-			dbContext.Remove(bookmark);
-		}
 
 		await mediaRepository.DeleteMedia(i.Media);
 		foreach (ProductEntity product in i.Children ?? new List<ProductEntity>()) {
@@ -256,7 +233,7 @@ public class ProductRepository(
 				UserId = p.UserId,
 				Tags = [TagNotification.ReceivedReactionOnProduct],
 				ProductId = p.Id,
-				CreatorUserId = _userId,
+				CreatorUserId = _userId
 			});
 
 		await dbContext.SaveChangesAsync();

@@ -84,38 +84,6 @@ public class UserEntity {
 	[JsonIgnore]
 	public string? Password { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public string VisitedProducts { get; set; } = "";
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public string BookmarkedProducts { get; set; } = "";
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public string FollowingUsers { get; set; } = "";
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public string FollowedUsers { get; set; } = "";
-
-	[System.Text.Json.Serialization.JsonIgnore]
-	[JsonIgnore]
-	public string BlockedUsers { get; set; } = "";
-
-	[NotMapped]
-	public bool IsFollowing { get; set; }
-
-	[NotMapped]
-	public int? CountProducts { get; set; }
-
-	[NotMapped]
-	public int? CountFollowers { get; set; }
-
-	[NotMapped]
-	public int? CountFollowing { get; set; }
-
 	[NotMapped]
 	public string? Token { get; set; }
 }
@@ -129,7 +97,6 @@ public class UserJsonDetail {
 	public string? SoundCloud { get; set; }
 	public string? Pinterest { get; set; }
 	public string? Website { get; set; }
-	public string? Activity { get; set; }
 	public string? Color { get; set; }
 	public string? Code { get; set; }
 	public string? ShebaNumber { get; set; }

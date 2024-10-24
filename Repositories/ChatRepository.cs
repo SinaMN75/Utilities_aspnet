@@ -136,7 +136,7 @@ public class ChatRepository(
 					CreatorUserId = _userId,
 					Message = dto.Message,
 					GroupChatId = dto.GroupChatId,
-					Tags = [TagNotification.ReceivedChat],
+					Tags = [TagNotification.ReceivedChat]
 				});
 			}
 		}

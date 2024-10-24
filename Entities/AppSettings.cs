@@ -1,7 +1,7 @@
 ﻿namespace Utilities_aspnet.Entities;
 
 public class AppSettings {
-	public static AppSettings Settings { get; private set; }
+	public static AppSettings? Settings { get; private set; }
 	public SmsPanelSettings SmsPanelSettings { get; set; } = null!;
 	public Zibal Zibal { get; set; } = null!;
 	public PushNotificationSetting PushNotificationSetting { get; set; } = null!;
@@ -45,7 +45,6 @@ public class PushNotificationSetting {
 	public string? Provider { get; set; }
 	public string? Token { get; set; }
 	public string? AppId { get; set; }
-	public string? FcmToken { get; set; }
 }
 
 public class IdTitleDto {
@@ -56,7 +55,6 @@ public class IdTitleDto {
 public class EnumDto {
 	public DateTime? DateTime { get; set; }
 	public DateTime? UtcDateTime { get; set; }
-	public IEnumerable<IdTitleDto>? TagChat { get; set; }
 	public IEnumerable<IdTitleDto>? UtilitiesStatusCodes { get; set; }
 	public IEnumerable<IdTitleDto>? Currency { get; set; }
 	public IEnumerable<IdTitleDto>? SeenStatus { get; set; }

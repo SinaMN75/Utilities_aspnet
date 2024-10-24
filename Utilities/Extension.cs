@@ -20,23 +20,12 @@ public class GenericResponse(UtilitiesStatusCodes status = UtilitiesStatusCodes.
 
 public static class BoolExtension {
 	public static bool IsTrue(this bool? value) => value != null && value != false;
-	public static bool IsFalse(this bool? value) => value != null && value != true;
 }
 
 public static class EnumerableExtension {
 	public static bool IsNotNullOrEmpty<T>(this IEnumerable<T>? list) => list != null && list.Any();
 
 	public static bool IsNotNull<T>(this IEnumerable<T>? list) => list != null;
-}
-
-public static class NumberExtension {
-	public static int ToInt(this double value) => (int)value;
-}
-
-public static class GuidExtension {
-	public static bool IsNotNullOrEmpty(this Guid? s) => s?.ToString().Length <= 5;
-
-	public static bool IsNullOrEmpty(this Guid? s) => !s.HasValue;
 }
 
 public static class StringExtension {
@@ -50,12 +39,6 @@ public static class StringExtension {
 		s = s.Replace("IR", "");
 		s = s.Replace("ir", "");
 		return s.Length == 24 ? s : null;
-	}
-
-	public static string? AddCommaSeperatorUsers(this string? baseString, string? userId) {
-		if (string.IsNullOrEmpty(baseString)) return userId;
-		if (baseString.Contains(userId ?? "")) return baseString;
-		return baseString + "," + userId;
 	}
 }
 

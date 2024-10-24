@@ -53,7 +53,7 @@ public class ContentRepository(DbContext context, IMediaRepository mediaReposito
 				Order = y.Order,
 				JsonDetail = y.JsonDetail,
 				Tags = y.Tags
-			}),
+			})
 		}));
 
 	public async Task<GenericResponse<ContentEntity?>> Update(ContentUpdateDto dto, CancellationToken ct) {

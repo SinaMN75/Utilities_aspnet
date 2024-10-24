@@ -5,7 +5,6 @@ public interface IPaymentRepository {
 	Task<GenericResponse<NgVerifyResponse>> VerifyNg(string outlet, string id);
 	Task<GenericResponse<ZibalRequestResponse>> PayZibal(NgPayDto dto);
 	Task<GenericResponse<ZibalVerifyResponse>> VerifyZibal(string outlet, string id);
-	Task<GenericResponse> CallBackZibalJadooAuthorize(string userId, int success, int status, string trackId);
 }
 
 public class PaymentRepository : IPaymentRepository {
@@ -81,20 +80,5 @@ public class PaymentRepository : IPaymentRepository {
 		requestAccessToken.AddHeader("Accept", "application/vnd.ni-identity.v1+json");
 		IRestResponse responseRequest = await new RestClient("https://api-gateway.sandbox.ngenius-payments.com/identity/auth/access-token").ExecuteAsync(requestAccessToken);
 		return NgAccessTokenResponse.FromJson(responseRequest.Content);
-	}
-
-	public async Task<GenericResponse> CallBackZibalJadooAuthorize(
-		string userId,
-		int success,
-		int status,
-		string trackId
-	) {
-		if (success != 1 || status != 2) return new GenericResponse(status: UtilitiesStatusCodes.BadRequest);
-		GenericResponse<ZibalVerifyResponse> i = await VerifyZibal(_appSettings.Zibal.Id!, trackId);
-		UserEntity user = (await _dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == userId))!;
-		List<TagUser> tags = user.Tags;
-		tags.Add(TagUser.Authorized);
-		await _userRepository.Update(new UserCreateUpdateDto { Tags = tags });
-		return new GenericResponse();
 	}
 }

@@ -17,7 +17,7 @@ public class Server {
 	}
 
 	public static void Configure(IHttpContextAccessor? httpContextAccessor) => _httpContextAccessor = httpContextAccessor;
-	
+
 	public static async Task RunCommand(string command, string args) {
 		Console.WriteLine("COMMAND Started");
 		Console.WriteLine(command);
@@ -29,7 +29,7 @@ public class Server {
 					RedirectStandardOutput = true,
 					RedirectStandardError = true,
 					UseShellExecute = true,
-					CreateNoWindow = true,
+					CreateNoWindow = true
 				}
 			};
 			process.Start();

@@ -71,10 +71,10 @@ public class SmsNotificationRepository(IConfiguration config) : ISmsNotification
 				var body = new {
 					app_ids = setting.AppId,
 					data = new {
-						title = dto.Title,
-						content = dto.Content,
-						bigContent = dto.BigContent,
-						action = new { action_type = dto.ActionType, url = dto.Url }
+						title = NotificationCreateDto.Title,
+						content = NotificationCreateDto.Content,
+						bigContent = NotificationCreateDto.BigContent,
+						action = new { action_type = NotificationCreateDto.ActionType, url = NotificationCreateDto.Url }
 					},
 					is_draft = false,
 					filter = new { custom_id = dto.UserIds }
@@ -89,14 +89,15 @@ public class SmsNotificationRepository(IConfiguration config) : ISmsNotification
 				request.AddHeader("Authorization", "Bearer " + setting.Token);
 				var body = new {
 					appId = setting.AppId,
-					title = dto.Title,
-					body = dto.Body,
-					content = dto.Content,
+					title = NotificationCreateDto.Title,
+					body = NotificationCreateDto.Body,
+					content = NotificationCreateDto.Content,
 					token = dto.FcmToken
 				};
 				request.AddJsonBody(body);
 				await new RestClient("https://fcm.sinamn75.com/send").ExecuteAsync(request);
-				break;			}
+				break;
+			}
 		}
 
 		return new GenericResponse();
@@ -104,12 +105,12 @@ public class SmsNotificationRepository(IConfiguration config) : ISmsNotification
 }
 
 public class NotificationCreateDto {
-	public IEnumerable<string> UserIds { get; set; } = new List<string>();
-	public string Title { get; set; } = "";
-	public string Body { get; set; } = "";
-	public string Content { get; set; } = "";
-	public string BigContent { get; set; } = "";
-	public string Url { get; set; } = "";
-	public string ActionType { get; set; } = "U";
+	public IEnumerable<string> UserIds { get; } = new List<string>();
+	public static string Title => "";
+	public static string Body => "";
+	public static string Content => "";
+	public static string BigContent => "";
+	public static string Url => "";
+	public static string ActionType => "U";
 	public string? FcmToken { get; set; }
 }

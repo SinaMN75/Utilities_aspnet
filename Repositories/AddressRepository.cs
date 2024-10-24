@@ -18,7 +18,7 @@ public class AddressRepository(DbContext context) : IAddressRepository {
 			ReceiverFullName = dto.ReceiverFullName,
 			ReceiverPhoneNumber = dto.ReceiverPhoneNumber,
 			Unit = dto.Unit,
-			UserId = dto.UserId,
+			UserId = dto.UserId
 		}, ct);
 		await context.SaveChangesAsync(ct);
 		return new GenericResponse<AddressEntity?>(e.Entity);
