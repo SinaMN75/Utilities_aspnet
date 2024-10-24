@@ -174,14 +174,6 @@ public class MediaRepository(
 		media.Tags = model.Tags ?? [];
 		media.Order = model.Order ?? media.Order;
 
-		if (model.RemoveTags.IsNotNullOrEmpty()) {
-			model.RemoveTags!.ForEach(item => media.Tags.Remove(item));
-		}
-
-		if (model.AddTags.IsNotNullOrEmpty()) {
-			media.Tags.AddRange(model.AddTags!);
-		}
-
 		dbContext.Set<MediaEntity>().Update(media);
 		await dbContext.SaveChangesAsync();
 

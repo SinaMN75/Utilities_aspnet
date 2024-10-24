@@ -132,11 +132,6 @@ public class CommentRepository(
 		if (dto.UserId.IsNotNullOrEmpty()) comment.TargetUserId = dto.UserId;
 		if (dto.Status.HasValue) comment.Status = dto.Status;
 		if (dto.Tags.IsNotNullOrEmpty()) comment.Tags = dto.Tags!;
-		if (dto.RemoveTags.IsNotNullOrEmpty()) {
-			dto.RemoveTags!.ForEach(item => comment.Tags.Remove(item));
-		}
-
-		if (dto.AddTags.IsNotNullOrEmpty()) comment.Tags.AddRange(dto.AddTags!);
 
 		comment.UpdatedAt = DateTime.UtcNow;
 		dbContext.Set<CommentEntity>().Update(comment);

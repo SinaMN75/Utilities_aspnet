@@ -33,7 +33,6 @@ public class DiscountUpdateDto {
 	public string? Title { get; set; }
 	public string? Code { get; set; }
 
-	public long? DiscountPrice { get; set; }
 	public int? NumberUses { get; set; } = 1000;
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
