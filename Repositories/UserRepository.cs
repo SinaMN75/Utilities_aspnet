@@ -111,7 +111,7 @@ public class UserRepository(
 	}
 
 	public async Task<GenericResponse<IQueryable<UserEntity>>> Filter(UserFilterDto dto) {
-		IQueryable<UserEntity> q = dbContext.Set<UserEntity>().Select(x => new UserEntity {
+		IQueryable<UserEntity> q = dbContext.Set<UserEntity>().AsNoTracking().Select(x => new UserEntity {
 			Id = x.Id,
 			FirstName = x.FirstName,
 			LastName = x.LastName,
