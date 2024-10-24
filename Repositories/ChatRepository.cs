@@ -374,10 +374,7 @@ public class ChatRepository(
 	public async Task<GenericResponse> Mute(Guid id) {
 		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
 		if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound);
-
-		if (user.MutedChats.IsNullOrEmpty()) user.MutedChats += id.ToString();
-		else user.MutedChats = user.MutedChats + "," + id;
-
+		
 		dbContext.Update(user);
 		await dbContext.SaveChangesAsync();
 

@@ -53,15 +53,7 @@ public class UserEntity {
 	[MaxLength(100)]
 	public string? City { get; set; }
 
-	[MaxLength(100)]
-	public string? Badge { get; set; }
-
-	[MaxLength(100)]
-	public string? JobStatus { get; set; }
-
-	public string? MutedChats { get; set; }
 	public GenderType? Gender { get; set; }
-	public double? Point { get; set; } = 0;
 	public DateTime? Birthdate { get; set; }
 	public DateTime? CreatedAt { get; set; }
 	public DateTime? UpdatedAt { get; set; }
@@ -181,26 +173,18 @@ public class UserCreateUpdateDto {
 	public string? State { get; set; }
 	public string? Country { get; set; }
 	public string? City { get; set; }
-	public string? Badge { get; set; }
-	public string? VisitedProducts { get; set; }
-	public string? BookmarkedProducts { get; set; }
-	public string? FollowedUsers { get; set; }
-	public string? FollowingUsers { get; set; }
 	public string? FcmToken { get; set; }
-	public string? BlockedUsers { get; set; }
 	public string? Instagram { get; set; }
 	public string? Telegram { get; set; }
 	public string? RegistrationNumber { get; set; }
 	public string? PostalCode { get; set; }
 	public string? LandlinePhone { get; set; }
-	public string? JobStatus { get; set; }
 	public string? WhatsApp { get; set; }
 	public string? LinkedIn { get; set; }
 	public string? Dribble { get; set; }
 	public string? SoundCloud { get; set; }
 	public string? Pinterest { get; set; }
 	public string? Website { get; set; }
-	public string? Activity { get; set; }
 	public string? Color { get; set; }
 	public string? Password { get; set; }
 	public string? Code { get; set; }
@@ -224,7 +208,6 @@ public class UserCreateUpdateDto {
 	public long? DeliveryPrice1 { get; set; }
 	public long? DeliveryPrice2 { get; set; }
 	public long? DeliveryPrice3 { get; set; }
-	public double? Point { get; set; } = 0;
 	public bool? Suspend { get; set; }
 	public GenderType? Gender { get; set; }
 	public LegalAuthenticationType? LegalAuthenticationType { get; set; }
@@ -258,17 +241,13 @@ public class UserFilterDto : BaseFilterDto {
 	public string? State { get; set; }
 	public string? Country { get; set; }
 	public string? City { get; set; }
-	public string? Badge { get; set; }
 	public bool? HasAppUserName { get; set; }
-	public bool? ShowMedia { get; set; }
+	public bool ShowMedia { get; set; } = false;
 	public bool? ShowPremiums { get; set; }
-	public bool? ShowCategories { get; set; }
+	public bool ShowCategories { get; set; } = false;
 	public bool? ShowSuspend { get; set; }
-	public bool? HideBlockedUsers { get; set; } = true;
 	public bool? ShowMyCustomers { get; set; }
 	public bool? OrderByUserName { get; set; }
-	public bool? NoneOfMyFollowing { get; set; }
-	public bool? NoneOfMyFollower { get; set; }
 	public bool? OrderByCreatedAt { get; set; }
 	public bool? OrderByCreatedAtDesc { get; set; }
 	public bool? OrderByUpdatedAt { get; set; }

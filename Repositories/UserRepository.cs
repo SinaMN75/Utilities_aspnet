@@ -53,11 +53,7 @@ public class UserRepository(
 				Country = x.Country,
 				City = x.City,
 				State = x.State,
-				Badge = x.Badge,
-				JobStatus = x.JobStatus,
-				MutedChats = x.MutedChats,
 				Gender = x.Gender,
-				Point = x.Point,
 				Birthdate = x.Birthdate,
 				CreatedAt = x.CreatedAt,
 				UpdatedAt = x.UpdatedAt,
@@ -115,12 +111,63 @@ public class UserRepository(
 	}
 
 	public async Task<GenericResponse<IQueryable<UserEntity>>> Filter(UserFilterDto dto) {
-		IQueryable<UserEntity> q = dbContext.Set<UserEntity>();
+		IQueryable<UserEntity> q = dbContext.Set<UserEntity>().Select(x => new UserEntity {
+			Id = x.Id,
+			FirstName = x.FirstName,
+			LastName = x.LastName,
+			FullName = x.FullName,
+			Title = x.Title,
+			Subtitle = x.Subtitle,
+			Headline = x.Headline,
+			Bio = x.Bio,
+			AppUserName = x.AppUserName,
+			AppPhoneNumber = x.AppPhoneNumber,
+			UserName = x.UserName,
+			PhoneNumber = x.PhoneNumber,
+			AppEmail = x.AppEmail,
+			Email = x.Email,
+			Country = x.Country,
+			State = x.State,
+			City = x.City,
+			Gender = x.Gender,
+			Birthdate = x.Birthdate,
+			CreatedAt = x.CreatedAt,
+			UpdatedAt = x.UpdatedAt,
+			PremiumExpireDate = x.PremiumExpireDate,
+			Suspend = x.Suspend,
+			JsonDetail = x.JsonDetail,
+			Tags = x.Tags,
+			Media = dto.ShowMedia
+				? x.Media!.Select(z => new MediaEntity {
+					Id = z.Id,
+					FileName = z.FileName,
+					Order = z.Order,
+					JsonDetail = z.JsonDetail,
+					Tags = z.Tags
+				})
+				: null,
+			Categories = dto.ShowCategories
+				? x.Categories!.Select(y => new CategoryEntity {
+					Id = y.Id,
+					Title = y.Title,
+					TitleTr1 = y.TitleTr1,
+					TitleTr2 = y.TitleTr2,
+					JsonDetail = y.JsonDetail,
+					Tags = y.Tags,
+					Media = y.Media!.Select(z => new MediaEntity {
+						Id = z.Id,
+						FileName = z.FileName,
+						Order = z.Order,
+						JsonDetail = z.JsonDetail,
+						Tags = z.Tags
+					})
+				})
+				: null
+		});
 
 		if (dto.UserNameExact.IsNotNullOrEmpty()) q = q.Where(x => x.AppUserName == dto.UserNameExact || x.UserName == dto.UserNameExact);
 		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => x.Id == dto.UserId);
 		if (dto.HasAppUserName.IsTrue()) q = q.Where(x => x.AppUserName != null);
-		if (dto.Badge.IsNotNullOrEmpty()) q = q.Where(x => x.Badge!.Contains(dto.Badge!));
 		if (dto.Bio.IsNotNullOrEmpty()) q = q.Where(x => x.Bio!.Contains(dto.Bio!));
 		if (dto.Email.IsNotNullOrEmpty()) q = q.Where(x => x.Email!.Contains(dto.Email!));
 		if (dto.Gender != null) q = q.Where(x => x.Gender == dto.Gender);
@@ -160,10 +207,7 @@ public class UserRepository(
 		if (dto.OrderByCreatedAtDesc.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
 		if (dto.OrderByUpdatedAt.IsTrue()) q = q.OrderBy(x => x.UpdatedAt);
 		if (dto.OrderByUpdatedAtDesc.IsTrue()) q = q.OrderByDescending(x => x.UpdatedAt);
-
-		if (dto.ShowMedia.IsTrue()) q = q.Include(u => u.Media);
-		if (dto.ShowCategories.IsTrue()) q = q.Include(u => u.Categories);
-
+		
 		if (dto.ShowMyCustomers.IsTrue()) {
 			IQueryable<OrderEntity> orders = dbContext.Set<OrderEntity>()
 				.Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p!.Media)
@@ -395,9 +439,6 @@ public class UserRepository(
 		if (dto.Country is not null) entity.Country = dto.Country;
 		if (dto.State is not null) entity.State = dto.State;
 		if (dto.City is not null) entity.City = dto.City;
-		if (dto.Point is not null) entity.Point = dto.Point;
-		if (dto.Badge is not null) entity.Badge = dto.Badge;
-		if (dto.JobStatus is not null) entity.JobStatus = dto.JobStatus;
 		if (dto.Tags is not null) entity.Tags = dto.Tags;
 		if (dto.Password is not null) entity.Password = dto.Password;
 		if (dto.PremiumExpireDate is not null) entity.PremiumExpireDate = dto.PremiumExpireDate;
