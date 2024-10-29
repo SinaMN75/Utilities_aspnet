@@ -121,13 +121,8 @@ public static class StartupExtension {
 			});
 
 			c.AddSecurityRequirement(new OpenApiSecurityRequirement {
-				{
-					new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } },
-					Array.Empty<string>()
-				}, {
-					new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "apiKey" } },
-					Array.Empty<string>()
-				}
+				{ new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } }, Array.Empty<string>() },
+				{ new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "apiKey" } }, Array.Empty<string>() }
 			});
 		});
 	}

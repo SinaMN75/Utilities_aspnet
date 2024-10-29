@@ -22,7 +22,7 @@ public class CategoryController(ICategoryRepository repository) : BaseApiControl
 		Result(await repository.ImportFromExcel(file, ct));
 
 	[HttpPost("Filter")]
-	[OutputCache(Duration=60, PolicyName = "default")]
+	[OutputCache(Duration=10, PolicyName = "default")]
 	public async Task<ActionResult<GenericResponse<IQueryable<CategoryEntity>>>> Filter(CategoryFilterDto dto) => Result(await repository.Filter(dto));
 
 	[HttpPut]
