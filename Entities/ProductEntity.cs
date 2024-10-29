@@ -264,8 +264,3 @@ public class ReactionCreateUpdateDto {
 	public required Reaction Reaction { get; set; }
 	public required Guid ProductId { get; set; }
 }
-
-public class CustomersPaymentPerProduct {
-	public UserEntity? Customer { get; set; }
-	public double? Payment { get; set; }
-}

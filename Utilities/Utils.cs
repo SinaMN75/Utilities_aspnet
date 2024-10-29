@@ -19,6 +19,7 @@ public static class StartupExtension {
 
 	private static void AddUtilitiesServices<T>(this WebApplicationBuilder builder) where T : DbContext {
 		builder.Services.AddOptions();
+		builder.Services.AddOutputCache();
 
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 		AppSettings.Initialize(builder.Configuration);
@@ -141,6 +142,7 @@ public static class StartupExtension {
 	public static void UseUtilitiesServices(this WebApplication app) {
 		app.UseCors(option => option.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 		app.UseRateLimiter();
+		app.UseOutputCache();
 		app.UseDeveloperExceptionPage();
 		app.UseUtilitiesSwagger();
 		app.UseStaticFiles();
