@@ -5,32 +5,43 @@ namespace Utilities_aspnet.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [ApiKey]
-public class CategoryController(ICategoryRepository repository) : BaseApiController {
+public class CategoryController(ICategoryRepository repository, IOutputCacheStore store) : BaseApiController {
 	[HttpPost]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Create(CategoryCreateDto dto, CancellationToken ct) =>
-		Result(await repository.Create(dto, ct));
+	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Create(CategoryCreateDto dto, CancellationToken ct) {
+		await store.EvictByTagAsync("category", ct);
+		return Result(await repository.Create(dto, ct));
+	}
 
 	[HttpPost("BulkCreate")]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse<IEnumerable<CategoryEntity>>>> BulkCreate(IEnumerable<CategoryCreateDto> dto, CancellationToken ct) =>
-		Result(await repository.BulkCreate(dto, ct));
-	
+	public async Task<ActionResult<GenericResponse<IEnumerable<CategoryEntity>>>> BulkCreate(IEnumerable<CategoryCreateDto> dto, CancellationToken ct) {
+		await store.EvictByTagAsync("category", ct);
+		return Result(await repository.BulkCreate(dto, ct));
+	}
+
 	[HttpPost("ImportFromExcel")]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse<IEnumerable<CategoryEntity>>>> ImportFromExcel(IFormFile file, CancellationToken ct) =>
-		Result(await repository.ImportFromExcel(file, ct));
+	public async Task<ActionResult<GenericResponse<IEnumerable<CategoryEntity>>>> ImportFromExcel(IFormFile file, CancellationToken ct) {
+		await store.EvictByTagAsync("category", ct);
+		return Result(await repository.ImportFromExcel(file, ct));
+	}
 
 	[HttpPost("Filter")]
-	[OutputCache(Duration=10, PolicyName = "default")]
+	[OutputCache(Duration = 60 * 60 * 24, PolicyName = "default", Tags = ["category"])]
 	public async Task<ActionResult<GenericResponse<IQueryable<CategoryEntity>>>> Filter(CategoryFilterDto dto) => Result(await repository.Filter(dto));
 
 	[HttpPut]
 	[Authorize]
-	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Update(CategoryUpdateDto dto, CancellationToken ct) =>
-		Result(await repository.Update(dto, ct));
+	public async Task<ActionResult<GenericResponse<CategoryEntity>>> Update(CategoryUpdateDto dto, CancellationToken ct) {
+		await store.EvictByTagAsync("category", ct);
+		return Result(await repository.Update(dto, ct));
+	}
 
 	[HttpDelete("{id:guid}")]
 	[Authorize]
-	public async Task<IActionResult> Delete(Guid id, CancellationToken ct) => Result(await repository.Delete(id, ct));
+	public async Task<IActionResult> Delete(Guid id, CancellationToken ct) {
+		await store.EvictByTagAsync("category", ct);
+		return Result(await repository.Delete(id, ct));
+	}
 }
