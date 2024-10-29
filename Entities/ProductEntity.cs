@@ -226,20 +226,13 @@ public class ProductFilterDto : BaseFilterDto {
 	public string? Query { get; set; }
 	public long? StartPriceRange { get; set; }
 	public long? EndPriceRange { get; set; }
-	public long? Price1 { get; set; }
-	public long? Price2 { get; set; }
-	public int? MinMedia { get; set; }
-	public bool? IsFollowing { get; set; }
-	public bool? IsBookmarked { get; set; }
 	public bool? HasDiscount { get; set; }
 	public bool? ShowMedia { get; set; } = false;
 	public bool? ShowCategories { get; set; } = false;
 	public bool? ShowCreator { get; set; } = false;
 	public bool? ShowCategoryMedia { get; set; } = false;
-	public bool? HideBlockedUsers { get; set; } = true;
 	public bool? ShowChildren { get; set; } = false;
-	public bool? ShowPostOfPrivateUser { get; set; }
-	public bool? ShowComments { get; set; }
+	public bool? ShowComments { get; set; } = false;
 	public bool? OrderByVotes { get; set; } = false;
 	public bool? OrderByVotesDescending { get; set; } = false;
 	public bool? OrderByAtoZ { get; set; } = false;
@@ -248,8 +241,6 @@ public class ProductFilterDto : BaseFilterDto {
 	public bool? OrderByPriceDescending { get; set; } = false;
 	public bool? OrderByCreatedDate { get; set; } = true;
 	public bool? OrderByCreatedDateDescending { get; set; } = false;
-	public bool ShowWithChildren { get; set; } = false;
-	public bool? Shuffle1 { get; set; } = false;
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
 	public Currency? Currency { get; set; }

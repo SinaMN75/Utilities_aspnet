@@ -48,7 +48,7 @@ public class ProductRepository(
 
 	public async Task<GenericResponse<IQueryable<ProductEntity>>> Filter(ProductFilterDto dto) {
 		IQueryable<ProductEntity> q = dbContext.Set<ProductEntity>().AsNoTracking();
-		q = !dto.ShowWithChildren ? q.Where(x => x.ParentId == null) : q.Include(x => x.Parent);
+		q = q.Where(x => x.ParentId == null);
 
 		if (dto.Ids.IsNotNullOrEmpty()) q = q.Where(x => dto.Ids!.Contains(x.Id));
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
@@ -74,19 +74,11 @@ public class ProductRepository(
 		if (dto.UserIds.IsNotNullOrEmpty()) q = q.Where(x => dto.UserIds!.Contains(x.UserId));
 		if (dto.FromDate is not null) q = q.Where(x => x.CreatedAt > dto.FromDate);
 
-		if (dto.ShowPostOfPrivateUser != null && !dto.ShowPostOfPrivateUser.Value) {
-			q = q.Include(i => i.User);
-			q = q.Where(w => w.User != null);
-		}
-
 		if (dto.ShowChildren.IsTrue()) q = q.Include(i => i.Children)!.ThenInclude(x => x.Media);
 		if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(x => x.Children);
 		if (dto.ShowComments.IsTrue()) q = q.Include(i => i.Comments!.Where(x => x.Parent == null));
 		if (dto.ShowCategoryMedia.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.Media);
-		if (dto.ShowMedia.IsTrue()) {
-			q = q.Include(i => i.Media!.Where(j => j.ParentId == null)).ThenInclude(i => i.Children);
-			if (dto.MinMedia is not null) q = q.Where(x => x.Media!.Count() >= dto.MinMedia);
-		}
+		if (dto.ShowMedia.IsTrue()) q = q.Include(i => i.Media!.Where(j => j.ParentId == null)).ThenInclude(i => i.Children);
 
 		if (dto.OrderByVotes.IsTrue()) q = q.OrderBy(x => x.VoteCount);
 		if (dto.OrderByVotesDescending.IsTrue()) q = q.OrderByDescending(x => x.VoteCount);
@@ -97,17 +89,11 @@ public class ProductRepository(
 			q = q.Include(i => i.User).ThenInclude(x => x!.Categories);
 		}
 		
-		q = q.Include(x => x.Parent).ThenInclude(x => x!.Categories);
-		q = q.Include(x => x.Parent).ThenInclude(x => x!.Media);
-		q = q.Include(x => x.Parent).ThenInclude(x => x!.User).ThenInclude(x => x!.Media);
-
 		if (dto.OrderByPriceAscending.IsTrue()) q = q.Where(w => w.Price.HasValue).OrderBy(o => o.Price);
 		if (dto.OrderByPriceDescending.IsTrue()) q = q.Where(x => x.Price.HasValue).OrderByDescending(x => x.Price);
 		if (dto.OrderByCreatedDate.IsTrue()) q = q.OrderBy(x => x.CreatedAt);
 		if (dto.OrderByCreatedDateDescending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
-
-		if (dto.Shuffle1.IsTrue()) q = q.Shuffle();
-
+		
 		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
