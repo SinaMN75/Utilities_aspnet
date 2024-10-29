@@ -1,4 +1,5 @@
-﻿using static System.TimeSpan;
+﻿using Microsoft.AspNetCore.OutputCaching;
+using StackExchange.Redis;
 
 namespace Utilities_aspnet.Utilities;
 
@@ -19,21 +20,37 @@ public static class StartupExtension {
 
 	private static void AddUtilitiesServices<T>(this WebApplicationBuilder builder) where T : DbContext {
 		builder.Services.AddOptions();
-		builder.Services.AddOutputCache();
+		builder.Services.AddOutputCache(x => x.AddPolicy("default", y => {
+			y.Cache();
+			y.AddPolicy<CustomCachePolicy>().VaryByValue(context => {
+					context.Request.EnableBuffering();
+					using StreamReader reader = new(context.Request.Body, leaveOpen: true);
+					Task<string> body = reader.ReadToEndAsync();
+					context.Request.Body.Position = 0;
+					KeyValuePair<string, string> keyVal = new("requestBody", body.Result);
+					return keyVal;
+				}
+			);
+		})).AddStackExchangeRedisCache(x => {
+			x.ConnectionMultiplexerFactory = async () => await ConnectionMultiplexer.ConnectAsync(builder.Configuration
+					.GetSection("AppSettings")
+					.GetConnectionString("Redis")!);
+		});
 
-		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+		Server.Configure(builder.Services.BuildServiceProvider().GetService<IServiceProvider>()?.GetService<IHttpContextAccessor>());
 		AppSettings.Initialize(builder.Configuration);
+		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 		builder.Services.AddRateLimiter(x => {
 			x.RejectionStatusCode = 429;
 			x.AddFixedWindowLimiter("fixed", y => {
 				y.PermitLimit = 5;
-				y.Window = FromSeconds(2);
+				y.Window = TimeSpan.FromSeconds(2);
 				y.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
 				y.QueueLimit = 10;
 			});
 			x.AddFixedWindowLimiter("follow", y => {
 				y.PermitLimit = 30;
-				y.Window = FromHours(24);
+				y.Window = TimeSpan.FromHours(24);
 			});
 		});
 
@@ -129,7 +146,7 @@ public static class StartupExtension {
 				ValidateIssuer = true,
 				ValidateAudience = true,
 				RequireExpirationTime = true,
-				ClockSkew = Zero,
+				ClockSkew = TimeSpan.Zero,
 				ValidAudience = "https://SinaMN75.com,BetterSoft1234",
 				ValidIssuer = "https://SinaMN75.com,BetterSoft1234",
 				IssuerSigningKey = new SymmetricSecurityKey("https://SinaMN75.com,BetterSoft1234"u8.ToArray())
@@ -162,5 +179,19 @@ public static class StartupExtension {
 			c.DocExpansion(DocExpansion.None);
 			c.DefaultModelsExpandDepth(2);
 		});
+	}
+	
+	internal class CustomCachePolicy : IOutputCachePolicy {
+		public ValueTask CacheRequestAsync(OutputCacheContext context, CancellationToken cancellation) {
+			context.AllowCacheLookup = true;
+			context.AllowCacheStorage = true;
+			context.AllowLocking = true;
+			context.EnableOutputCaching = true;
+			context.ResponseExpirationTimeSpan = TimeSpan.FromSeconds(10);
+			return ValueTask.CompletedTask;
+		}
+
+		public ValueTask ServeFromCacheAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
+		public ValueTask ServeResponseAsync(OutputCacheContext context, CancellationToken cancellation) => ValueTask.CompletedTask;
 	}
 }
