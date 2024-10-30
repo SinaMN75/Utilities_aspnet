@@ -179,7 +179,7 @@ public static class StartupExtension {
 			context.AllowCacheStorage = true;
 			context.AllowLocking = true;
 			context.EnableOutputCaching = true;
-			context.ResponseExpirationTimeSpan = TimeSpan.FromSeconds(10);
+			context.ResponseExpirationTimeSpan = TimeSpan.FromHours(6);
 			return ValueTask.CompletedTask;
 		}
 

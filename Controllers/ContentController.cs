@@ -7,7 +7,7 @@ namespace Utilities_aspnet.Controllers;
 [ApiKey]
 public class ContentController(IContentRepository repository, IOutputCacheStore store) : BaseApiController {
 	
-	[OutputCache(Duration = 60 * 60 * 6, PolicyName = "default", Tags = ["content"])]
+	[OutputCache(PolicyName = "default", Tags = ["content"])]
 	[HttpGet]
 	public ActionResult<GenericResponse<IQueryable<ContentEntity>>> Read() {
 		return Result(repository.Read());
