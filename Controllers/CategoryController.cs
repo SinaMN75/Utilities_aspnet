@@ -28,7 +28,7 @@ public class CategoryController(ICategoryRepository repository, IOutputCacheStor
 	}
 
 	[HttpPost("Filter")]
-	[OutputCache(Duration = 60 * 60 * 24, PolicyName = "default", Tags = ["category"])]
+	[OutputCache(PolicyName = "default", Tags = ["category"])]
 	public async Task<ActionResult<GenericResponse<IQueryable<CategoryEntity>>>> Filter(CategoryFilterDto dto) => Result(await repository.Filter(dto));
 
 	[HttpPut]

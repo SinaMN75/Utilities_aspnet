@@ -6,37 +6,30 @@ namespace Utilities_aspnet.Utilities;
 public static class StartupExtension {
 	public static void SetupUtilities<T>(this WebApplicationBuilder builder) where T : DbContext {
 		builder.AddUtilitiesServices<T>();
-
-		builder.AddUtilitiesSwagger(builder.Services.BuildServiceProvider().GetService<IServiceProvider>());
+		builder.AddUtilitiesSwagger();
 		builder.AddUtilitiesIdentity();
+		builder.AddUtilitiesOutputCache();
+	}
 
-		builder.Services.Configure<FormOptions>(x => {
-			x.ValueLengthLimit = int.MaxValue;
-			x.MultipartBodyLengthLimit = int.MaxValue;
-			x.MultipartHeadersLengthLimit = int.MaxValue;
+	public static void UseUtilitiesServices(this WebApplication app) {
+		app.UseCors(option => option.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+		app.UseRateLimiter();
+		app.UseOutputCache();
+		app.UseDeveloperExceptionPage();
+		app.UseUtilitiesSwagger();
+		app.UseStaticFiles();
+		app.Use(async (context, next) => {
+			await next();
+			if (context.Response.StatusCode == 401)
+				await context.Response.WriteAsJsonAsync(new GenericResponse(UtilitiesStatusCodes.UnAuthorized));
 		});
-		builder.Services.Configure<IISServerOptions>(options => options.MaxRequestBodySize = int.MaxValue);
+
+		app.UseAuthentication();
+		app.UseAuthorization();
 	}
 
 	private static void AddUtilitiesServices<T>(this WebApplicationBuilder builder) where T : DbContext {
 		builder.Services.AddOptions();
-		builder.Services.AddOutputCache(x => x.AddPolicy("default", y => {
-			y.Cache();
-			y.AddPolicy<CustomCachePolicy>().VaryByValue(context => {
-					context.Request.EnableBuffering();
-					using StreamReader reader = new(context.Request.Body, leaveOpen: true);
-					Task<string> body = reader.ReadToEndAsync();
-					context.Request.Body.Position = 0;
-					KeyValuePair<string, string> keyVal = new("requestBody", body.Result);
-					return keyVal;
-				}
-			);
-		})).AddStackExchangeRedisCache(x => {
-			x.ConnectionMultiplexerFactory = async () => await ConnectionMultiplexer.ConnectAsync(builder.Configuration
-					.GetSection("AppSettings")
-					.GetConnectionString("Redis")!);
-		});
-
 		Server.Configure(builder.Services.BuildServiceProvider().GetService<IServiceProvider>()?.GetService<IHttpContextAccessor>());
 		AppSettings.Initialize(builder.Configuration);
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
@@ -44,13 +37,9 @@ public static class StartupExtension {
 			x.RejectionStatusCode = 429;
 			x.AddFixedWindowLimiter("fixed", y => {
 				y.PermitLimit = 5;
-				y.Window = TimeSpan.FromSeconds(2);
+				y.Window = TimeSpan.FromSeconds(10);
 				y.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
 				y.QueueLimit = 10;
-			});
-			x.AddFixedWindowLimiter("follow", y => {
-				y.PermitLimit = 30;
-				y.Window = TimeSpan.FromHours(24);
 			});
 		});
 
@@ -76,6 +65,13 @@ public static class StartupExtension {
 			options.UseCamelCasing(true);
 		});
 
+		builder.Services.Configure<FormOptions>(x => {
+			x.ValueLengthLimit = int.MaxValue;
+			x.MultipartBodyLengthLimit = int.MaxValue;
+			x.MultipartHeadersLengthLimit = int.MaxValue;
+		});
+		builder.Services.Configure<IISServerOptions>(options => options.MaxRequestBodySize = int.MaxValue);
+
 		builder.Services.AddTransient<IApiKeyValidation, ApiKeyValidation>();
 		builder.Services.AddScoped<ApiKeyAuthFilter>();
 		builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -100,8 +96,7 @@ public static class StartupExtension {
 		builder.Services.AddScoped<IRegistrationRepository, RegistrationRepository>();
 	}
 
-	private static void AddUtilitiesSwagger(this IHostApplicationBuilder builder, IServiceProvider? serviceProvider) {
-		Server.Configure(serviceProvider?.GetService<IHttpContextAccessor>());
+	private static void AddUtilitiesSwagger(this IHostApplicationBuilder builder) {
 		builder.Services.AddEndpointsApiExplorer();
 		builder.Services.AddSwaggerGen(c => {
 			c.UseInlineDefinitionsForEnums();
@@ -125,6 +120,25 @@ public static class StartupExtension {
 				{ new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "apiKey" } }, Array.Empty<string>() }
 			});
 		});
+	}
+
+	private static void AddUtilitiesOutputCache(this WebApplicationBuilder builder) {
+		builder.Services.AddOutputCache(x => x.AddPolicy("default", y => {
+			y.Cache();
+			y.SetVaryByHeader("*");
+			y.SetVaryByQuery("*");
+			y.AddPolicy<CustomCachePolicy>().VaryByValue(context => {
+					context.Request.EnableBuffering();
+					using StreamReader reader = new(context.Request.Body, leaveOpen: true);
+					Task<string> body = reader.ReadToEndAsync();
+					context.Request.Body.Position = 0;
+					KeyValuePair<string, string> keyVal = new("requestBody", body.Result);
+					return keyVal;
+				}
+			);
+		})).AddStackExchangeRedisCache(x => x.ConnectionMultiplexerFactory = async () => await ConnectionMultiplexer.ConnectAsync(
+			builder.Configuration.GetSection("AppSettings").GetConnectionString("Redis")!
+		));
 	}
 
 	private static void AddUtilitiesIdentity(this IHostApplicationBuilder builder) {
@@ -151,23 +165,6 @@ public static class StartupExtension {
 		builder.Services.AddAuthorization();
 	}
 
-	public static void UseUtilitiesServices(this WebApplication app) {
-		app.UseCors(option => option.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-		app.UseRateLimiter();
-		app.UseOutputCache();
-		app.UseDeveloperExceptionPage();
-		app.UseUtilitiesSwagger();
-		app.UseStaticFiles();
-		app.Use(async (context, next) => {
-			await next();
-			if (context.Response.StatusCode == 401)
-				await context.Response.WriteAsJsonAsync(new GenericResponse(UtilitiesStatusCodes.UnAuthorized));
-		});
-
-		app.UseAuthentication();
-		app.UseAuthorization();
-	}
-
 	private static void UseUtilitiesSwagger(this IApplicationBuilder app) {
 		app.UseSwagger();
 		app.UseSwaggerUI(c => {
@@ -175,7 +172,7 @@ public static class StartupExtension {
 			c.DefaultModelsExpandDepth(2);
 		});
 	}
-	
+
 	internal class CustomCachePolicy : IOutputCachePolicy {
 		public ValueTask CacheRequestAsync(OutputCacheContext context, CancellationToken cancellation) {
 			context.AllowCacheLookup = true;
