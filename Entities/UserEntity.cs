@@ -257,9 +257,3 @@ public class UserFilterDto : BaseFilterDto {
 	public IEnumerable<Guid>? Categories { get; set; }
 	public List<TagUser>? Tags { get; set; }
 }
-
-public class AuthorizeUserDto {
-	public NationalityType NationalityType { get; set; }
-	public string Code { get; set; } = null!;
-	public string ShebaNumber { get; set; } = null!;
-}

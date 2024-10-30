@@ -10,7 +10,6 @@ public interface IUserRepository {
 	Task<GenericResponse<UserEntity?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto);
 	Task<GenericResponse<UserEntity?>> VerifyCodeForLogin(VerifyMobileForLoginDto dto);
 	Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model);
-	Task<GenericResponse> Authorize(AuthorizeUserDto dto);
 	Task<GenericResponse> Subscribe(string userId, Guid contentId, string transactionRefId);
 }
 
@@ -348,32 +347,6 @@ public class UserRepository(
 		return dto.VerificationCode == "1375" || dto.VerificationCode == await cache.GetStringData(user.Id)
 			? new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result.Result)
 			: new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.WrongVerificationCode);
-	}
-
-	public async Task<GenericResponse> Authorize(AuthorizeUserDto dto) {
-		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(f => f.Id == _userId);
-		if (user is null) return new GenericResponse(UtilitiesStatusCodes.UserNotFound);
-
-		string? sheba = dto.ShebaNumber.GetShebaNumber();
-
-		if (user.JsonDetail.LegalAuthenticationType == LegalAuthenticationType.Authenticated) {
-			if (sheba is null) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
-			user.JsonDetail.ShebaNumber = user.JsonDetail.ShebaNumber == dto.ShebaNumber ? user.JsonDetail.ShebaNumber : dto.ShebaNumber;
-		}
-		else {
-			string? meliCode = dto.Code.Length == 10 ? dto.Code : null;
-			if (meliCode is null || sheba is null) return new GenericResponse(UtilitiesStatusCodes.BadRequest);
-
-			user.JsonDetail.Code = meliCode;
-			user.JsonDetail.ShebaNumber = sheba;
-			user.JsonDetail.NationalityType = dto.NationalityType;
-			user.JsonDetail.LegalAuthenticationType = LegalAuthenticationType.Authenticated;
-		}
-
-		dbContext.Set<UserEntity>().Update(user);
-		await dbContext.SaveChangesAsync();
-
-		return new GenericResponse();
 	}
 
 	public async Task<GenericResponse> Subscribe(string userId, Guid contentId, string transactionRefId) {
