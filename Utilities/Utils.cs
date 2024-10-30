@@ -30,7 +30,6 @@ public static class StartupExtension {
 
 	private static void AddUtilitiesServices<T>(this WebApplicationBuilder builder) where T : DbContext {
 		builder.Services.AddOptions();
-		Server.Configure(builder.Services.BuildServiceProvider().GetService<IServiceProvider>()?.GetService<IHttpContextAccessor>());
 		AppSettings.Initialize(builder.Configuration);
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 		builder.Services.AddRateLimiter(x => {
@@ -71,7 +70,7 @@ public static class StartupExtension {
 			x.MultipartHeadersLengthLimit = int.MaxValue;
 		});
 		builder.Services.Configure<IISServerOptions>(options => options.MaxRequestBodySize = int.MaxValue);
-
+		Server.Configure(builder.Services.BuildServiceProvider().GetService<IServiceProvider>()?.GetService<IHttpContextAccessor>());
 		builder.Services.AddTransient<IApiKeyValidation, ApiKeyValidation>();
 		builder.Services.AddScoped<ApiKeyAuthFilter>();
 		builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();

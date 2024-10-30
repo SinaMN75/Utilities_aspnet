@@ -76,7 +76,7 @@ public class CategoryCreateDto {
 }
 
 public class CategoryUpdateDto {
-	public Guid? Id { get; set; }
+	public required Guid Id { get; set; }
 	public string? Title { get; set; }
 	public string? TitleTr1 { get; set; }
 	public string? TitleTr2 { get; set; }
