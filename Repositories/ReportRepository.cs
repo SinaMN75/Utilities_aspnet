@@ -18,8 +18,6 @@ public class ReportRepository(DbContext context, IHttpContextAccessor httpContex
 		};
 		if (dto.ProductId.HasValue) entity.ProductId = dto.ProductId;
 		if (dto.CommentId.HasValue) entity.CommentId = dto.CommentId;
-		if (dto.GroupChatId.HasValue) entity.GroupChatId = dto.GroupChatId;
-		if (dto.GroupChatMessageId.HasValue) entity.GroupChatMessageId = dto.GroupChatMessageId;
 		if (!dto.UserId.IsNotNullOrEmpty()) entity.UserId = dto.UserId;
 		await context.Set<ReportEntity>().AddAsync(entity);
 		await context.SaveChangesAsync();
@@ -74,16 +72,6 @@ public class ReportRepository(DbContext context, IHttpContextAccessor httpContex
 				AppPhoneNumber = x.CreatorUser.AppPhoneNumber,
 				Email = x.CreatorUser.Email,
 				PhoneNumber = x.CreatorUser.PhoneNumber
-			},
-			GroupChat = new GroupChatEntity {
-				Id = x.GroupChat!.Id,
-				Title = x.GroupChat.Title
-			},
-			GroupChatMessage = new GroupChatMessageEntity {
-				Id = x.GroupChatMessage!.Id,
-				Message = x.GroupChatMessage.Message,
-				UserId = x.GroupChatMessage.UserId,
-				GroupChatId = x.GroupChatMessage.GroupChatId
 			}
 		});
 		return new GenericResponse<IQueryable<ReportEntity>>(e);
@@ -99,8 +87,6 @@ public class ReportRepository(DbContext context, IHttpContextAccessor httpContex
 			.Include(x => x.User)
 			.Include(x => x.Product).ThenInclude(x => x!.Media)
 			.Include(x => x.Comment)
-			.Include(x => x.GroupChat)
-			.Include(x => x.GroupChatMessage)
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.Id == id);
 		return new GenericResponse<ReportEntity?>(entity);

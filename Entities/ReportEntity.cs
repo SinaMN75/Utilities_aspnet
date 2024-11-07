@@ -19,12 +19,6 @@ public class ReportEntity : BaseEntity {
 
 	public CommentEntity? Comment { get; set; }
 	public Guid? CommentId { get; set; }
-
-	public GroupChatMessageEntity? GroupChatMessage { get; set; }
-	public Guid? GroupChatMessageId { get; set; }
-
-	public GroupChatEntity? GroupChat { get; set; }
-	public Guid? GroupChatId { get; set; }
 }
 
 public class ReportCreateUpdateDto {

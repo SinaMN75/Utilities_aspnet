@@ -480,3 +480,7 @@ public enum TagSubscription {
 	Complete = 101,
 	AwaitingPayment = 102
 }
+
+public enum TagQuestion {
+	Food1 = 101
+}

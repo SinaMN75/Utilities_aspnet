@@ -80,7 +80,6 @@ public static class StartupExtension {
 		builder.Services.AddScoped<IMediaRepository, MediaRepository>();
 		builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 		builder.Services.AddScoped<IProductRepository, ProductRepository>();
-		builder.Services.AddScoped<IChatRepository, ChatRepository>();
 		builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 		builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 		builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
@@ -92,7 +91,6 @@ public static class StartupExtension {
 		builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 		builder.Services.AddScoped<IAppSettingsRepository, AppSettingsRepository>();
 		builder.Services.AddScoped<IAmazonS3Repository, AmazonS3Repository>();
-		builder.Services.AddScoped<IRegistrationRepository, RegistrationRepository>();
 	}
 
 	private static void AddUtilitiesSwagger(this IHostApplicationBuilder builder) {

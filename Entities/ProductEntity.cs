@@ -61,8 +61,6 @@ public class ProductEntity : BaseEntity {
 	public IEnumerable<CommentEntity>? Comments { get; set; }
 	public IEnumerable<ReportEntity>? Reports { get; set; }
 	public IEnumerable<NotificationEntity>? Notifications { get; set; }
-	public IEnumerable<GroupChatMessageEntity>? GroupChatMessage { get; set; }
-	public IEnumerable<RegistrationEntity>? Registrations { get; set; }
 
 	[NotMapped]
 	public IEnumerable<OrderEntity>? Orders { get; set; }

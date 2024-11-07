@@ -21,7 +21,6 @@ public class UserRepository(
 	IOrderRepository orderRepository,
 	ITransactionRepository transactionRepository,
 	ISmsNotificationRepository smsNotificationRepository,
-	IChatRepository chatRepository,
 	ICommentRepository commentRepository,
 	IReportRepository reportRepository,
 	IAddressRepository addressRepository,
@@ -500,7 +499,6 @@ public class UserRepository(
 		foreach (TransactionEntity transactionEntity in dbContext.Set<TransactionEntity>().Where(x => x.BuyerId == id || x.SellerId == id))
 			await transactionRepository.Delete(transactionEntity.Id, ct);
 		foreach (AddressEntity addressEntity in dbContext.Set<AddressEntity>().Where(x => x.UserId == id)) await addressRepository.Delete(addressEntity.Id, ct);
-		foreach (GroupChatEntity groupChatEntity in dbContext.Set<GroupChatEntity>().Where(x => x.CreatorUserId == id)) await chatRepository.DeleteGroupChat(groupChatEntity.Id);
 
 		dbContext.Remove(user);
 

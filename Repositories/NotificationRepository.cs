@@ -24,7 +24,6 @@ public class NotificationRepository(DbContext dbContext, IHttpContextAccessor ht
 		if (dto.ShowCreator.IsTrue()) q = q.Include(x => x.CreatorUser).ThenInclude(x => x!.Media);
 		if (dto.ShowUser.IsTrue()) q = q.Include(x => x.User).ThenInclude(x => x!.Media);
 		if (dto.ShowProduct.IsTrue()) q = q.Include(x => x.Product).ThenInclude(x => x!.Media);
-		if (dto.ShowGroupChat.IsTrue()) q = q.Include(x => x.GroupChat);
 		if (dto.ShowComment.IsTrue()) {
 			q = q.Include(x => x.Comment)
 				.ThenInclude(x => x!.Product).ThenInclude(x => x!.Media);

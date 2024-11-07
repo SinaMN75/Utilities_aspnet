@@ -1,7 +1,8 @@
 namespace Utilities_aspnet.Utilities;
 
 public static class Redis {
-	public static void SetStringData(this IDistributedCache cache,
+	public static void SetStringData(
+		this IDistributedCache cache,
 		string key,
 		string value,
 		TimeSpan? absoluteExpireTime = null,
@@ -10,7 +11,7 @@ public static class Redis {
 			AbsoluteExpirationRelativeToNow = absoluteExpireTime ?? TimeSpan.FromSeconds(60),
 			SlidingExpiration = slidingExpireTime
 		};
-		
+
 		cache.SetStringAsync(key, value, options);
 	}
 
