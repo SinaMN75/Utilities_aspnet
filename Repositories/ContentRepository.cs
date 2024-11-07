@@ -39,7 +39,7 @@ public class ContentRepository(DbContext context, IMediaRepository mediaReposito
 		return new GenericResponse<ContentEntity>(e.Entity);
 	}
 
-	public GenericResponse<IQueryable<ContentEntity>> Read() => new(context.Set<ContentEntity>().AsNoTracking()
+	public GenericResponse<IQueryable<ContentEntity>> Read() => new(context.Set<ContentEntity>()
 		.Select(x => new ContentEntity {
 			Id = x.Id,
 			Title = x.Title,
@@ -54,7 +54,7 @@ public class ContentRepository(DbContext context, IMediaRepository mediaReposito
 				JsonDetail = y.JsonDetail,
 				Tags = y.Tags
 			})
-		}));
+		}).AsNoTracking());
 
 	public async Task<GenericResponse<ContentEntity?>> Update(ContentUpdateDto dto, CancellationToken ct) {
 		ContentEntity e = (await context.Set<ContentEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id, ct))!;

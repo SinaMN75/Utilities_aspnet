@@ -426,6 +426,7 @@ public enum TagUser {
 	Guest = 204,
 	Teacher = 205,
 	Student = 206,
+	MofidTeacher = 207,
 	AdminCategoryRead = 300,
 	AdminCategoryUpdate = 301,
 	AdminProductRead = 302,
