@@ -372,12 +372,12 @@ public class UserRepository(
 
 	private static JwtSecurityToken CreateToken(UserEntity user) {
 		List<Claim> claims = [
-			new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-			new Claim(ClaimTypes.NameIdentifier, user.Id),
-			new Claim(ClaimTypes.Name, user.Id),
-			new Claim(ClaimTypes.Email, user.Email ?? user.Id),
-			new Claim(ClaimTypes.MobilePhone, user.PhoneNumber ?? user.Id),
-			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+			new(JwtRegisteredClaimNames.Sub, user.Id),
+			new(ClaimTypes.NameIdentifier, user.Id),
+			new(ClaimTypes.Name, user.Id),
+			new(ClaimTypes.Email, user.Email ?? user.Id),
+			new(ClaimTypes.MobilePhone, user.PhoneNumber ?? user.Id),
+			new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
 		];
 		SymmetricSecurityKey key = new("https://SinaMN75.com,BetterSoft1234"u8.ToArray());
 		SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha256);

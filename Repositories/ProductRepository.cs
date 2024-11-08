@@ -201,7 +201,7 @@ public class ProductRepository(
 		ProductEntity p = (await dbContext.Set<ProductEntity>().FirstOrDefaultAsync(x => x.Id == dto.ProductId))!;
 
 		if (p.JsonDetail.UsersReactions.IsNullOrEmpty()) {
-			p.JsonDetail.UsersReactions = new List<UserReaction> { new() { Reaction = dto.Reaction, UserId = _userId! } };
+			p.JsonDetail.UsersReactions = [new UserReaction { Reaction = dto.Reaction, UserId = _userId! }];
 		}
 		else if (p.JsonDetail.UsersReactions!.Any(x => x.UserId == _userId)) {
 			p.JsonDetail.UsersReactions!.First(x => x.UserId == _userId).Reaction = dto.Reaction;

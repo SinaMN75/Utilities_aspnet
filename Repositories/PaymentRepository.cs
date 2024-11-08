@@ -8,16 +8,6 @@ public interface IPaymentRepository {
 }
 
 public class PaymentRepository : IPaymentRepository {
-	private readonly DbContext _dbContext;
-	private readonly IUserRepository _userRepository;
-	private readonly AppSettings _appSettings;
-	
-	public PaymentRepository(DbContext dbContext, IConfiguration config, IUserRepository userRepository) {
-		_dbContext = dbContext;
-		_userRepository = userRepository;
-		_appSettings = new AppSettings();
-		config.GetSection("AppSettings").Bind(_appSettings);
-	}
 	public async Task<GenericResponse<NgHostedResponse>> PayNg(NgPayDto dto) {
 		NgAccessTokenResponse requestAccessToken = await GetNGeniusAccessToken();
 

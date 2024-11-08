@@ -93,7 +93,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 		if (o is null) {
 			EntityEntry<OrderEntity> orderEntity = await dbContext.Set<OrderEntity>().AddAsync(new OrderEntity {
 				OrderNumber = new Random().Next(10000, 99999),
-				Tags = p.Tags.Contains(new[] { TagProduct.Premium1Month, TagProduct.Premium3Month, TagProduct.Premium6Month, TagProduct.Premium12Month })
+				Tags = p.Tags.Contains([TagProduct.Premium1Month, TagProduct.Premium3Month, TagProduct.Premium6Month, TagProduct.Premium12Month])
 					? [TagOrder.Pending, TagOrder.Premium]
 					: [TagOrder.Pending],
 				UserId = _userId,
