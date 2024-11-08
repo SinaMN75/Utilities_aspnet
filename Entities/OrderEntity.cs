@@ -67,8 +67,6 @@ public class OrderCreateUpdateDto {
 	public Guid? AddressId { get; set; }
 	public string? RefCode { get; set; }
 	public List<TagOrder>? Tags { get; set; }
-	public List<TagOrder>? RemoveTags { get; set; }
-	public List<TagOrder>? AddTags { get; set; }
 }
 
 public class OrderDetailCreateUpdateDto {
@@ -125,11 +123,6 @@ public class ReserveChairDto {
 	public string? UserId { get; set; }
 	public string? UserName { get; set; }
 	public required long Price { get; set; }
-}
-
-public class ApplyDiscountCodeOnOrderDto {
-	public Guid? OrderId { get; set; }
-	public string? Code { get; set; }
 }
 
 public class OrderFilterDto : BaseFilterDto {

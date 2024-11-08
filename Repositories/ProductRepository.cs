@@ -50,14 +50,14 @@ public class ProductRepository(
 		IQueryable<ProductEntity> q = dbContext.Set<ProductEntity>().AsNoTracking();
 		q = q.Where(x => x.ParentId == null);
 
-		if (dto.Ids.IsNotNullOrEmpty()) q = q.Where(x => dto.Ids!.Contains(x.Id));
-		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
-		if (dto.Subtitle.IsNotNullOrEmpty()) q = q.Where(x => (x.Subtitle ?? "").Contains(dto.Subtitle!));
-		if (dto.Description.IsNotNullOrEmpty()) q = q.Where(x => (x.Description ?? "").Contains(dto.Description!));
-		if (dto.State.IsNotNullOrEmpty()) q = q.Where(x => x.State!.Contains(dto.State ?? ""));
-		if (dto.Country.IsNotNullOrEmpty()) q = q.Where(x => x.Country!.Contains(dto.Country ?? ""));
-		if (dto.City.IsNotNullOrEmpty()) q = q.Where(x => x.City!.Contains(dto.City ?? ""));
-		if (dto.StateRegion.IsNotNullOrEmpty())
+		if (dto.Ids is not null) q = q.Where(x => dto.Ids!.Contains(x.Id));
+		if (dto.Title is not null) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
+		if (dto.Subtitle is not null) q = q.Where(x => (x.Subtitle ?? "").Contains(dto.Subtitle!));
+		if (dto.Description is not null) q = q.Where(x => (x.Description ?? "").Contains(dto.Description!));
+		if (dto.State is not null) q = q.Where(x => x.State!.Contains(dto.State ?? ""));
+		if (dto.Country is not null) q = q.Where(x => x.Country!.Contains(dto.Country ?? ""));
+		if (dto.City is not null) q = q.Where(x => x.City!.Contains(dto.City ?? ""));
+		if (dto.StateRegion is not null)
 			q = q.Where(x => x.Country!.Contains(dto.Country ?? "") || x.State!.Contains(dto.StateRegion ?? "") || x.City!.Contains(dto.StateRegion ?? ""));
 		if (dto.StartPriceRange.HasValue) q = q.Where(x => x.Price >= dto.StartPriceRange);
 		if (dto.Currency.HasValue) q = q.Where(x => x.Currency == dto.Currency);
@@ -65,13 +65,13 @@ public class ProductRepository(
 		if (dto.EndPriceRange.HasValue) q = q.Where(x => x.Price <= dto.EndPriceRange);
 		if (dto.StartDate.HasValue) q = q.Where(x => x.StartDate >= dto.StartDate);
 		if (dto.EndDate.HasValue) q = q.Where(x => x.EndDate <= dto.EndDate);
-		if (dto.Query.IsNotNullOrEmpty())
+		if (dto.Query is not null)
 			q = q.Where(x => (x.Title ?? "").Contains(dto.Query!) || (x.Subtitle ?? "").Contains(dto.Query!) || (x.Description ?? "").Contains(dto.Query!));
 
-		if (dto.Categories.IsNotNullOrEmpty()) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
-		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
-		if (dto.TagsInclude.IsNotNullOrEmpty()) q = q.Where(x => dto.TagsInclude!.Any(y => x.Tags.Contains(y)));
-		if (dto.UserIds.IsNotNullOrEmpty()) q = q.Where(x => dto.UserIds!.Contains(x.UserId));
+		if (dto.Categories is not null) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
+		if (dto.Tags is not null) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
+		if (dto.TagsInclude is not null) q = q.Where(x => dto.TagsInclude!.Any(y => x.Tags.Contains(y)));
+		if (dto.UserIds is not null) q = q.Where(x => dto.UserIds!.Contains(x.UserId));
 		if (dto.FromDate is not null) q = q.Where(x => x.CreatedAt > dto.FromDate);
 
 		if (dto.ShowChildren.IsTrue()) q = q.Include(i => i.Children)!.ThenInclude(x => x.Media);
@@ -119,7 +119,7 @@ public class ProductRepository(
 			.FirstOrDefaultAsync(i => i.Id == id, ct);
 		if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound);
 
-		if (_userId.IsNotNullOrEmpty()) {
+		if (_userId is not null) {
 			if (i.JsonDetail.VisitCounts.IsNullOrEmpty()) i.JsonDetail.VisitCounts = [new VisitCount { UserId = _userId ?? "", Count = 1 }];
 			else {
 				if (i.JsonDetail.VisitCounts!.Any(x => x.UserId == _userId)) {

@@ -114,7 +114,6 @@ public class UserJsonDetail {
 	public LegalAuthenticationType? LegalAuthenticationType { get; set; }
 	public NationalityType? NationalityType { get; set; }
 	public List<UserSubscriptions>? UserSubscriptions { get; set; } = [];
-	public List<KeyValue>? KeyValues1 { get; set; } = [];
 	public List<string>? StringList { get; set; } = [];
 }
 

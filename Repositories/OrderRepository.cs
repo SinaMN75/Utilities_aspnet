@@ -24,11 +24,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 		e.AddressId = dto.AddressId ?? e.AddressId;
 		e.JsonDetail.RefCode = dto.RefCode ?? e.JsonDetail.RefCode;
 		e.UpdatedAt = DateTime.UtcNow;
-
-		if (dto.RemoveTags.IsNotNullOrEmpty()) dto.RemoveTags?.ForEach(item => e.Tags.Remove(item));
-
-		if (dto.AddTags.IsNotNullOrEmpty()) e.Tags.AddRange(dto.AddTags!);
-
+		
 		await dbContext.SaveChangesAsync();
 
 		return new GenericResponse<OrderEntity?>(e);

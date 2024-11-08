@@ -27,6 +27,4 @@ public class ReportCreateUpdateDto {
 	public string? UserId { get; set; }
 	public Guid? ProductId { get; set; }
 	public Guid? CommentId { get; set; }
-	public Guid? GroupChatMessageId { get; set; }
-	public Guid? GroupChatId { get; set; }
 }
