@@ -385,7 +385,6 @@ public enum TagUser {
 	Authorized = 100,
 	Private = 101,
 	Public = 102,
-	AwaitingAuthorization = 103,
 	Male = 200,
 	Female = 201,
 	Unknown = 202,
@@ -408,18 +407,7 @@ public enum TagUser {
 	AdminOrderUpdate = 311,
 	AdminContentRead = 312,
 	AdminContentUpdate = 313,
-	AdminCommentRead = 314,
-	AdminCommentUpdate = 315,
-	ProductPublic = 401,
-	BuysPublic = 402,
-	SellsPublic = 403,
-	FollowingsPublic = 404,
-	FollowersPublic = 405,
-	ProductPrivate = 406,
-	BuysPrivate = 407,
-	SellsPrivate = 408,
-	FollowingsPrivate = 409,
-	FollowersPrivate = 410
+	AdminCommentRead = 314
 }
 
 public enum TagReservationChair {
