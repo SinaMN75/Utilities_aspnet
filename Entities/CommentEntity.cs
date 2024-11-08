@@ -8,9 +8,7 @@ public class CommentEntity : BaseEntity {
 
 	[MaxLength(2000)]
 	public string? Comment { get; set; }
-
-	public ChatStatus? Status { get; set; }
-
+	
 	public Guid? ParentId { get; set; }
 	public CommentEntity? Parent { get; set; }
 
@@ -50,7 +48,6 @@ public class CommentCreateUpdateDto {
 	public string? Comment { get; set; }
 	public Guid? ProductId { get; set; }
 	public string? UserId { get; set; }
-	public ChatStatus? Status { get; set; }
 	public List<TagComment>? Tags { get; set; }
 }
 
@@ -59,6 +56,5 @@ public class CommentFilterDto : BaseFilterDto {
 	public string? ProductOwnerId { get; set; }
 	public Guid? ProductId { get; set; }
 	public string? TargetUserId { get; set; }
-	public ChatStatus? Status { get; set; }
 	public List<TagComment>? Tags { get; set; }
 }

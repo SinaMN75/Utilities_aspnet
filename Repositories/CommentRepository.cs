@@ -24,7 +24,6 @@ public class CommentRepository(
 		IQueryable<CommentEntity> q = dbContext.Set<CommentEntity>().AsNoTracking().Where(x => x.ParentId == null);
 
 		if (dto.ProductId is not null) q = q.Where(x => x.ProductId == dto.ProductId);
-		if (dto.Status is not null) q = q.Where(x => x.Status == dto.Status);
 		if (dto.UserId is not null) q = q.Where(x => x.UserId == dto.UserId);
 		if (dto.ProductOwnerId is not null) q = q.Where(x => x.Product!.UserId == dto.ProductOwnerId);
 		if (dto.Tags is not null) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
@@ -84,7 +83,6 @@ public class CommentRepository(
 			Score = dto.Score,
 			ParentId = dto.ParentId,
 			UserId = _userId,
-			Status = dto.Status,
 			Tags = dto.Tags ?? []
 		};
 		await dbContext.AddAsync(comment, ct);
@@ -130,7 +128,6 @@ public class CommentRepository(
 		if (dto.Score.HasValue) comment.Score = dto.Score;
 		if (dto.ProductId.HasValue) comment.ProductId = dto.ProductId;
 		if (dto.UserId.IsNotNullOrEmpty()) comment.TargetUserId = dto.UserId;
-		if (dto.Status.HasValue) comment.Status = dto.Status;
 		if (dto.Tags.IsNotNullOrEmpty()) comment.Tags = dto.Tags!;
 
 		comment.UpdatedAt = DateTime.UtcNow;

@@ -54,29 +54,6 @@ public enum SeenStatus {
 	Deleted = 104
 }
 
-public enum ChatStatus {
-	Open = 100,
-	Closes = 101,
-	WaitingForHost = 102,
-	Answered = 103,
-	Deleted = 104
-}
-
-public enum ChatType {
-	Private = 100,
-	PublicGroup = 101,
-	PrivateGroup = 102,
-	PublicChannel = 103,
-	PrivateChannel = 104
-}
-
-public enum Priority {
-	VeryHigh = 100,
-	High = 101,
-	Normal = 102,
-	Low = 103
-}
-
 public enum Reaction {
 	None = 100,
 	Like = 101,
@@ -106,11 +83,6 @@ public enum PrivacyType {
 public enum NationalityType {
 	Iranian = 100,
 	NonIranian = 101
-}
-
-public enum LegalAuthenticationType {
-	Authenticated = 100,
-	NotAutenticated = 101
 }
 
 public enum TagTransaction {
@@ -409,11 +381,6 @@ public enum TagOrder {
 	Visible = 601
 }
 
-public enum TagChat {
-	Product = 100,
-	Shop = 101
-}
-
 public enum TagUser {
 	Authorized = 100,
 	Private = 101,
@@ -453,12 +420,6 @@ public enum TagUser {
 	SellsPrivate = 408,
 	FollowingsPrivate = 409,
 	FollowersPrivate = 410
-}
-
-public enum TagPayment {
-	PayOrder = 101,
-	PayWallet = 102,
-	Premium = 103
 }
 
 public enum TagReservationChair {

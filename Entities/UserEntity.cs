@@ -111,7 +111,6 @@ public class UserJsonDetail {
 	public long? DeliveryPrice2 { get; set; }
 	public long? DeliveryPrice3 { get; set; }
 	public PrivacyType? PrivacyType { get; set; }
-	public LegalAuthenticationType? LegalAuthenticationType { get; set; }
 	public NationalityType? NationalityType { get; set; }
 	public List<UserSubscriptions>? UserSubscriptions { get; set; } = [];
 	public List<string>? StringList { get; set; } = [];
@@ -204,7 +203,6 @@ public class UserCreateUpdateDto {
 	public long? DeliveryPrice3 { get; set; }
 	public bool? Suspend { get; set; }
 	public GenderType? Gender { get; set; }
-	public LegalAuthenticationType? LegalAuthenticationType { get; set; }
 	public NationalityType? NationalityType { get; set; }
 	public PrivacyType? PrivacyType { get; set; }
 	public DateTime? BirthDate { get; set; }

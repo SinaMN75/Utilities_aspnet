@@ -440,7 +440,6 @@ public class UserRepository(
 		if (dto.UniqueId is not null) entity.JsonDetail.UniqueId = dto.UniqueId;
 		if (dto.PassportNumber is not null) entity.JsonDetail.PassportNumber = dto.PassportNumber;
 		if (dto.ShebaNumber is not null) entity.JsonDetail.ShebaNumber = dto.ShebaNumber;
-		if (dto.LegalAuthenticationType is not null) entity.JsonDetail.LegalAuthenticationType = dto.LegalAuthenticationType;
 		if (dto.Degree is not null) entity.JsonDetail.Degree = dto.Degree;
 		if (dto.NationalityType is not null) entity.JsonDetail.NationalityType = dto.NationalityType;
 		if (dto.Code is not null) entity.JsonDetail.Code = dto.Code;
