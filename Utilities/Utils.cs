@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.OutputCaching;
 using StackExchange.Redis;
+using Utilities_aspnet.EndPoints;
 
 namespace Utilities_aspnet.Utilities;
 
@@ -26,6 +27,8 @@ public static class StartupExtension {
 
 		app.UseAuthentication();
 		app.UseAuthorization();
+		
+		app.UseContentEndPoints();
 	}
 
 	private static void AddUtilitiesServices<T>(this WebApplicationBuilder builder) where T : DbContext {
