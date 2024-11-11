@@ -244,34 +244,26 @@ public static class ProductEntityExtension {
 		if (dto.Link is not null) entity.JsonDetail.Link = dto.Link;
 		if (dto.Website is not null) entity.JsonDetail.Website = dto.Website;
 		if (dto.Email is not null) entity.JsonDetail.Email = dto.Email;
-		if (dto.ResponseTime is not null) entity.JsonDetail.ResponseTime = dto.ResponseTime;
-		if (dto.OnTimeDelivery is not null) entity.JsonDetail.OnTimeDelivery = dto.OnTimeDelivery;
 		if (dto.Length is not null) entity.JsonDetail.Length = dto.Length;
 		if (dto.Width is not null) entity.JsonDetail.Width = dto.Width;
 		if (dto.Height is not null) entity.JsonDetail.Height = dto.Height;
 		if (dto.Weight is not null) entity.JsonDetail.Weight = dto.Weight;
-		if (dto.MinOrder is not null) entity.JsonDetail.MinOrder = dto.MinOrder;
-		if (dto.MaxOrder is not null) entity.JsonDetail.MaxOrder = dto.MaxOrder;
 		if (dto.MinPrice is not null) entity.JsonDetail.MinPrice = dto.MinPrice;
 		if (dto.MaxPrice is not null) entity.JsonDetail.MaxPrice = dto.MaxPrice;
 		if (dto.Unit is not null) entity.JsonDetail.Unit = dto.Unit;
 		if (dto.Address is not null) entity.JsonDetail.Address = dto.Address;
 		if (dto.StartDate is not null) entity.JsonDetail.StartDate = dto.StartDate;
 		if (dto.EndDate is not null) entity.JsonDetail.EndDate = dto.EndDate;
-		if (dto.ShippingCost is not null) entity.JsonDetail.ShippingCost = dto.ShippingCost;
-		if (dto.ShippingTime is not null) entity.JsonDetail.ShippingTime = dto.ShippingTime;
 		if (dto.Details is not null) entity.JsonDetail.Details = dto.Details;
 		if (dto.Type1 is not null) entity.JsonDetail.Type1 = dto.Type1;
 		if (dto.Type2 is not null) entity.JsonDetail.Type2 = dto.Type2;
 		if (dto.KeyValues is not null) entity.JsonDetail.KeyValues = dto.KeyValues;
 		if (dto.ReservationTimes is not null) entity.JsonDetail.ReservationTimes = dto.ReservationTimes;
 		if (dto.RelatedProducts is not null) entity.JsonDetail.RelatedProducts = dto.RelatedProducts;
-		if (dto.RelatedGroupChats is not null) entity.JsonDetail.RelatedGroupChats = dto.RelatedGroupChats;
 		if (dto.ClubName is not null) entity.JsonDetail.ClubName = dto.ClubName;
 		if (dto.Policies is not null) entity.JsonDetail.Policies = dto.Policies;
 		if (dto.MaximumMembers is not null) entity.JsonDetail.MaximumMembers = dto.MaximumMembers;
 		if (dto.PaymentRefId is not null) entity.JsonDetail.PaymentRefId = dto.PaymentRefId;
-		if (dto.Teams is not null) entity.JsonDetail.Teams = dto.Teams;
 
 		if (dto.Categories.IsNotNull()) {
 			List<CategoryEntity> listCategory = [];

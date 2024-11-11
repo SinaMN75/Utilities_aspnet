@@ -40,13 +40,9 @@ public class UserRepository(
 				Title = x.Title,
 				Subtitle = x.Subtitle,
 				FullName = x.FullName,
-				Headline = x.Headline,
 				Bio = x.Bio,
-				AppUserName = x.AppUserName,
-				AppPhoneNumber = x.AppPhoneNumber,
 				UserName = x.UserName,
 				PhoneNumber = x.PhoneNumber,
-				AppEmail = x.AppEmail,
 				Email = x.Email,
 				Country = x.Country,
 				City = x.City,
@@ -116,13 +112,9 @@ public class UserRepository(
 			FullName = x.FullName,
 			Title = x.Title,
 			Subtitle = x.Subtitle,
-			Headline = x.Headline,
 			Bio = x.Bio,
-			AppUserName = x.AppUserName,
-			AppPhoneNumber = x.AppPhoneNumber,
 			UserName = x.UserName,
 			PhoneNumber = x.PhoneNumber,
-			AppEmail = x.AppEmail,
 			Email = x.Email,
 			Country = x.Country,
 			State = x.State,
@@ -163,24 +155,17 @@ public class UserRepository(
 				: null
 		});
 
-		if (dto.UserNameExact.IsNotNullOrEmpty()) q = q.Where(x => x.AppUserName == dto.UserNameExact || x.UserName == dto.UserNameExact);
 		if (dto.UserId.IsNotNullOrEmpty()) q = q.Where(x => x.Id == dto.UserId);
-		if (dto.HasAppUserName.IsTrue()) q = q.Where(x => x.AppUserName != null);
 		if (dto.Bio.IsNotNullOrEmpty()) q = q.Where(x => x.Bio!.Contains(dto.Bio!));
 		if (dto.Email.IsNotNullOrEmpty()) q = q.Where(x => x.Email!.Contains(dto.Email!));
 		if (dto.Gender != null) q = q.Where(x => x.Gender == dto.Gender);
-		if (dto.Headline.IsNotNullOrEmpty()) q = q.Where(x => x.Headline!.Contains(dto.Headline!));
-		if (dto.JobStatus.IsNotNullOrEmpty()) q = q.Where(x => x.Headline!.Contains(dto.JobStatus!));
 		if (dto.City.IsNotNullOrEmpty()) q = q.Where(x => x.City!.Contains(dto.City!));
 		if (dto.Country.IsNotNullOrEmpty()) q = q.Where(x => x.Country!.Contains(dto.Country!));
 		if (dto.State.IsNotNullOrEmpty()) q = q.Where(x => x.State!.Contains(dto.State!));
-		if (dto.AppEmail.IsNotNullOrEmpty()) q = q.Where(x => x.AppEmail!.Contains(dto.AppEmail!));
 		if (dto.FirstName.IsNotNullOrEmpty()) q = q.Where(x => x.FirstName!.Contains(dto.FirstName!));
 		if (dto.LastName.IsNotNullOrEmpty()) q = q.Where(x => x.LastName!.Contains(dto.LastName!));
 		if (dto.FullName.IsNotNullOrEmpty()) q = q.Where(x => x.FullName!.Contains(dto.FullName!));
 		if (dto.PhoneNumber.IsNotNullOrEmpty()) q = q.Where(x => x.PhoneNumber!.Contains(dto.PhoneNumber!));
-		if (dto.AppUserName.IsNotNullOrEmpty()) q = q.Where(x => x.AppUserName!.Contains(dto.AppUserName!));
-		if (dto.AppPhoneNumber.IsNotNullOrEmpty()) q = q.Where(x => x.AppPhoneNumber!.Contains(dto.AppPhoneNumber!));
 		if (dto.ShowPremiums.IsTrue()) q = q.Where(x => x.PremiumExpireDate > DateTime.UtcNow);
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
 
@@ -188,16 +173,13 @@ public class UserRepository(
 			q = q.Where(x => x.FirstName!.Contains(dto.Query!) ||
 			                 x.LastName!.Contains(dto.Query!) ||
 			                 x.FullName!.Contains(dto.Query!) ||
-			                 x.UserName!.Contains(dto.Query!) ||
-			                 x.AppUserName!.Contains(dto.Query!) ||
-			                 x.AppEmail!.Contains(dto.Query!)
-			);
+			                 x.UserName!.Contains(dto.Query!));
 
 		if (dto.Categories.IsNotNullOrEmpty()) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
 
 		if (dto.UserIds.IsNotNullOrEmpty()) q = q.Where(x => dto.UserIds!.Contains(x.Id));
 		if (dto.PhoneNumbers.IsNotNullOrEmpty()) q = q.Where(x => dto.PhoneNumbers!.Contains(x.PhoneNumber));
-		if (dto.UserName.IsNotNullOrEmpty()) q = q.Where(x => (x.AppUserName ?? "").Contains(dto.UserName!, StringComparison.CurrentCultureIgnoreCase));
+		if (dto.UserName.IsNotNullOrEmpty()) q = q.Where(x => (x.UserName!).Contains(dto.UserName!, StringComparison.CurrentCultureIgnoreCase));
 		if (dto.ShowSuspend.IsTrue()) q = q.Where(x => x.Suspend == true);
 
 		if (dto.OrderByUserName.IsTrue()) q = q.OrderBy(x => x.UserName);
@@ -303,8 +285,6 @@ public class UserRepository(
 	public async Task<GenericResponse<UserEntity?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto) {
 		UserEntity? existingUser = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Email == dto.Mobile ||
 		                                                                                      x.PhoneNumber == dto.Mobile ||
-		                                                                                      x.AppUserName == dto.Mobile ||
-		                                                                                      x.AppPhoneNumber == dto.Mobile ||
 		                                                                                      x.UserName == dto.Mobile);
 
 		if (existingUser != null) {
@@ -334,7 +314,6 @@ public class UserRepository(
 
 		user.FirstName = dto.FirstName ?? user.FirstName;
 		user.LastName = dto.LastName ?? user.LastName;
-		user.AppUserName = dto.UserName ?? user.AppUserName;
 		user.JsonDetail.Instagram = dto.Instagram ?? user.JsonDetail.Instagram;
 		user.JsonDetail.FcmToken = dto.FcmToken ?? user.JsonDetail.FcmToken;
 
@@ -399,12 +378,8 @@ public class UserRepository(
 		if (dto.Title is not null) entity.Title = dto.Title;
 		if (dto.Subtitle is not null) entity.Subtitle = dto.Subtitle;
 		if (dto.Bio is not null) entity.Bio = dto.Bio;
-		if (dto.AppUserName is not null) entity.AppUserName = dto.AppUserName;
 		if (dto.PhoneNumber is not null) entity.PhoneNumber = dto.PhoneNumber;
-		if (dto.AppEmail is not null) entity.AppEmail = dto.AppEmail;
 		if (dto.Suspend is not null) entity.Suspend = dto.Suspend;
-		if (dto.Headline is not null) entity.Headline = dto.Headline;
-		if (dto.AppPhoneNumber is not null) entity.AppPhoneNumber = dto.AppPhoneNumber;
 		if (dto.BirthDate is not null) entity.Birthdate = dto.BirthDate;
 		if (dto.Gender is not null) entity.Gender = dto.Gender;
 		if (dto.Email is not null) entity.Email = dto.Email;
@@ -429,23 +404,14 @@ public class UserRepository(
 		if (dto.Height is not null) entity.JsonDetail.Height = dto.Height;
 		if (dto.Weight is not null) entity.JsonDetail.Weight = dto.Weight;
 		if (dto.FoodAllergies is not null) entity.JsonDetail.FoodAllergies = dto.FoodAllergies;
-		if (dto.Institute is not null) entity.JsonDetail.Institute = dto.Institute;
 		if (dto.Sickness is not null) entity.JsonDetail.Sickness = dto.Sickness;
 		if (dto.UsedDrugs is not null) entity.JsonDetail.UsedDrugs = dto.UsedDrugs;
 		if (dto.Color is not null) entity.JsonDetail.Color = dto.Color;
-		if (dto.PrivacyType is not null) entity.JsonDetail.PrivacyType = dto.PrivacyType;
 		if (dto.FcmToken is not null) entity.JsonDetail.FcmToken = dto.FcmToken;
-		if (dto.HouseholdNumber is not null) entity.JsonDetail.HouseholdNumber = dto.HouseholdNumber;
 		if (dto.RegistrationNumber is not null) entity.JsonDetail.RegistrationNumber = dto.RegistrationNumber;
-		if (dto.UniqueId is not null) entity.JsonDetail.UniqueId = dto.UniqueId;
 		if (dto.PassportNumber is not null) entity.JsonDetail.PassportNumber = dto.PassportNumber;
 		if (dto.ShebaNumber is not null) entity.JsonDetail.ShebaNumber = dto.ShebaNumber;
-		if (dto.Degree is not null) entity.JsonDetail.Degree = dto.Degree;
-		if (dto.NationalityType is not null) entity.JsonDetail.NationalityType = dto.NationalityType;
 		if (dto.Code is not null) entity.JsonDetail.Code = dto.Code;
-		if (dto.DeliveryPrice1 is not null) entity.JsonDetail.DeliveryPrice1 = dto.DeliveryPrice1;
-		if (dto.DeliveryPrice2 is not null) entity.JsonDetail.DeliveryPrice2 = dto.DeliveryPrice2;
-		if (dto.DeliveryPrice3 is not null) entity.JsonDetail.DeliveryPrice3 = dto.DeliveryPrice3;
 		if (dto.StringList is not null) entity.JsonDetail.StringList = dto.StringList;
 		if (dto.PostalCode is not null) entity.JsonDetail.PostalCode = dto.PostalCode;
 		if (dto.LandlinePhone is not null) entity.JsonDetail.LandlinePhone = dto.LandlinePhone;

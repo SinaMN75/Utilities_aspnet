@@ -97,7 +97,6 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 					? [TagOrder.Pending, TagOrder.Premium]
 					: [TagOrder.Pending],
 				UserId = _userId,
-				SendPrice = p.User!.JsonDetail.DeliveryPrice1,
 				CreatedAt = DateTime.UtcNow,
 				ProductOwnerId = p.UserId,
 				UpdatedAt = DateTime.UtcNow
@@ -126,7 +125,6 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 				UserId = _userId,
 				CreatedAt = DateTime.UtcNow,
 				ProductOwnerId = p.UserId,
-				SendPrice = p.User!.JsonDetail.DeliveryPrice1,
 				UpdatedAt = DateTime.UtcNow
 			});
 
@@ -280,7 +278,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 				await dbContext.SaveChangesAsync();
 			}
 
-			orderEntity.TotalPrice = orderEntity.OrderDetails.Select(x => x.FinalPrice!).Sum() + (orderEntity.ProductOwner!.JsonDetail.DeliveryPrice1 ?? 0);
+			orderEntity.TotalPrice = orderEntity.OrderDetails.Select(x => x.FinalPrice!).Sum();
 			dbContext.Set<OrderEntity>().Update(orderEntity);
 			await dbContext.SaveChangesAsync();
 		}

@@ -74,16 +74,10 @@ public class ProductJsonDetail {
 	public string? AdminMessage { get; set; }
 	public string? PaymentRefId { get; set; }
 	public int? MaximumMembers { get; set; }
-	public int? ResponseTime { get; set; }
-	public int? OnTimeDelivery { get; set; }
 	public int? Length { get; set; }
 	public int? Width { get; set; }
 	public int? Height { get; set; }
 	public int? Weight { get; set; }
-	public int? MinOrder { get; set; }
-	public int? ShippingCost { get; set; }
-	public int? ShippingTime { get; set; }
-	public long? MaxOrder { get; set; }
 	public long? MaxPrice { get; set; }
 	public long? MinPrice { get; set; }
 	public DateTime? StartDate { get; set; }
@@ -93,10 +87,8 @@ public class ProductJsonDetail {
 	public List<VisitCount>? VisitCounts { get; set; } = [];
 	public List<Seat>? Seats { get; set; } = [];
 	public List<Guid>? RelatedProducts { get; set; } = [];
-	public List<Guid>? RelatedGroupChats { get; set; } = [];
 	public List<UserReaction>? UsersReactions { get; set; } = [];
 	public List<string>? Policies { get; set; } = [];
-	public List<string>? Teams { get; set; } = [];
 }
 
 public class UserReaction {
@@ -170,31 +162,23 @@ public class ProductCreateUpdateDto {
 	public int? Width { get; set; }
 	public int? Height { get; set; }
 	public int? Weight { get; set; }
-	public int? MinOrder { get; set; }
-	public int? MaxOrder { get; set; }
 	public long? MaxPrice { get; set; }
 	public long? MinPrice { get; set; }
 	public long? Price1 { get; set; }
 	public long? Price2 { get; set; }
-	public int? ResponseTime { get; set; }
-	public int? OnTimeDelivery { get; set; }
 	public int? Stock { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
 	public DateTime? ExpireDate { get; set; }
 	public Currency? Currency { get; set; }
-	public int? ShippingTime { get; set; }
-	public int? ShippingCost { get; set; }
 	public Guid? ParentId { get; set; }
 	public List<KeyValue>? KeyValues { get; set; }
 	public List<TagProduct>? Tags { get; set; }
 	public List<Guid>? RelatedProducts { get; set; }
-	public List<Guid>? RelatedGroupChats { get; set; }
 
 	public IEnumerable<Guid>? Categories { get; set; }
 	public IEnumerable<ProductCreateUpdateDto>? Children { get; set; }
 	public List<ReservationTime>? ReservationTimes { get; set; }
-	public List<string>? Teams { get; set; }
 	public List<Seat>? Seats { get; set; }
 }
 

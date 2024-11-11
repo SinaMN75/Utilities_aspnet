@@ -23,8 +23,6 @@ public class AppSettingsRepository(IConfiguration config, DbContext dbContext) :
 				SeenStatus = EnumExtension.GetValues<SeenStatus>(),
 				Reaction = EnumExtension.GetValues<Reaction>(),
 				GenderType = EnumExtension.GetValues<GenderType>(),
-				PrivacyType = EnumExtension.GetValues<PrivacyType>(),
-				Nationality = EnumExtension.GetValues<NationalityType>(),
 				TagMedia = EnumExtension.GetValues<TagMedia>(),
 				TagContent = EnumExtension.GetValues<TagContent>(),
 				TagProduct = EnumExtension.GetValues<TagProduct>(),

@@ -78,10 +78,7 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 					Tags = x.Buyer.Tags,
 					PhoneNumber = x.Buyer.PhoneNumber,
 					JsonDetail = x.Buyer.JsonDetail,
-					Email = x.Buyer.Email,
-					AppEmail = x.Buyer.AppEmail,
-					AppPhoneNumber = x.Buyer.AppPhoneNumber,
-					AppUserName = x.Buyer.AppUserName
+					Email = x.Buyer.Email
 				},
 				Seller = new UserEntity {
 					Id = x.Buyer!.Id,
@@ -91,10 +88,7 @@ public class TransactionRepository(DbContext dbContext, IWebHostEnvironment env)
 					Tags = x.Buyer.Tags,
 					PhoneNumber = x.Buyer.PhoneNumber,
 					JsonDetail = x.Buyer.JsonDetail,
-					Email = x.Buyer.Email,
-					AppEmail = x.Buyer.AppEmail,
-					AppPhoneNumber = x.Buyer.AppPhoneNumber,
-					AppUserName = x.Buyer.AppUserName
+					Email = x.Buyer.Email
 				},
 				Order = x.Order != null
 					? new OrderEntity {

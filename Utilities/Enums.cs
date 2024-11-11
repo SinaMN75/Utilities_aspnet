@@ -73,18 +73,6 @@ public enum GenderType {
 	None = 107
 }
 
-public enum PrivacyType {
-	Private = 100,
-	Public = 101,
-	FollowersOnly = 102,
-	Business = 103
-}
-
-public enum NationalityType {
-	Iranian = 100,
-	NonIranian = 101
-}
-
 public enum TagTransaction {
 	DepositToWallet = 101,
 	WithdrawFromTheWallet = 102,

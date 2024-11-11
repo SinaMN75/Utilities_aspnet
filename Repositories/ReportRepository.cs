@@ -54,9 +54,6 @@ public class ReportRepository(DbContext context, IHttpContextAccessor httpContex
 				FirstName = x.User.FirstName,
 				LastName = x.User.LastName,
 				FullName = x.User.FullName,
-				AppUserName = x.User.AppUserName,
-				AppEmail = x.User.AppEmail,
-				AppPhoneNumber = x.User.AppPhoneNumber,
 				Email = x.User.Email,
 				PhoneNumber = x.User.PhoneNumber
 			},
@@ -67,9 +64,6 @@ public class ReportRepository(DbContext context, IHttpContextAccessor httpContex
 				FirstName = x.CreatorUser.FirstName,
 				LastName = x.CreatorUser.LastName,
 				FullName = x.CreatorUser.FullName,
-				AppUserName = x.CreatorUser.AppUserName,
-				AppEmail = x.CreatorUser.AppEmail,
-				AppPhoneNumber = x.CreatorUser.AppPhoneNumber,
 				Email = x.CreatorUser.Email,
 				PhoneNumber = x.CreatorUser.PhoneNumber
 			}

@@ -118,7 +118,6 @@ public class MediaJsonDetail {
 	public string? Link1 { get; set; }
 	public string? Link2 { get; set; }
 	public string? Link3 { get; set; }
-	public PrivacyType? IsPrivate { get; set; }
 }
 
 public class UploadDto {
@@ -131,7 +130,6 @@ public class UploadDto {
 	public string? Time { get; set; }
 	public string? Artist { get; set; }
 	public string? Album { get; set; }
-	public PrivacyType? PrivacyType { get; set; }
 	public Guid? ProductId { get; set; }
 	public Guid? ContentId { get; set; }
 	public Guid? CategoryId { get; set; }

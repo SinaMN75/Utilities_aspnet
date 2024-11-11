@@ -54,7 +54,6 @@ public class MediaRepository(
 				JsonDetail = {
 					Title = model.Title,
 					Description = model.Description,
-					IsPrivate = model.PrivacyType,
 					Size = model.Size,
 					Time = model.Time,
 					Artist = model.Artist,
@@ -91,7 +90,6 @@ public class MediaRepository(
 				         JsonDetail = {
 					         Title = model.Title,
 					         Description = model.Description,
-					         IsPrivate = model.PrivacyType,
 					         Size = model.Size,
 					         Time = model.Time,
 					         Artist = model.Artist,
