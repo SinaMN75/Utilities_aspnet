@@ -49,15 +49,14 @@ public class ProductRepository(
 	public async Task<GenericResponse<IQueryable<ProductEntity>>> Filter(ProductFilterDto dto) {
 		IQueryable<ProductEntity> q = dbContext.Set<ProductEntity>().AsNoTracking();
 		q = q.Where(x => x.ParentId == null);
-
 		if (dto.Ids.IsNotNullOrEmpty()) q = q.Where(x => dto.Ids!.Contains(x.Id));
-		if (dto.Title is not null) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
-		if (dto.Subtitle is not null) q = q.Where(x => (x.Subtitle ?? "").Contains(dto.Subtitle!));
-		if (dto.Description is not null) q = q.Where(x => (x.Description ?? "").Contains(dto.Description!));
-		if (dto.State is not null) q = q.Where(x => x.State!.Contains(dto.State ?? ""));
-		if (dto.Country is not null) q = q.Where(x => x.Country!.Contains(dto.Country ?? ""));
-		if (dto.City is not null) q = q.Where(x => x.City!.Contains(dto.City ?? ""));
-		if (dto.StateRegion is not null)
+		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
+		if (dto.Subtitle.IsNotNullOrEmpty()) q = q.Where(x => (x.Subtitle ?? "").Contains(dto.Subtitle!));
+		if (dto.Description.IsNotNullOrEmpty()) q = q.Where(x => (x.Description ?? "").Contains(dto.Description!));
+		if (dto.State.IsNotNullOrEmpty()) q = q.Where(x => x.State!.Contains(dto.State ?? ""));
+		if (dto.Country.IsNotNullOrEmpty()) q = q.Where(x => x.Country!.Contains(dto.Country ?? ""));
+		if (dto.City.IsNotNullOrEmpty()) q = q.Where(x => x.City!.Contains(dto.City ?? ""));
+		if (dto.StateRegion.IsNotNullOrEmpty())
 			q = q.Where(x => x.Country!.Contains(dto.StateRegion ?? "") || x.State!.Contains(dto.StateRegion ?? "") || x.City!.Contains(dto.StateRegion ?? ""));
 		if (dto.StartPriceRange.HasValue) q = q.Where(x => x.Price >= dto.StartPriceRange);
 		if (dto.Currency.HasValue) q = q.Where(x => x.Currency == dto.Currency);
@@ -72,7 +71,7 @@ public class ProductRepository(
 		if (dto.TagsInclude.IsNotNullOrEmpty()) q = q.Where(x => dto.TagsInclude!.Any(y => x.Tags.Contains(y)));
 		if (dto.UserIds.IsNotNullOrEmpty()) q = q.Where(x => dto.UserIds!.Contains(x.UserId));
 		if (dto.FromDate is not null) q = q.Where(x => x.CreatedAt > dto.FromDate);
-		if (dto.ShowExpired == false) q = q.Where(x => x.EndDate < DateTime.UtcNow);
+		if (dto.ShowExpired == false) q = q.Where(x => x.EndDate < DateTime.UtcNow || x.EndDate == null);
 
 		if (dto.ShowChildren.IsTrue()) q = q.Include(i => i.Children)!.ThenInclude(x => x.Media);
 		if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(x => x.Children);
@@ -117,7 +116,7 @@ public class ProductRepository(
 			.FirstOrDefaultAsync(i => i.Id == id, ct);
 		if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound);
 
-		if (_userId is not null) {
+		if (_userId.IsNotNullOrEmpty()) {
 			if (i.JsonDetail.VisitCounts.IsNullOrEmpty()) i.JsonDetail.VisitCounts = [new VisitCount { UserId = _userId ?? "", Count = 1 }];
 			else {
 				if (i.JsonDetail.VisitCounts!.Any(x => x.UserId == _userId)) {
@@ -141,8 +140,8 @@ public class ProductRepository(
 			.Where(x => x.Id == dto.Id)
 			.FirstOrDefaultAsync(ct))!;
 
-		if (dto.Children is not null)
-			foreach (ProductCreateUpdateDto childDto in dto.Children) {
+		if (dto.Children.IsNotNullOrEmpty())
+			foreach (ProductCreateUpdateDto childDto in dto.Children ?? []) {
 				if (childDto.Id is null)
 					await Create(childDto, ct);
 				else {
