@@ -50,7 +50,7 @@ public class ProductRepository(
 		IQueryable<ProductEntity> q = dbContext.Set<ProductEntity>().AsNoTracking();
 		q = q.Where(x => x.ParentId == null);
 
-		if (dto.Ids is not null) q = q.Where(x => dto.Ids!.Contains(x.Id));
+		if (dto.Ids.IsNotNullOrEmpty()) q = q.Where(x => dto.Ids!.Contains(x.Id));
 		if (dto.Title is not null) q = q.Where(x => (x.Title ?? "").Contains(dto.Title!));
 		if (dto.Subtitle is not null) q = q.Where(x => (x.Subtitle ?? "").Contains(dto.Subtitle!));
 		if (dto.Description is not null) q = q.Where(x => (x.Description ?? "").Contains(dto.Description!));
@@ -67,10 +67,10 @@ public class ProductRepository(
 		if (dto.Query is not null)
 			q = q.Where(x => (x.Title ?? "").Contains(dto.Query!) || (x.Subtitle ?? "").Contains(dto.Query!) || (x.Description ?? "").Contains(dto.Query!));
 
-		if (dto.Categories is not null) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
-		if (dto.Tags is not null) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
-		if (dto.TagsInclude is not null) q = q.Where(x => dto.TagsInclude!.Any(y => x.Tags.Contains(y)));
-		if (dto.UserIds is not null) q = q.Where(x => dto.UserIds!.Contains(x.UserId));
+		if (dto.Categories.IsNotNullOrEmpty()) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
+		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
+		if (dto.TagsInclude.IsNotNullOrEmpty()) q = q.Where(x => dto.TagsInclude!.Any(y => x.Tags.Contains(y)));
+		if (dto.UserIds.IsNotNullOrEmpty()) q = q.Where(x => dto.UserIds!.Contains(x.UserId));
 		if (dto.FromDate is not null) q = q.Where(x => x.CreatedAt > dto.FromDate);
 		if (dto.ShowExpired) q = q.Where(x => x.ExpireDate < DateTime.UtcNow);
 
@@ -86,12 +86,12 @@ public class ProductRepository(
 			q = q.Include(i => i.User).ThenInclude(x => x!.Media);
 			q = q.Include(i => i.User).ThenInclude(x => x!.Categories);
 		}
-		
+
 		if (dto.OrderByPriceAscending.IsTrue()) q = q.Where(w => w.Price.HasValue).OrderBy(o => o.Price);
 		if (dto.OrderByPriceDescending.IsTrue()) q = q.Where(x => x.Price.HasValue).OrderByDescending(x => x.Price);
 		if (dto.OrderByCreatedDate.IsTrue()) q = q.OrderBy(x => x.CreatedAt);
 		if (dto.OrderByCreatedDateDescending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
-		
+
 		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
@@ -131,7 +131,7 @@ public class ProductRepository(
 			dbContext.Update(i);
 			await dbContext.SaveChangesAsync(ct);
 		}
-		
+
 		return new GenericResponse<ProductEntity?>(i);
 	}
 
