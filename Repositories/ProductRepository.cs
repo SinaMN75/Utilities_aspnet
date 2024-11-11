@@ -58,7 +58,7 @@ public class ProductRepository(
 		if (dto.Country is not null) q = q.Where(x => x.Country!.Contains(dto.Country ?? ""));
 		if (dto.City is not null) q = q.Where(x => x.City!.Contains(dto.City ?? ""));
 		if (dto.StateRegion is not null)
-			q = q.Where(x => x.Country!.Contains(dto.Country ?? "") || x.State!.Contains(dto.StateRegion ?? "") || x.City!.Contains(dto.StateRegion ?? ""));
+			q = q.Where(x => x.Country!.Contains(dto.StateRegion ?? "") || x.State!.Contains(dto.StateRegion ?? "") || x.City!.Contains(dto.StateRegion ?? ""));
 		if (dto.StartPriceRange.HasValue) q = q.Where(x => x.Price >= dto.StartPriceRange);
 		if (dto.Currency.HasValue) q = q.Where(x => x.Currency == dto.Currency);
 		if (dto.EndPriceRange.HasValue) q = q.Where(x => x.Price <= dto.EndPriceRange);
