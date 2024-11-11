@@ -89,7 +89,6 @@ public class CommentRepository(
 
 		if (dto.ProductId is not null) {
 			ProductEntity product = (await dbContext.Set<ProductEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == dto.ProductId, ct))!;
-			product.CommentsCount += 1;
 
 			if (product.UserId != _userId)
 				await notificationRepository.Create(new NotificationCreateUpdateDto {

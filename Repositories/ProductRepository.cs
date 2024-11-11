@@ -61,7 +61,6 @@ public class ProductRepository(
 			q = q.Where(x => x.Country!.Contains(dto.Country ?? "") || x.State!.Contains(dto.StateRegion ?? "") || x.City!.Contains(dto.StateRegion ?? ""));
 		if (dto.StartPriceRange.HasValue) q = q.Where(x => x.Price >= dto.StartPriceRange);
 		if (dto.Currency.HasValue) q = q.Where(x => x.Currency == dto.Currency);
-		if (dto.HasDiscount.IsTrue()) q = q.Where(x => x.DiscountPercent != null || x.DiscountPrice != null);
 		if (dto.EndPriceRange.HasValue) q = q.Where(x => x.Price <= dto.EndPriceRange);
 		if (dto.StartDate.HasValue) q = q.Where(x => x.StartDate >= dto.StartDate);
 		if (dto.EndDate.HasValue) q = q.Where(x => x.EndDate <= dto.EndDate);
@@ -73,6 +72,7 @@ public class ProductRepository(
 		if (dto.TagsInclude is not null) q = q.Where(x => dto.TagsInclude!.Any(y => x.Tags.Contains(y)));
 		if (dto.UserIds is not null) q = q.Where(x => dto.UserIds!.Contains(x.UserId));
 		if (dto.FromDate is not null) q = q.Where(x => x.CreatedAt > dto.FromDate);
+		if (dto.ShowExpired) q = q.Where(x => x.ExpireDate < DateTime.UtcNow);
 
 		if (dto.ShowChildren.IsTrue()) q = q.Include(i => i.Children)!.ThenInclude(x => x.Media);
 		if (dto.ShowCategories.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(x => x.Children);
@@ -80,8 +80,6 @@ public class ProductRepository(
 		if (dto.ShowCategoryMedia.IsTrue()) q = q.Include(i => i.Categories)!.ThenInclude(i => i.Media);
 		if (dto.ShowMedia.IsTrue()) q = q.Include(i => i.Media!.Where(j => j.ParentId == null)).ThenInclude(i => i.Children);
 
-		if (dto.OrderByVotes.IsTrue()) q = q.OrderBy(x => x.VoteCount);
-		if (dto.OrderByVotesDescending.IsTrue()) q = q.OrderByDescending(x => x.VoteCount);
 		if (dto.OrderByAtoZ.IsTrue()) q = q.OrderBy(x => x.Title);
 		if (dto.OrderByZtoA.IsTrue()) q = q.OrderByDescending(x => x.Title);
 		if (dto.ShowCreator.IsTrue()) {
@@ -133,14 +131,7 @@ public class ProductRepository(
 			dbContext.Update(i);
 			await dbContext.SaveChangesAsync(ct);
 		}
-
-		IQueryable<OrderEntity> completeOrder = dbContext.Set<OrderEntity>()
-			.Include(x => x.User).ThenInclude(x => x!.Media)
-			.Where(c => c.OrderDetails!.Any(w => w.ProductId == i.Id) && c.Tags.Contains(TagOrder.Complete)).AsNoTracking();
-		i.SuccessfulPurchase = completeOrder.Count();
-
-		i.Orders = completeOrder.OrderByDescending(x => x.TotalPrice);
-
+		
 		return new GenericResponse<ProductEntity?>(i);
 	}
 
@@ -234,14 +225,12 @@ public static class ProductEntityExtension {
 		if (dto.State is not null) entity.State = dto.State;
 		if (dto.City is not null) entity.City = dto.City;
 		if (dto.Country is not null) entity.Country = dto.Country;
-		if (dto.DiscountPercent is not null) entity.DiscountPercent = dto.DiscountPercent;
-		if (dto.DiscountPrice is not null) entity.DiscountPrice = dto.DiscountPrice;
+		if (dto.ExpireDate is not null) entity.ExpireDate = dto.ExpireDate;
 		if (dto.Description is not null) entity.Description = dto.Description;
 		if (dto.Price is not null) entity.Price = dto.Price;
 		if (dto.Stock is not null) entity.Stock = dto.Stock;
 		if (dto.StartDate is not null) entity.StartDate = dto.StartDate;
 		if (dto.EndDate is not null) entity.EndDate = dto.EndDate;
-		if (dto.CommentsCount is not null) entity.CommentsCount = dto.CommentsCount;
 		if (dto.Price1 is not null) entity.Price1 = dto.Price1;
 		if (dto.Price2 is not null) entity.Price2 = dto.Price2;
 		if (dto.Currency is not null) entity.Currency = dto.Currency;
@@ -284,9 +273,6 @@ public static class ProductEntityExtension {
 		if (dto.MaximumMembers is not null) entity.JsonDetail.MaximumMembers = dto.MaximumMembers;
 		if (dto.PaymentRefId is not null) entity.JsonDetail.PaymentRefId = dto.PaymentRefId;
 		if (dto.Teams is not null) entity.JsonDetail.Teams = dto.Teams;
-
-		if (dto.ScorePlus.HasValue) entity.VoteCount += dto.ScorePlus ?? 1;
-		if (dto.ScoreMinus.HasValue) entity.VoteCount -= dto.ScoreMinus ?? 1;
 
 		if (dto.Categories.IsNotNull()) {
 			List<CategoryEntity> listCategory = [];

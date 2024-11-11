@@ -27,33 +27,28 @@ public class ProductEntity : BaseEntity {
 	public double? Longitude { get; set; }
 
 	public int? Stock { get; set; }
-	public int VoteCount { get; set; }
-	public int? DiscountPercent { get; set; }
-	public int? CommentsCount { get; set; }
-	public long? DiscountPrice { get; set; }
 	public long? Price { get; set; }
 	public long? Price1 { get; set; }
 	public long? Price2 { get; set; }
 	public Currency? Currency { get; set; }
-
-	public string? SeenUsers { get; set; } = "";
-
+	
 	public ProductEntity? Parent { get; set; }
 	public Guid? ParentId { get; set; }
-
+	
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
-
-	[InverseProperty("Parent")]
-	public IEnumerable<ProductEntity>? Children { get; set; }
-
-	public string? UserId { get; set; }
-	public UserEntity? User { get; set; }
+	public DateTime? ExpireDate { get; set; }
 
 	public ProductJsonDetail JsonDetail { get; set; } = new();
 
 	[MaxLength(100)]
 	public List<TagProduct> Tags { get; set; } = [];
+	
+	public string? UserId { get; set; }
+	public UserEntity? User { get; set; }
+	
+	[InverseProperty("Parent")]
+	public IEnumerable<ProductEntity>? Children { get; set; }
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
@@ -61,12 +56,6 @@ public class ProductEntity : BaseEntity {
 	public IEnumerable<CommentEntity>? Comments { get; set; }
 	public IEnumerable<ReportEntity>? Reports { get; set; }
 	public IEnumerable<NotificationEntity>? Notifications { get; set; }
-
-	[NotMapped]
-	public IEnumerable<OrderEntity>? Orders { get; set; }
-
-	[NotMapped]
-	public int? SuccessfulPurchase { get; set; }
 }
 
 public class ProductJsonDetail {
@@ -187,16 +176,12 @@ public class ProductCreateUpdateDto {
 	public long? MinPrice { get; set; }
 	public long? Price1 { get; set; }
 	public long? Price2 { get; set; }
-	public int? ScorePlus { get; set; }
-	public int? ScoreMinus { get; set; }
-	public long? DiscountPrice { get; set; }
 	public int? ResponseTime { get; set; }
 	public int? OnTimeDelivery { get; set; }
-	public int? DiscountPercent { get; set; }
-	public int? CommentsCount { get; set; }
 	public int? Stock { get; set; }
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
+	public DateTime? ExpireDate { get; set; }
 	public Currency? Currency { get; set; }
 	public int? ShippingTime { get; set; }
 	public int? ShippingCost { get; set; }
@@ -224,15 +209,12 @@ public class ProductFilterDto : BaseFilterDto {
 	public string? Query { get; set; }
 	public long? StartPriceRange { get; set; }
 	public long? EndPriceRange { get; set; }
-	public bool? HasDiscount { get; set; }
 	public bool? ShowMedia { get; set; } = false;
 	public bool? ShowCategories { get; set; } = false;
 	public bool? ShowCreator { get; set; } = false;
 	public bool? ShowCategoryMedia { get; set; } = false;
 	public bool? ShowChildren { get; set; } = false;
 	public bool? ShowComments { get; set; } = false;
-	public bool? OrderByVotes { get; set; } = false;
-	public bool? OrderByVotesDescending { get; set; } = false;
 	public bool? OrderByAtoZ { get; set; } = false;
 	public bool? OrderByZtoA { get; set; } = false;
 	public bool? OrderByPriceAscending { get; set; } = false;
@@ -241,6 +223,7 @@ public class ProductFilterDto : BaseFilterDto {
 	public bool? OrderByCreatedDateDescending { get; set; } = false;
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
+	public bool ShowExpired { get; set; } = false;
 	public Currency? Currency { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 	public List<TagProduct>? Tags { get; set; }

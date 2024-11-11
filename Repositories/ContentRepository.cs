@@ -3,7 +3,7 @@
 public interface IContentRepository {
 	Task<GenericResponse<ContentEntity>> Create(ContentCreateDto dto, CancellationToken ct);
 	GenericResponse<IQueryable<ContentEntity>> Read();
-	Task<GenericResponse<ContentEntity?>> Update(ContentUpdateDto dto, CancellationToken ct);
+	Task<GenericResponse<ContentEntity>> Update(ContentUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 }
 
