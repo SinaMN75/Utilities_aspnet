@@ -182,27 +182,8 @@ public class UserRepository(
 		if (dto.UserName.IsNotNullOrEmpty()) q = q.Where(x => (x.UserName!).Contains(dto.UserName!, StringComparison.CurrentCultureIgnoreCase));
 		if (dto.ShowSuspend.IsTrue()) q = q.Where(x => x.Suspend == true);
 
-		if (dto.OrderByUserName.IsTrue()) q = q.OrderBy(x => x.UserName);
 		if (dto.OrderByCreatedAt.IsTrue()) q = q.OrderBy(x => x.CreatedAt);
 		if (dto.OrderByCreatedAtDesc.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
-		if (dto.OrderByUpdatedAt.IsTrue()) q = q.OrderBy(x => x.UpdatedAt);
-		if (dto.OrderByUpdatedAtDesc.IsTrue()) q = q.OrderByDescending(x => x.UpdatedAt);
-		
-		if (dto.ShowMyCustomers.IsTrue()) {
-			IQueryable<OrderEntity> orders = dbContext.Set<OrderEntity>()
-				.Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p!.Media)
-				.Include(i => i.OrderDetails)!.ThenInclude(p => p.Product).ThenInclude(p => p!.Categories)
-				.Include(i => i.Address)
-				.Include(i => i.User).ThenInclude(i => i!.Media)
-				.Include(i => i.ProductOwner).ThenInclude(i => i!.Media)
-				.AsNoTracking()
-				.Where(w => w.OrderDetails == null || w.OrderDetails.Any(a => a.Product == null || a.Product.UserId == _userId));
-			if (orders.Any()) {
-				List<string?> customers = orders.Select(s => s.UserId).ToList();
-				List<UserEntity> tempQ = q.ToList();
-				q = tempQ.Where(w => customers.Any(a => a == w.Id)).AsQueryable();
-			}
-		}
 
 		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);

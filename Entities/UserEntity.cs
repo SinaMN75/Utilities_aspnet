@@ -187,7 +187,6 @@ public class UserFilterDto : BaseFilterDto {
 	public string? LastName { get; set; }
 	public string? FullName { get; set; }
 	public string? Bio { get; set; }
-	public GenderType? Gender { get; set; } = null!;
 	public string? State { get; set; }
 	public string? Country { get; set; }
 	public string? City { get; set; }
@@ -195,12 +194,9 @@ public class UserFilterDto : BaseFilterDto {
 	public bool? ShowPremiums { get; set; }
 	public bool ShowCategories { get; set; } = false;
 	public bool? ShowSuspend { get; set; }
-	public bool? ShowMyCustomers { get; set; }
-	public bool? OrderByUserName { get; set; }
 	public bool? OrderByCreatedAt { get; set; }
 	public bool? OrderByCreatedAtDesc { get; set; }
-	public bool? OrderByUpdatedAt { get; set; }
-	public bool? OrderByUpdatedAtDesc { get; set; }
+	public GenderType? Gender { get; set; } = null!;
 	public IEnumerable<string>? UserIds { get; set; }
 	public IEnumerable<string>? PhoneNumbers { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
