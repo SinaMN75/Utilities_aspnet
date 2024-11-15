@@ -5,18 +5,16 @@ public interface IQuestionRepository {
 	Task<GenericResponse<IEnumerable<QuestionEntity>>> Filter(QuestionFilterDto dto);
 	Task<GenericResponse<QuestionEntity?>> Update(QuestionUpdateDto dto);
 	Task<GenericResponse> Delete(Guid id);
+	Task<GenericResponse<UserEntity>> CreateUserAnswer(UserAnswerCreateDto dto);
 }
 
-public class QuestionRepository(DbContext dbContext) : IQuestionRepository {
+public class QuestionRepository(DbContext dbContext, IUserRepository userRepository) : IQuestionRepository {
 	public async Task<GenericResponse<QuestionEntity>> Create(QuestionCreateDto dto) {
 		EntityEntry<QuestionEntity> i = await dbContext.AddAsync(new QuestionEntity {
 			Tags = dto.Tags,
 			CreatedAt = DateTime.Now,
 			UpdatedAt = DateTime.Now,
-			JsonDetail = new QuestionJsonDetail {
-				Question = dto.Question,
-				Answers = dto.Answers
-			}
+			JsonDetail = new QuestionJsonDetail { Question = dto.Question, Answers = dto.Answers }
 		});
 		await dbContext.SaveChangesAsync();
 		return new GenericResponse<QuestionEntity>(i.Entity);
@@ -28,9 +26,7 @@ public class QuestionRepository(DbContext dbContext) : IQuestionRepository {
 		if (dto.Tags is not null) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
 
 		int totalCount = await q.CountAsync();
-
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize).AsNoTracking();
-		
 		return new GenericResponse<IEnumerable<QuestionEntity>>(q) {
 			TotalCount = totalCount,
 			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
@@ -52,5 +48,14 @@ public class QuestionRepository(DbContext dbContext) : IQuestionRepository {
 	public async Task<GenericResponse> Delete(Guid id) {
 		await dbContext.Set<QuestionEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
+	}
+
+	public async Task<GenericResponse<UserEntity>> CreateUserAnswer(UserAnswerCreateDto dto) {
+		GenericResponse<UserEntity> e = await userRepository.Update(new UserCreateUpdateDto(Id: dto.UserId, QuestionAnswers: new UserQuestionAnswer {
+				CreatedAt = DateTime.Now,
+				UserAnswers = dto.UserAnswers
+			})
+		);
+		return e;
 	}
 }

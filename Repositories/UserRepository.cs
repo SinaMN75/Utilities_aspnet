@@ -4,7 +4,7 @@ public interface IUserRepository {
 	Task<GenericResponse<UserEntity?>> Create(UserCreateUpdateDto dto);
 	Task<GenericResponse<IQueryable<UserEntity>>> Filter(UserFilterDto dto);
 	Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null);
-	Task<GenericResponse<UserEntity?>> Update(UserCreateUpdateDto dto);
+	Task<GenericResponse<UserEntity>> Update(UserCreateUpdateDto dto);
 	Task<GenericResponse> Delete(string id, CancellationToken ct);
 	Task<GenericResponse<UserEntity?>> GetTokenForTest(string? mobile);
 	Task<GenericResponse<UserEntity?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto);
@@ -89,11 +89,10 @@ public class UserRepository(
 		return new GenericResponse<UserEntity?>(entity);
 	}
 
-	public async Task<GenericResponse<UserEntity?>> Update(UserCreateUpdateDto dto) {
-		UserEntity? entity = await dbContext.Set<UserEntity>()
+	public async Task<GenericResponse<UserEntity>> Update(UserCreateUpdateDto dto) {
+		UserEntity entity = (await dbContext.Set<UserEntity>()
 			.Include(x => x.Categories)
-			.FirstOrDefaultAsync(x => x.Id == dto.Id);
-		if (entity == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
+			.FirstOrDefaultAsync(x => x.Id == dto.Id))!;
 		await FillUserData(dto, entity);
 		await dbContext.SaveChangesAsync();
 
@@ -101,7 +100,7 @@ public class UserRepository(
 			await smsNotificationRepository.SendSms(entity.PhoneNumber ?? "", "upgradeAcoount", "کاربر گرامی");
 		}
 
-		return new GenericResponse<UserEntity?>(entity);
+		return new GenericResponse<UserEntity>(entity);
 	}
 
 	public async Task<GenericResponse<IQueryable<UserEntity>>> Filter(UserFilterDto dto) {
@@ -245,7 +244,7 @@ public class UserRepository(
 			);
 
 		UserEntity user = new() {
-			Id = dto.Id ?? Guid.NewGuid().ToString(),
+			Id = dto.Id,
 			Suspend = false,
 			CreatedAt = DateTime.UtcNow,
 			UpdatedAt = DateTime.UtcNow
@@ -394,6 +393,7 @@ public class UserRepository(
 		if (dto.ShebaNumber is not null) entity.JsonDetail.ShebaNumber = dto.ShebaNumber;
 		if (dto.Code is not null) entity.JsonDetail.Code = dto.Code;
 		if (dto.StringList is not null) entity.JsonDetail.StringList = dto.StringList;
+		if (dto.QuestionAnswers is not null) entity.JsonDetail.QuestionAnswers?.Add(dto.QuestionAnswers);
 		if (dto.PostalCode is not null) entity.JsonDetail.PostalCode = dto.PostalCode;
 		if (dto.LandlinePhone is not null) entity.JsonDetail.LandlinePhone = dto.LandlinePhone;
 		if (dto.HealthReport1 is not null) entity.JsonDetail.HealthReport1 = dto.HealthReport1;

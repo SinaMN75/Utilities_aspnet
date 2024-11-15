@@ -13,8 +13,7 @@ public class QuestionJsonDetail {
 
 public class AnswerDetail {
 	public required string Answer { get; set; }
-	public required bool IsCorrect { get; set; }
-	public required string Hint { get; set; } = "";
+	public required string Hint { get; set; }
 }
 
 public class QuestionCreateDto {
@@ -33,3 +32,5 @@ public class QuestionUpdateDto {
 public class QuestionFilterDto : BaseFilterDto {
 	public List<TagQuestion>? Tags { get; set; }
 }
+
+public record UserAnswerCreateDto(string UserId, List<UserAnswer> UserAnswers);

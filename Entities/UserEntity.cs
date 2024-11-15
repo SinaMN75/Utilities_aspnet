@@ -92,7 +92,19 @@ public class UserJsonDetail {
 	public string? HealthReport1 { get; set; }
 	public string? HealthReport2 { get; set; }
 	public List<UserSubscriptions>? UserSubscriptions { get; set; } = [];
+	public List<UserQuestionAnswer>? QuestionAnswers { get; set; } = [];
 	public List<string>? StringList { get; set; } = [];
+}
+
+public class UserQuestionAnswer {
+	public required List<UserAnswer> UserAnswers { get; set; } = [];
+	public DateTime CreatedAt { get; set; } = DateTime.Now;
+}
+
+public class UserAnswer {
+	public string Question { get; set; } = "";
+	public string Answer { get; set; } = "";
+	public string Hint { get; set; } = "";
 }
 
 public class UserSubscriptions {
@@ -127,54 +139,55 @@ public class LoginWithPasswordDto {
 }
 
 public record UserCreateUpdateDto(
-	string? Id,
-	string? Email,
-	string? FirstName,
-	string? UserName,
-	string? Title,
-	string? Subtitle,
-	string? PhoneNumber,
-	string? LastName,
-	string? FullName,
-	string? Bio,
-	string? State,
-	string? Country,
-	string? City,
-	string? FcmToken,
-	string? Instagram,
-	string? Telegram,
-	string? RegistrationNumber,
-	string? PostalCode,
-	string? LandlinePhone,
-	string? WhatsApp,
-	string? LinkedIn,
-	string? Dribble,
-	string? SoundCloud,
-	string? Pinterest,
-	string? Website,
-	string? Color,
-	string? Password,
-	string? Code,
-	string? ShebaNumber,
-	string? Address,
-	string? FatherName,
-	string? NationalCode,
-	string? SchoolName,
-	string? Height,
-	string? Weight,
-	string? FoodAllergies,
-	string? Sickness,
-	string? UsedDrugs,
-	string? PassportNumber,
-	string? HealthReport1,
-	string? HealthReport2,
-	bool? Suspend,
-	GenderType? Gender,
-	DateTime? BirthDate,
-	DateTime? PremiumExpireDate,
-	IEnumerable<Guid>? Categories,
-	List<TagUser>? Tags,
-	List<string>? StringList
+	string Id,
+	string? Email = null,
+	string? FirstName = null,
+	string? UserName = null,
+	string? Title = null,
+	string? Subtitle = null,
+	string? PhoneNumber = null,
+	string? LastName = null,
+	string? FullName = null,
+	string? Bio = null,
+	string? State = null,
+	string? Country = null,
+	string? City = null,
+	string? FcmToken = null,
+	string? Instagram = null,
+	string? Telegram = null,
+	string? RegistrationNumber = null,
+	string? PostalCode = null,
+	string? LandlinePhone = null,
+	string? WhatsApp = null,
+	string? LinkedIn = null,
+	string? Dribble = null,
+	string? SoundCloud = null,
+	string? Pinterest = null,
+	string? Website = null,
+	string? Color = null,
+	string? Password = null,
+	string? Code = null,
+	string? ShebaNumber = null,
+	string? Address = null,
+	string? FatherName = null,
+	string? NationalCode = null,
+	string? SchoolName = null,
+	string? Height = null,
+	string? Weight = null,
+	string? FoodAllergies = null,
+	string? Sickness = null,
+	string? UsedDrugs = null,
+	string? PassportNumber = null,
+	string? HealthReport1 = null,
+	string? HealthReport2 = null,
+	bool? Suspend = null,
+	GenderType? Gender = null,
+	DateTime? BirthDate = null,
+	DateTime? PremiumExpireDate = null,
+	IEnumerable<Guid>? Categories = null,
+	List<TagUser>? Tags = null,
+	List<string>? StringList = null,
+	UserQuestionAnswer? QuestionAnswers = null
 );
 
 public class UserFilterDto : BaseFilterDto {

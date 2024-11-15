@@ -16,4 +16,8 @@ public class QuestionController(IQuestionRepository repository) : BaseApiControl
 
 	[HttpDelete("{id:guid}")]
 	public async Task<IActionResult> Delete(Guid id) => Result(await repository.Delete(id));
+
+	[HttpPost("CreateUserAnswer")]
+	public async Task<ActionResult<GenericResponse<UserEntity>>> CreateUserAnswer(UserAnswerCreateDto dto) =>
+		Result(await repository.CreateUserAnswer(dto));
 }
