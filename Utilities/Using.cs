@@ -42,5 +42,12 @@ global using OfficeOpenXml;
 global using System.Data;
 global using ClosedXML.Excel;
 global using Microsoft.Extensions.Hosting;
+global using OpenTelemetry.Logs;
+global using OpenTelemetry.Metrics;
+global using OpenTelemetry.Resources;
+global using OpenTelemetry.Trace;
+global using Microsoft.AspNetCore.OutputCaching;
+global using Microsoft.Extensions.Logging;
+global using StackExchange.Redis;
 
 #endregion

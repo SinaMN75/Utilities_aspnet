@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.OutputCaching;
-using StackExchange.Redis;
-
-namespace Utilities_aspnet.Utilities;
+﻿namespace Utilities_aspnet.Utilities;
 
 public static class StartupExtension {
 	public static void SetupUtilities<T>(this WebApplicationBuilder builder) where T : DbContext {
@@ -9,6 +6,7 @@ public static class StartupExtension {
 		builder.AddUtilitiesSwagger();
 		builder.AddUtilitiesIdentity();
 		builder.AddUtilitiesOutputCache();
+		builder.AddOtlsServices();
 	}
 
 	public static void UseUtilitiesServices(this WebApplication app) {
@@ -137,6 +135,24 @@ public static class StartupExtension {
 		})).AddStackExchangeRedisCache(x => x.ConnectionMultiplexerFactory = async () => await ConnectionMultiplexer.ConnectAsync(
 			builder.Configuration.GetSection("AppSettings").GetConnectionString("Redis")!
 		));
+	}
+
+	private static void AddOtlsServices(this IHostApplicationBuilder builder) {
+		builder.Services.AddOpenTelemetry()
+			.ConfigureResource(res => res.AddService("sinamn75api"))
+			.WithMetrics(meter => {
+				meter.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation();
+				meter.AddOtlpExporter();
+			})
+			.WithTracing(t => {
+				t.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation();
+				t.AddOtlpExporter();
+			});
+
+		builder.Logging.AddOpenTelemetry(o => {
+			o.AddConsoleExporter().SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("sinamn75api"));
+			o.AddOtlpExporter();
+		});
 	}
 
 	private static void AddUtilitiesIdentity(this IHostApplicationBuilder builder) {
