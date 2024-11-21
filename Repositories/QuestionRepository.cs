@@ -9,12 +9,18 @@ public interface IQuestionRepository {
 
 public class QuestionRepository(DbContext dbContext) : IQuestionRepository {
 	public async Task<GenericResponse<QuestionEntity>> Create(QuestionCreateDto dto) {
+		List<CategoryEntity> categories = [];
+		foreach (Guid item in dto.Categories)
+			categories.Add((await dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item))!);
+
 		EntityEntry<QuestionEntity> i = await dbContext.AddAsync(new QuestionEntity {
 			Tags = dto.Tags,
 			CreatedAt = DateTime.Now,
 			UpdatedAt = DateTime.Now,
+			Categories = categories,
 			JsonDetail = new QuestionJsonDetail { Question = dto.Question, Answers = dto.Answers }
 		});
+
 		await dbContext.SaveChangesAsync();
 		return new GenericResponse<QuestionEntity>(i.Entity);
 	}
@@ -22,6 +28,7 @@ public class QuestionRepository(DbContext dbContext) : IQuestionRepository {
 	public async Task<GenericResponse<IEnumerable<QuestionEntity>>> Filter(QuestionFilterDto dto) {
 		IQueryable<QuestionEntity> q = dbContext.Set<QuestionEntity>();
 
+		if (dto.Categories.IsNotNullOrEmpty()) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
 		if (dto.Tags is not null) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
 
 		int totalCount = await q.CountAsync();

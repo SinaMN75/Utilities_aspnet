@@ -4,6 +4,8 @@ namespace Utilities_aspnet.Entities;
 public class QuestionEntity : BaseEntity {
 	public required QuestionJsonDetail JsonDetail { get; set; }
 	public required List<TagQuestion> Tags { get; set; }
+
+	public required IEnumerable<CategoryEntity> Categories { get; set; }
 }
 
 public class QuestionJsonDetail {
@@ -20,6 +22,7 @@ public class QuestionCreateDto {
 	public required string Question { get; set; }
 	public required List<AnswerDetail> Answers { get; set; }
 	public required List<TagQuestion> Tags { get; set; }
+	public required IEnumerable<Guid> Categories { get; set; }
 }
 
 public class QuestionUpdateDto {
@@ -30,5 +33,6 @@ public class QuestionUpdateDto {
 }
 
 public class QuestionFilterDto : BaseFilterDto {
+	public IEnumerable<Guid>? Categories { get; set; }
 	public List<TagQuestion>? Tags { get; set; }
 }

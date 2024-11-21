@@ -56,6 +56,7 @@ public class ProductEntity : BaseEntity {
 	public IEnumerable<CommentEntity>? Comments { get; set; }
 	public IEnumerable<ReportEntity>? Reports { get; set; }
 	public IEnumerable<NotificationEntity>? Notifications { get; set; }
+	public IEnumerable<QuestionEntity>? Questions { get; set; }
 }
 
 public class ProductJsonDetail {
