@@ -26,7 +26,7 @@ public class QuestionController(IQuestionRepository repository) : BaseApiControl
 		Result(await repository.CreateUserQuestionAnswer(dto));
 	
 	[HttpPost("FilterUserAnswer")]
-	public async Task<ActionResult<GenericResponse<IEnumerable<QuestionEntity>>>> Filter(UserQuestionAnswerFilterDto dto) =>
+	public async Task<ActionResult<GenericResponse<IEnumerable<UserQuestionAnswerEntity>>>> Filter(UserQuestionAnswerFilterDto dto) =>
 		Result(await repository.FilterUserQuestionAnswer(dto));
 
 
