@@ -53,6 +53,7 @@ public class UserEntity {
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
+	public IEnumerable<UserQuestionAnswerEntity>? UserQuestionAnswers { get; set; }
 
 	[MaxLength(50)]
 	[System.Text.Json.Serialization.JsonIgnore]

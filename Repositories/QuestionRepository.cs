@@ -6,13 +6,16 @@ public interface IQuestionRepository {
 	Task<GenericResponse<IEnumerable<QuestionEntity>>> Filter(QuestionFilterDto dto);
 	Task<GenericResponse<QuestionEntity?>> Update(QuestionUpdateDto dto);
 	Task<GenericResponse> Delete(Guid id);
+	
+	Task<GenericResponse<UserQuestionAnswerEntity>> CreateUserQuestionAnswer(UserQuestionAnswerCreateDto dto);
+	Task<GenericResponse<IEnumerable<UserQuestionAnswerEntity>>> FilterUserQuestionAnswer(UserQuestionAnswerFilterDto dto);
 }
 
 public class QuestionRepository(DbContext dbContext) : IQuestionRepository {
 	public async Task<GenericResponse<QuestionEntity>> Create(QuestionCreateDto dto) {
 		List<CategoryEntity> categories = [];
 		foreach (Guid item in dto.Categories)
-			categories.Add((await dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item))!);
+			categories.Add((await dbContext.Set<CategoryEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == item))!);
 
 		EntityEntry<QuestionEntity> i = await dbContext.AddAsync(new QuestionEntity {
 			Tags = dto.Tags,
@@ -76,5 +79,28 @@ public class QuestionRepository(DbContext dbContext) : IQuestionRepository {
 	public async Task<GenericResponse> Delete(Guid id) {
 		await dbContext.Set<QuestionEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
+	}
+
+	public async Task<GenericResponse<UserQuestionAnswerEntity>> CreateUserQuestionAnswer(UserQuestionAnswerCreateDto dto) {
+		EntityEntry<UserQuestionAnswerEntity> e = await dbContext.AddAsync(new UserQuestionAnswerEntity {
+			UserId = dto.UserId,
+			JsonDetail = new UserQuestionAnswerJsonDetail { UserQuestionAnswer = dto.UserQuestionAnswer }
+		});
+
+		return new GenericResponse<UserQuestionAnswerEntity>(e.Entity);
+	}
+
+	public async Task<GenericResponse<IEnumerable<UserQuestionAnswerEntity>>> FilterUserQuestionAnswer(UserQuestionAnswerFilterDto dto) {
+		IQueryable<UserQuestionAnswerEntity> q = dbContext.Set<UserQuestionAnswerEntity>();
+
+		if (dto.UserIds.IsNotNullOrEmpty()) q = q.Where(x => dto.UserIds!.Contains(x.UserId));
+
+		int totalCount = await q.CountAsync();
+		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize).AsNoTracking();
+		return new GenericResponse<IEnumerable<UserQuestionAnswerEntity>>(q) {
+			TotalCount = totalCount,
+			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
+			PageSize = dto.PageSize
+		};
 	}
 }

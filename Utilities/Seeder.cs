@@ -28,6 +28,10 @@ public static class Seeder {
 			b.ToJson();
 			b.OwnsMany(i => i.Answers);
 		});
+		builder.Entity<UserQuestionAnswerEntity>().OwnsOne(e => e.JsonDetail, b => {
+			b.ToJson();
+			b.OwnsMany(i => i.UserQuestionAnswer);
+		});
 		builder.Entity<OrderEntity>().OwnsOne(e => e.JsonDetail, b => {
 			b.ToJson();
 			b.OwnsMany(i => i.ReservationTimes);

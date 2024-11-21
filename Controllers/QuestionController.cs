@@ -20,4 +20,14 @@ public class QuestionController(IQuestionRepository repository) : BaseApiControl
 
 	[HttpDelete("{id:guid}")]
 	public async Task<IActionResult> Delete(Guid id) => Result(await repository.Delete(id));
+	
+	[HttpPost("UserAnswer")]
+	public async Task<ActionResult<GenericResponse<QuestionEntity>>> CreateUserAnswer(UserQuestionAnswerCreateDto dto) => 
+		Result(await repository.CreateUserQuestionAnswer(dto));
+	
+	[HttpPost("FilterUserAnswer")]
+	public async Task<ActionResult<GenericResponse<IEnumerable<QuestionEntity>>>> Filter(UserQuestionAnswerFilterDto dto) =>
+		Result(await repository.FilterUserQuestionAnswer(dto));
+
+
 }
