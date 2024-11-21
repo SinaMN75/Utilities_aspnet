@@ -6,7 +6,6 @@ public static class Seeder {
 		builder.Entity<UserEntity>().OwnsOne(e => e.JsonDetail, b => {
 			b.ToJson();
 			b.OwnsMany(i => i.UserSubscriptions).OwnsMany(i => i.KeyValues);
-			b.OwnsMany(i => i.QuestionAnswers).OwnsMany(i => i.UserAnswers);
 		});
 		builder.Entity<MediaEntity>().OwnsOne(e => e.JsonDetail, b => b.ToJson());
 		builder.Entity<ContentEntity>().OwnsOne(e => e.JsonDetail, b => {

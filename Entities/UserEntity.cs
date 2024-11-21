@@ -92,19 +92,7 @@ public class UserJsonDetail {
 	public string? HealthReport1 { get; set; }
 	public string? HealthReport2 { get; set; }
 	public List<UserSubscriptions>? UserSubscriptions { get; set; } = [];
-	public List<UserQuestionAnswer>? QuestionAnswers { get; set; } = [];
 	public List<string>? StringList { get; set; } = [];
-}
-
-public class UserQuestionAnswer {
-	public required List<UserAnswer> UserAnswers { get; set; } = [];
-	public DateTime CreatedAt { get; set; } = DateTime.Now;
-}
-
-public class UserAnswer {
-	public string Question { get; set; } = "";
-	public string Answer { get; set; } = "";
-	public string Hint { get; set; } = "";
 }
 
 public class UserSubscriptions {
@@ -186,8 +174,7 @@ public record UserCreateUpdateDto(
 	DateTime? PremiumExpireDate = null,
 	IEnumerable<Guid>? Categories = null,
 	List<TagUser>? Tags = null,
-	List<string>? StringList = null,
-	UserQuestionAnswer? QuestionAnswers = null
+	List<string>? StringList = null
 );
 
 public class UserFilterDto : BaseFilterDto {

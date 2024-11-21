@@ -32,5 +32,3 @@ public class QuestionUpdateDto {
 public class QuestionFilterDto : BaseFilterDto {
 	public List<TagQuestion>? Tags { get; set; }
 }
-
-public record UserAnswerCreateDto(string UserId, List<UserAnswer> UserAnswers);

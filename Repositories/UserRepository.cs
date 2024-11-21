@@ -393,7 +393,6 @@ public class UserRepository(
 		if (dto.ShebaNumber is not null) entity.JsonDetail.ShebaNumber = dto.ShebaNumber;
 		if (dto.Code is not null) entity.JsonDetail.Code = dto.Code;
 		if (dto.StringList is not null) entity.JsonDetail.StringList = dto.StringList;
-		if (dto.QuestionAnswers is not null) entity.JsonDetail.QuestionAnswers?.Add(dto.QuestionAnswers);
 		if (dto.PostalCode is not null) entity.JsonDetail.PostalCode = dto.PostalCode;
 		if (dto.LandlinePhone is not null) entity.JsonDetail.LandlinePhone = dto.LandlinePhone;
 		if (dto.HealthReport1 is not null) entity.JsonDetail.HealthReport1 = dto.HealthReport1;

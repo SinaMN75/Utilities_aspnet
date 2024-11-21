@@ -5,10 +5,9 @@ public interface IQuestionRepository {
 	Task<GenericResponse<IEnumerable<QuestionEntity>>> Filter(QuestionFilterDto dto);
 	Task<GenericResponse<QuestionEntity?>> Update(QuestionUpdateDto dto);
 	Task<GenericResponse> Delete(Guid id);
-	Task<GenericResponse<UserEntity>> CreateUserAnswer(UserAnswerCreateDto dto);
 }
 
-public class QuestionRepository(DbContext dbContext, IUserRepository userRepository) : IQuestionRepository {
+public class QuestionRepository(DbContext dbContext) : IQuestionRepository {
 	public async Task<GenericResponse<QuestionEntity>> Create(QuestionCreateDto dto) {
 		EntityEntry<QuestionEntity> i = await dbContext.AddAsync(new QuestionEntity {
 			Tags = dto.Tags,
@@ -48,14 +47,5 @@ public class QuestionRepository(DbContext dbContext, IUserRepository userReposit
 	public async Task<GenericResponse> Delete(Guid id) {
 		await dbContext.Set<QuestionEntity>().Where(x => x.Id == id).ExecuteDeleteAsync();
 		return new GenericResponse();
-	}
-
-	public async Task<GenericResponse<UserEntity>> CreateUserAnswer(UserAnswerCreateDto dto) {
-		GenericResponse<UserEntity> e = await userRepository.Update(new UserCreateUpdateDto(Id: dto.UserId, QuestionAnswers: new UserQuestionAnswer {
-				CreatedAt = DateTime.Now,
-				UserAnswers = dto.UserAnswers
-			})
-		);
-		return e;
 	}
 }
