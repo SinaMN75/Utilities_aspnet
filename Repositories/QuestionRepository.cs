@@ -26,7 +26,7 @@ public class QuestionRepository(DbContext dbContext) : IQuestionRepository {
 	}
 
 	public async Task<GenericResponse<IEnumerable<QuestionEntity>>> Filter(QuestionFilterDto dto) {
-		IQueryable<QuestionEntity> q = dbContext.Set<QuestionEntity>();
+		IQueryable<QuestionEntity> q = dbContext.Set<QuestionEntity>().Include(x => x.Categories);
 
 		if (dto.Categories.IsNotNullOrEmpty()) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
 		if (dto.Tags is not null) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
