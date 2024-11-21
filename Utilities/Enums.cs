@@ -183,6 +183,7 @@ public enum TagCategory {
 	Estate = 190,
 	Rent = 191,
 	Health = 192,
+	Question = 193,
 	Enabled = 201
 }
 
