@@ -2,6 +2,7 @@ namespace Utilities_aspnet.Repositories;
 
 public interface IQuestionRepository {
 	Task<GenericResponse<QuestionEntity>> Create(QuestionCreateDto dto);
+	Task<GenericResponse> BulkCreate(List<QuestionCreateDto> dto);
 	Task<GenericResponse<IEnumerable<QuestionEntity>>> Filter(QuestionFilterDto dto);
 	Task<GenericResponse<QuestionEntity?>> Update(QuestionUpdateDto dto);
 	Task<GenericResponse> Delete(Guid id);
@@ -23,6 +24,27 @@ public class QuestionRepository(DbContext dbContext) : IQuestionRepository {
 
 		await dbContext.SaveChangesAsync();
 		return new GenericResponse<QuestionEntity>(i.Entity);
+	}
+
+	public async Task<GenericResponse> BulkCreate(List<QuestionCreateDto> dto) {
+		List<CategoryEntity> categories = [];
+		foreach (Guid item in dto.First().Categories)
+			categories.Add((await dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item))!);
+
+		List<QuestionEntity> list = [];
+		
+		foreach (QuestionCreateDto i in dto) {
+			list.Add(new QuestionEntity {
+				Tags = i.Tags,
+				CreatedAt = DateTime.Now,
+				UpdatedAt = DateTime.Now,
+				Categories = categories,
+				JsonDetail = new QuestionJsonDetail { Question = i.Question, Answers = i.Answers }
+			});
+		}
+
+		await dbContext.AddRangeAsync(list);
+		return new GenericResponse();
 	}
 
 	public async Task<GenericResponse<IEnumerable<QuestionEntity>>> Filter(QuestionFilterDto dto) {

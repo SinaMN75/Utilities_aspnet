@@ -8,6 +8,10 @@ public class QuestionController(IQuestionRepository repository) : BaseApiControl
 	[HttpPost]
 	public async Task<ActionResult<GenericResponse<QuestionEntity>>> Create(QuestionCreateDto dto) => Result(await repository.Create(dto));
 
+	[HttpPost("BulkCreate")]
+	public async Task<ActionResult<GenericResponse<QuestionEntity>>> BulkCreate(List<QuestionCreateDto> dto) => 
+		Result(await repository.BulkCreate(dto));
+
 	[HttpPost("Filter")]
 	public async Task<ActionResult<GenericResponse<IEnumerable<QuestionEntity>>>> Filter(QuestionFilterDto dto) => Result(await repository.Filter(dto));
 

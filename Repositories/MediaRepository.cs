@@ -54,10 +54,6 @@ public class MediaRepository(
 				JsonDetail = {
 					Title = model.Title,
 					Description = model.Description,
-					Size = model.Size,
-					Time = model.Time,
-					Artist = model.Artist,
-					Album = model.Album,
 					Link1 = model.Link1,
 					Link2 = model.Link2,
 					Link3 = model.Link3
@@ -90,10 +86,6 @@ public class MediaRepository(
 				         JsonDetail = {
 					         Title = model.Title,
 					         Description = model.Description,
-					         Size = model.Size,
-					         Time = model.Time,
-					         Artist = model.Artist,
-					         Album = model.Album,
 					         Link1 = model.Link1,
 					         Link2 = model.Link2,
 					         Link3 = model.Link3
@@ -161,10 +153,6 @@ public class MediaRepository(
 
 		media.JsonDetail.Title = model.Title ?? media.JsonDetail.Title;
 		media.JsonDetail.Description = model.Description ?? media.JsonDetail.Description;
-		media.JsonDetail.Size = model.Size ?? media.JsonDetail.Size;
-		media.JsonDetail.Time = model.Time ?? media.JsonDetail.Time;
-		media.JsonDetail.Artist = model.Artist ?? media.JsonDetail.Artist;
-		media.JsonDetail.Album = model.Album ?? media.JsonDetail.Album;
 		media.JsonDetail.Link1 = model.Link1 ?? media.JsonDetail.Link1;
 		media.JsonDetail.Link2 = model.Link2 ?? media.JsonDetail.Link2;
 		media.JsonDetail.Link3 = model.Link3 ?? media.JsonDetail.Link3;
