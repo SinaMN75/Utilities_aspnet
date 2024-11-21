@@ -329,26 +329,23 @@ public class UserRepository(
 		return new GenericResponse();
 	}
 
-	private static JwtSecurityToken CreateToken(UserEntity user) {
-		List<Claim> claims = [
-			new(JwtRegisteredClaimNames.Sub, user.Id),
-			new(ClaimTypes.NameIdentifier, user.Id),
-			new(ClaimTypes.Name, user.Id),
-			new(ClaimTypes.Email, user.Email ?? user.Id),
-			new(ClaimTypes.MobilePhone, user.PhoneNumber ?? user.Id),
-			new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-		];
-		SymmetricSecurityKey key = new("https://SinaMN75.com,BetterSoft1234"u8.ToArray());
-		SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha256);
-		JwtSecurityToken token = new(
-			issuer: "https://SinaMN75.com,BetterSoft1234",
-			audience: "https://SinaMN75.com,BetterSoft1234",
-			claims: claims,
-			expires: DateTime.UtcNow.AddDays(365),
-			signingCredentials: creds
-		);
-		return token;
-	}
+	private static JwtSecurityToken CreateToken(UserEntity user) => new JwtSecurityToken(
+		issuer: "https://SinaMN75.com,BetterSoft1234",
+		audience: "https://SinaMN75.com,BetterSoft1234",
+		expires: DateTime.UtcNow.AddMinutes(10),
+		claims: [
+			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+			new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+			new Claim(ClaimTypes.NameIdentifier, user.Id),
+			new Claim(ClaimTypes.Name, user.Id),
+			new Claim(ClaimTypes.Email, user.Email ?? user.Id),
+			new Claim(ClaimTypes.MobilePhone, user.PhoneNumber ?? user.Id),
+		],
+		signingCredentials: new SigningCredentials(
+			new SymmetricSecurityKey("https://SinaMN75.com,BetterSoft1234"u8.ToArray()),
+			SecurityAlgorithms.HmacSha256
+		)
+	);
 
 	private async Task FillUserData(UserCreateUpdateDto dto, UserEntity entity) {
 		if (dto.FirstName is not null) entity.FirstName = dto.FirstName;

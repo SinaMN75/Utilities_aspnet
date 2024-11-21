@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace Utilities_aspnet.Utilities;
 
 public class HttpClientInterceptor(HttpClient httpClient) {

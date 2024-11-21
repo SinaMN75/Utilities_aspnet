@@ -1,6 +1,3 @@
-using System.Text;
-using Microsoft.AspNetCore.Mvc.Filters;
-
 namespace Utilities_aspnet.Utilities;
 
 //

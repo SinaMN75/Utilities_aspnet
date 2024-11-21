@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.OutputCaching;
-
 namespace Utilities_aspnet.Controllers;
 
 [ApiController]

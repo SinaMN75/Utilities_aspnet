@@ -10,6 +10,9 @@ global using System.Security.Claims;
 global using System.Threading.RateLimiting;
 global using System.Reflection;
 global using System.Globalization;
+global using System.Data;
+global using System.Text;
+global using System.Diagnostics;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.AspNetCore.Http;
 global using Microsoft.AspNetCore.Builder;
@@ -27,6 +30,10 @@ global using Microsoft.AspNetCore.Hosting;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.RateLimiting;
 global using Microsoft.Extensions.Caching.Distributed;
+global using Microsoft.Extensions.Hosting;
+global using Microsoft.AspNetCore.OutputCaching;
+global using Microsoft.Extensions.Logging;
+global using Microsoft.AspNetCore.Mvc.Filters;
 global using Utilities_aspnet.Utilities;
 global using Utilities_aspnet.Entities;
 global using Utilities_aspnet.Repositories;
@@ -39,15 +46,12 @@ global using Amazon.S3.Model;
 global using RestSharp;
 global using Swashbuckle.AspNetCore.SwaggerUI;
 global using OfficeOpenXml;
-global using System.Data;
 global using ClosedXML.Excel;
-global using Microsoft.Extensions.Hosting;
 global using OpenTelemetry.Logs;
 global using OpenTelemetry.Metrics;
 global using OpenTelemetry.Resources;
 global using OpenTelemetry.Trace;
-global using Microsoft.AspNetCore.OutputCaching;
-global using Microsoft.Extensions.Logging;
 global using StackExchange.Redis;
+
 
 #endregion
