@@ -16,6 +16,7 @@ public class QuestionJsonDetail {
 public class AnswerDetail {
 	public required string Answer { get; set; }
 	public required string Hint { get; set; }
+	public required int Point { get; set; }
 }
 
 public class QuestionCreateDto {
