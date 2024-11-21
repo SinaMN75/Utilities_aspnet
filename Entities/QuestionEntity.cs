@@ -8,7 +8,7 @@ public class QuestionEntity : BaseEntity {
 	public required IEnumerable<CategoryEntity> Categories { get; set; }
 }
 
-[Table("Questions")]
+[Table("UserQuestionAnswers")]
 public class UserQuestionAnswerEntity : BaseEntity {
 	public required string UserId { get; set; }
 	public UserEntity? User { get; set; }
