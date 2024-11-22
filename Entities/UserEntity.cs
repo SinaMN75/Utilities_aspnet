@@ -62,10 +62,12 @@ public class UserEntity {
 
 	[NotMapped]
 	public string? Token { get; set; }
+	
+	[NotMapped]
+	public string? RefreshToken { get; set; }
 }
 
 public class UserJsonDetail {
-	public string? RefreshToken { get; set; }
 	public string? Instagram { get; set; }
 	public string? Telegram { get; set; }
 	public string? WhatsApp { get; set; }
