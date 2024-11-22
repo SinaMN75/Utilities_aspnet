@@ -138,9 +138,7 @@ public static class StartupExtension {
 					return keyVal;
 				}
 			);
-		})).AddStackExchangeRedisCache(x => x.ConnectionMultiplexerFactory = async () => await ConnectionMultiplexer.ConnectAsync(
-			builder.Configuration.GetConnectionString("Redis")!
-		));
+		}));
 	}
 
 	private static void AddOpenTelemetry(this IHostApplicationBuilder builder) {
