@@ -1,7 +1,7 @@
 ﻿namespace Utilities_aspnet.Entities;
 
 public class AppSettings {
-	public static AppSettings? Settings { get; private set; }
+	public static AppSettings Settings { get; private set; } = null!;
 	public SmsPanelSettings SmsPanelSettings { get; set; } = null!;
 	public Zibal Zibal { get; set; } = null!;
 	public PushNotificationSetting PushNotificationSetting { get; set; } = null!;

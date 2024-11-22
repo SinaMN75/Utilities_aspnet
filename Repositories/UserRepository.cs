@@ -6,7 +6,7 @@ public interface IUserRepository {
 	Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null);
 	Task<GenericResponse<UserEntity>> Update(UserCreateUpdateDto dto);
 	Task<GenericResponse> Delete(string id, CancellationToken ct);
-	Task<GenericResponse<UserEntity?>> GetTokenForTest(string? mobile);
+	Task<GenericResponse<UserEntity?>> GetTokenForTest(string mobile);
 	Task<GenericResponse<UserEntity?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto);
 	Task<GenericResponse<UserEntity?>> VerifyCodeForLogin(VerifyMobileForLoginDto dto);
 	Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model);
@@ -25,8 +25,7 @@ public class UserRepository(
 	IReportRepository reportRepository,
 	IAddressRepository addressRepository,
 	INotificationRepository notificationRepository,
-	IDistributedCache cache,
-	IConfiguration config
+	IDistributedCache cache
 ) : IUserRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
@@ -194,12 +193,11 @@ public class UserRepository(
 		};
 	}
 
-	public async Task<GenericResponse<UserEntity?>> GetTokenForTest(string? mobile) {
-		string m = mobile ?? "09351902721";
-		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == m);
-		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
+	public async Task<GenericResponse<UserEntity?>> GetTokenForTest(string mobile) {
+		UserEntity user = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == mobile))!;
 		JwtSecurityToken token = CreateToken(user);
-		return new GenericResponse<UserEntity?>(ReadByIdMinimal(user.Id, new JwtSecurityTokenHandler().WriteToken(token)).Result);
+		user.Token = new JwtSecurityTokenHandler().WriteToken(token);
+		return new GenericResponse<UserEntity?>(user);
 	}
 
 	public async Task<GenericResponse<UserEntity?>> LoginWithPassword(LoginWithPasswordDto model) {
@@ -329,23 +327,31 @@ public class UserRepository(
 		return new GenericResponse();
 	}
 
-	private static JwtSecurityToken CreateToken(UserEntity user) => new JwtSecurityToken(
-		issuer: "https://SinaMN75.com,BetterSoft1234",
-		audience: "https://SinaMN75.com,BetterSoft1234",
-		expires: DateTime.UtcNow.AddMinutes(10),
-		claims: [
-			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-			new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-			new Claim(ClaimTypes.NameIdentifier, user.Id),
-			new Claim(ClaimTypes.Name, user.Id),
-			new Claim(ClaimTypes.Email, user.Email ?? user.Id),
-			new Claim(ClaimTypes.MobilePhone, user.PhoneNumber ?? user.Id),
-		],
-		signingCredentials: new SigningCredentials(
-			new SymmetricSecurityKey("https://SinaMN75.com,BetterSoft1234"u8.ToArray()),
-			SecurityAlgorithms.HmacSha256
-		)
-	);
+	public async Task<GenericResponse> Delete(string id, CancellationToken ct) {
+		UserEntity? user = await dbContext.Set<UserEntity>()
+			.Include(x => x.Media)
+			.FirstOrDefaultAsync(x => x.Id == id, cancellationToken: ct);
+
+		if (user is null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
+
+		await mediaRepository.DeleteMedia(user.Media);
+		foreach (CommentEntity commentEntity in dbContext.Set<CommentEntity>().Where(x => x.UserId == id || x.TargetUserId == id))
+			await commentRepository.Delete(commentEntity.Id, ct);
+		foreach (NotificationEntity notificationEntity in dbContext.Set<NotificationEntity>().Where(x => x.UserId == id || x.CreatorUserId == id))
+			await notificationRepository.Delete(notificationEntity.Id);
+		foreach (ReportEntity reportEntity in dbContext.Set<ReportEntity>().Where(x => x.UserId == id || x.CreatorUserId == _userId))
+			await reportRepository.Delete(reportEntity.Id);
+		foreach (OrderEntity orderEntity in dbContext.Set<OrderEntity>().Where(x => x.UserId == id)) await orderRepository.Delete(orderEntity.Id);
+		foreach (TransactionEntity transactionEntity in dbContext.Set<TransactionEntity>().Where(x => x.BuyerId == id || x.SellerId == id))
+			await transactionRepository.Delete(transactionEntity.Id, ct);
+		foreach (AddressEntity addressEntity in dbContext.Set<AddressEntity>().Where(x => x.UserId == id)) await addressRepository.Delete(addressEntity.Id, ct);
+
+		dbContext.Remove(user);
+
+		await dbContext.SaveChangesAsync(ct);
+
+		return new GenericResponse();
+	}
 
 	private async Task FillUserData(UserCreateUpdateDto dto, UserEntity entity) {
 		if (dto.FirstName is not null) entity.FirstName = dto.FirstName;
@@ -413,45 +419,28 @@ public class UserRepository(
 		string? cachedData = await cache.GetStringAsync(userId);
 		if (cachedData.IsNullOrEmpty()) cache.SetStringData(userId, newOtp, TimeSpan.FromSeconds(120));
 
-		UserEntity? user = await ReadByIdMinimal(userId);
+		UserEntity user = (await dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId || u.UserName == userId))!;
 
-		AppSettings appSettings = new();
-		config.GetSection("AppSettings").Bind(appSettings);
-
-		await sms.SendSms(user?.PhoneNumber!, appSettings.SmsPanelSettings.PatternCode!, newOtp);
+		await sms.SendSms(user.PhoneNumber!, AppSettings.Settings.SmsPanelSettings.PatternCode!, newOtp);
 		await dbContext.SaveChangesAsync();
 		return true;
 	}
 
-	public async Task<GenericResponse> Delete(string id, CancellationToken ct) {
-		UserEntity? user = await dbContext.Set<UserEntity>()
-			.Include(x => x.Media)
-			.FirstOrDefaultAsync(x => x.Id == id, cancellationToken: ct);
-
-		if (user is null) return new GenericResponse(UtilitiesStatusCodes.NotFound);
-
-		await mediaRepository.DeleteMedia(user.Media);
-		foreach (CommentEntity commentEntity in dbContext.Set<CommentEntity>().Where(x => x.UserId == id || x.TargetUserId == id))
-			await commentRepository.Delete(commentEntity.Id, ct);
-		foreach (NotificationEntity notificationEntity in dbContext.Set<NotificationEntity>().Where(x => x.UserId == id || x.CreatorUserId == id))
-			await notificationRepository.Delete(notificationEntity.Id);
-		foreach (ReportEntity reportEntity in dbContext.Set<ReportEntity>().Where(x => x.UserId == id || x.CreatorUserId == _userId))
-			await reportRepository.Delete(reportEntity.Id);
-		foreach (OrderEntity orderEntity in dbContext.Set<OrderEntity>().Where(x => x.UserId == id)) await orderRepository.Delete(orderEntity.Id);
-		foreach (TransactionEntity transactionEntity in dbContext.Set<TransactionEntity>().Where(x => x.BuyerId == id || x.SellerId == id))
-			await transactionRepository.Delete(transactionEntity.Id, ct);
-		foreach (AddressEntity addressEntity in dbContext.Set<AddressEntity>().Where(x => x.UserId == id)) await addressRepository.Delete(addressEntity.Id, ct);
-
-		dbContext.Remove(user);
-
-		await dbContext.SaveChangesAsync(ct);
-
-		return new GenericResponse();
-	}
-
-	private async Task<UserEntity?> ReadByIdMinimal(string? idOrUserName, string? token = null) {
-		UserEntity e = (await dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(u => u.Id == idOrUserName || u.UserName == idOrUserName))!;
-		e.Token = token;
-		return e;
-	}
+	private static JwtSecurityToken CreateToken(UserEntity user) => new(
+		issuer: "https://SinaMN75.com,BetterSoft1234",
+		audience: "https://SinaMN75.com,BetterSoft1234",
+		expires: DateTime.UtcNow.AddMinutes(10),
+		claims: [
+			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+			new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+			new Claim(ClaimTypes.NameIdentifier, user.Id),
+			new Claim(ClaimTypes.Name, user.Id),
+			new Claim(ClaimTypes.Email, user.Email ?? user.Id),
+			new Claim(ClaimTypes.MobilePhone, user.PhoneNumber ?? user.Id),
+		],
+		signingCredentials: new SigningCredentials(
+			new SymmetricSecurityKey("https://SinaMN75.com,BetterSoft1234"u8.ToArray()),
+			SecurityAlgorithms.HmacSha256
+		)
+	);
 }

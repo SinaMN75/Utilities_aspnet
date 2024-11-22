@@ -29,7 +29,7 @@ public class UserController(IUserRepository repository, IOutputCacheStore store)
 	}
 
 	[HttpPost("GetTokenForTest/{mobile}")]
-	public async Task<ActionResult<GenericResponse>> GetTokenForTest(string? mobile, CancellationToken ct) {
+	public async Task<ActionResult<GenericResponse>> GetTokenForTest(string mobile, CancellationToken ct) {
 		await store.EvictByTagAsync("user", ct);
 		return Result(await repository.GetTokenForTest(mobile));
 	}
