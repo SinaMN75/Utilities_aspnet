@@ -3,7 +3,6 @@
 [ApiController]
 [Route("api/address")]
 [Authorize]
-[ApiKey]
 public class AddressController(IAddressRepository repository) : BaseApiController {
 	[HttpPost]
 	public async Task<ActionResult<GenericResponse<AddressEntity>>> Create(AddressCreateDto dto, CancellationToken ct) => Result(await repository.Create(dto, ct));

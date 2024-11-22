@@ -34,6 +34,7 @@ global using Microsoft.Extensions.Hosting;
 global using Microsoft.AspNetCore.OutputCaching;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.AspNetCore.Mvc.Filters;
+global using Microsoft.Extensions.Primitives;
 global using Utilities_aspnet.Utilities;
 global using Utilities_aspnet.Entities;
 global using Utilities_aspnet.Repositories;

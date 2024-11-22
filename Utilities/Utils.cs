@@ -12,12 +12,10 @@ public static class StartupExtension {
 		if (addOpenTelemetry) builder.AddOpenTelemetry();
 	}
 
-	public static void UseUtilitiesServices(
-		this WebApplication app,
-		bool log = false
-	) {
+	public static void UseUtilitiesServices(this WebApplication app, bool log = false) {
 		if (log) app.UseMiddleware<RequestResponseLoggingMiddleware>();
 		app.UseCors(option => option.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+		app.UseMiddleware<ApiKeyMiddleware>();  
 		app.UseRateLimiter();
 		app.UseOutputCache();
 		app.UseDeveloperExceptionPage();
@@ -80,8 +78,6 @@ public static class StartupExtension {
 		});
 		builder.Services.Configure<IISServerOptions>(options => options.MaxRequestBodySize = int.MaxValue);
 		Server.Configure(builder.Services.BuildServiceProvider().GetService<IServiceProvider>()?.GetService<IHttpContextAccessor>());
-		builder.Services.AddTransient<IApiKeyValidation, ApiKeyValidation>();
-		builder.Services.AddScoped<ApiKeyAuthFilter>();
 		builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 		builder.Services.AddScoped<IReportRepository, ReportRepository>();
 		builder.Services.AddScoped<IUserRepository, UserRepository>();

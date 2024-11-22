@@ -2,7 +2,6 @@
 
 [ApiController]
 [Route("api/[controller]")]
-[ApiKey]
 public class MailSmsNotificationController(ISmsNotificationRepository repository) : BaseApiController {
 	[HttpPost("SendNotification")]
 	public async Task<ActionResult<GenericResponse>> SendNotification(NotificationCreateDto dto) => Result(await repository.SendNotification(dto));

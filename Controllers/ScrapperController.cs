@@ -2,7 +2,6 @@ namespace Utilities_aspnet.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[ApiKey]
 public class ScrapperController : ControllerBase {
 	[HttpGet("GetInstaPostRapidApi/{username}")]
 	public static string GetInstaPostRapidApi(string username) {

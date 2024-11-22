@@ -2,7 +2,6 @@ namespace Utilities_aspnet.Controllers;
 
 [ApiController]
 [Route("api/user")]
-[ApiKey]
 public class UserController(IUserRepository repository, IOutputCacheStore store) : BaseApiController {
 	[HttpPost]
 	public async Task<ActionResult<GenericResponse<UserEntity>>> Create(UserCreateUpdateDto dto, CancellationToken ct) {

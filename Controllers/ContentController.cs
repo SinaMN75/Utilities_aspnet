@@ -2,7 +2,6 @@ namespace Utilities_aspnet.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[ApiKey]
 public class ContentController(IContentRepository repository, IOutputCacheStore store) : BaseApiController {
 	
 	[OutputCache(PolicyName = "default", Tags = ["content"])]

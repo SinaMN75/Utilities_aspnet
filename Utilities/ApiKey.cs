@@ -4,33 +4,17 @@ namespace Utilities_aspnet.Utilities;
 // Api Response Encryption
 //
 
-public interface IApiKeyValidation {
-	bool IsValidApiKey(string userApiKey);
-}
+public class ApiKeyMiddleware(RequestDelegate next, IConfiguration configuration) {
+	public async Task Invoke(HttpContext context) {
+		if ((context.Request.Path.Value ?? "").Contains("api"))
+			if (!context.Request.Headers.TryGetValue("X-API-Key", out StringValues apiKey) || apiKey != configuration.GetValue<string>("ApiKey")!) {
+				context.Response.StatusCode = StatusCodes.Status404NotFound;
+				return;
+			}
 
-public class ApiKeyValidation(IConfiguration configuration) : IApiKeyValidation {
-	public bool IsValidApiKey(string userApiKey) {
-		if (string.IsNullOrWhiteSpace(userApiKey)) return false;
-		string? apiKey = configuration.GetValue<string>("ApiKey");
-		return apiKey != null && apiKey == userApiKey;
+		await next(context);
 	}
 }
-
-public class ApiKeyAttribute() : ServiceFilterAttribute(typeof(ApiKeyAuthFilter));
-
-public class ApiKeyAuthFilter(IApiKeyValidation apiKeyValidation) : IAuthorizationFilter {
-	public void OnAuthorization(AuthorizationFilterContext context) {
-		string userApiKey = context.HttpContext.Request.Headers["X-API-Key"].ToString();
-		if (string.IsNullOrWhiteSpace(userApiKey)) {
-			context.Result = new BadRequestResult();
-			return;
-		}
-
-		if (!apiKeyValidation.IsValidApiKey(userApiKey))
-			context.Result = new UnauthorizedResult();
-	}
-}
-
 //
 // Api Response Encryption
 //

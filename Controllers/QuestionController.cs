@@ -3,7 +3,6 @@ namespace Utilities_aspnet.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-[ApiKey]
 public class QuestionController(IQuestionRepository repository) : BaseApiController {
 	[HttpPost]
 	public async Task<ActionResult<GenericResponse<QuestionEntity>>> Create(QuestionCreateDto dto) => Result(await repository.Create(dto));

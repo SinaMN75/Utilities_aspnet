@@ -2,7 +2,6 @@
 
 [ApiController]
 [Route("api/[controller]")]
-[ApiKey]
 public class CommentController(ICommentRepository commentRepository) : BaseApiController {
 	[HttpGet("{id:guid}")]
 	public async Task<ActionResult<GenericResponse<CommentEntity>>> ReadById(Guid id) => Result(await commentRepository.ReadById(id));
