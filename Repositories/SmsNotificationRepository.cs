@@ -5,7 +5,7 @@ public interface ISmsNotificationRepository {
 	public Task<GenericResponse> SendNotification(NotificationCreateDto dto);
 }
 
-public class SmsNotificationRepository(IConfiguration config) : ISmsNotificationRepository {
+public class SmsNotificationRepository : ISmsNotificationRepository {
 	public async Task<GenericResponse> SendSms(
 		string mobileNumber,
 		string template,
@@ -13,9 +13,7 @@ public class SmsNotificationRepository(IConfiguration config) : ISmsNotification
 		string? param2 = null,
 		string? param3 = null
 	) {
-		AppSettings appSettings = new();
-		config.GetSection("AppSettings").Bind(appSettings);
-		SmsPanelSettings smsSetting = appSettings.SmsPanelSettings;
+		SmsPanelSettings smsSetting = AppSettings.Settings.SmsPanelSettings;
 
 		switch (smsSetting.Provider) {
 			case "ghasedak": {
@@ -59,9 +57,7 @@ public class SmsNotificationRepository(IConfiguration config) : ISmsNotification
 	}
 
 	public async Task<GenericResponse> SendNotification(NotificationCreateDto dto) {
-		AppSettings appSettings = new();
-		config.GetSection("AppSettings").Bind(appSettings);
-		PushNotificationSetting setting = appSettings.PushNotificationSetting;
+		PushNotificationSetting setting = AppSettings.Settings.PushNotificationSetting;
 
 		switch (setting.Provider) {
 			case "pushe": {

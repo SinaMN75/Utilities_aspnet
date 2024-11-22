@@ -267,8 +267,6 @@ public class UserRepository(
 
 		if (existingUser != null) {
 			if (!await SendOtp(existingUser.Id)) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.MaximumLimitReached);
-			dbContext.Update(existingUser);
-			await dbContext.SaveChangesAsync();
 			return new GenericResponse<UserEntity?>(existingUser);
 		}
 

@@ -10,11 +10,9 @@ public interface IAmazonS3Repository {
 	Task DeleteObjects(string bucketName);
 }
 
-public class AmazonS3Repository(IConfiguration config) : IAmazonS3Repository {
+public class AmazonS3Repository : IAmazonS3Repository {
 	private IAmazonS3 Authenticate() {
-		AppSettings appSettings = new();
-		config.GetSection("AppSettings").Bind(appSettings);
-		AmazonS3Settings amazonS3Settings = appSettings.AmazonS3Settings;
+		AmazonS3Settings amazonS3Settings = AppSettings.Settings.AmazonS3Settings;
 		return new AmazonS3Client(
 			new BasicAWSCredentials(amazonS3Settings.AccessKey, amazonS3Settings.SecretKey),
 			new AmazonS3Config { ServiceURL = amazonS3Settings.Url });

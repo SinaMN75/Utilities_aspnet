@@ -11,31 +11,27 @@ public interface IAppSettingsRepository {
 	);
 }
 
-public class AppSettingsRepository(IConfiguration config, DbContext dbContext) : IAppSettingsRepository {
-	public GenericResponse<EnumDto> ReadAppSettings() {
-		AppSettings appSettings = new();
-		config.GetSection("AppSettings").Bind(appSettings);
-		return new GenericResponse<EnumDto>(new EnumDto {
-				DateTime = DateTime.UtcNow,
-				UtcDateTime = DateTime.UtcNow,
-				UtilitiesStatusCodes = EnumExtension.GetValues<UtilitiesStatusCodes>(),
-				Currency = EnumExtension.GetValues<Currency>(),
-				SeenStatus = EnumExtension.GetValues<SeenStatus>(),
-				Reaction = EnumExtension.GetValues<Reaction>(),
-				GenderType = EnumExtension.GetValues<GenderType>(),
-				TagMedia = EnumExtension.GetValues<TagMedia>(),
-				TagContent = EnumExtension.GetValues<TagContent>(),
-				TagProduct = EnumExtension.GetValues<TagProduct>(),
-				TagNotification = EnumExtension.GetValues<TagNotification>(),
-				TagOrder = EnumExtension.GetValues<TagOrder>(),
-				TagCategory = EnumExtension.GetValues<TagCategory>(),
-				TagComments = EnumExtension.GetValues<TagComment>(),
-				TagReservationChair = EnumExtension.GetValues<TagReservationChair>(),
-				TagUser = EnumExtension.GetValues<TagUser>(),
-				AppSettings = appSettings
-			}
-		);
-	}
+public class AppSettingsRepository(DbContext dbContext) : IAppSettingsRepository {
+	public GenericResponse<EnumDto> ReadAppSettings() => new(new EnumDto {
+			DateTime = DateTime.UtcNow,
+			UtcDateTime = DateTime.UtcNow,
+			UtilitiesStatusCodes = EnumExtension.GetValues<UtilitiesStatusCodes>(),
+			Currency = EnumExtension.GetValues<Currency>(),
+			SeenStatus = EnumExtension.GetValues<SeenStatus>(),
+			Reaction = EnumExtension.GetValues<Reaction>(),
+			GenderType = EnumExtension.GetValues<GenderType>(),
+			TagMedia = EnumExtension.GetValues<TagMedia>(),
+			TagContent = EnumExtension.GetValues<TagContent>(),
+			TagProduct = EnumExtension.GetValues<TagProduct>(),
+			TagNotification = EnumExtension.GetValues<TagNotification>(),
+			TagOrder = EnumExtension.GetValues<TagOrder>(),
+			TagCategory = EnumExtension.GetValues<TagCategory>(),
+			TagComments = EnumExtension.GetValues<TagComment>(),
+			TagReservationChair = EnumExtension.GetValues<TagReservationChair>(),
+			TagUser = EnumExtension.GetValues<TagUser>(),
+			AppSettings = AppSettings.Settings
+		}
+	);
 
 	public async Task<GenericResponse<DashboardReadDto>> ReadDashboardData() =>
 		new(new DashboardReadDto {

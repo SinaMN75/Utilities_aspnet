@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text;
-
-namespace Utilities_aspnet.Utilities;
+﻿namespace Utilities_aspnet.Utilities;
 
 public static class StartupExtension {
 	public static void SetupUtilities<T>(
@@ -42,8 +39,8 @@ public static class StartupExtension {
 			.AddFilter("Microsoft.AspNetCore", LogLevel.Warning);
 
 		builder.Services.AddOptions();
-		AppSettings.Initialize(builder.Configuration);
 		builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+		AppSettings.Initialize(builder.Configuration);
 		builder.Services.AddRateLimiter(x => {
 			x.RejectionStatusCode = 429;
 			x.AddFixedWindowLimiter("fixed", y => {
@@ -86,7 +83,6 @@ public static class StartupExtension {
 		builder.Services.AddTransient<IApiKeyValidation, ApiKeyValidation>();
 		builder.Services.AddScoped<ApiKeyAuthFilter>();
 		builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-		builder.Services.AddScoped<AppSettings>();
 		builder.Services.AddScoped<IReportRepository, ReportRepository>();
 		builder.Services.AddScoped<IUserRepository, UserRepository>();
 		builder.Services.AddScoped<IMediaRepository, MediaRepository>();
@@ -147,7 +143,7 @@ public static class StartupExtension {
 				}
 			);
 		})).AddStackExchangeRedisCache(x => x.ConnectionMultiplexerFactory = async () => await ConnectionMultiplexer.ConnectAsync(
-			builder.Configuration.GetSection("AppSettings").GetConnectionString("Redis")!
+			builder.Configuration.GetConnectionString("Redis")!
 		));
 	}
 

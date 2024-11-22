@@ -11,8 +11,7 @@ public interface IMediaRepository {
 public class MediaRepository(
 	IWebHostEnvironment env,
 	DbContext dbContext,
-	IAmazonS3Repository amazonS3Repository,
-	IConfiguration config
+	IAmazonS3Repository amazonS3Repository
 ) : IMediaRepository {
 	public async Task<GenericResponse<IEnumerable<MediaEntity>?>> Upload(UploadDto model) {
 		List<MediaEntity> medias = [];
@@ -63,9 +62,7 @@ public class MediaRepository(
 			await dbContext.SaveChangesAsync();
 			medias.Add(media);
 			string path = await SaveMedia(model.File, name);
-			AppSettings appSettings = new();
-			config.GetSection("AppSettings").Bind(appSettings);
-			AmazonS3Settings amazonS3Settings = appSettings.AmazonS3Settings;
+			AmazonS3Settings amazonS3Settings = AppSettings.Settings.AmazonS3Settings;
 			if (amazonS3Settings.UseS3 ?? false)
 				await amazonS3Repository.UploadObjectFromFileAsync(amazonS3Settings.DefaultBucket!, name, path);
 		}
@@ -124,10 +121,8 @@ public class MediaRepository(
 			File.Delete(Path.Combine(env.WebRootPath, "Medias", media.FileName!));
 		}
 		catch (Exception) { }
-
-		AppSettings appSettings = new();
-		config.GetSection("AppSettings").Bind(appSettings);
-		AmazonS3Settings amazonS3Settings = appSettings.AmazonS3Settings;
+		
+		AmazonS3Settings amazonS3Settings = AppSettings.Settings.AmazonS3Settings;
 		if (amazonS3Settings.UseS3 ?? false)
 			await amazonS3Repository.DeleteObject(amazonS3Settings.DefaultBucket!, media.FileName!);
 
