@@ -4,7 +4,7 @@ public interface IUserRepository {
 	Task<GenericResponse<UserEntity?>> RefreshToken(RefreshTokenDto dto);
 	Task<GenericResponse<UserEntity?>> Create(UserCreateUpdateDto dto);
 	Task<GenericResponse<IQueryable<UserEntity>>> Filter(UserFilterDto dto);
-	Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null, string? refreshToken = null);
+	Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, (string, string)? tokenRefreshToken = null);
 	Task<GenericResponse<UserEntity>> Update(UserCreateUpdateDto dto);
 	Task<GenericResponse> Delete(string id, CancellationToken ct);
 	Task<GenericResponse<UserEntity?>> GetTokenForTest(string mobile);
@@ -30,7 +30,7 @@ public class UserRepository(
 ) : IUserRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
-	public async Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null, string? refreshToken = null) {
+	public async Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, (string, string)? tokenRefreshToken = null) {
 		bool isUserId = Guid.TryParse(idOrUserName, out _);
 		UserEntity? entity = await dbContext.Set<UserEntity>().AsNoTracking()
 			.Select(x => new UserEntity {
@@ -84,11 +84,12 @@ public class UserRepository(
 			.FirstOrDefaultAsync(u => isUserId ? u.Id == idOrUserName : u.UserName == idOrUserName);
 
 		if (entity == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
-		entity.Token = token;
-		if (refreshToken != null) {
-			entity.RefreshToken = refreshToken;
-			cache.SetStringData($"{entity.Id}_refreshToken", refreshToken, absoluteExpireTime: TimeSpan.FromDays(30));
-		}
+
+		if (tokenRefreshToken == null) return new GenericResponse<UserEntity?>(entity);
+
+		entity.Token = tokenRefreshToken.Value.Item1;
+		entity.RefreshToken = tokenRefreshToken.Value.Item2;
+		cache.SetStringData($"{entity.Id}_refreshToken", tokenRefreshToken.Value.Item2, absoluteExpireTime: TimeSpan.FromDays(30));
 
 		return new GenericResponse<UserEntity?>(entity);
 	}
@@ -200,8 +201,8 @@ public class UserRepository(
 
 	public async Task<GenericResponse<UserEntity?>> GetTokenForTest(string mobile) {
 		UserEntity user = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == mobile))!;
-		(JwtSecurityToken, string) token = CreateToken(user);
-		user.Token = new JwtSecurityTokenHandler().WriteToken(token.Item1);
+		(string, string) token = CreateToken(user);
+		user.Token = token.Item1;
 		user.RefreshToken = token.Item2;
 		return new GenericResponse<UserEntity?>(user);
 	}
@@ -214,20 +215,16 @@ public class UserRepository(
 		);
 
 		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound, "UserName or Password is Wrong.");
-
 		await dbContext.SaveChangesAsync();
-		(JwtSecurityToken, string) token = CreateToken(user);
-
-		return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token.Item1), token.Item2).Result.Result);
+		return new GenericResponse<UserEntity?>(ReadById(user.Id, CreateToken(user)).Result.Result);
 	}
 
 	public async Task<GenericResponse<UserEntity?>> RefreshToken(RefreshTokenDto dto) {
 		UserEntity user = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == dto.UserId))!;
 		string? cachedToken = await cache.GetStringData($"{user.Id}_refreshToken");
-		if (cachedToken == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.Forbidden);
-
-		(JwtSecurityToken, string) token = CreateToken(user);
-		return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token.Item1), token.Item2).Result.Result);
+		return cachedToken == null
+			? new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.Forbidden)
+			: new GenericResponse<UserEntity?>(ReadById(user.Id, CreateToken(user)).Result.Result);
 	}
 
 	public async Task<GenericResponse<UserEntity?>> Create(UserCreateUpdateDto dto) {
@@ -263,9 +260,7 @@ public class UserRepository(
 		await dbContext.AddAsync(user);
 		await dbContext.SaveChangesAsync();
 
-		(JwtSecurityToken, string) token = CreateToken(user);
-
-		return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token.Item1), token.Item2).Result.Result);
+		return new GenericResponse<UserEntity?>(ReadById(user.Id, CreateToken(user)).Result.Result);
 	}
 
 	public async Task<GenericResponse<UserEntity?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto) {
@@ -304,10 +299,9 @@ public class UserRepository(
 		dbContext.Update(user);
 
 		await dbContext.SaveChangesAsync();
-		(JwtSecurityToken, string) token = CreateToken(user);
 
 		return dto.VerificationCode == "1375" || dto.VerificationCode == await cache.GetStringData(user.Id)
-			? new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token.Item1), token.Item2).Result.Result)
+			? new GenericResponse<UserEntity?>(ReadById(user.Id, CreateToken(user)).Result.Result)
 			: new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.WrongVerificationCode);
 	}
 
@@ -432,21 +426,23 @@ public class UserRepository(
 		return true;
 	}
 
-	private static (JwtSecurityToken, string) CreateToken(UserEntity user) => (new JwtSecurityToken(
-		issuer: "https://SinaMN75.com,BetterSoft1234",
-		audience: "https://SinaMN75.com,BetterSoft1234",
-		expires: DateTime.Now.AddMinutes(3),
-		claims: [
-			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-			new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-			new Claim(ClaimTypes.NameIdentifier, user.Id),
-			new Claim(ClaimTypes.Name, user.Id),
-			new Claim(ClaimTypes.Email, user.Email ?? user.Id),
-			new Claim(ClaimTypes.MobilePhone, user.PhoneNumber ?? user.Id),
-		],
-		signingCredentials: new SigningCredentials(
-			new SymmetricSecurityKey("https://SinaMN75.com,BetterSoft1234"u8.ToArray()),
-			SecurityAlgorithms.HmacSha256
-		)
-	), Guid.NewGuid().ToString());
+	private static (string, string) CreateToken(UserEntity user) {
+		return (new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(
+			issuer: "https://SinaMN75.com,BetterSoft1234",
+			audience: "https://SinaMN75.com,BetterSoft1234",
+			expires: DateTime.Now.AddMinutes(3),
+			claims: [
+				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+				new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+				new Claim(ClaimTypes.NameIdentifier, user.Id),
+				new Claim(ClaimTypes.Name, user.Id),
+				new Claim(ClaimTypes.Email, user.Email ?? user.Id),
+				new Claim(ClaimTypes.MobilePhone, user.PhoneNumber ?? user.Id),
+			],
+			signingCredentials: new SigningCredentials(
+				new SymmetricSecurityKey("https://SinaMN75.com,BetterSoft1234"u8.ToArray()),
+				SecurityAlgorithms.HmacSha256
+			)
+		)), Guid.NewGuid().ToString());
+	}
 }
