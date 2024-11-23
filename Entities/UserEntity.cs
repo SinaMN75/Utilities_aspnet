@@ -131,7 +131,7 @@ public class LoginWithPasswordDto {
 }
 
 public record UserCreateUpdateDto(
-	string Id,
+	string? Id,
 	string? Email = null,
 	string? FirstName = null,
 	string? UserName = null,
@@ -205,4 +205,9 @@ public class UserFilterDto : BaseFilterDto {
 	public IEnumerable<string>? PhoneNumbers { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 	public List<TagUser>? Tags { get; set; }
+}
+
+public class RefreshTokenDto {
+	public required string RefreshToken { get; set; }
+	public required string UserId { get; set; }
 }

@@ -1,6 +1,7 @@
 ﻿namespace Utilities_aspnet.Repositories;
 
 public interface IUserRepository {
+	Task<GenericResponse<UserEntity?>> RefreshToken(RefreshTokenDto dto);
 	Task<GenericResponse<UserEntity?>> Create(UserCreateUpdateDto dto);
 	Task<GenericResponse<IQueryable<UserEntity>>> Filter(UserFilterDto dto);
 	Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, string? token = null, string? refreshToken = null);
@@ -84,7 +85,10 @@ public class UserRepository(
 
 		if (entity == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.NotFound);
 		entity.Token = token;
-		entity.RefreshToken = refreshToken;
+		if (refreshToken != null) {
+			entity.RefreshToken = refreshToken;
+			cache.SetStringData($"{entity.Id}_refreshToken", refreshToken, absoluteExpireTime: TimeSpan.FromDays(30));
+		}
 
 		return new GenericResponse<UserEntity?>(entity);
 	}
@@ -217,26 +221,29 @@ public class UserRepository(
 		return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token.Item1), token.Item2).Result.Result);
 	}
 
+	public async Task<GenericResponse<UserEntity?>> RefreshToken(RefreshTokenDto dto) {
+		UserEntity user = (await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.Id == dto.UserId))!;
+		string? cachedToken = await cache.GetStringData($"{user.Id}_refreshToken");
+		if (cachedToken == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.Forbidden);
+
+		(JwtSecurityToken, string) token = CreateToken(user);
+		return new GenericResponse<UserEntity?>(ReadById(user.Id, new JwtSecurityTokenHandler().WriteToken(token.Item1), token.Item2).Result.Result);
+	}
+
 	public async Task<GenericResponse<UserEntity?>> Create(UserCreateUpdateDto dto) {
-		UserEntity? sameUserName = await dbContext.Set<UserEntity>().AsNoTracking()
-			.FirstOrDefaultAsync(x => x.UserName == (dto.UserName ?? "null"));
-		UserEntity? samePhoneNumber = await dbContext.Set<UserEntity>().AsNoTracking()
-			.FirstOrDefaultAsync(x => x.PhoneNumber == (dto.PhoneNumber ?? "null"));
-		UserEntity? sameEmail = await dbContext.Set<UserEntity>().AsNoTracking()
-			.FirstOrDefaultAsync(x => x.Email == (dto.Email ?? "null"));
-		if (sameUserName != null)
+		if (await dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.UserName == (dto.UserName ?? "null")) != null)
 			return new GenericResponse<UserEntity?>(
 				result: null,
 				status: UtilitiesStatusCodes.UserAlreadyExist,
 				message: $"{dto.UserName} is Already Taken"
 			);
-		if (samePhoneNumber != null)
+		if (await dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.PhoneNumber == (dto.PhoneNumber ?? "null")) != null)
 			return new GenericResponse<UserEntity?>(
 				result: null,
 				status: UtilitiesStatusCodes.UserAlreadyExist,
 				message: $"{dto.PhoneNumber} is Already Taken"
 			);
-		if (sameEmail != null)
+		if (await dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Email == (dto.Email ?? "null")) != null)
 			return new GenericResponse<UserEntity?>(
 				result: null,
 				status: UtilitiesStatusCodes.UserAlreadyExist,
@@ -244,7 +251,6 @@ public class UserRepository(
 			);
 
 		UserEntity user = new() {
-			Id = dto.Id,
 			Suspend = false,
 			CreatedAt = DateTime.UtcNow,
 			UpdatedAt = DateTime.UtcNow
@@ -417,7 +423,7 @@ public class UserRepository(
 
 		string newOtp = Random.Shared.Next(1000, 9999).ToString();
 		string? cachedData = await cache.GetStringAsync(userId);
-		if (cachedData.IsNullOrEmpty()) cache.SetStringData(userId, newOtp, TimeSpan.FromSeconds(120));
+		if (cachedData.IsNullOrEmpty()) cache.SetStringData(userId, newOtp, TimeSpan.FromMinutes(60));
 
 		UserEntity user = (await dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId || u.UserName == userId))!;
 
@@ -429,7 +435,7 @@ public class UserRepository(
 	private static (JwtSecurityToken, string) CreateToken(UserEntity user) => (new JwtSecurityToken(
 		issuer: "https://SinaMN75.com,BetterSoft1234",
 		audience: "https://SinaMN75.com,BetterSoft1234",
-		expires: DateTime.UtcNow.AddDays(365),
+		expires: DateTime.Now.AddMinutes(3),
 		claims: [
 			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
 			new Claim(JwtRegisteredClaimNames.Sub, user.Id),

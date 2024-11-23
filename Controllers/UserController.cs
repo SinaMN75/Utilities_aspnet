@@ -14,6 +14,9 @@ public class UserController(IUserRepository repository, IOutputCacheStore store)
 		await store.EvictByTagAsync("user", ct);
 		return Result(await repository.LoginWithPassword(dto));
 	}
+	
+	[HttpPost("RefreshToken")]
+	public async Task<ActionResult<GenericResponse>> RefreshToken(RefreshTokenDto dto) => Result(await repository.RefreshToken(dto));
 
 	[HttpPost("GetVerificationCodeForLogin")]
 	public async Task<ActionResult<GenericResponse<UserEntity>>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto, CancellationToken ct) {
