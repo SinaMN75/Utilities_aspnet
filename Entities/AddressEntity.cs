@@ -3,25 +3,25 @@
 [Table("Address")]
 public class AddressEntity : BaseEntity {
 	[MaxLength(50)]
-	public string ReceiverFullName { get; set; } = null!;
+	public required string ReceiverFullName { get; set; }
 
 	[MaxLength(20)]
-	public string ReceiverPhoneNumber { get; set; } = null!;
+	public required string ReceiverPhoneNumber { get; set; }
 
 	[MaxLength(100)]
-	public string Address { get; set; } = null!;
+	public required string Address { get; set; }
 
 	[MaxLength(10)]
-	public string Pelak { get; set; } = null!;
+	public required string Pelak { get; set; }
 
 	[MaxLength(10)]
-	public string Unit { get; set; } = null!;
+	public required string Unit { get; set; }
 
 	[MaxLength(20)]
-	public string PostalCode { get; set; } = null!;
+	public required string PostalCode { get; set; }
 
 	public UserEntity? User { get; set; }
-	public string? UserId { get; set; }
+	public required string UserId { get; set; }
 }
 
 public class AddressCreateDto {

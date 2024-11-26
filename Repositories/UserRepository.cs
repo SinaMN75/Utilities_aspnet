@@ -413,11 +413,11 @@ public class UserRepository(
 	}
 
 	private async Task<bool> SendOtp(string userId) {
-		if (await cache.GetStringAsync(userId) != null) return false;
+		string? cachedData = await cache.GetStringAsync(userId);
+		if (cachedData is not null) return false;
 
 		string newOtp = Random.Shared.Next(1000, 9999).ToString();
-		string? cachedData = await cache.GetStringAsync(userId);
-		if (cachedData.IsNullOrEmpty()) cache.SetStringData(userId, newOtp, TimeSpan.FromMinutes(60));
+		cache.SetStringData(userId, newOtp, TimeSpan.FromMinutes(60));
 
 		UserEntity user = (await dbContext.Set<UserEntity>().AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId || u.UserName == userId))!;
 
@@ -430,7 +430,7 @@ public class UserRepository(
 		return (new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(
 			issuer: "https://SinaMN75.com,BetterSoft1234",
 			audience: "https://SinaMN75.com,BetterSoft1234",
-			expires: DateTime.Now.AddMinutes(3),
+			expires: DateTime.Now.AddDays(365),
 			claims: [
 				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
 				new Claim(JwtRegisteredClaimNames.Sub, user.Id),
