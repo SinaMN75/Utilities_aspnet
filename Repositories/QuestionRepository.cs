@@ -47,6 +47,7 @@ public class QuestionRepository(DbContext dbContext) : IQuestionRepository {
 		}
 
 		await dbContext.AddRangeAsync(list);
+		await dbContext.SaveChangesAsync();
 		return new GenericResponse();
 	}
 
@@ -86,6 +87,8 @@ public class QuestionRepository(DbContext dbContext) : IQuestionRepository {
 			UserId = dto.UserId,
 			JsonDetail = new UserQuestionAnswerJsonDetail { UserQuestionAnswer = dto.UserQuestionAnswer }
 		});
+		
+		await dbContext.SaveChangesAsync();
 
 		return new GenericResponse<UserQuestionAnswerEntity>(e.Entity);
 	}
