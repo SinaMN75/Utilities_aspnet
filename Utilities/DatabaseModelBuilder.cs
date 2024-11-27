@@ -1,6 +1,6 @@
 namespace Utilities_aspnet.Utilities;
 
-public static class Seeder {
+public static class DatabaseModelBuilder {
 	public static void SetupModelBuilder(this ModelBuilder builder) {
 		builder.Entity<CategoryEntity>().OwnsOne(e => e.JsonDetail, b => b.ToJson());
 		builder.Entity<UserEntity>().OwnsOne(e => e.JsonDetail, b => {

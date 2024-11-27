@@ -6,13 +6,12 @@ public static class Redis {
 		string key,
 		string value,
 		TimeSpan? absoluteExpireTime = null,
-		TimeSpan? slidingExpireTime = null) {
-		DistributedCacheEntryOptions options = new() {
+		TimeSpan? slidingExpireTime = null
+	) {
+		cache.SetStringAsync(key, value, new DistributedCacheEntryOptions {
 			AbsoluteExpirationRelativeToNow = absoluteExpireTime ?? TimeSpan.FromSeconds(60),
 			SlidingExpiration = slidingExpireTime
-		};
-
-		cache.SetStringAsync(key, value, options);
+		});
 	}
 
 	public static Task<string?> GetStringData(this IDistributedCache cache, string recordId) => cache.GetStringAsync(recordId);

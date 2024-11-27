@@ -33,15 +33,14 @@ public class Encryption {
 		using Aes aes = Aes.Create();
 		aes.Key = key;
 		aes.IV = iv;
-		using (ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV))
-		using (MemoryStream ms = new()) {
-			using (CryptoStream cs = new(ms, encryptor, CryptoStreamMode.Write))
-			using (StreamWriter writer = new(cs)) {
-				writer.Write(plainText);
-			}
-
-			return Convert.ToBase64String(ms.ToArray());
+		using ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+		using MemoryStream ms = new();
+		using (CryptoStream cs = new(ms, encryptor, CryptoStreamMode.Write))
+		using (StreamWriter writer = new(cs)) {
+			writer.Write(plainText);
 		}
+
+		return Convert.ToBase64String(ms.ToArray());
 	}
 
 	public static string DecryptAes(string cipherText, byte[] key, byte[] iv) {

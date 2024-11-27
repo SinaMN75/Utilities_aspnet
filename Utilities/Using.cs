@@ -44,15 +44,13 @@ global using Newtonsoft.Json.Converters;
 global using Amazon.Runtime;
 global using Amazon.S3;
 global using Amazon.S3.Model;
-global using RestSharp;
-global using Swashbuckle.AspNetCore.SwaggerUI;
-global using OfficeOpenXml;
-global using ClosedXML.Excel;
 global using OpenTelemetry.Logs;
 global using OpenTelemetry.Metrics;
 global using OpenTelemetry.Resources;
 global using OpenTelemetry.Trace;
-global using StackExchange.Redis;
-
+global using RestSharp;
+global using Swashbuckle.AspNetCore.SwaggerUI;
+global using OfficeOpenXml;
+global using ClosedXML.Excel;
 
 #endregion
