@@ -13,15 +13,11 @@ public interface IQuestionRepository {
 
 public class QuestionRepository(DbContext dbContext) : IQuestionRepository {
 	public async Task<GenericResponse<QuestionEntity>> Create(QuestionCreateDto dto) {
-		List<CategoryEntity> categories = [];
-		foreach (Guid item in dto.Categories)
-			categories.Add((await dbContext.Set<CategoryEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == item))!);
-
 		EntityEntry<QuestionEntity> i = await dbContext.AddAsync(new QuestionEntity {
 			Tags = dto.Tags,
 			CreatedAt = DateTime.Now,
 			UpdatedAt = DateTime.Now,
-			Categories = categories,
+			CategoryId = dto.CategoryId,
 			JsonDetail = new QuestionJsonDetail { Question = dto.Question, Answers = dto.Answers }
 		});
 
@@ -30,10 +26,6 @@ public class QuestionRepository(DbContext dbContext) : IQuestionRepository {
 	}
 
 	public async Task<GenericResponse> BulkCreate(List<QuestionCreateDto> dto) {
-		List<CategoryEntity> categories = [];
-		foreach (Guid item in dto.First().Categories)
-			categories.Add((await dbContext.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == item))!);
-
 		List<QuestionEntity> list = [];
 		
 		foreach (QuestionCreateDto i in dto) {
@@ -41,7 +33,7 @@ public class QuestionRepository(DbContext dbContext) : IQuestionRepository {
 				Tags = i.Tags,
 				CreatedAt = DateTime.Now,
 				UpdatedAt = DateTime.Now,
-				Categories = categories,
+				CategoryId = i.CategoryId,
 				JsonDetail = new QuestionJsonDetail { Question = i.Question, Answers = i.Answers }
 			});
 		}
@@ -52,10 +44,10 @@ public class QuestionRepository(DbContext dbContext) : IQuestionRepository {
 	}
 
 	public async Task<GenericResponse<IEnumerable<QuestionEntity>>> Filter(QuestionFilterDto dto) {
-		IQueryable<QuestionEntity> q = dbContext.Set<QuestionEntity>().Include(x => x.Categories);
+		IQueryable<QuestionEntity> q = dbContext.Set<QuestionEntity>().Include(x => x.Category);
 
-		if (dto.Categories.IsNotNullOrEmpty()) q = q.Where(x => x.Categories!.Any(y => dto.Categories!.ToList().Contains(y.Id)));
-		if (dto.Tags is not null) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
+		if (dto.CategoryId is not null) q = q.Where(x => x.CategoryId == dto.CategoryId);
+		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
 
 		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize).AsNoTracking();
