@@ -21,6 +21,7 @@ public class QuestionJsonDetail {
 }
 
 public class UserQuestionAnswerJsonDetail {
+	public string? Title { get; set; }
 	public List<UserQuestionAnswerJson> UserQuestionAnswer { get; set; } = [];
 }
 
@@ -34,6 +35,7 @@ public class UserQuestionAnswerJson {
 	public required string Question { get; set; }
 	public required string Answer { get; set; }
 	public required string Hint { get; set; }
+	public required string Title { get; set; }
 	public required int Point { get; set; }
 }
 
