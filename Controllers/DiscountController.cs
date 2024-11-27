@@ -8,7 +8,7 @@ public class DiscountController(IDiscountRepository repository) : BaseApiControl
 	public async Task<ActionResult<GenericResponse<DiscountEntity>>> Create(DiscountCreateDto dto) => Result(await repository.Create(dto));
 
 	[HttpPost("Filter")]
-	public ActionResult<GenericResponse<IEnumerable<DiscountEntity>>> Filter(DiscountFilterDto dto) => Result(repository.Filter(dto));
+	public async Task<ActionResult<GenericResponse<IEnumerable<DiscountEntity>>>> Filter(DiscountFilterDto dto) => Result(await repository.Filter(dto));
 
 	[HttpPut]
 	public async Task<ActionResult<GenericResponse<DiscountEntity>>> Update(DiscountUpdateDto dto) => Result(await repository.Update(dto));

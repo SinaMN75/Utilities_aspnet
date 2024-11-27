@@ -4,7 +4,7 @@ public interface ICommentRepository {
 	Task<GenericResponse<CommentEntity?>> Create(CommentCreateUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse> AddReactionToComment(Guid commentId, Reaction reaction, CancellationToken ct);
 	Task<GenericResponse<CommentEntity?>> ReadById(Guid id);
-	Task<GenericResponse<IQueryable<CommentEntity>?>> Filter(CommentFilterDto dto);
+	Task<GenericResponse<IQueryable<CommentEntity>>> Filter(CommentFilterDto dto);
 	Task<GenericResponse<CommentEntity?>> Update(Guid id, CommentCreateUpdateDto dto, CancellationToken ct);
 	Task<GenericResponse> Delete(Guid id, CancellationToken ct);
 }
@@ -19,7 +19,7 @@ public class CommentRepository(
 	: ICommentRepository {
 	private readonly string? _userId = httpContextAccessor.HttpContext!.User.Identity!.Name;
 
-	public async Task<GenericResponse<IQueryable<CommentEntity>?>> Filter(CommentFilterDto dto) {
+	public async Task<GenericResponse<IQueryable<CommentEntity>>> Filter(CommentFilterDto dto) {
 		IQueryable<CommentEntity> q = dbContext.Set<CommentEntity>().AsNoTracking().Where(x => x.ParentId == null);
 
 		if (dto.ProductId is not null) q = q.Where(x => x.ProductId == dto.ProductId);
@@ -36,16 +36,9 @@ public class CommentRepository(
 			.Include(x => x.Children)!.ThenInclude(x => x.User).ThenInclude(x => x!.Media)
 			.OrderByDescending(x => x.CreatedAt);
 
-		int totalCount = await dbContext.Set<CommentEntity>().AsNoTracking().Where(x => x.ProductId == dto.ProductId).CountAsync();
-		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
-
-		return new GenericResponse<IQueryable<CommentEntity>?>(q) {
-			TotalCount = totalCount,
-			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
-			PageSize = dto.PageSize
-		};
+		return await q.Paginate(dto);
 	}
-
+	
 	public async Task<GenericResponse<CommentEntity?>> ReadById(Guid id) {
 		CommentEntity? comment = await dbContext.Set<CommentEntity>()
 			.Include(x => x.User).ThenInclude(x => x!.Media)
