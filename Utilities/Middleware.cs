@@ -66,13 +66,18 @@ public class RequestResponseLoggingMiddleware(RequestDelegate next, ILogger<Requ
 		string res = await new StreamReader(context.Response.Body).ReadToEndAsync();
 		context.Response.Body.Seek(0, SeekOrigin.Begin);
 
-		bool isSuccessful = context.Response.StatusCode is >= 200 and <= 299;
+		LogLevel logLevel = context.Response.StatusCode switch {
+			>= 200 and <= 299 => LogLevel.Information,
+			>= 400 and <= 499 => LogLevel.Error,
+			>= 500 and <= 900 => LogLevel.Critical,
+			_ => LogLevel.Information
+		};
 
 		stopwatch.Stop();
 		logger.Log(
-			isSuccessful ? LogLevel.Information : LogLevel.Critical,
+			logLevel,
 			$"""
-			 {stopwatch.ElapsedMilliseconds} {context.Request.Method} {context.Request.Path} {context.Response.StatusCode}
+			 {stopwatch.ElapsedMilliseconds} {DateTime.UtcNow.ToLongTimeString()} {context.Request.Method} {context.Request.Path} {context.Response.StatusCode}
 			 {context.Request.Headers.ToJsonObject()}
 			 {req}
 			 {res}
