@@ -26,6 +26,8 @@ public static class EnumerableExtension {
 	public static bool IsNotNullOrEmpty<T>(this IEnumerable<T>? list) => list != null && list.Any();
 
 	public static bool IsNotNull<T>(this IEnumerable<T>? list) => list != null;
+	
+	public static bool IsNullOrEmpty<T>(this IEnumerable<T>? list) => list == null || list.Any();
 
 	public static async Task<GenericResponse<IQueryable<T>>> Paginate<T>(this IQueryable<T> q, BaseFilterDto dto) where T : BaseEntity {
 		int totalCount = await q.CountAsync();
