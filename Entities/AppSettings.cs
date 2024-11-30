@@ -17,7 +17,7 @@ public class AppSettings {
 	public string? IosDownloadLink1 { get; set; }
 	public string? IosDownloadLink2 { get; set; }
 
-	public static void Initialize(IConfiguration configuration) => 
+	public static void Initialize(IConfiguration configuration) =>
 		Settings = configuration.GetSection("AppSettings").Get<AppSettings>()!;
 }
 

@@ -21,7 +21,7 @@ public class ProductV2Controller(IProductRepository repository, IOutputCacheStor
 	[Authorize]
 	[AllowAnonymous]
 	[HttpGet("{id:guid}")]
-	public async Task<ActionResult<GenericResponse<ProductEntity>>> ReadById(Guid id, CancellationToken ct) => 
+	public async Task<ActionResult<GenericResponse<ProductEntity>>> ReadById(Guid id, CancellationToken ct) =>
 		Result(await repository.ReadById(id, ct));
 
 	[HttpPut]

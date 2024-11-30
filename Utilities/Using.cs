@@ -30,7 +30,6 @@ global using Microsoft.AspNetCore.Hosting;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.RateLimiting;
 global using Microsoft.Extensions.Caching.Distributed;
-global using Microsoft.Extensions.Hosting;
 global using Microsoft.AspNetCore.OutputCaching;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.AspNetCore.Mvc.Filters;
@@ -52,5 +51,6 @@ global using RestSharp;
 global using Swashbuckle.AspNetCore.SwaggerUI;
 global using OfficeOpenXml;
 global using ClosedXML.Excel;
+global using System.Security.Cryptography;
 
 #endregion

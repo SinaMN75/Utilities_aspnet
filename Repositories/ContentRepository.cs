@@ -56,7 +56,7 @@ public class ContentRepository(DbContext context, IMediaRepository mediaReposito
 			})
 		}).AsNoTracking());
 
-	public async Task<GenericResponse<ContentEntity?>> Update(ContentUpdateDto dto, CancellationToken ct) {
+	public async Task<GenericResponse<ContentEntity>> Update(ContentUpdateDto dto, CancellationToken ct) {
 		ContentEntity e = (await context.Set<ContentEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id, ct))!;
 		e.UpdatedAt = DateTime.UtcNow;
 		if (dto.Title is not null) e.Title = dto.Title;
@@ -84,7 +84,7 @@ public class ContentRepository(DbContext context, IMediaRepository mediaReposito
 
 		context.Update(e);
 		await context.SaveChangesAsync(ct);
-		return new GenericResponse<ContentEntity?>(e);
+		return new GenericResponse<ContentEntity>(e);
 	}
 
 	public async Task<GenericResponse> Delete(Guid id, CancellationToken ct) {

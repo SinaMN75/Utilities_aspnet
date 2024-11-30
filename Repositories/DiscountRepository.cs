@@ -47,7 +47,7 @@ public class DiscountRepository(DbContext dbContext) : IDiscountRepository {
 	public async Task<GenericResponse<DiscountEntity?>> Update(DiscountUpdateDto dto) {
 		DiscountEntity? e = await dbContext.Set<DiscountEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id);
 		if (e == null) return new GenericResponse<DiscountEntity?>(null, UtilitiesStatusCodes.NotFound);
-		
+
 		if (dto.Title is not null) e.Title = dto.Title;
 		if (dto.NumberUses is not null) e.NumberUses = dto.NumberUses.Value;
 		if (dto.Code is not null) e.Code = dto.Code;

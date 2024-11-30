@@ -1,13 +1,10 @@
-using System.Security.Cryptography;
-using System.Text;
-
 namespace Utilities_aspnet.Utilities;
 
 public class Encryption {
 	[Obsolete("Obsolete")]
 	private void Example() {
-		byte[] aesKey = new byte[32]; // 256-bit key for AES  
-		byte[] aesIv = new byte[16]; // 128-bit IV for AES  
+		byte[] aesKey = new byte[32];
+		byte[] aesIv = new byte[16];
 		new RNGCryptoServiceProvider().GetBytes(aesKey);
 		new RNGCryptoServiceProvider().GetBytes(aesIv);
 
@@ -17,7 +14,6 @@ public class Encryption {
 		Console.WriteLine($"Decrypted: {decrypted}");
 	}
 
-	// Base64 Encryption/Decryption  
 	public static string Base64Encode(string plainText) {
 		byte[] plainTextBytes = Encoding.UTF8.GetBytes(plainText);
 		return Convert.ToBase64String(plainTextBytes);
@@ -28,7 +24,6 @@ public class Encryption {
 		return Encoding.UTF8.GetString(base64EncodedBytes);
 	}
 
-	// AES Encryption/Decryption  
 	public static string EncryptAes(string plainText, byte[] key, byte[] iv) {
 		using Aes aes = Aes.Create();
 		aes.Key = key;
@@ -47,12 +42,11 @@ public class Encryption {
 		using Aes aes = Aes.Create();
 		aes.Key = key;
 		aes.IV = iv;
-		using (ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV))
-		using (MemoryStream ms = new(Convert.FromBase64String(cipherText)))
-		using (CryptoStream cs = new(ms, decryptor, CryptoStreamMode.Read))
-		using (StreamReader reader = new(cs)) {
-			return reader.ReadToEnd();
-		}
+		using ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+		using MemoryStream ms = new(Convert.FromBase64String(cipherText));
+		using CryptoStream cs = new(ms, decryptor, CryptoStreamMode.Read);
+		using StreamReader reader = new(cs);
+		return reader.ReadToEnd();
 	}
 
 	// RSA Encryption/Decryption  

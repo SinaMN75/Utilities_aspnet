@@ -25,14 +25,14 @@ public class OrderController(IOrderRepository repository) : BaseApiController {
 	[Authorize]
 	public async Task<ActionResult<GenericResponse<OrderEntity>>> CreateUpdateOrderDetail(OrderDetailCreateUpdateDto dto) =>
 		Result(await repository.CreateUpdateOrderDetail(dto));
-	
+
 	[HttpPost("CreateReservationOrder")]
 	[Authorize]
 	public async Task<ActionResult<GenericResponse<OrderEntity>>> CreateReservationOrder(ReserveCreateUpdateDto dto) =>
-		Result(await repository.CreateReservationOrder(dto));		
-	
+		Result(await repository.CreateReservationOrder(dto));
+
 	[HttpPost("CreateChairReservationOrder")]
 	[Authorize]
 	public async Task<ActionResult<GenericResponse<OrderEntity>>> CreateChairReservationOrder(ReserveChairCreateUpdateDto dto) =>
-		Result(await repository.CreateChairReservationOrder(dto));	
+		Result(await repository.CreateChairReservationOrder(dto));
 }

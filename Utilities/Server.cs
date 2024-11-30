@@ -1,5 +1,4 @@
-﻿
-namespace Utilities_aspnet.Utilities;
+﻿namespace Utilities_aspnet.Utilities;
 
 public class Server {
 	private static IHttpContextAccessor? _httpContextAccessor;

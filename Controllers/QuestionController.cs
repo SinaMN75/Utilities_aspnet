@@ -8,7 +8,7 @@ public class QuestionController(IQuestionRepository repository) : BaseApiControl
 	public async Task<ActionResult<GenericResponse<QuestionEntity>>> Create(QuestionCreateDto dto) => Result(await repository.Create(dto));
 
 	[HttpPost("BulkCreate")]
-	public async Task<ActionResult<GenericResponse<QuestionEntity>>> BulkCreate(List<QuestionCreateDto> dto) => 
+	public async Task<ActionResult<GenericResponse<QuestionEntity>>> BulkCreate(List<QuestionCreateDto> dto) =>
 		Result(await repository.BulkCreate(dto));
 
 	[HttpPost("Filter")]
@@ -19,14 +19,12 @@ public class QuestionController(IQuestionRepository repository) : BaseApiControl
 
 	[HttpDelete("{id:guid}")]
 	public async Task<IActionResult> Delete(Guid id) => Result(await repository.Delete(id));
-	
+
 	[HttpPost("UserAnswer")]
-	public async Task<ActionResult<GenericResponse<QuestionEntity>>> CreateUserAnswer(UserQuestionAnswerCreateDto dto) => 
+	public async Task<ActionResult<GenericResponse<QuestionEntity>>> CreateUserAnswer(UserQuestionAnswerCreateDto dto) =>
 		Result(await repository.CreateUserQuestionAnswer(dto));
-	
+
 	[HttpPost("FilterUserAnswer")]
 	public async Task<ActionResult<GenericResponse<IEnumerable<UserQuestionAnswerEntity>>>> Filter(UserQuestionAnswerFilterDto dto) =>
 		Result(await repository.FilterUserQuestionAnswer(dto));
-
-
 }

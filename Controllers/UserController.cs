@@ -14,7 +14,7 @@ public class UserController(IUserRepository repository, IOutputCacheStore store)
 		await store.EvictByTagAsync("user", ct);
 		return Result(await repository.LoginWithPassword(dto));
 	}
-	
+
 	[HttpPost("RefreshToken")]
 	public async Task<ActionResult<GenericResponse>> RefreshToken(RefreshTokenDto dto) => Result(await repository.RefreshToken(dto));
 
@@ -65,7 +65,7 @@ public class UserController(IUserRepository repository, IOutputCacheStore store)
 		await store.EvictByTagAsync("user", ct);
 		return Result(await repository.Update(dto));
 	}
-	
+
 	[HttpPost("Subscribe")]
 	public async Task<ActionResult<GenericResponse>> Subscribe(string userId, Guid contentId, string transactionRefId, CancellationToken ct) {
 		await store.EvictByTagAsync("user", ct);

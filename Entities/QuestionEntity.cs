@@ -49,7 +49,7 @@ public class QuestionCreateDto {
 
 public class UserQuestionAnswerCreateDto {
 	public required string UserId { get; set; }
-	public required List<UserQuestionAnswerJson> UserQuestionAnswer { get; set; } 
+	public required List<UserQuestionAnswerJson> UserQuestionAnswer { get; set; }
 }
 
 public class QuestionUpdateDto {

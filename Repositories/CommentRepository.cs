@@ -38,7 +38,7 @@ public class CommentRepository(
 
 		return await q.Paginate(dto);
 	}
-	
+
 	public async Task<GenericResponse<CommentEntity?>> ReadById(Guid id) {
 		CommentEntity? comment = await dbContext.Set<CommentEntity>()
 			.Include(x => x.User).ThenInclude(x => x!.Media)
@@ -59,7 +59,7 @@ public class CommentRepository(
 	public async Task<GenericResponse<CommentEntity?>> Create(CommentCreateUpdateDto dto, CancellationToken ct) {
 		DateTime yesterday = DateTime.Now.Subtract(TimeSpan.FromDays(1));
 		int commentsToday = await dbContext.Set<CommentEntity>()
-		.Where(x => x.UserId == _userId && x.CreatedAt >= yesterday)
+			.Where(x => x.UserId == _userId && x.CreatedAt >= yesterday)
 			.AsNoTracking()
 			.CountAsync(ct);
 		if (commentsToday >= 30) return new GenericResponse<CommentEntity?>(null, UtilitiesStatusCodes.Overused);

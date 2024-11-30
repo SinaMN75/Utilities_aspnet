@@ -183,7 +183,7 @@ public class UserRepository(
 
 		if (dto.UserIds.IsNotNullOrEmpty()) q = q.Where(x => dto.UserIds!.Contains(x.Id));
 		if (dto.PhoneNumbers.IsNotNullOrEmpty()) q = q.Where(x => dto.PhoneNumbers!.Contains(x.PhoneNumber));
-		if (dto.UserName.IsNotNullOrEmpty()) q = q.Where(x => (x.UserName!).Contains(dto.UserName!, StringComparison.CurrentCultureIgnoreCase));
+		if (dto.UserName.IsNotNullOrEmpty()) q = q.Where(x => x.UserName!.Contains(dto.UserName!, StringComparison.CurrentCultureIgnoreCase));
 		if (dto.ShowSuspend.IsTrue()) q = q.Where(x => x.Suspend == true);
 
 		if (dto.OrderByCreatedAt.IsTrue()) q = q.OrderBy(x => x.CreatedAt);
@@ -437,7 +437,7 @@ public class UserRepository(
 				new Claim(ClaimTypes.NameIdentifier, user.Id),
 				new Claim(ClaimTypes.Name, user.Id),
 				new Claim(ClaimTypes.Email, user.Email ?? user.Id),
-				new Claim(ClaimTypes.MobilePhone, user.PhoneNumber ?? user.Id),
+				new Claim(ClaimTypes.MobilePhone, user.PhoneNumber ?? user.Id)
 			],
 			signingCredentials: new SigningCredentials(
 				new SymmetricSecurityKey("https://SinaMN75.com,BetterSoft1234"u8.ToArray()),

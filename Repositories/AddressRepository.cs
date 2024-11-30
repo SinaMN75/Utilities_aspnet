@@ -57,7 +57,7 @@ public class AddressRepository(DbContext context) : IAddressRepository {
 			PostalCode = x.PostalCode,
 			UserId = x.UserId
 		});
-		
+
 		if (dto.UserId is not null) q = q.Where(o => o.UserId == dto.UserId);
 
 		int totalCount = await q.CountAsync();

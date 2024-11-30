@@ -26,7 +26,7 @@ public static class EnumerableExtension {
 	public static bool IsNotNullOrEmpty<T>(this IEnumerable<T>? list) => list != null && list.Any();
 
 	public static bool IsNotNull<T>(this IEnumerable<T>? list) => list != null;
-	
+
 	public static bool IsNullOrEmpty<T>(this IEnumerable<T>? list) => list == null || list.Any();
 
 	public static async Task<GenericResponse<IQueryable<T>>> Paginate<T>(this IQueryable<T> q, BaseFilterDto dto) where T : BaseEntity {
@@ -51,7 +51,7 @@ public static class StringExtension {
 			Formatting = Formatting.Indented,
 			ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
 			PreserveReferencesHandling = PreserveReferencesHandling.None,
-			NullValueHandling = NullValueHandling.Ignore,
+			NullValueHandling = NullValueHandling.Ignore
 		});
 }
 

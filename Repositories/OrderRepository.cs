@@ -24,7 +24,7 @@ public class OrderRepository(DbContext dbContext, IHttpContextAccessor httpConte
 		e.AddressId = dto.AddressId ?? e.AddressId;
 		e.JsonDetail.RefCode = dto.RefCode ?? e.JsonDetail.RefCode;
 		e.UpdatedAt = DateTime.UtcNow;
-		
+
 		await dbContext.SaveChangesAsync();
 
 		return new GenericResponse<OrderEntity?>(e);

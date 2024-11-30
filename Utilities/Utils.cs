@@ -15,7 +15,7 @@ public static class StartupExtension {
 	public static void UseUtilitiesServices(this WebApplication app, bool log = false) {
 		if (log) app.UseMiddleware<RequestResponseLoggingMiddleware>();
 		app.UseCors(option => option.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-		app.UseMiddleware<ApiKeyMiddleware>();  
+		app.UseMiddleware<ApiKeyMiddleware>();
 		app.UseRateLimiter();
 		app.UseOutputCache();
 		app.UseDeveloperExceptionPage();
@@ -98,7 +98,7 @@ public static class StartupExtension {
 		builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 	}
 
-	private static void AddUtilitiesSwagger(this IHostApplicationBuilder builder) {
+	private static void AddUtilitiesSwagger(this WebApplicationBuilder builder) {
 		builder.Services.AddEndpointsApiExplorer();
 		builder.Services.AddSwaggerGen(c => {
 			c.UseInlineDefinitionsForEnums();
@@ -141,7 +141,7 @@ public static class StartupExtension {
 		}));
 	}
 
-	private static void AddOpenTelemetry(this IHostApplicationBuilder builder) {
+	private static void AddOpenTelemetry(this WebApplicationBuilder builder) {
 		builder.Services.AddOpenTelemetry()
 			.ConfigureResource(res => res.AddService("sinamn75api"))
 			.WithMetrics(x => {
@@ -156,7 +156,7 @@ public static class StartupExtension {
 		builder.Logging.AddOpenTelemetry(o => o.AddOtlpExporter());
 	}
 
-	private static void AddUtilitiesIdentity(this IHostApplicationBuilder builder) {
+	private static void AddUtilitiesIdentity(this WebApplicationBuilder builder) {
 		builder.Services.AddAuthentication(options => {
 			options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
 			options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;

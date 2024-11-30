@@ -18,7 +18,7 @@ public class TransactionEntity : BaseEntity {
 
 	[MaxLength(100)]
 	public List<TagTransaction> Tags { get; set; } = [];
-	
+
 	public UserEntity? Buyer { get; set; }
 
 	[ForeignKey(nameof(Buyer))]
@@ -28,7 +28,7 @@ public class TransactionEntity : BaseEntity {
 
 	[ForeignKey(nameof(Seller))]
 	public string? SellerId { get; set; }
-	
+
 	public OrderEntity? Order { get; set; }
 	public Guid? OrderId { get; set; }
 }

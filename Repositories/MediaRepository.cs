@@ -17,7 +17,7 @@ public class MediaRepository(
 		List<MediaEntity> medias = [];
 
 		if (model.File is not null) {
-			List<string> allowedExtensions = [".png", ".gif", ".jpg", ".jpeg",".svg", ".mp4",".mov", ".mp3", ".pdf", ".aac", ".apk", ".zip", ".rar", ".mkv"];
+			List<string> allowedExtensions = [".png", ".gif", ".jpg", ".jpeg", ".svg", ".mp4", ".mov", ".mp3", ".pdf", ".aac", ".apk", ".zip", ".rar", ".mkv"];
 			if (!allowedExtensions.Contains(Path.GetExtension(model.File!.FileName.ToLower())))
 				return new GenericResponse<IEnumerable<MediaEntity>?>(null, UtilitiesStatusCodes.BadRequest);
 
@@ -121,7 +121,7 @@ public class MediaRepository(
 			File.Delete(Path.Combine(env.WebRootPath, "Medias", media.FileName!));
 		}
 		catch (Exception) { }
-		
+
 		AmazonS3Settings amazonS3Settings = AppSettings.Settings.AmazonS3Settings;
 		if (amazonS3Settings.UseS3 ?? false)
 			await amazonS3Repository.DeleteObject(amazonS3Settings.DefaultBucket!, media.FileName!);
@@ -175,7 +175,7 @@ public class MediaRepository(
 
 		await using FileStream stream = new(path, FileMode.Create);
 		await image.CopyToAsync(stream);
-		
+
 		return path;
 	}
 }

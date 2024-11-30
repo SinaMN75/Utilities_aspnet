@@ -8,7 +8,7 @@ public class CommentEntity : BaseEntity {
 
 	[MaxLength(2000)]
 	public string? Comment { get; set; }
-	
+
 	public Guid? ParentId { get; set; }
 	public CommentEntity? Parent { get; set; }
 
@@ -27,9 +27,9 @@ public class CommentEntity : BaseEntity {
 	public IEnumerable<CommentEntity>? Children { get; set; }
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
-	
+
 	public IEnumerable<ReportEntity>? Reports { get; set; }
-	
+
 	public IEnumerable<NotificationEntity>? Notifications { get; set; }
 }
 

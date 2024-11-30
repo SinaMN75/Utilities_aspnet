@@ -6,7 +6,7 @@ public interface IQuestionRepository {
 	Task<GenericResponse<IEnumerable<QuestionEntity>>> Filter(QuestionFilterDto dto);
 	Task<GenericResponse<QuestionEntity?>> Update(QuestionUpdateDto dto);
 	Task<GenericResponse> Delete(Guid id);
-	
+
 	Task<GenericResponse<UserQuestionAnswerEntity>> CreateUserQuestionAnswer(UserQuestionAnswerCreateDto dto);
 	Task<GenericResponse<IEnumerable<UserQuestionAnswerEntity>>> FilterUserQuestionAnswer(UserQuestionAnswerFilterDto dto);
 }
@@ -27,7 +27,7 @@ public class QuestionRepository(DbContext dbContext) : IQuestionRepository {
 
 	public async Task<GenericResponse> BulkCreate(List<QuestionCreateDto> dto) {
 		List<QuestionEntity> list = [];
-		
+
 		foreach (QuestionCreateDto i in dto) {
 			list.Add(new QuestionEntity {
 				Tags = i.Tags,
@@ -79,7 +79,7 @@ public class QuestionRepository(DbContext dbContext) : IQuestionRepository {
 			UserId = dto.UserId,
 			JsonDetail = new UserQuestionAnswerJsonDetail { UserQuestionAnswer = dto.UserQuestionAnswer }
 		});
-		
+
 		await dbContext.SaveChangesAsync();
 
 		return new GenericResponse<UserQuestionAnswerEntity>(e.Entity);

@@ -117,7 +117,7 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 		await context.SaveChangesAsync(ct);
 		return new GenericResponse();
 	}
-	
+
 	public async Task<GenericResponse<CategoryEntity?>> Update(CategoryUpdateDto dto, CancellationToken ct) {
 		CategoryEntity entity = (await context.Set<CategoryEntity>().FirstOrDefaultAsync(x => x.Id == dto.Id, ct))!;
 		entity.UpdatedAt = DateTime.UtcNow;

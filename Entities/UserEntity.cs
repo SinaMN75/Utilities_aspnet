@@ -62,7 +62,7 @@ public class UserEntity {
 
 	[NotMapped]
 	public string? Token { get; set; }
-	
+
 	[NotMapped]
 	public string? RefreshToken { get; set; }
 }

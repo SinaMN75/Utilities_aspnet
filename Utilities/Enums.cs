@@ -399,7 +399,7 @@ public enum TagUser {
 	AdminCommentRead = 314,
 	AdminQuestionRead = 315,
 	AdminQuestionUpdate = 316,
-	AdminSuper = 399,
+	AdminSuper = 399
 }
 
 public enum TagReservationChair {

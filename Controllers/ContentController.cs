@@ -3,7 +3,6 @@ namespace Utilities_aspnet.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 public class ContentController(IContentRepository repository, IOutputCacheStore store) : BaseApiController {
-	
 	[OutputCache(PolicyName = "default", Tags = ["content"])]
 	[HttpGet]
 	public ActionResult<GenericResponse<IQueryable<ContentEntity>>> Read() {

@@ -31,10 +31,10 @@ public class ProductEntity : BaseEntity {
 	public long? Price1 { get; set; }
 	public long? Price2 { get; set; }
 	public Currency? Currency { get; set; }
-	
+
 	public ProductEntity? Parent { get; set; }
 	public Guid? ParentId { get; set; }
-	
+
 	public DateTime? StartDate { get; set; }
 	public DateTime? EndDate { get; set; }
 	public DateTime? ExpireDate { get; set; }
@@ -43,10 +43,10 @@ public class ProductEntity : BaseEntity {
 
 	[MaxLength(100)]
 	public List<TagProduct> Tags { get; set; } = [];
-	
+
 	public string? UserId { get; set; }
 	public UserEntity? User { get; set; }
-	
+
 	[InverseProperty("Parent")]
 	public IEnumerable<ProductEntity>? Children { get; set; }
 

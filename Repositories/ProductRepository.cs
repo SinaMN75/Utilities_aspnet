@@ -116,20 +116,20 @@ public class ProductRepository(
 			.FirstOrDefaultAsync(i => i.Id == id, ct);
 		if (i == null) return new GenericResponse<ProductEntity?>(null, UtilitiesStatusCodes.NotFound);
 
-		if (_userId.IsNotNullOrEmpty()) {
-			if (i.JsonDetail.VisitCounts.IsNullOrEmpty()) i.JsonDetail.VisitCounts = [new VisitCount { UserId = _userId ?? "", Count = 1 }];
-			else {
-				if (i.JsonDetail.VisitCounts!.Any(x => x.UserId == _userId)) {
-					i.JsonDetail.VisitCounts!.First(x => x.UserId == _userId).Count += 1;
-				}
-				else {
-					i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId, Count = 1 });
-				}
-			}
+		if (!_userId.IsNotNullOrEmpty()) return new GenericResponse<ProductEntity?>(i);
 
-			dbContext.Update(i);
-			await dbContext.SaveChangesAsync(ct);
+		if (i.JsonDetail.VisitCounts.IsNullOrEmpty()) i.JsonDetail.VisitCounts = [new VisitCount { UserId = _userId ?? "", Count = 1 }];
+		else {
+			if (i.JsonDetail.VisitCounts!.Any(x => x.UserId == _userId)) {
+				i.JsonDetail.VisitCounts!.First(x => x.UserId == _userId).Count += 1;
+			}
+			else {
+				i.JsonDetail.VisitCounts!.Add(new VisitCount { UserId = _userId, Count = 1 });
+			}
 		}
+
+		dbContext.Update(i);
+		await dbContext.SaveChangesAsync(ct);
 
 		return new GenericResponse<ProductEntity?>(i);
 	}
