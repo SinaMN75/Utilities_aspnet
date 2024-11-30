@@ -2,8 +2,7 @@ namespace Utilities_aspnet.Entities;
 
 public class BaseEntity {
 	[Key]
-	[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-	public Guid Id { get; set; }
+	public Guid Id { get; set; } = Guid.CreateVersion7();
 
 	public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 	public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
