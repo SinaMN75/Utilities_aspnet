@@ -129,6 +129,7 @@ public static class StartupExtension {
 			y.Cache();
 			y.SetVaryByHeader("*");
 			y.SetVaryByQuery("*");
+			y.Expire(TimeSpan.FromHours(1));
 			y.AddPolicy<CustomCachePolicy>().VaryByValue(context => {
 					context.Request.EnableBuffering();
 					using StreamReader reader = new(context.Request.Body, leaveOpen: true);
