@@ -139,7 +139,7 @@ public static class StartupExtension {
 					return keyVal;
 				}
 			);
-		}));
+		})).AddStackExchangeRedisOutputCache(x => x.Configuration = builder.Configuration.GetConnectionString("Redis"));
 	}
 
 	private static void AddOpenTelemetry(this WebApplicationBuilder builder) {
