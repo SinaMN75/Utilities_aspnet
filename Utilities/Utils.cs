@@ -1,4 +1,6 @@
-﻿namespace Utilities_aspnet.Utilities;
+﻿using Scalar.AspNetCore;
+
+namespace Utilities_aspnet.Utilities;
 
 public static class StartupExtension {
 	public static void SetupUtilities<T>(
@@ -7,6 +9,7 @@ public static class StartupExtension {
 	) where T : DbContext {
 		builder.AddUtilitiesServices<T>();
 		builder.AddUtilitiesSwagger();
+		builder.AddUtilitiesOpenApi();
 		builder.AddUtilitiesIdentity();
 		builder.AddUtilitiesOutputCache();
 		if (addOpenTelemetry) builder.AddOpenTelemetry();
@@ -21,6 +24,8 @@ public static class StartupExtension {
 		app.UseDeveloperExceptionPage();
 		app.UseUtilitiesSwagger();
 		app.UseStaticFiles();
+		app.MapOpenApi();
+		app.MapScalarApiReference();
 		app.Use(async (context, next) => {
 			await next();
 			if (context.Response.StatusCode == 401)
@@ -122,6 +127,10 @@ public static class StartupExtension {
 				{ new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "apiKey" } }, Array.Empty<string>() }
 			});
 		});
+	}
+	
+	private static void AddUtilitiesOpenApi(this WebApplicationBuilder builder) {
+		builder.Services.AddOpenApi();
 	}
 
 	private static void AddUtilitiesOutputCache(this WebApplicationBuilder builder) {
