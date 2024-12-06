@@ -3,7 +3,7 @@
 public interface IUserRepository {
 	Task<GenericResponse<UserEntity?>> RefreshToken(RefreshTokenDto dto);
 	Task<GenericResponse<UserEntity?>> Create(UserCreateUpdateDto dto);
-	Task<GenericResponse<IQueryable<UserEntity>>> Filter(UserFilterDto dto);
+	Task<GenericResponse<IEnumerable<UserEntity>>> Filter(UserFilterDto dto);
 	Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, (string, string)? tokenRefreshToken = null);
 	Task<GenericResponse<UserEntity>> Update(UserCreateUpdateDto dto);
 	Task<GenericResponse> Delete(string id, CancellationToken ct);
@@ -108,7 +108,7 @@ public class UserRepository(
 		return new GenericResponse<UserEntity>(entity);
 	}
 
-	public async Task<GenericResponse<IQueryable<UserEntity>>> Filter(UserFilterDto dto) {
+	public async Task<GenericResponse<IEnumerable<UserEntity>>> Filter(UserFilterDto dto) {
 		IQueryable<UserEntity> q = dbContext.Set<UserEntity>().AsNoTracking().Select(x => new UserEntity {
 			Id = x.Id,
 			FirstName = x.FirstName,
@@ -192,7 +192,7 @@ public class UserRepository(
 		int totalCount = await q.CountAsync();
 		q = q.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize);
 
-		return new GenericResponse<IQueryable<UserEntity>>(q.AsSingleQuery()) {
+		return new GenericResponse<IEnumerable<UserEntity>>(q.AsSingleQuery()) {
 			TotalCount = totalCount,
 			PageCount = totalCount % dto.PageSize == 0 ? totalCount / dto.PageSize : totalCount / dto.PageSize + 1,
 			PageSize = dto.PageSize
