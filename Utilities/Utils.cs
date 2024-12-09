@@ -8,7 +8,7 @@ public static class StartupExtension {
 		builder.AddUtilitiesServices<T>();
 		builder.AddUtilitiesSwagger();
 		builder.AddUtilitiesIdentity();
-		builder.AddUtilitiesOutputCache();
+		builder.AddUtilitiesCache();
 		if (addOpenTelemetry) builder.AddOpenTelemetry();
 	}
 
@@ -57,9 +57,7 @@ public static class StartupExtension {
 			o.EnableRetryOnFailure(maxRetryCount: 2);
 			o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
 		}));
-
-		builder.Services.AddStackExchangeRedisCache(o => o.Configuration = builder.Configuration.GetConnectionString("Redis"));
-
+		
 		builder.Services.AddHttpContextAccessor();
 		builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 		builder.Services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")));
@@ -125,7 +123,9 @@ public static class StartupExtension {
 		});
 	}
 
-	private static void AddUtilitiesOutputCache(this WebApplicationBuilder builder) {
+	private static void AddUtilitiesCache(this WebApplicationBuilder builder) {
+		builder.Services.AddStackExchangeRedisCache(o => o.Configuration = builder.Configuration.GetConnectionString("Redis"));
+		builder.Services.AddMemoryCache();
 		builder.Services.AddOutputCache(x => x.AddPolicy("default", y => {
 			y.Cache();
 			y.SetVaryByHeader("*");
