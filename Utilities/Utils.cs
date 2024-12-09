@@ -79,6 +79,7 @@ public static class StartupExtension {
 		builder.Services.Configure<IISServerOptions>(options => options.MaxRequestBodySize = int.MaxValue);
 		Server.Configure(builder.Services.BuildServiceProvider().GetService<IServiceProvider>()?.GetService<IHttpContextAccessor>());
 		builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+		builder.Services.AddSingleton<ICacheRepository, MemoryCacheRepository>();
 		builder.Services.AddScoped<IReportRepository, ReportRepository>();
 		builder.Services.AddScoped<IUserRepository, UserRepository>();
 		builder.Services.AddScoped<IMediaRepository, MediaRepository>();
