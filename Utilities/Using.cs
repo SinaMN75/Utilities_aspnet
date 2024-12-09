@@ -10,7 +10,6 @@ global using System.Security.Claims;
 global using System.Threading.RateLimiting;
 global using System.Reflection;
 global using System.Globalization;
-global using System.Data;
 global using System.Text;
 global using System.Diagnostics;
 global using System.Security.Cryptography;
@@ -51,6 +50,5 @@ global using Amazon.S3.Model;
 global using RestSharp;
 global using Swashbuckle.AspNetCore.SwaggerUI;
 global using OfficeOpenXml;
-global using ClosedXML.Excel;
 
 #endregion

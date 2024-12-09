@@ -11,10 +11,6 @@ public class TransactionController(ITransactionRepository repository) : BaseApiC
 	[HttpPost("Filter")]
 	public ActionResult<GenericResponse<IQueryable<TransactionEntity>>> Filter(TransactionFilterDto dto) => Result(repository.Filter(dto));
 
-	[HttpPost("GenerateReport")]
-	public async Task<ActionResult<GenericResponse<List<MediaEntity>>>> GenerateReport(TransactionFilterDto dto)
-		=> Result(await repository.GenerateReport(dto));
-
 	[HttpPut]
 	public async Task<ActionResult<GenericResponse<IQueryable<TransactionEntity>>>> Update(TransactionUpdateDto dto, CancellationToken ct)
 		=> Result(await repository.Update(dto, ct));

@@ -57,10 +57,8 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 		List<CategoryCreateDto> list = [];
 		using MemoryStream stream = new();
 		await file.CopyToAsync(stream, ct);
-		using ExcelPackage package = new(stream);
-		ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
-		int rowCount = worksheet.Dimension.Rows;
-		for (int i = 2; i < rowCount; i++) {
+		ExcelWorksheet worksheet = new ExcelPackage(stream).Workbook.Worksheets[0];
+		for (int i = 2; i < worksheet.Dimension.Rows; i++) {
 			list.Add(new CategoryCreateDto {
 				Title = worksheet.Cells[i, 2].Value.ToString()!,
 				TitleTr1 = worksheet.Cells[i, 3].Value.ToString(),
@@ -70,7 +68,6 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 		}
 
 		await BulkCreate(list, ct);
-
 		return new GenericResponse();
 	}
 

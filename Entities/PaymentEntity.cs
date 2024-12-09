@@ -56,7 +56,7 @@ public class NgVerifyResponse {
 
 	public static string ToJson(NgVerifyResponse self) => JsonConvert.SerializeObject(self, Converter.Settings);
 
-	public static NgVerifyResponse FromJson(string json) => JsonConvert.DeserializeObject<NgVerifyResponse>(json, Converter.Settings);
+	public static NgVerifyResponse FromJson(string json) => JsonConvert.DeserializeObject<NgVerifyResponse>(json, Converter.Settings)!;
 }
 
 public class NgVerifyResponseLinks {
@@ -111,7 +111,7 @@ public class NgAccessTokenResponse {
 	public string? TokenType { get; set; }
 
 	public static string ToJson(NgAccessTokenResponse self) => JsonConvert.SerializeObject(self, Converter.Settings);
-	public static NgAccessTokenResponse FromJson(string json) => JsonConvert.DeserializeObject<NgAccessTokenResponse>(json, Converter.Settings);
+	public static NgAccessTokenResponse FromJson(string json) => JsonConvert.DeserializeObject<NgAccessTokenResponse>(json, Converter.Settings)!;
 }
 
 public class NgHostedResponse {
@@ -157,7 +157,7 @@ public class NgHostedResponse {
 	[JsonProperty("_embedded")]
 	public Embedded? Embedded { get; set; }
 
-	public static NgHostedResponse FromJson(string json) => JsonConvert.DeserializeObject<NgHostedResponse>(json, Converter.Settings);
+	public static NgHostedResponse FromJson(string json) => JsonConvert.DeserializeObject<NgHostedResponse>(json, Converter.Settings)!;
 	public static string ToJson(NgHostedResponse self) => JsonConvert.SerializeObject(self, Converter.Settings);
 }
 
