@@ -48,8 +48,6 @@ public class EncryptParamsAttribute() : TypeFilterAttribute(typeof(Base64DecodeF
 
 public class RequestResponseLoggingMiddleware(RequestDelegate next, ILogger<RequestResponseLoggingMiddleware> logger) {
 	public async Task InvokeAsync(HttpContext context) {
-		Stopwatch stopwatch = Stopwatch.StartNew();
-
 		context.Request.EnableBuffering();
 		using StreamReader streamReader = new(context.Request.Body, Encoding.UTF8, leaveOpen: true);
 		string req = await streamReader.ReadToEndAsync();
@@ -65,24 +63,16 @@ public class RequestResponseLoggingMiddleware(RequestDelegate next, ILogger<Requ
 		context.Response.Body.Seek(0, SeekOrigin.Begin);
 		string res = await new StreamReader(context.Response.Body).ReadToEndAsync();
 		context.Response.Body.Seek(0, SeekOrigin.Begin);
-
-		LogLevel logLevel = context.Response.StatusCode switch {
-			>= 200 and <= 299 => LogLevel.Information,
-			>= 400 and <= 499 => LogLevel.Error,
-			>= 500 and <= 900 => LogLevel.Critical,
-			_ => LogLevel.Information
-		};
-
-		stopwatch.Stop();
-		logger.Log(
-			logLevel,
-			$"""
-			 {stopwatch.ElapsedMilliseconds} {DateTime.UtcNow.ToLongTimeString()} {context.Request.Method} {context.Request.Path} {context.Response.StatusCode}
-			 {context.Request.Headers.ToJsonObject()}
-			 {req}
-			 {res}
-			 """
-		);
+		
+		if (context.Response.StatusCode >= 300)
+			logger.LogCritical(
+				$"""
+				 {context.Request.Method} {context.Request.Path} {context.Response.StatusCode}
+				 {context.Request.Headers.EncodeJson()}
+				 {req}
+				 {res}
+				 """
+			);
 
 		await responseBody.CopyToAsync(originalResponseBodyStream);
 	}

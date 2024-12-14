@@ -5,9 +5,7 @@ namespace Utilities_aspnet.Controllers;
 public class ContentController(IContentRepository repository, IOutputCacheStore store) : BaseApiController {
 	[OutputCache(PolicyName = "default", Tags = ["content"])]
 	[HttpGet]
-	public ActionResult<GenericResponse<IQueryable<ContentEntity>>> Read() {
-		return Result(repository.Read());
-	}
+	public ActionResult<GenericResponse<IQueryable<ContentEntity>>> Read() => Result(repository.Read());
 
 	[HttpPost]
 	[Authorize]
