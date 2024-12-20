@@ -17,38 +17,31 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 
 		switch (smsSetting.Provider) {
 			case "ghasedak": {
-				RestRequest request = new(Method.POST);
-				request.AddHeader("apikey", smsSetting.SmsApiKey!);
-				request.AddParameter("receptor", mobileNumber);
-				request.AddParameter("type", 1);
-				request.AddParameter("template", smsSetting.PatternCode!);
-				request.AddParameter("param1", param1);
-				if (param2 != null) request.AddParameter("param2", param2);
-				if (param3 != null) request.AddParameter("param3", param3);
-				await new RestClient("https://api.ghasedak.me/v2/verification/send/simple").ExecuteAsync(request);
+				HttpClientInterceptor client = new();
+				client.AddHeader("apikey", smsSetting.SmsApiKey!);
+				await client.PostAsync("https://api.ghasedak.me/v2/verification/send/simple", new {
+					receptor = mobileNumber,
+					type = 1,
+					template = smsSetting.PatternCode!,
+					param1,
+					param2,
+					param3
+				});
 				break;
 			}
 			case "faraz": {
-				RestRequest request = new(Method.POST);
-				request.AddJsonBody("{\"op\" : \"pattern\"" +
-				                    ",\"user\" : \"" + smsSetting.UserName + "\"" +
-				                    ",\"pass\":  \"" + smsSetting.SmsSecret + "\"" +
-				                    ",\"fromNum\" : \"03000505\"" +
-				                    ",\"toNum\": \"" + mobileNumber + "\"" +
-				                    ",\"patternCode\": \"" + smsSetting.PatternCode + "\"" +
-				                    ",\"inputData\" : [{\"verification-code\": \"" + param1 + "\"}]}");
-				await new RestClient("http://ippanel.com/api/select").ExecuteAsync(request);
 				break;
 			}
 			case "kavenegar": {
-				RestRequest request = new(Method.POST);
-				request.AddHeader("apikey", smsSetting.SmsApiKey!);
-				request.AddParameter("receptor", mobileNumber);
-				request.AddParameter("token", param1);
-				if (param2 != null) request.AddParameter("token2", param2);
-				if (param3 != null) request.AddParameter("token3", param3);
-				request.AddParameter("template", template);
-				await new RestClient($"https://api.kavenegar.com/v1/{smsSetting.SmsApiKey}/verify/lookup.json").ExecuteAsync(request);
+				HttpClientInterceptor client = new();
+				client.AddHeader("apikey", smsSetting.SmsApiKey!);
+				await client.PostAsync($"https://api.kavenegar.com/v1/{smsSetting.SmsApiKey}/verify/lookup.json", new {
+					receptor = mobileNumber,
+					template,
+					token = param1,
+					token2 = param2,
+					token3 = param3,
+				});
 				break;
 			}
 		}
@@ -61,37 +54,19 @@ public class SmsNotificationRepository : ISmsNotificationRepository {
 
 		switch (setting.Provider) {
 			case "pushe": {
-				RestRequest request = new(Method.POST);
-				request.AddHeader("Content-Type", "application/json");
-				request.AddHeader("Authorization", "Token " + setting.Token);
-				var body = new {
-					app_ids = setting.AppId,
-					data = new {
-						title = NotificationCreateDto.Title,
-						content = NotificationCreateDto.Content,
-						bigContent = NotificationCreateDto.BigContent,
-						action = new { action_type = NotificationCreateDto.ActionType, url = NotificationCreateDto.Url }
-					},
-					is_draft = false,
-					filter = new { custom_id = dto.UserIds }
-				};
-				request.AddJsonBody(body);
-				await new RestClient("https://api.pushe.co/v2/messaging/notifications/").ExecuteAsync(request);
 				break;
 			}
 			case "firebase": {
-				RestRequest request = new(Method.POST);
-				request.AddHeader("Content-Type", "application/json");
-				request.AddHeader("Authorization", "Bearer " + setting.Token);
-				var body = new {
+				HttpClientInterceptor client = new();
+				client.AddHeader("Content-Type", "application/json");
+				client.AddHeader("Authorization", "Bearer " + setting.Token);
+				await client.PostAsync("https://fcm.sinamn75.com/send", new {
 					appId = setting.AppId,
 					title = NotificationCreateDto.Title,
 					body = NotificationCreateDto.Body,
 					content = NotificationCreateDto.Content,
 					token = dto.FcmToken
-				};
-				request.AddJsonBody(body);
-				await new RestClient("https://fcm.sinamn75.com/send").ExecuteAsync(request);
+				});
 				break;
 			}
 		}

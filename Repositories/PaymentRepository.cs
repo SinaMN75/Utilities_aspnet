@@ -7,68 +7,127 @@ public interface IPaymentRepository {
 	Task<GenericResponse<ZibalVerifyResponse>> VerifyZibal(string outlet, string id);
 }
 
+// public class PaymentRepository : IPaymentRepository {
+// 	public async Task<GenericResponse<NgHostedResponse>> PayNg(NgPayDto dto) {
+// 		NgAccessTokenResponse requestAccessToken = await GetNGeniusAccessToken();
+//
+// 		RestRequest requestPay = new(Method.POST);
+// 		requestPay.AddHeader("Content-Type", "application/vnd.ni-payment.v2+json");
+// 		requestPay.AddHeader("Authorization", $"Bearer {requestAccessToken.access_token}");
+// 		requestPay.AddHeader("Accept", "application/vnd.ni-payment.v2+json");
+// 		requestPay.AddJsonBody(new {
+// 				dto.action,
+// 				amount = new { currencyCode = dto.currency, value = dto.amount },
+// 				dto.emailAddress,
+// 				merchantAttributes = new { dto.redirectUrl, skipConfirmationPage = true }
+// 			}
+// 		);
+// 		IRestResponse responsePay = await new RestClient($"https://api-gateway.sandbox.ngenius-payments.com/transactions/outlets/{dto.outlet}/orders").ExecuteAsync(requestPay);
+//
+// 		return new GenericResponse<NgHostedResponse>(responsePay.Content.DecodeJson<NgHostedResponse>());
+// 	}
+//
+// 	public async Task<GenericResponse<ZibalRequestResponse>> PayZibal(NgPayDto dto) {
+// 		RestRequest requestRequest = new("https://gateway.zibal.ir/v1/request", Method.POST);
+//
+// 		requestRequest.AddJsonBody(new {
+// 			merchant = dto.outlet,
+// 			dto.amount,
+// 			callbackUrl = dto.redirectUrl
+// 		});
+//
+// 		requestRequest.AddHeader("Content-Type", "application/json");
+//
+// 		IRestResponse responseRequest = await new RestClient().ExecuteAsync(requestRequest);
+// 		return new GenericResponse<ZibalRequestResponse>(responseRequest.Content.DecodeJson<ZibalRequestResponse>());
+// 	}
+//
+// 	public async Task<GenericResponse<ZibalVerifyResponse>> VerifyZibal(string outlet, string id) {
+// 		RestRequest requestRequest = new("https://gateway.zibal.ir/v1/verify", Method.POST);
+// 		requestRequest.AddJsonBody(new { merchant = outlet, trackId = id });
+// 		requestRequest.AddHeader("Content-Type", "application/json");
+//
+// 		IRestResponse responseRequest = await new RestClient().ExecuteAsync(requestRequest);
+//
+// 		Console.WriteLine(responseRequest.Request.Body!.Value);
+// 		return new GenericResponse<ZibalVerifyResponse>(responseRequest.Content.DecodeJson<ZibalVerifyResponse>());
+// 	}
+//
+// 	public async Task<GenericResponse<NgVerifyResponse>> VerifyNg(string outlet, string id) {
+// 		NgAccessTokenResponse requestAccessToken = await GetNGeniusAccessToken();
+//
+// 		RestRequest requestOrderStatus = new(Method.GET);
+// 		requestOrderStatus.AddHeader("Authorization", $"Bearer {requestAccessToken.access_token}");
+// 		IRestResponse responseRequest =
+// 			await new RestClient($"https://api-gateway.sandbox.ngenius-payments.com/transactions/outlets/{outlet}/orders/{id}").ExecuteAsync(requestOrderStatus);
+// 		return new GenericResponse<NgVerifyResponse>(responseRequest.Content.DecodeJson<NgVerifyResponse>());
+// 	}
+//
+// 	private static async Task<NgAccessTokenResponse> GetNGeniusAccessToken() {
+// 		RestRequest requestAccessToken = new(Method.POST);
+// 		requestAccessToken.AddHeader("Content-Type", "application/vnd.ni-identity.v1+json");
+// 		requestAccessToken.AddHeader("Authorization", "Basic OTUyOTFhMzgtZDhjNy00Y2I1LWE3NTQtMmRhYmU1ZWZlY2E1OmMxYTA0OWJlLThiMGItNDg2My05NzQwLTgwNTY1Mjc4MTNiYQ==");
+// 		requestAccessToken.AddHeader("Accept", "application/vnd.ni-identity.v1+json");
+// 		IRestResponse responseRequest = await new RestClient("https://api-gateway.sandbox.ngenius-payments.com/identity/auth/access-token").ExecuteAsync(requestAccessToken);
+// 		return responseRequest.Content.DecodeJson<NgAccessTokenResponse>();
+// 	}
+// }
+
 public class PaymentRepository : IPaymentRepository {
 	public async Task<GenericResponse<NgHostedResponse>> PayNg(NgPayDto dto) {
 		NgAccessTokenResponse requestAccessToken = await GetNGeniusAccessToken();
 
-		RestRequest requestPay = new(Method.POST);
+		HttpClientInterceptor requestPay = new();
 		requestPay.AddHeader("Content-Type", "application/vnd.ni-payment.v2+json");
 		requestPay.AddHeader("Authorization", $"Bearer {requestAccessToken.access_token}");
 		requestPay.AddHeader("Accept", "application/vnd.ni-payment.v2+json");
-		requestPay.AddJsonBody(new {
+		string response = await requestPay.PostAsync($"https://api-gateway.sandbox.ngenius-payments.com/transactions/outlets/{dto.outlet}/orders", new {
 				dto.action,
 				amount = new { currencyCode = dto.currency, value = dto.amount },
 				dto.emailAddress,
 				merchantAttributes = new { dto.redirectUrl, skipConfirmationPage = true }
 			}
 		);
-		IRestResponse responsePay = await new RestClient($"https://api-gateway.sandbox.ngenius-payments.com/transactions/outlets/{dto.outlet}/orders").ExecuteAsync(requestPay);
 
-		return new GenericResponse<NgHostedResponse>(responsePay.Content.DecodeJson<NgHostedResponse>());
+		return new GenericResponse<NgHostedResponse>(response.DecodeJson<NgHostedResponse>());
 	}
 
 	public async Task<GenericResponse<ZibalRequestResponse>> PayZibal(NgPayDto dto) {
-		RestRequest requestRequest = new("https://gateway.zibal.ir/v1/request", Method.POST);
-
-		requestRequest.AddJsonBody(new {
-			merchant = dto.outlet,
-			dto.amount,
-			callbackUrl = dto.redirectUrl
-		});
-
+		HttpClientInterceptor requestRequest = new();
 		requestRequest.AddHeader("Content-Type", "application/json");
 
-		IRestResponse responseRequest = await new RestClient().ExecuteAsync(requestRequest);
-		return new GenericResponse<ZibalRequestResponse>(responseRequest.Content.DecodeJson<ZibalRequestResponse>());
+		string response = await requestRequest.PostAsync("https://gateway.zibal.ir/v1/request", new {
+				merchant = dto.outlet,
+				dto.amount,
+				callbackUrl = dto.redirectUrl
+			}
+		);
+		return new GenericResponse<ZibalRequestResponse>(response.DecodeJson<ZibalRequestResponse>());
 	}
 
 	public async Task<GenericResponse<ZibalVerifyResponse>> VerifyZibal(string outlet, string id) {
-		RestRequest requestRequest = new("https://gateway.zibal.ir/v1/verify", Method.POST);
-		requestRequest.AddJsonBody(new { merchant = outlet, trackId = id });
+		HttpClientInterceptor requestRequest = new();
 		requestRequest.AddHeader("Content-Type", "application/json");
-
-		IRestResponse responseRequest = await new RestClient().ExecuteAsync(requestRequest);
-
-		Console.WriteLine(responseRequest.Request.Body!.Value);
-		return new GenericResponse<ZibalVerifyResponse>(responseRequest.Content.DecodeJson<ZibalVerifyResponse>());
+		string response = await requestRequest.PostAsync("https://gateway.zibal.ir/v1/verify", new { merchant = outlet, trackId = id });
+		return new GenericResponse<ZibalVerifyResponse>(response.DecodeJson<ZibalVerifyResponse>());
 	}
 
 	public async Task<GenericResponse<NgVerifyResponse>> VerifyNg(string outlet, string id) {
 		NgAccessTokenResponse requestAccessToken = await GetNGeniusAccessToken();
 
-		RestRequest requestOrderStatus = new(Method.GET);
+		HttpClientInterceptor requestOrderStatus = new();
 		requestOrderStatus.AddHeader("Authorization", $"Bearer {requestAccessToken.access_token}");
-		IRestResponse responseRequest =
-			await new RestClient($"https://api-gateway.sandbox.ngenius-payments.com/transactions/outlets/{outlet}/orders/{id}").ExecuteAsync(requestOrderStatus);
-		return new GenericResponse<NgVerifyResponse>(responseRequest.Content.DecodeJson<NgVerifyResponse>());
+		HttpClientInterceptor responseRequest = new();
+		string response = await responseRequest.GetRawAsync($"https://api-gateway.sandbox.ngenius-payments.com/transactions/outlets/{outlet}/orders/{id}");
+		return new GenericResponse<NgVerifyResponse>(response.DecodeJson<NgVerifyResponse>());
 	}
 
 	private static async Task<NgAccessTokenResponse> GetNGeniusAccessToken() {
-		RestRequest requestAccessToken = new(Method.POST);
+		HttpClientInterceptor requestAccessToken = new();
 		requestAccessToken.AddHeader("Content-Type", "application/vnd.ni-identity.v1+json");
 		requestAccessToken.AddHeader("Authorization", "Basic OTUyOTFhMzgtZDhjNy00Y2I1LWE3NTQtMmRhYmU1ZWZlY2E1OmMxYTA0OWJlLThiMGItNDg2My05NzQwLTgwNTY1Mjc4MTNiYQ==");
 		requestAccessToken.AddHeader("Accept", "application/vnd.ni-identity.v1+json");
-		IRestResponse responseRequest = await new RestClient("https://api-gateway.sandbox.ngenius-payments.com/identity/auth/access-token").ExecuteAsync(requestAccessToken);
-		return responseRequest.Content.DecodeJson<NgAccessTokenResponse>();
+		string responseRequest = await requestAccessToken.PostAsync("https://api-gateway.sandbox.ngenius-payments.com/identity/auth/access-token");
+		return responseRequest.DecodeJson<NgAccessTokenResponse>();
 	}
 }

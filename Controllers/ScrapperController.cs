@@ -4,12 +4,8 @@ namespace Utilities_aspnet.Controllers;
 [Route("api/[controller]")]
 public class ScrapperController : ControllerBase {
 	[HttpGet("GetInstaPostRapidApi/{username}")]
-	public static string GetInstaPostRapidApi(string username) {
-		RestClient client = new($"https://rapidapi.sinamn75.com/api/Scrapper/GetInstaPostRapidApi/{username}") { RemoteCertificateValidationCallback = (_, _, _, _) => true };
-		RestRequest request = new(Method.GET);
-		IRestResponse response = client.Execute(request);
-		return response.Content;
-	}
+	public static async Task<string> GetInstaPostRapidApi(string username) =>
+		await new HttpClientInterceptor().GetRawAsync($"https://rapidapi.sinamn75.com/api/Scrapper/GetInstaPostRapidApi/{username}");
 
 	[HttpGet("GetInstaPostRapidApiTest")]
 	public static string GetInstaPostRapidApiTest() =>

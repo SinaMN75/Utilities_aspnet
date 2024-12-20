@@ -46,7 +46,6 @@ global using System.Text.Json.Serialization;
 global using Amazon.Runtime;
 global using Amazon.S3;
 global using Amazon.S3.Model;
-global using RestSharp;
 global using Swashbuckle.AspNetCore.SwaggerUI;
 global using OfficeOpenXml;
 

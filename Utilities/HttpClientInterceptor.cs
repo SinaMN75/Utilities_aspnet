@@ -7,7 +7,7 @@ public class HttpClientInterceptor {
 		_httpClient.BaseAddress = new Uri(baseAddress);
 	}
 
-	public void AddDefaultHeader(string name, string value) {
+	public void AddHeader(string name, string value) {
 		_httpClient.DefaultRequestHeaders.Add(name, value);
 	}
 
@@ -19,13 +19,17 @@ public class HttpClientInterceptor {
 		return JsonSerializer.Deserialize<T>(json, Core.JsonSettings);
 	}
 
-	public async Task<T?> PostAsync<T, TU>(string endpoint, TU data) {
-		StringContent content = new StringContent(JsonSerializer.Serialize(data, Core.JsonSettings), Encoding.UTF8, "application/json");
-		HttpResponseMessage response = await _httpClient.PostAsync(endpoint, content);
+	public async Task<string> GetRawAsync(string endpoint) {
+		HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
 		response.EnsureSuccessStatusCode();
+		return await response.Content.ReadAsStringAsync();
+	}
 
-		string json = await response.Content.ReadAsStringAsync();
-		return JsonSerializer.Deserialize<T>(json, Core.JsonSettings);
+	public async Task<string> PostAsync(string endpoint, object? data = null) {
+		HttpResponseMessage response =
+			await _httpClient.PostAsync(endpoint, data == null ? null : new StringContent(JsonSerializer.Serialize(data, Core.JsonSettings), Encoding.UTF8, "application/json"));
+		response.EnsureSuccessStatusCode();
+		return await response.Content.ReadAsStringAsync();
 	}
 
 	public async Task<T?> PutAsync<T, TU>(string endpoint, TU data) {
