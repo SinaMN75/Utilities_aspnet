@@ -40,9 +40,6 @@ global using Utilities_aspnet.Entities;
 global using Utilities_aspnet.Repositories;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
-global using Amazon.Runtime;
-global using Amazon.S3;
-global using Amazon.S3.Model;
 global using Swashbuckle.AspNetCore.SwaggerUI;
 global using OfficeOpenXml;
 
