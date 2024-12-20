@@ -67,7 +67,7 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 			});
 		}
 
-		await BulkCreate(list, ct);
+		await BulkCreate(list, ct); 
 		return new GenericResponse();
 	}
 

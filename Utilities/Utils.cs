@@ -57,17 +57,17 @@ public static class StartupExtension {
 			o.EnableRetryOnFailure(maxRetryCount: 2);
 			o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
 		}));
-		
+
 		builder.Services.AddHttpContextAccessor();
 		builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 		builder.Services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")));
-		builder.Services.AddControllersWithViews(option => option.EnableEndpointRouting = false).AddNewtonsoftJson(options => {
-			options.SerializerSettings.ContractResolver = new DefaultContractResolver();
-			options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-			options.SerializerSettings.PreserveReferencesHandling = PreserveReferencesHandling.None;
-			options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-			options.UseCamelCasing(true);
-		});
+
+		builder.Services.AddControllersWithViews(options => options.EnableEndpointRouting = false)
+			.AddJsonOptions(options => {
+				options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+				options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+				options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+			});
 
 		builder.Services.Configure<FormOptions>(x => {
 			x.ValueLengthLimit = int.MaxValue;

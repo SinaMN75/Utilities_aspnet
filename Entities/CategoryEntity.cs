@@ -26,11 +26,9 @@ public class CategoryEntity : BaseEntity {
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
 	public IEnumerable<UserEntity>? Users { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
 	public IEnumerable<ProductEntity>? Products { get; set; }
 }

@@ -1,31 +1,48 @@
 namespace Utilities_aspnet.Utilities;
 
-public class HttpClientInterceptor(HttpClient httpClient) {
-	public async Task<TResponse?> SendAsync<TRequest, TResponse>(
-		string url,
-		HttpMethod httpMethod,
-		TRequest requestBody,
-		Dictionary<string, string>? headers = null) {
-		try {
-			HttpRequestMessage requestMessage = new(httpMethod, url);
+public class HttpClientInterceptor {
+	private readonly HttpClient _httpClient = new();
 
-			if (requestBody != null)
-				requestMessage.Content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
+	public void SetBaseAddress(string baseAddress) {
+		_httpClient.BaseAddress = new Uri(baseAddress);
+	}
 
-			if (headers != null)
-				foreach (KeyValuePair<string, string> header in headers)
-					requestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value);
+	public void AddDefaultHeader(string name, string value) {
+		_httpClient.DefaultRequestHeaders.Add(name, value);
+	}
 
-			HttpResponseMessage response = await httpClient.SendAsync(requestMessage);
-			string responseBody = await response.Content.ReadAsStringAsync();
+	public async Task<T?> GetAsync<T>(string endpoint) {
+		HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
+		response.EnsureSuccessStatusCode();
 
-			response.EnsureSuccessStatusCode();
+		string json = await response.Content.ReadAsStringAsync();
+		return JsonSerializer.Deserialize<T>(json, Core.JsonSettings);
+	}
 
-			return JsonConvert.DeserializeObject<TResponse>(responseBody);
-		}
-		catch (Exception ex) {
-			Console.WriteLine($"Exception occurred: {ex.Message}");
-			throw;
-		}
+	public async Task<T?> PostAsync<T, TU>(string endpoint, TU data) {
+		StringContent content = new StringContent(JsonSerializer.Serialize(data, Core.JsonSettings), Encoding.UTF8, "application/json");
+		HttpResponseMessage response = await _httpClient.PostAsync(endpoint, content);
+		response.EnsureSuccessStatusCode();
+
+		string json = await response.Content.ReadAsStringAsync();
+		return JsonSerializer.Deserialize<T>(json, Core.JsonSettings);
+	}
+
+	public async Task<T?> PutAsync<T, TU>(string endpoint, TU data) {
+		StringContent content = new StringContent(JsonSerializer.Serialize(data, Core.JsonSettings), Encoding.UTF8, "application/json");
+		HttpResponseMessage response = await _httpClient.PutAsync(endpoint, content);
+		response.EnsureSuccessStatusCode();
+
+		string json = await response.Content.ReadAsStringAsync();
+		return JsonSerializer.Deserialize<T>(json, Core.JsonSettings);
+	}
+
+	public async Task DeleteAsync(string endpoint) {
+		HttpResponseMessage response = await _httpClient.DeleteAsync(endpoint);
+		response.EnsureSuccessStatusCode();
+	}
+
+	public void Dispose() {
+		_httpClient.Dispose();
 	}
 }

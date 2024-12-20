@@ -46,7 +46,6 @@ public class OrderDetailEntity : BaseEntity {
 	public long? UnitPrice { get; set; }
 	public int? Count { get; set; }
 
-	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
 	public OrderEntity? Order { get; set; }
 

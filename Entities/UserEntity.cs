@@ -56,7 +56,6 @@ public class UserEntity {
 	public IEnumerable<UserQuestionAnswerEntity>? UserQuestionAnswers { get; set; }
 
 	[MaxLength(50)]
-	[System.Text.Json.Serialization.JsonIgnore]
 	[JsonIgnore]
 	public string? Password { get; set; }
 

@@ -46,9 +46,9 @@ public static class StringExtension {
 
 	public static bool IsNullOrEmpty(this string? s) => string.IsNullOrEmpty(s);
 
-	public static string EncodeJson<T>(this T obj) => JsonConvert.SerializeObject(obj, Core.JsonSettings);
+	public static string EncodeJson<T>(this T obj) => JsonSerializer.Serialize(obj, Core.JsonSettings);
 
-	public static T DecodeJson<T>(this string json) => JsonConvert.DeserializeObject<T>(json, Core.JsonSettings)!;
+	public static T DecodeJson<T>(this string json) => JsonSerializer.Deserialize<T>(json, Core.JsonSettings)!;
 }
 
 public static class ListExtensions {

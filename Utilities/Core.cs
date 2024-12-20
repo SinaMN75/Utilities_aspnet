@@ -1,10 +1,9 @@
 namespace Utilities_aspnet.Utilities;
 
 public static class Core {
-	public static readonly JsonSerializerSettings JsonSettings = new() {
-		Formatting = Formatting.Indented,
-		ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-		PreserveReferencesHandling = PreserveReferencesHandling.None,
-		NullValueHandling = NullValueHandling.Ignore
+	public static readonly JsonSerializerOptions? JsonSettings = new() {
+		WriteIndented = true,
+		ReferenceHandler = ReferenceHandler.IgnoreCycles,
+		DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
 	};
 }

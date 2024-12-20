@@ -3,14 +3,7 @@ namespace Utilities_aspnet.Utilities;
 public class EncryptResponseAttribute : ActionFilterAttribute {
 	public override async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next) {
 		if (context.Result is ObjectResult { Value: not null } objectResult) {
-			string jsonString = JsonConvert.SerializeObject(objectResult.Value,
-				new JsonSerializerSettings {
-					ContractResolver = new CamelCasePropertyNamesContractResolver(),
-					PreserveReferencesHandling = PreserveReferencesHandling.Objects,
-					ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-					NullValueHandling = NullValueHandling.Ignore
-				}
-			);
+			string jsonString = objectResult.Value.EncodeJson();
 			string encryptedData = Encryption.Base64Encode(jsonString);
 			context.Result = new ContentResult {
 				Content = encryptedData,

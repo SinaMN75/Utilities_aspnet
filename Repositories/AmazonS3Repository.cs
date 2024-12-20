@@ -52,7 +52,7 @@ public class AmazonS3Repository : IAmazonS3Repository {
 			// Submit the request
 			DeleteObjectsResponse response = await Authenticate().DeleteObjectsAsync(request);
 
-			Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
+			Console.WriteLine(response.EncodeJson());
 			Console.WriteLine($"Object {objectName} successfully deleted from {bucketName} bucket");
 		}
 		catch (AmazonS3Exception amazonS3Exception) {
