@@ -124,7 +124,6 @@ public static class StartupExtension {
 	}
 
 	private static void AddUtilitiesCache(this WebApplicationBuilder builder) {
-		builder.Services.AddStackExchangeRedisCache(o => o.Configuration = builder.Configuration.GetConnectionString("Redis"));
 		builder.Services.AddMemoryCache();
 		builder.Services.AddOutputCache(x => x.AddPolicy("default", y => {
 			y.Cache();
@@ -144,17 +143,7 @@ public static class StartupExtension {
 	}
 
 	private static void AddOpenTelemetry(this WebApplicationBuilder builder) {
-		builder.Services.AddOpenTelemetry()
-			.ConfigureResource(res => res.AddService("sinamn75api"))
-			.WithMetrics(x => {
-				x.AddAspNetCoreInstrumentation();
-				x.AddOtlpExporter();
-			})
-			.WithTracing(x => {
-				x.AddAspNetCoreInstrumentation();
-				x.AddOtlpExporter();
-			});
-
+		builder.Services.AddOpenTelemetry().ConfigureResource(res => res.AddService("sinamn75api"));
 		builder.Logging.AddOpenTelemetry(o => o.AddOtlpExporter());
 	}
 

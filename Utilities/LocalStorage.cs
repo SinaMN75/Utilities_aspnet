@@ -1,6 +1,6 @@
 namespace Utilities_aspnet.Utilities;
 
-public static class Redis {
+public static class LocalStorage {
 	public static void SetStringData(
 		this IDistributedCache cache,
 		string key,
