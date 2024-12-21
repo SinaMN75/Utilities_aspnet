@@ -3,6 +3,7 @@
 public interface IUserRepository {
 	Task<GenericResponse<UserEntity?>> RefreshToken(RefreshTokenDto dto);
 	Task<GenericResponse<UserEntity?>> Create(UserCreateUpdateDto dto);
+	Task<GenericResponse> BulkCreate(List<UserCreateUpdateDto> dto);
 	Task<GenericResponse<IEnumerable<UserEntity>>> Filter(UserFilterDto dto);
 	Task<GenericResponse<UserEntity?>> ReadById(string idOrUserName, (string, string)? tokenRefreshToken = null);
 	Task<GenericResponse<UserEntity>> Update(UserCreateUpdateDto dto);
@@ -262,6 +263,18 @@ public class UserRepository(
 		await dbContext.SaveChangesAsync();
 
 		return new GenericResponse<UserEntity?>(ReadById(user.Id, CreateToken(user)).Result.Result);
+	}
+
+	public async Task<GenericResponse> BulkCreate(List<UserCreateUpdateDto> dto) {
+		foreach (UserCreateUpdateDto userCreateUpdateDto in dto) {
+			UserEntity user = new() { Suspend = false, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow };
+			await FillUserData(userCreateUpdateDto, user);
+			user.UserName = userCreateUpdateDto.UserName ?? userCreateUpdateDto.Email ?? userCreateUpdateDto.PhoneNumber;
+			await dbContext.AddAsync(user);
+			await dbContext.SaveChangesAsync();
+		}
+
+		return new GenericResponse();
 	}
 
 	public async Task<GenericResponse<UserEntity?>> GetVerificationCodeForLogin(GetMobileVerificationCodeForLoginDto dto) {
