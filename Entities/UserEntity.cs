@@ -50,7 +50,7 @@ public class UserEntity {
 	public UserJsonDetail JsonDetail { get; set; } = new();
 
 	public List<TagUser> Tags { get; set; } = [];
-	public List<int> Tags2 { get; set; } = [];
+	public List<int>? Tags2 { get; set; } = [];
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
