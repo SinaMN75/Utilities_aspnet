@@ -8,6 +8,12 @@ public class UserController(IUserRepository repository, IOutputCacheStore store)
 		await store.EvictByTagAsync("user", ct);
 		return Result(await repository.Create(dto));
 	}
+	
+	[HttpPost("BulkCreate")]
+	public async Task<ActionResult<GenericResponse>> BulkCreate(List<UserCreateUpdateDto> dto, CancellationToken ct) {
+		await store.EvictByTagAsync("user", ct);
+		return Result(await repository.BulkCreate(dto));
+	}
 
 	[HttpPost("LoginWithPassword")]
 	public async Task<ActionResult<GenericResponse>> LoginWithPassword(LoginWithPasswordDto dto, CancellationToken ct) {
