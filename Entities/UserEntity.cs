@@ -50,6 +50,7 @@ public class UserEntity {
 	public UserJsonDetail JsonDetail { get; set; } = new();
 
 	public List<TagUser> Tags { get; set; } = [];
+	public List<int> Tags2 { get; set; } = [];
 
 	public IEnumerable<MediaEntity>? Media { get; set; }
 	public IEnumerable<CategoryEntity>? Categories { get; set; }
@@ -177,6 +178,7 @@ public record UserCreateUpdateDto(
 	DateTime? PremiumExpireDate = null,
 	IEnumerable<Guid>? Categories = null,
 	List<TagUser>? Tags = null,
+	List<int>? Tags2 = null,
 	List<string>? StringList = null
 );
 
@@ -204,6 +206,7 @@ public class UserFilterDto : BaseFilterDto {
 	public IEnumerable<string>? PhoneNumbers { get; set; }
 	public IEnumerable<Guid>? Categories { get; set; }
 	public List<TagUser>? Tags { get; set; }
+	public List<int>? Tags2 { get; set; }
 }
 
 public class RefreshTokenDto {

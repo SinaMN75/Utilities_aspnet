@@ -54,6 +54,7 @@ public class UserRepository(
 				Suspend = x.Suspend,
 				JsonDetail = x.JsonDetail,
 				Tags = x.Tags,
+				Tags2 = x.Tags2,
 				PremiumExpireDate = x.PremiumExpireDate,
 				Media = x.Media!.Select(y => new MediaEntity {
 					Id = y.Id,
@@ -370,6 +371,7 @@ public class UserRepository(
 		if (dto.State is not null) entity.State = dto.State;
 		if (dto.City is not null) entity.City = dto.City;
 		if (dto.Tags is not null) entity.Tags = dto.Tags;
+		if (dto.Tags2 is not null) entity.Tags2 = dto.Tags2;
 		if (dto.Password is not null) entity.Password = dto.Password;
 		if (dto.PremiumExpireDate is not null) entity.PremiumExpireDate = dto.PremiumExpireDate;
 		if (dto.Instagram is not null) entity.JsonDetail.Instagram = dto.Instagram;
