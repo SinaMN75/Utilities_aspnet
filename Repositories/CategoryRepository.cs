@@ -74,7 +74,16 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 	public async Task<GenericResponse<IEnumerable<CategoryEntity>>> Filter(CategoryFilterDto dto) {
 		IQueryable<CategoryEntity> q = context.Set<CategoryEntity>()
 			.Where(x => x.ParentId == null)
-			.Include(x => x.Children).AsNoTracking();
+			.Include(x => x.Children)!
+			.ThenInclude(x => x.Children)!
+			.ThenInclude(x => x.Children)!
+			.ThenInclude(x => x.Children)!
+			.ThenInclude(x => x.Children)!
+			.ThenInclude(x => x.Children)!
+			.ThenInclude(x => x.Children)!
+			.ThenInclude(x => x.Children)!
+			.ThenInclude(x => x.Children)
+			.AsNoTracking();
 
 		if (dto.Title.IsNotNullOrEmpty()) q = q.Where(x => x.Title!.Contains(dto.Title!));
 		if (dto.TitleTr1.IsNotNullOrEmpty()) q = q.Where(x => x.TitleTr1!.Contains(dto.TitleTr1!));
