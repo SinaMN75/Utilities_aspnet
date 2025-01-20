@@ -52,11 +52,8 @@ public class UserRepository(
 				Birthdate = x.Birthdate,
 				CreatedAt = x.CreatedAt,
 				UpdatedAt = x.UpdatedAt,
-				Suspend = x.Suspend,
 				JsonDetail = x.JsonDetail,
 				Tags = x.Tags,
-				Tags2 = x.Tags2,
-				PremiumExpireDate = x.PremiumExpireDate,
 				Media = x.Media!.Select(y => new MediaEntity {
 					Id = y.Id,
 					FileName = y.FileName,
@@ -71,7 +68,6 @@ public class UserRepository(
 					Title = y.Title,
 					TitleTr1 = y.TitleTr1,
 					TitleTr2 = y.TitleTr2,
-					Order = y.Order,
 					JsonDetail = y.JsonDetail,
 					Tags = y.Tags,
 					Media = y.Media!.Select(z => new MediaEntity {
@@ -129,8 +125,6 @@ public class UserRepository(
 			Birthdate = x.Birthdate,
 			CreatedAt = x.CreatedAt,
 			UpdatedAt = x.UpdatedAt,
-			PremiumExpireDate = x.PremiumExpireDate,
-			Suspend = x.Suspend,
 			JsonDetail = x.JsonDetail,
 			Tags = x.Tags,
 			Media = dto.ShowMedia
@@ -172,7 +166,6 @@ public class UserRepository(
 		if (dto.LastName.IsNotNullOrEmpty()) q = q.Where(x => x.LastName!.Contains(dto.LastName!));
 		if (dto.FullName.IsNotNullOrEmpty()) q = q.Where(x => x.FullName!.Contains(dto.FullName!));
 		if (dto.PhoneNumber.IsNotNullOrEmpty()) q = q.Where(x => x.PhoneNumber!.Contains(dto.PhoneNumber!));
-		if (dto.ShowPremiums.IsTrue()) q = q.Where(x => x.PremiumExpireDate > DateTime.UtcNow);
 		if (dto.Tags.IsNotNullOrEmpty()) q = q.Where(x => dto.Tags!.All(y => x.Tags.Contains(y)));
 
 		if (dto.Query.IsNotNullOrEmpty())
@@ -186,7 +179,6 @@ public class UserRepository(
 		if (dto.UserIds.IsNotNullOrEmpty()) q = q.Where(x => dto.UserIds!.Contains(x.Id));
 		if (dto.PhoneNumbers.IsNotNullOrEmpty()) q = q.Where(x => dto.PhoneNumbers!.Contains(x.PhoneNumber));
 		if (dto.UserName.IsNotNullOrEmpty()) q = q.Where(x => x.UserName!.Contains(dto.UserName!, StringComparison.CurrentCultureIgnoreCase));
-		if (dto.ShowSuspend.IsTrue()) q = q.Where(x => x.Suspend == true);
 
 		if (dto.OrderByCreatedAt.IsTrue()) q = q.OrderBy(x => x.CreatedAt);
 		if (dto.OrderByCreatedAtDesc.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
@@ -250,7 +242,6 @@ public class UserRepository(
 			);
 
 		UserEntity user = new() {
-			Suspend = false,
 			CreatedAt = DateTime.UtcNow,
 			UpdatedAt = DateTime.UtcNow
 		};
@@ -267,7 +258,7 @@ public class UserRepository(
 
 	public async Task<GenericResponse> BulkCreate(List<UserCreateUpdateDto> dto) {
 		foreach (UserCreateUpdateDto userCreateUpdateDto in dto) {
-			UserEntity user = new() { Suspend = false, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow };
+			UserEntity user = new() { CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow };
 			await FillUserData(userCreateUpdateDto, user);
 			user.UserName = userCreateUpdateDto.UserName ?? userCreateUpdateDto.Email ?? userCreateUpdateDto.PhoneNumber;
 			await dbContext.AddAsync(user);
@@ -303,7 +294,6 @@ public class UserRepository(
 		string mobile = dto.Mobile.Replace("+", "");
 		UserEntity? user = await dbContext.Set<UserEntity>().FirstOrDefaultAsync(x => x.PhoneNumber == mobile || x.Email == mobile);
 		if (user == null) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.UserNotFound);
-		if (user.Suspend ?? false) return new GenericResponse<UserEntity?>(null, UtilitiesStatusCodes.UserSuspended);
 
 		user.FirstName = dto.FirstName ?? user.FirstName;
 		user.LastName = dto.LastName ?? user.LastName;
@@ -376,7 +366,6 @@ public class UserRepository(
 		if (dto.Subtitle is not null) entity.Subtitle = dto.Subtitle;
 		if (dto.Bio is not null) entity.Bio = dto.Bio;
 		if (dto.PhoneNumber is not null) entity.PhoneNumber = dto.PhoneNumber;
-		if (dto.Suspend is not null) entity.Suspend = dto.Suspend;
 		if (dto.BirthDate is not null) entity.Birthdate = dto.BirthDate;
 		if (dto.Gender is not null) entity.Gender = dto.Gender;
 		if (dto.Email is not null) entity.Email = dto.Email;
@@ -384,9 +373,7 @@ public class UserRepository(
 		if (dto.State is not null) entity.State = dto.State;
 		if (dto.City is not null) entity.City = dto.City;
 		if (dto.Tags is not null) entity.Tags = dto.Tags;
-		if (dto.Tags2 is not null) entity.Tags2 = dto.Tags2;
 		if (dto.Password is not null) entity.Password = dto.Password;
-		if (dto.PremiumExpireDate is not null) entity.PremiumExpireDate = dto.PremiumExpireDate;
 		if (dto.Instagram is not null) entity.JsonDetail.Instagram = dto.Instagram;
 		if (dto.Telegram is not null) entity.JsonDetail.Telegram = dto.Telegram;
 		if (dto.WhatsApp is not null) entity.JsonDetail.WhatsApp = dto.WhatsApp;

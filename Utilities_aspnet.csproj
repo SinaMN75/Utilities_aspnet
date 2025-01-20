@@ -9,9 +9,6 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0"/>
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.1"/>
-        <PackageReference Include="EPPlus" Version="7.5.1"/>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0"/>
-        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.10.0"/>
-        <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.10.0"/>
     </ItemGroup>
 </Project>

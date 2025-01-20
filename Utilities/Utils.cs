@@ -1,15 +1,11 @@
 ﻿namespace Utilities_aspnet.Utilities;
 
 public static class StartupExtension {
-	public static void SetupUtilities<T>(
-		this WebApplicationBuilder builder,
-		bool addOpenTelemetry = false
-	) where T : DbContext {
+	public static void SetupUtilities<T>(this WebApplicationBuilder builder) where T : DbContext {
 		builder.AddUtilitiesServices<T>();
 		builder.AddUtilitiesSwagger();
 		builder.AddUtilitiesIdentity();
 		builder.AddUtilitiesCache();
-		if (addOpenTelemetry) builder.AddOpenTelemetry();
 	}
 
 	public static void UseUtilitiesServices(this WebApplication app, bool log = false) {
@@ -140,12 +136,7 @@ public static class StartupExtension {
 			);
 		}));
 	}
-
-	private static void AddOpenTelemetry(this WebApplicationBuilder builder) {
-		builder.Services.AddOpenTelemetry().ConfigureResource(res => res.AddService("sinamn75api"));
-		builder.Logging.AddOpenTelemetry(o => o.AddOtlpExporter());
-	}
-
+	
 	private static void AddUtilitiesIdentity(this WebApplicationBuilder builder) {
 		builder.Services.AddAuthentication(options => {
 			options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

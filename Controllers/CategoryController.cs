@@ -17,13 +17,6 @@ public class CategoryController(ICategoryRepository repository, IOutputCacheStor
 		return Result(await repository.BulkCreate(dto, ct));
 	}
 
-	[HttpPost("ImportFromExcel")]
-	[Authorize]
-	public async Task<ActionResult<GenericResponse<IEnumerable<CategoryEntity>>>> ImportFromExcel(IFormFile file, CancellationToken ct) {
-		await store.EvictByTagAsync("category", ct);
-		return Result(await repository.ImportFromExcel(file, ct));
-	}
-
 	[HttpPost("Filter")]
 	[OutputCache(PolicyName = "default", Tags = ["category"])]
 	public async Task<ActionResult<GenericResponse<IQueryable<CategoryEntity>>>> Filter(CategoryFilterDto dto) => Result(await repository.Filter(dto));

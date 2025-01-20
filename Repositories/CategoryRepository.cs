@@ -3,7 +3,6 @@
 public interface ICategoryRepository {
 	public Task<GenericResponse<CategoryEntity>> Create(CategoryCreateDto dto, CancellationToken ct);
 	public Task<GenericResponse<IEnumerable<CategoryEntity>>> BulkCreate(IEnumerable<CategoryCreateDto> dto, CancellationToken ct);
-	public Task<GenericResponse> ImportFromExcel(IFormFile file, CancellationToken ct);
 	public Task<GenericResponse<IEnumerable<CategoryEntity>>> Filter(CategoryFilterDto dto);
 	public Task<GenericResponse<CategoryEntity?>> Update(CategoryUpdateDto dto, CancellationToken ct);
 	public Task<GenericResponse> Delete(Guid id, CancellationToken ct);
@@ -17,7 +16,6 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 			Title = dto.Title,
 			TitleTr1 = dto.TitleTr1,
 			TitleTr2 = dto.TitleTr2,
-			Order = dto.Order,
 			Tags = dto.Tags,
 			ParentId = dto.ParentId,
 			JsonDetail = new CategoryJsonDetail {
@@ -53,24 +51,6 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 		return new GenericResponse<IEnumerable<CategoryEntity>>(list);
 	}
 
-	public async Task<GenericResponse> ImportFromExcel(IFormFile file, CancellationToken ct) {
-		List<CategoryCreateDto> list = [];
-		using MemoryStream stream = new();
-		await file.CopyToAsync(stream, ct);
-		ExcelWorksheet worksheet = new ExcelPackage(stream).Workbook.Worksheets[0];
-		for (int i = 2; i < worksheet.Dimension.Rows; i++) {
-			list.Add(new CategoryCreateDto {
-				Title = worksheet.Cells[i, 2].Value.ToString()!,
-				TitleTr1 = worksheet.Cells[i, 3].Value.ToString(),
-				ParentId = Guid.TryParse(worksheet.Cells[i, 4].Value.ToString(), out _) ? Guid.Parse(worksheet.Cells[i, 4].Value.ToString()!) : null,
-				Tags = [TagCategory.Category]
-			});
-		}
-
-		await BulkCreate(list, ct); 
-		return new GenericResponse();
-	}
-
 	public async Task<GenericResponse<IEnumerable<CategoryEntity>>> Filter(CategoryFilterDto dto) {
 		IQueryable<CategoryEntity> q = context.Set<CategoryEntity>()
 			.Where(x => x.ParentId == null)
@@ -93,8 +73,6 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 
 		q = q.OrderBy(x => x.CreatedAt);
 		if (dto.OrderByCreatedAtDescending.IsTrue()) q = q.OrderByDescending(x => x.CreatedAt);
-		if (dto.OrderByOrder.IsTrue()) q = q.OrderBy(x => x.Order);
-		if (dto.OrderByOrderDescending.IsTrue()) q = q.OrderByDescending(x => x.Order);
 
 		if (dto.ShowMedia.IsTrue()) q = q.Include(x => x.Media);
 
@@ -131,7 +109,6 @@ public class CategoryRepository(DbContext context, IMediaRepository mediaReposit
 		if (dto.TitleTr1 is not null) entity.TitleTr1 = dto.TitleTr1;
 		if (dto.TitleTr2 is not null) entity.TitleTr2 = dto.TitleTr2;
 		if (dto.Tags is not null) entity.Tags = dto.Tags;
-		if (dto.Order is not null) entity.Order = dto.Order;
 		if (dto.Subtitle is not null) entity.JsonDetail.Subtitle = dto.Subtitle;
 		if (dto.Price is not null) entity.JsonDetail.Price = dto.Price;
 		if (dto.Color is not null) entity.JsonDetail.Color = dto.Color;

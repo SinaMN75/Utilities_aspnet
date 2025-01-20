@@ -11,8 +11,6 @@ public class CategoryEntity : BaseEntity {
 	[MaxLength(100)]
 	public string? TitleTr2 { get; set; }
 
-	public int? Order { get; set; }
-
 	public CategoryJsonDetail JsonDetail { get; set; } = new();
 
 	[MaxLength(100)]
@@ -62,7 +60,6 @@ public class CategoryCreateDto {
 	public long? SendPrice { get; set; }
 	public int? Value { get; set; }
 	public int? Stock { get; set; }
-	public int? Order { get; set; }
 	public DateTime? Date1 { get; set; }
 	public DateTime? Date2 { get; set; }
 	public Guid? ParentId { get; set; }
@@ -84,7 +81,6 @@ public class CategoryUpdateDto {
 	public long? SendPrice { get; set; }
 	public int? Value { get; set; }
 	public int? Stock { get; set; }
-	public int? Order { get; set; }
 	public DateTime? Date1 { get; set; }
 	public DateTime? Date2 { get; set; }
 	public List<TagCategory>? Tags { get; set; }
@@ -97,7 +93,5 @@ public class CategoryFilterDto : BaseFilterDto {
 	public List<TagCategory>? Tags { get; set; }
 	public Guid? ParentId { get; set; }
 	public bool? ShowMedia { get; set; }
-	public bool? OrderByOrder { get; set; }
-	public bool? OrderByOrderDescending { get; set; }
 	public bool? OrderByCreatedAtDescending { get; set; }
 }

@@ -8,10 +8,11 @@ global using System.ComponentModel.DataAnnotations.Schema;
 global using System.IdentityModel.Tokens.Jwt;
 global using System.Security.Claims;
 global using System.Threading.RateLimiting;
-global using System.Reflection;
 global using System.Text;
 global using System.Diagnostics;
 global using System.Security.Cryptography;
+global using System.Text.Json;
+global using System.Text.Json.Serialization;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.AspNetCore.Http;
 global using Microsoft.AspNetCore.Builder;
@@ -33,14 +34,9 @@ global using Microsoft.AspNetCore.OutputCaching;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.AspNetCore.Mvc.Filters;
 global using Microsoft.Extensions.Primitives;
-global using OpenTelemetry.Logs;
-global using OpenTelemetry.Resources;
 global using Utilities_aspnet.Utilities;
 global using Utilities_aspnet.Entities;
 global using Utilities_aspnet.Repositories;
-global using System.Text.Json;
-global using System.Text.Json.Serialization;
 global using Swashbuckle.AspNetCore.SwaggerUI;
-global using OfficeOpenXml;
 
 #endregion
