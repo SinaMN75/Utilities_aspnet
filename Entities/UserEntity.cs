@@ -90,8 +90,8 @@ public class UserJsonDetail {
 	public string? UsedDrugs { get; set; }
 	public string? FcmToken { get; set; }
 	public string? PassportNumber { get; set; }
-	public string? HealthReport1 { get; set; }
-	public string? HealthReport2 { get; set; }
+	public List<string>? Health1 { get; set; } = [];
+	public List<string>? Health2 { get; set; } = [];
 	public List<UserSubscriptions>? UserSubscriptions { get; set; } = [];
 	public List<string>? StringList { get; set; } = [];
 }

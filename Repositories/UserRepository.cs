@@ -400,8 +400,14 @@ public class UserRepository(
 		if (dto.StringList is not null) entity.JsonDetail.StringList = dto.StringList;
 		if (dto.PostalCode is not null) entity.JsonDetail.PostalCode = dto.PostalCode;
 		if (dto.LandlinePhone is not null) entity.JsonDetail.LandlinePhone = dto.LandlinePhone;
-		if (dto.HealthReport1 is not null) entity.JsonDetail.HealthReport1 = dto.HealthReport1;
-		if (dto.HealthReport2 is not null) entity.JsonDetail.HealthReport2 = dto.HealthReport2;
+		if (dto.HealthReport1 is not null) {
+			if (entity.JsonDetail.Health1 == null) entity.JsonDetail.Health1 = [dto.HealthReport1];
+			else entity.JsonDetail.Health1.Add(dto.HealthReport1);
+		}
+		if (dto.HealthReport2 is not null) {
+			if (entity.JsonDetail.Health2 == null) entity.JsonDetail.Health1 = [dto.HealthReport2];
+			else entity.JsonDetail.Health2.Add(dto.HealthReport2);
+		}
 
 		if (dto.Categories.IsNotNull()) {
 			List<CategoryEntity> list = [];
