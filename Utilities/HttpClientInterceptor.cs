@@ -33,7 +33,7 @@ public class HttpClientInterceptor {
 	}
 
 	public async Task<T?> PutAsync<T, TU>(string endpoint, TU data) {
-		StringContent content = new StringContent(JsonSerializer.Serialize(data, Core.JsonSettings), Encoding.UTF8, "application/json");
+		StringContent content = new(JsonSerializer.Serialize(data, Core.JsonSettings), Encoding.UTF8, "application/json");
 		HttpResponseMessage response = await _httpClient.PutAsync(endpoint, content);
 		response.EnsureSuccessStatusCode();
 
