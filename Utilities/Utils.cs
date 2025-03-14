@@ -47,13 +47,13 @@ public static class StartupExtension {
 
 		builder.Services.AddCors(c => c.AddPolicy("AllowOrigin", option => option.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 		builder.Services.AddScoped<DbContext, T>();
-
 		builder.Services.AddDbContextPool<T>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("ServerPostgres"), o => {
 			AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 			o.EnableRetryOnFailure(maxRetryCount: 2);
 			o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
 		}));
 
+		builder.Services.AddHttpClient();
 		builder.Services.AddHttpContextAccessor();
 		builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 		builder.Services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")));
@@ -72,6 +72,7 @@ public static class StartupExtension {
 		});
 		builder.Services.Configure<IISServerOptions>(options => options.MaxRequestBodySize = int.MaxValue);
 		Server.Configure(builder.Services.BuildServiceProvider().GetService<IServiceProvider>()?.GetService<IHttpContextAccessor>());
+		builder.Services.AddScoped<IHttpClientService, HttpClientService>();
 		builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 		builder.Services.AddSingleton<ICacheRepository, MemoryCacheRepository>();
 		builder.Services.AddScoped<IReportRepository, ReportRepository>();
