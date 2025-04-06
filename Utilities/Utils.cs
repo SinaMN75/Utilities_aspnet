@@ -91,6 +91,7 @@ public static class StartupExtension {
 		builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 		builder.Services.AddScoped<IAppSettingsRepository, AppSettingsRepository>();
 		builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
+		builder.Services.AddScoped<AvreenIpgService>();
 	}
 
 	private static void AddUtilitiesSwagger(this WebApplicationBuilder builder) {

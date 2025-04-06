@@ -3,7 +3,7 @@
 [ApiController]
 [Route("api/payment")]
 [Authorize]
-public class PaymentController(IPaymentRepository repository) : BaseApiController {
+public class PaymentController(IPaymentRepository repository, AvreenIpgService service) : BaseApiController {
 	[HttpPost("payNG")]
 	public async Task<ActionResult<GenericResponse<NgHostedResponse>>> PayNg(NgPayDto dto) =>
 		Result(await repository.PayNg(dto));
@@ -19,4 +19,20 @@ public class PaymentController(IPaymentRepository repository) : BaseApiControlle
 	[HttpPost("verifyZibal/{outlet}/{id}")]
 	public async Task<ActionResult<GenericResponse<NgHostedResponse>>> VerifyZibal(string outlet, string id) =>
 		Result(await repository.VerifyZibal(outlet, id));
+	
+	[HttpPost("GetTokenAvreen")]
+	public async Task<ActionResult> GetToken([FromBody] IpgGetTokenParams body) {
+		return Ok(await service.GetTokenAsync(body));
+	}
+
+	[HttpGet("PayAvreen")]
+	public ActionResult Pay([FromQuery] string token) {
+		return Redirect(service.GetPaymentUrl(token));
+	}
+
+	[HttpPost("ConfirmAvreen")]
+	public async Task<ActionResult> Confirm([FromForm] IpgRedirectResult data) {
+		return Ok(await service.ConfirmPaymentAsync(data));
+	}
+	
 }
